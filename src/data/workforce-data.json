@@ -1,0 +1,592 @@
+{
+  "metadata": {
+    "reportingPeriod": "Q2-2025",
+    "generatedDate": "2025-01-15T10:30:00Z",
+    "dataSource": "HRIS System",
+    "lastUpdated": "2025-01-15T08:00:00Z",
+    "currency": "USD",
+    "organization": "University System"
+  },
+  
+  "currentPeriod": {
+    "quarter": "Q2-2025",
+    "startDate": "2025-01-01",
+    "endDate": "2025-03-31",
+    
+    "headcount": {
+      "total": 2847,
+      "faculty": 1234,
+      "staff": 1456,
+      "students": 157,
+      "changeFromPrevious": {
+        "total": 43,
+        "faculty": 18,
+        "staff": 22,
+        "students": 3,
+        "percentChange": 1.5
+      }
+    },
+    
+    "positions": {
+      "total": 2950,
+      "filled": 2847,
+      "vacant": 103,
+      "vacancyRate": 3.5,
+      "changeFromPrevious": {
+        "total": 15,
+        "filled": 43,
+        "vacant": -28,
+        "vacancyRateChange": -0.9
+      }
+    },
+    
+    "locations": [
+      {
+        "name": "Omaha Campus",
+        "total": 2687,
+        "breakdown": {
+          "faculty": 1156,
+          "staff": 1374,
+          "students": 157
+        },
+        "percentOfTotal": 94.4,
+        "changeFromPrevious": 38
+      },
+      {
+        "name": "Phoenix Campus",
+        "total": 160,
+        "breakdown": {
+          "faculty": 78,
+          "staff": 82,
+          "students": 0
+        },
+        "percentOfTotal": 5.6,
+        "changeFromPrevious": 5
+      }
+    ],
+    
+    "topDivisions": [
+      {
+        "name": "Academic Affairs",
+        "headcount": 567,
+        "faculty": 423,
+        "staff": 144,
+        "vacancies": 12,
+        "vacancyRate": 2.1,
+        "changeFromPrevious": 8
+      },
+      {
+        "name": "Student Affairs",
+        "headcount": 234,
+        "faculty": 45,
+        "staff": 189,
+        "vacancies": 6,
+        "vacancyRate": 2.5,
+        "changeFromPrevious": 3
+      },
+      {
+        "name": "Research & Innovation",
+        "headcount": 189,
+        "faculty": 134,
+        "staff": 55,
+        "vacancies": 8,
+        "vacancyRate": 4.1,
+        "changeFromPrevious": 12
+      },
+      {
+        "name": "Information Technology",
+        "headcount": 156,
+        "faculty": 23,
+        "staff": 133,
+        "vacancies": 7,
+        "vacancyRate": 4.3,
+        "changeFromPrevious": -2
+      },
+      {
+        "name": "Finance & Administration",
+        "headcount": 145,
+        "faculty": 12,
+        "staff": 133,
+        "vacancies": 4,
+        "vacancyRate": 2.7,
+        "changeFromPrevious": 1
+      },
+      {
+        "name": "Human Resources",
+        "headcount": 89,
+        "faculty": 8,
+        "staff": 81,
+        "vacancies": 3,
+        "vacancyRate": 3.3,
+        "changeFromPrevious": 2
+      },
+      {
+        "name": "Facilities Management",
+        "headcount": 123,
+        "faculty": 5,
+        "staff": 118,
+        "vacancies": 9,
+        "vacancyRate": 6.8,
+        "changeFromPrevious": -3
+      },
+      {
+        "name": "Marketing & Communications",
+        "headcount": 67,
+        "faculty": 15,
+        "staff": 52,
+        "vacancies": 2,
+        "vacancyRate": 2.9,
+        "changeFromPrevious": 4
+      },
+      {
+        "name": "Library Services",
+        "headcount": 78,
+        "faculty": 34,
+        "staff": 44,
+        "vacancies": 3,
+        "vacancyRate": 3.7,
+        "changeFromPrevious": 1
+      },
+      {
+        "name": "Athletics",
+        "headcount": 92,
+        "faculty": 28,
+        "staff": 64,
+        "vacancies": 5,
+        "vacancyRate": 5.2,
+        "changeFromPrevious": 6
+      }
+    ]
+  },
+  
+  "historicalTrends": [
+    {
+      "quarter": "Q2-2024",
+      "startDate": "2024-01-01",
+      "endDate": "2024-03-31",
+      "headcount": {
+        "total": 2675,
+        "faculty": 1189,
+        "staff": 1342,
+        "students": 144
+      },
+      "positions": {
+        "total": 2890,
+        "filled": 2675,
+        "vacant": 215,
+        "vacancyRate": 7.4
+      },
+      "startersLeavers": {
+        "starters": 89,
+        "leavers": 156,
+        "netChange": -67,
+        "turnoverRate": 5.8
+      }
+    },
+    {
+      "quarter": "Q3-2024",
+      "startDate": "2024-04-01",
+      "endDate": "2024-06-30",
+      "headcount": {
+        "total": 2712,
+        "faculty": 1198,
+        "staff": 1368,
+        "students": 146
+      },
+      "positions": {
+        "total": 2905,
+        "filled": 2712,
+        "vacant": 193,
+        "vacancyRate": 6.6
+      },
+      "startersLeavers": {
+        "starters": 134,
+        "leavers": 97,
+        "netChange": 37,
+        "turnoverRate": 3.6
+      }
+    },
+    {
+      "quarter": "Q4-2024",
+      "startDate": "2024-07-01",
+      "endDate": "2024-09-30",
+      "headcount": {
+        "total": 2756,
+        "faculty": 1208,
+        "staff": 1395,
+        "students": 153
+      },
+      "positions": {
+        "total": 2920,
+        "filled": 2756,
+        "vacant": 164,
+        "vacancyRate": 5.6
+      },
+      "startersLeavers": {
+        "starters": 98,
+        "leavers": 54,
+        "netChange": 44,
+        "turnoverRate": 2.0
+      }
+    },
+    {
+      "quarter": "Q1-2025",
+      "startDate": "2024-10-01",
+      "endDate": "2024-12-31",
+      "headcount": {
+        "total": 2804,
+        "faculty": 1216,
+        "staff": 1434,
+        "students": 154
+      },
+      "positions": {
+        "total": 2935,
+        "filled": 2804,
+        "vacant": 131,
+        "vacancyRate": 4.5
+      },
+      "startersLeavers": {
+        "starters": 112,
+        "leavers": 64,
+        "netChange": 48,
+        "turnoverRate": 2.3
+      }
+    },
+    {
+      "quarter": "Q2-2025",
+      "startDate": "2025-01-01",
+      "endDate": "2025-03-31",
+      "headcount": {
+        "total": 2847,
+        "faculty": 1234,
+        "staff": 1456,
+        "students": 157
+      },
+      "positions": {
+        "total": 2950,
+        "filled": 2847,
+        "vacant": 103,
+        "vacancyRate": 3.5
+      },
+      "startersLeavers": {
+        "starters": 87,
+        "leavers": 44,
+        "netChange": 43,
+        "turnoverRate": 1.5
+      }
+    }
+  ],
+  
+  "startersLeaversDetail": {
+    "monthlyData": [
+      {
+        "month": "2024-01",
+        "starters": 45,
+        "leavers": 67,
+        "netChange": -22,
+        "categories": {
+          "starters": {
+            "faculty": 12,
+            "staff": 31,
+            "students": 2
+          },
+          "leavers": {
+            "faculty": 18,
+            "staff": 44,
+            "students": 5
+          }
+        }
+      },
+      {
+        "month": "2024-02",
+        "starters": 23,
+        "leavers": 45,
+        "netChange": -22,
+        "categories": {
+          "starters": {
+            "faculty": 8,
+            "staff": 14,
+            "students": 1
+          },
+          "leavers": {
+            "faculty": 12,
+            "staff": 31,
+            "students": 2
+          }
+        }
+      },
+      {
+        "month": "2024-03",
+        "starters": 21,
+        "leavers": 44,
+        "netChange": -23,
+        "categories": {
+          "starters": {
+            "faculty": 6,
+            "staff": 13,
+            "students": 2
+          },
+          "leavers": {
+            "faculty": 15,
+            "staff": 27,
+            "students": 2
+          }
+        }
+      },
+      {
+        "month": "2024-04",
+        "starters": 67,
+        "leavers": 34,
+        "netChange": 33,
+        "categories": {
+          "starters": {
+            "faculty": 23,
+            "staff": 42,
+            "students": 2
+          },
+          "leavers": {
+            "faculty": 8,
+            "staff": 24,
+            "students": 2
+          }
+        }
+      },
+      {
+        "month": "2024-05",
+        "starters": 45,
+        "leavers": 32,
+        "netChange": 13,
+        "categories": {
+          "starters": {
+            "faculty": 15,
+            "staff": 29,
+            "students": 1
+          },
+          "leavers": {
+            "faculty": 11,
+            "staff": 20,
+            "students": 1
+          }
+        }
+      },
+      {
+        "month": "2024-06",
+        "starters": 22,
+        "leavers": 31,
+        "netChange": -9,
+        "categories": {
+          "starters": {
+            "faculty": 7,
+            "staff": 14,
+            "students": 1
+          },
+          "leavers": {
+            "faculty": 12,
+            "staff": 18,
+            "students": 1
+          }
+        }
+      },
+      {
+        "month": "2024-07",
+        "starters": 56,
+        "leavers": 23,
+        "netChange": 33,
+        "categories": {
+          "starters": {
+            "faculty": 18,
+            "staff": 36,
+            "students": 2
+          },
+          "leavers": {
+            "faculty": 6,
+            "staff": 16,
+            "students": 1
+          }
+        }
+      },
+      {
+        "month": "2024-08",
+        "starters": 28,
+        "leavers": 19,
+        "netChange": 9,
+        "categories": {
+          "starters": {
+            "faculty": 9,
+            "staff": 18,
+            "students": 1
+          },
+          "leavers": {
+            "faculty": 5,
+            "staff": 13,
+            "students": 1
+          }
+        }
+      },
+      {
+        "month": "2024-09",
+        "starters": 14,
+        "leavers": 12,
+        "netChange": 2,
+        "categories": {
+          "starters": {
+            "faculty": 4,
+            "staff": 9,
+            "students": 1
+          },
+          "leavers": {
+            "faculty": 3,
+            "staff": 8,
+            "students": 1
+          }
+        }
+      },
+      {
+        "month": "2024-10",
+        "starters": 43,
+        "leavers": 25,
+        "netChange": 18,
+        "categories": {
+          "starters": {
+            "faculty": 14,
+            "staff": 28,
+            "students": 1
+          },
+          "leavers": {
+            "faculty": 7,
+            "staff": 17,
+            "students": 1
+          }
+        }
+      },
+      {
+        "month": "2024-11",
+        "starters": 38,
+        "leavers": 22,
+        "netChange": 16,
+        "categories": {
+          "starters": {
+            "faculty": 12,
+            "staff": 25,
+            "students": 1
+          },
+          "leavers": {
+            "faculty": 6,
+            "staff": 15,
+            "students": 1
+          }
+        }
+      },
+      {
+        "month": "2024-12",
+        "starters": 31,
+        "leavers": 17,
+        "netChange": 14,
+        "categories": {
+          "starters": {
+            "faculty": 10,
+            "staff": 20,
+            "students": 1
+          },
+          "leavers": {
+            "faculty": 4,
+            "staff": 12,
+            "students": 1
+          }
+        }
+      },
+      {
+        "month": "2025-01",
+        "starters": 32,
+        "leavers": 15,
+        "netChange": 17,
+        "categories": {
+          "starters": {
+            "faculty": 11,
+            "staff": 20,
+            "students": 1
+          },
+          "leavers": {
+            "faculty": 4,
+            "staff": 10,
+            "students": 1
+          }
+        }
+      },
+      {
+        "month": "2025-02",
+        "starters": 28,
+        "leavers": 14,
+        "netChange": 14,
+        "categories": {
+          "starters": {
+            "faculty": 9,
+            "staff": 18,
+            "students": 1
+          },
+          "leavers": {
+            "faculty": 3,
+            "staff": 10,
+            "students": 1
+          }
+        }
+      },
+      {
+        "month": "2025-03",
+        "starters": 27,
+        "leavers": 15,
+        "netChange": 12,
+        "categories": {
+          "starters": {
+            "faculty": 8,
+            "staff": 18,
+            "students": 1
+          },
+          "leavers": {
+            "faculty": 4,
+            "staff": 10,
+            "students": 1
+          }
+        }
+      }
+    ]
+  },
+  
+  "demographics": {
+    "ageGroups": [
+      { "range": "Under 25", "count": 234, "percentage": 8.2 },
+      { "range": "25-34", "count": 687, "percentage": 24.1 },
+      { "range": "35-44", "count": 856, "percentage": 30.1 },
+      { "range": "45-54", "count": 698, "percentage": 24.5 },
+      { "range": "55-64", "count": 312, "percentage": 11.0 },
+      { "range": "65+", "count": 60, "percentage": 2.1 }
+    ],
+    "tenure": [
+      { "range": "0-1 years", "count": 456, "percentage": 16.0 },
+      { "range": "1-3 years", "count": 623, "percentage": 21.9 },
+      { "range": "3-5 years", "count": 512, "percentage": 18.0 },
+      { "range": "5-10 years", "count": 678, "percentage": 23.8 },
+      { "range": "10-15 years", "count": 367, "percentage": 12.9 },
+      { "range": "15+ years", "count": 211, "percentage": 7.4 }
+    ]
+  },
+  
+  "filters": {
+    "availableQuarters": ["Q2-2024", "Q3-2024", "Q4-2024", "Q1-2025", "Q2-2025"],
+    "availableLocations": ["All", "Omaha Campus", "Phoenix Campus"],
+    "availableEmployeeTypes": ["All", "Faculty", "Staff", "Students"],
+    "availableDivisions": [
+      "All",
+      "Academic Affairs",
+      "Student Affairs", 
+      "Research & Innovation",
+      "Information Technology",
+      "Finance & Administration",
+      "Human Resources",
+      "Facilities Management",
+      "Marketing & Communications",
+      "Library Services",
+      "Athletics"
+    ]
+  }
+} 

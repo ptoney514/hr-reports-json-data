@@ -1,0 +1,517 @@
+{
+  "metadata": {
+    "fiscalYear": "FY2024",
+    "reportingPeriod": "FY2024 YTD (Jul 2023 - Mar 2024)",
+    "generatedDate": "2025-01-15T10:30:00Z",
+    "dataSource": "HRIS Turnover Analytics",
+    "lastUpdated": "2025-01-15T08:00:00Z",
+    "organization": "University System",
+    "benchmarkSource": "CUPA-HR Higher Education Turnover Study"
+  },
+
+  "currentFiscalYear": {
+    "period": "FY2024 YTD",
+    "startDate": "2023-07-01",
+    "endDate": "2024-03-31",
+    
+    "overallTurnover": {
+      "totalDepartures": 287,
+      "averageHeadcount": 2756,
+      "annualizedTurnoverRate": 12.5,
+      "changeFromPreviousYear": -1.8,
+      "quarterlyProgression": [
+        { "quarter": "Q1-FY24", "rate": 14.2 },
+        { "quarter": "Q2-FY24", "rate": 13.8 },
+        { "quarter": "Q3-FY24", "rate": 11.9 },
+        { "quarter": "Q4-FY24", "rate": 10.4 }
+      ]
+    },
+
+    "turnoverByCategory": [
+      {
+        "category": "Faculty",
+        "totalEmployees": 1208,
+        "departures": 89,
+        "turnoverRate": 8.8,
+        "voluntary": 67,
+        "involuntary": 22,
+        "voluntaryRate": 6.6,
+        "involuntaryRate": 2.2,
+        "changeFromPreviousYear": -0.9
+      },
+      {
+        "category": "Staff",
+        "totalEmployees": 1395,
+        "departures": 178,
+        "turnoverRate": 15.3,
+        "voluntary": 142,
+        "involuntary": 36,
+        "voluntaryRate": 12.2,
+        "involuntaryRate": 3.1,
+        "changeFromPreviousYear": -2.1
+      },
+      {
+        "category": "Students",
+        "totalEmployees": 153,
+        "departures": 20,
+        "turnoverRate": 15.7,
+        "voluntary": 18,
+        "involuntary": 2,
+        "voluntaryRate": 14.1,
+        "involuntaryRate": 1.6,
+        "changeFromPreviousYear": -3.2
+      }
+    ],
+
+    "voluntaryTurnoverReasons": [
+      {
+        "reason": "Career Advancement/Better Opportunity",
+        "count": 89,
+        "percentage": 39.2,
+        "facultyCount": 28,
+        "staffCount": 58,
+        "studentCount": 3
+      },
+      {
+        "reason": "Compensation & Benefits",
+        "count": 52,
+        "percentage": 22.9,
+        "facultyCount": 15,
+        "staffCount": 35,
+        "studentCount": 2
+      },
+      {
+        "reason": "Work-Life Balance",
+        "count": 31,
+        "percentage": 13.7,
+        "facultyCount": 12,
+        "staffCount": 17,
+        "studentCount": 2
+      },
+      {
+        "reason": "Relocation/Personal",
+        "count": 24,
+        "percentage": 10.6,
+        "facultyCount": 8,
+        "staffCount": 14,
+        "studentCount": 2
+      },
+      {
+        "reason": "Retirement",
+        "count": 18,
+        "percentage": 7.9,
+        "facultyCount": 3,
+        "staffCount": 15,
+        "studentCount": 0
+      },
+      {
+        "reason": "Education/Return to School",
+        "count": 8,
+        "percentage": 3.5,
+        "facultyCount": 1,
+        "staffCount": 3,
+        "studentCount": 4
+      },
+      {
+        "reason": "Other/Undisclosed",
+        "count": 5,
+        "percentage": 2.2,
+        "facultyCount": 0,
+        "staffCount": 0,
+        "studentCount": 5
+      }
+    ],
+
+    "departuresByTenure": [
+      {
+        "tenureRange": "0-1 years",
+        "departures": 98,
+        "totalInRange": 456,
+        "turnoverRate": 21.5,
+        "percentOfDepartures": 34.1,
+        "voluntary": 82,
+        "involuntary": 16
+      },
+      {
+        "tenureRange": "1-3 years", 
+        "departures": 76,
+        "totalInRange": 623,
+        "turnoverRate": 12.2,
+        "percentOfDepartures": 26.5,
+        "voluntary": 65,
+        "involuntary": 11
+      },
+      {
+        "tenureRange": "3-5 years",
+        "departures": 48,
+        "totalInRange": 512,
+        "turnoverRate": 9.4,
+        "percentOfDepartures": 16.7,
+        "voluntary": 39,
+        "involuntary": 9
+      },
+      {
+        "tenureRange": "5-10 years",
+        "departures": 42,
+        "totalInRange": 678,
+        "turnoverRate": 6.2,
+        "percentOfDepartures": 14.6,
+        "voluntary": 30,
+        "involuntary": 12
+      },
+      {
+        "tenureRange": "10-15 years",
+        "departures": 16,
+        "totalInRange": 367,
+        "turnoverRate": 4.4,
+        "percentOfDepartures": 5.6,
+        "voluntary": 10,
+        "involuntary": 6
+      },
+      {
+        "tenureRange": "15+ years",
+        "departures": 7,
+        "totalInRange": 211,
+        "turnoverRate": 3.3,
+        "percentOfDepartures": 2.4,
+        "voluntary": 1,
+        "involuntary": 6
+      }
+    ],
+
+    "departuresByGrade": [
+      {
+        "grade": "A - Executive/Senior Leadership",
+        "departures": 8,
+        "totalInGrade": 45,
+        "turnoverRate": 17.8,
+        "voluntary": 6,
+        "involuntary": 2,
+        "averageTenure": "8.5 years",
+        "topReasons": ["Career Advancement", "Compensation"]
+      },
+      {
+        "grade": "C - Faculty/Academic",
+        "departures": 89,
+        "totalInGrade": 1208,
+        "turnoverRate": 7.4,
+        "voluntary": 67,
+        "involuntary": 22,
+        "averageTenure": "6.2 years",
+        "topReasons": ["Career Advancement", "Work-Life Balance"]
+      },
+      {
+        "grade": "D - Professional Staff",
+        "departures": 124,
+        "totalInGrade": 892,
+        "turnoverRate": 13.9,
+        "voluntary": 98,
+        "involuntary": 26,
+        "averageTenure": "4.1 years",
+        "topReasons": ["Compensation", "Career Advancement"]
+      },
+      {
+        "grade": "X - Support Staff",
+        "departures": 46,
+        "totalInGrade": 458,
+        "turnoverRate": 10.0,
+        "voluntary": 36,
+        "involuntary": 10,
+        "averageTenure": "5.8 years",
+        "topReasons": ["Work-Life Balance", "Compensation"]
+      },
+      {
+        "grade": "Y - Student Workers",
+        "departures": 20,
+        "totalInGrade": 153,
+        "turnoverRate": 13.1,
+        "voluntary": 18,
+        "involuntary": 2,
+        "averageTenure": "1.2 years",
+        "topReasons": ["Education", "Graduation"]
+      }
+    ]
+  },
+
+  "benchmarkComparison": {
+    "dataSource": "CUPA-HR 2024 Higher Education Workforce Trends",
+    "comparisonPeriod": "FY2023-2024",
+    "institutionType": "Public Research University",
+    
+    "overallComparison": {
+      "ourRate": 12.5,
+      "benchmarkMedian": 14.2,
+      "benchmarkRange": {
+        "25th": 11.8,
+        "75th": 16.9
+      },
+      "performance": "Better than median",
+      "percentile": 35
+    },
+
+    "categoryComparisons": [
+      {
+        "category": "Faculty",
+        "ourRate": 8.8,
+        "benchmarkMedian": 10.1,
+        "performance": "Better than median",
+        "percentile": 28
+      },
+      {
+        "category": "Professional Staff",
+        "ourRate": 13.9,
+        "benchmarkMedian": 15.6,
+        "performance": "Better than median", 
+        "percentile": 32
+      },
+      {
+        "category": "Support Staff",
+        "ourRate": 10.0,
+        "benchmarkMedian": 18.2,
+        "performance": "Significantly better",
+        "percentile": 15
+      }
+    ],
+
+    "regionalComparison": {
+      "region": "Midwest",
+      "ourRate": 12.5,
+      "regionalMedian": 13.8,
+      "performance": "Better than regional median"
+    }
+  },
+
+  "historicalTrends": [
+    {
+      "fiscalYear": "FY2020",
+      "period": "2019-07-01 to 2020-06-30",
+      "overallTurnoverRate": 16.8,
+      "facultyRate": 12.3,
+      "staffRate": 19.2,
+      "voluntaryRate": 13.1,
+      "involuntaryRate": 3.7,
+      "totalDepartures": 421,
+      "context": "COVID-19 Impact Year"
+    },
+    {
+      "fiscalYear": "FY2021", 
+      "period": "2020-07-01 to 2021-06-30",
+      "overallTurnoverRate": 11.2,
+      "facultyRate": 8.9,
+      "staffRate": 12.8,
+      "voluntaryRate": 8.4,
+      "involuntaryRate": 2.8,
+      "totalDepartures": 289,
+      "context": "Reduced hiring/departures"
+    },
+    {
+      "fiscalYear": "FY2022",
+      "period": "2021-07-01 to 2022-06-30", 
+      "overallTurnoverRate": 18.9,
+      "facultyRate": 11.4,
+      "staffRate": 23.1,
+      "voluntaryRate": 15.7,
+      "involuntaryRate": 3.2,
+      "totalDepartures": 467,
+      "context": "Great Resignation Impact"
+    },
+    {
+      "fiscalYear": "FY2023",
+      "period": "2022-07-01 to 2023-06-30",
+      "overallTurnoverRate": 14.3,
+      "facultyRate": 9.7,
+      "staffRate": 17.4,
+      "voluntaryRate": 11.8,
+      "involuntaryRate": 2.5,
+      "totalDepartures": 356,
+      "context": "Market stabilization"
+    },
+    {
+      "fiscalYear": "FY2024",
+      "period": "2023-07-01 to 2024-06-30",
+      "overallTurnoverRate": 12.5,
+      "facultyRate": 8.8,
+      "staffRate": 15.3,
+      "voluntaryRate": 9.8,
+      "involuntaryRate": 2.7,
+      "totalDepartures": 287,
+      "context": "Current period (YTD)"
+    }
+  ],
+
+  "turnoverByDepartment": [
+    {
+      "department": "Information Technology",
+      "totalEmployees": 156,
+      "departures": 28,
+      "turnoverRate": 17.9,
+      "voluntary": 25,
+      "involuntary": 3,
+      "riskLevel": "High",
+      "primaryReasons": ["Compensation", "Career Advancement"],
+      "benchmarkComparison": "Above average",
+      "retentionInitiatives": ["Market adjustment study", "Remote work policy"]
+    },
+    {
+      "department": "Facilities Management",
+      "totalEmployees": 123,
+      "departures": 21,
+      "turnoverRate": 17.1,
+      "voluntary": 18,
+      "involuntary": 3,
+      "riskLevel": "High", 
+      "primaryReasons": ["Work-Life Balance", "Compensation"],
+      "benchmarkComparison": "Above average",
+      "retentionInitiatives": ["Shift flexibility", "Skills training"]
+    },
+    {
+      "department": "Student Affairs",
+      "totalEmployees": 234,
+      "departures": 32,
+      "turnoverRate": 13.7,
+      "voluntary": 27,
+      "involuntary": 5,
+      "riskLevel": "Medium",
+      "primaryReasons": ["Career Advancement", "Work-Life Balance"],
+      "benchmarkComparison": "Average",
+      "retentionInitiatives": ["Professional development", "Wellness programs"]
+    },
+    {
+      "department": "Finance & Administration",
+      "totalEmployees": 145,
+      "departures": 19,
+      "turnoverRate": 13.1,
+      "voluntary": 15,
+      "involuntary": 4,
+      "riskLevel": "Medium",
+      "primaryReasons": ["Compensation", "Career Advancement"],
+      "benchmarkComparison": "Average",
+      "retentionInitiatives": ["Cross-training", "Leadership development"]
+    },
+    {
+      "department": "Research & Innovation",
+      "totalEmployees": 189,
+      "departures": 18,
+      "turnoverRate": 9.5,
+      "voluntary": 14,
+      "involuntary": 4,
+      "riskLevel": "Low",
+      "primaryReasons": ["Career Advancement", "Relocation"],
+      "benchmarkComparison": "Better than average",
+      "retentionInitiatives": ["Research sabbaticals", "Grant writing support"]
+    },
+    {
+      "department": "Academic Affairs",
+      "totalEmployees": 567,
+      "departures": 48,
+      "turnoverRate": 8.5,
+      "voluntary": 38,
+      "involuntary": 10,
+      "riskLevel": "Low",
+      "primaryReasons": ["Retirement", "Career Advancement"],
+      "benchmarkComparison": "Better than average",
+      "retentionInitiatives": ["Tenure track expansion", "Research support"]
+    },
+    {
+      "department": "Marketing & Communications",
+      "totalEmployees": 67,
+      "departures": 5,
+      "turnoverRate": 7.5,
+      "voluntary": 4,
+      "involuntary": 1,
+      "riskLevel": "Low",
+      "primaryReasons": ["Career Advancement"],
+      "benchmarkComparison": "Better than average",
+      "retentionInitiatives": ["Creative project opportunities", "Conference attendance"]
+    },
+    {
+      "department": "Human Resources",
+      "totalEmployees": 89,
+      "departures": 6,
+      "turnoverRate": 6.7,
+      "voluntary": 5,
+      "involuntary": 1,
+      "riskLevel": "Low",
+      "primaryReasons": ["Work-Life Balance"],
+      "benchmarkComparison": "Much better than average",
+      "retentionInitiatives": ["Flexible schedules", "Professional certifications"]
+    },
+    {
+      "department": "Library Services",
+      "totalEmployees": 78,
+      "departures": 4,
+      "turnoverRate": 5.1,
+      "voluntary": 3,
+      "involuntary": 1,
+      "riskLevel": "Low",
+      "primaryReasons": ["Retirement"],
+      "benchmarkComparison": "Much better than average",
+      "retentionInitiatives": ["Technology training", "Collaborative projects"]
+    },
+    {
+      "department": "Athletics",
+      "totalEmployees": 92,
+      "departures": 4,
+      "turnoverRate": 4.3,
+      "voluntary": 3,
+      "involuntary": 1,
+      "riskLevel": "Low",
+      "primaryReasons": ["Career Advancement"],
+      "benchmarkComparison": "Much better than average",
+      "retentionInitiatives": ["Performance bonuses", "Championship incentives"]
+    }
+  ],
+
+  "costAnalysis": {
+    "averageReplacementCost": {
+      "faculty": 45000,
+      "professionalStaff": 28000,
+      "supportStaff": 15000,
+      "studentWorkers": 2500
+    },
+    "totalEstimatedCost": {
+      "FY2024": 6780000,
+      "breakdown": {
+        "facultyCost": 4005000,
+        "professionalStaffCost": 3472000,
+        "supportStaffCost": 690000,
+        "studentWorkerCost": 50000
+      }
+    },
+    "costPerDeparture": 23623,
+    "savingsFromImprovement": {
+      "ifReachedBenchmark": 2340000,
+      "ifReduced2Percent": 1876000
+    }
+  },
+
+  "filters": {
+    "availableFiscalYears": ["FY2020", "FY2021", "FY2022", "FY2023", "FY2024"],
+    "availableCategories": ["All", "Faculty", "Staff", "Students"],
+    "availableGrades": ["All", "A - Executive", "C - Faculty", "D - Professional", "X - Support", "Y - Student"],
+    "availableDepartments": [
+      "All",
+      "Academic Affairs",
+      "Student Affairs",
+      "Research & Innovation", 
+      "Information Technology",
+      "Finance & Administration",
+      "Human Resources",
+      "Facilities Management",
+      "Marketing & Communications",
+      "Library Services",
+      "Athletics"
+    ],
+    "availableTenureRanges": ["All", "0-1 years", "1-3 years", "3-5 years", "5-10 years", "10-15 years", "15+ years"],
+    "availableReasons": [
+      "All",
+      "Career Advancement/Better Opportunity",
+      "Compensation & Benefits", 
+      "Work-Life Balance",
+      "Relocation/Personal",
+      "Retirement",
+      "Education/Return to School",
+      "Other/Undisclosed"
+    ]
+  }
+} 
