@@ -132,7 +132,12 @@ const LocationChart = ({
 
   // Render vertical bar chart
   return (
-    <div className={`bg-white print:bg-white p-4 print:p-2 rounded-lg shadow-sm border print:border-gray ${className}`}>
+    <div 
+      id={`location-chart-${Date.now()}`}
+      data-chart-id="location-chart"
+      data-chart-title={title}
+      className={`bg-white print:bg-white p-4 print:p-2 rounded-lg shadow-sm border print:border-gray ${className}`}
+    >
       <h3 className="text-lg print:text-base font-semibold text-blue-700 print:text-black mb-3 print:mb-2">
         {title}
       </h3>

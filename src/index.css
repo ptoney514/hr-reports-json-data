@@ -1,3 +1,9 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Import print styles */
+@import './styles/print.css';
+
+/* Import accessibility styles */
+@import './styles/accessibility.css';

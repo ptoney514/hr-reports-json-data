@@ -1,27 +1,107 @@
 import React from 'react';
+import { Users, Building2, UserPlus, AlertTriangle, MapPin } from 'lucide-react';
 import DashboardLayout from './DashboardLayout';
-import { useWorkforceData } from '../../hooks/useWorkforceData';
-import SummaryCard from '../ui/SummaryCard';
 import HeadcountChart from '../charts/HeadcountChart';
-import StartersLeaversChart from '../charts/StartersLeaversChart';
 import LocationChart from '../charts/LocationChart';
 import DivisionsChart from '../charts/DivisionsChart';
-import { Users, Building2, TrendingUp, UserPlus, UserMinus, Target, MapPin, Briefcase } from 'lucide-react';
+import StartersLeaversChart from '../charts/StartersLeaversChart';
+import SummaryCard from '../ui/SummaryCard';
+
+// Hardcoded fallback data following I-9 dashboard pattern
+const WORKFORCE_FALLBACK_DATA = {
+  summary: {
+    totalEmployees: 2847,
+    totalPositions: 2950,
+    faculty: 1234,
+    staff: 1456,
+    students: 157,
+    vacancies: 103,
+    vacancyRate: 3.5,
+    employeeChange: 1.5,
+    facultyChange: 1.4,
+    staffChange: 1.5,
+    vacancyRateChange: -0.9
+  },
+  charts: {
+    historicalTrends: [
+      { quarter: 'Q2-2024', total: 2675, faculty: 1189, staff: 1342, students: 144 },
+      { quarter: 'Q3-2024', total: 2712, faculty: 1198, staff: 1368, students: 146 },
+      { quarter: 'Q4-2024', total: 2756, faculty: 1205, staff: 1398, students: 153 },
+      { quarter: 'Q1-2025', total: 2804, faculty: 1216, staff: 1434, students: 154 },
+      { quarter: 'Q2-2025', total: 2847, faculty: 1234, staff: 1456, students: 157 }
+    ],
+    startersLeavers: [
+      { month: 'Oct 2024', starters: 45, leavers: 32, netChange: 13 },
+      { month: 'Nov 2024', starters: 38, leavers: 28, netChange: 10 },
+      { month: 'Dec 2024', starters: 52, leavers: 41, netChange: 11 },
+      { month: 'Jan 2025', starters: 67, leavers: 35, netChange: 32 },
+      { month: 'Feb 2025', starters: 43, leavers: 31, netChange: 12 },
+      { month: 'Mar 2025', starters: 39, leavers: 27, netChange: 12 }
+    ],
+    topDivisions: [
+      { name: 'Academic Affairs', total: 567, faculty: 423, staff: 144, vacancies: 12, vacancyRate: 2.1 },
+      { name: 'Student Affairs', total: 234, faculty: 45, staff: 189, vacancies: 6, vacancyRate: 2.5 },
+      { name: 'Research & Innovation', total: 189, faculty: 134, staff: 55, vacancies: 8, vacancyRate: 4.1 },
+      { name: 'Information Technology', total: 156, faculty: 23, staff: 133, vacancies: 7, vacancyRate: 4.3 },
+      { name: 'Finance & Administration', total: 145, faculty: 12, staff: 133, vacancies: 4, vacancyRate: 2.7 },
+      { name: 'Human Resources', total: 89, faculty: 8, staff: 81, vacancies: 3, vacancyRate: 3.3 },
+      { name: 'Facilities Management', total: 123, faculty: 5, staff: 118, vacancies: 9, vacancyRate: 6.8 },
+      { name: 'Marketing & Communications', total: 67, faculty: 15, staff: 52, vacancies: 2, vacancyRate: 2.9 },
+      { name: 'Library Services', total: 78, faculty: 34, staff: 44, vacancies: 3, vacancyRate: 3.7 },
+      { name: 'Athletics', total: 92, faculty: 28, staff: 64, vacancies: 5, vacancyRate: 5.2 }
+    ],
+    locationDistribution: [
+      { name: 'Omaha Campus', total: 2687, faculty: 1156, staff: 1374, students: 157, percentage: 94.4 },
+      { name: 'Phoenix Campus', total: 160, faculty: 78, staff: 82, students: 0, percentage: 5.6 }
+    ]
+  },
+  metrics: {
+    recentHires: {
+      faculty: 23,
+      staff: 34,
+      students: 12
+    },
+    demographics: {
+      averageTenure: '8.2',
+      averageAge: '42',
+      genderRatio: '52/48',
+      diversityIndex: '34'
+    },
+    campuses: {
+      omaha: {
+        percentage: 94.4,
+        employees: 2687
+      },
+      phoenix: {
+        percentage: 5.6,
+        employees: 160
+      },
+      growthRate: 2.1
+    }
+  }
+};
 
 const WorkforceDashboard = () => {
-  const { 
-    data, 
-    loading, 
-    error, 
-    filters,
-    refreshData 
-  } = useWorkforceData();
+  // Use hardcoded data directly - following I-9 dashboard pattern
+  const data = WORKFORCE_FALLBACK_DATA;
+  const filters = { reportingPeriod: 'Q2-2025' };
 
   // Handle export functionality
   const handleExport = (type, context) => {
     console.log('Exporting workforce dashboard:', type, context);
-    // Implementation will be added later for actual export functionality
   };
+
+  // Defensive check - ensure data is available
+  if (!data || !data.summary || !data.charts || !data.metrics) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading workforce data...</p>
+        </div>
+      </div>
+    );
+  }
 
   // Available filters for this dashboard
   const availableFilters = {
@@ -74,54 +154,54 @@ const WorkforceDashboard = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 print:gap-2 mb-6 print:mb-4">
         <SummaryCard
           title="Total Employees"
-          value={data?.summary?.totalEmployees?.toLocaleString() || '0'}
-          change={data?.summary?.employeeChange}
+          value={data.summary.totalEmployees.toLocaleString()}
+          change={data.summary.employeeChange}
           changeType="percentage"
-          subtitle={`${data?.summary?.totalPositions?.toLocaleString() || '0'} total positions`}
+          subtitle={`${data.summary.totalPositions.toLocaleString()} total positions`}
           icon={Users}
           trend="positive"
         />
         
         <SummaryCard
           title="Faculty"
-          value={data?.summary?.faculty?.toLocaleString() || '0'}
-          change={data?.summary?.facultyChange}
+          value={data.summary.faculty.toLocaleString()}
+          change={data.summary.facultyChange}
           changeType="percentage"
-          subtitle={`${((data?.summary?.faculty / data?.summary?.totalEmployees) * 100 || 0).toFixed(1)}% of workforce`}
-          icon={Briefcase}
+          subtitle={`${((data.summary.faculty / data.summary.totalEmployees) * 100).toFixed(1)}% of workforce`}
+          icon={Users}
         />
         
         <SummaryCard
           title="Staff"
-          value={data?.summary?.staff?.toLocaleString() || '0'}
-          change={data?.summary?.staffChange}
+          value={data.summary.staff.toLocaleString()}
+          change={data.summary.staffChange}
           changeType="percentage"
-          subtitle={`${((data?.summary?.staff / data?.summary?.totalEmployees) * 100 || 0).toFixed(1)}% of workforce`}
+          subtitle={`${((data.summary.staff / data.summary.totalEmployees) * 100).toFixed(1)}% of workforce`}
           icon={Building2}
         />
         
         <SummaryCard
           title="Vacancy Rate"
-          value={`${data?.summary?.vacancyRate?.toFixed(1) || '0.0'}%`}
-          change={data?.summary?.vacancyRateChange}
+          value={`${data.summary.vacancyRate.toFixed(1)}%`}
+          change={data.summary.vacancyRateChange}
           changeType="percentage"
-          subtitle={`${data?.summary?.vacancies?.toLocaleString() || '0'} open positions`}
-          icon={Target}
-          trend={data?.summary?.vacancyRateChange > 0 ? 'negative' : 'positive'}
+          subtitle={`${data.summary.vacancies.toLocaleString()} open positions`}
+          icon={AlertTriangle}
+          trend={data.summary.vacancyRateChange > 0 ? 'negative' : 'positive'}
         />
       </div>
 
       {/* Charts Row 1: Historical Trends */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 print:gap-2 mb-6 print:mb-4">
         <HeadcountChart
-          data={data?.charts?.historicalTrends || []}
+          data={data.charts.historicalTrends}
           title="5-Quarter Headcount Trend"
           height={320}
           showLegend={true}
         />
         
         <StartersLeaversChart
-          data={data?.charts?.startersLeavers || []}
+          data={data.charts.startersLeavers}
           title="Monthly Hiring Activity"
           height={320}
           showLegend={true}
@@ -132,7 +212,7 @@ const WorkforceDashboard = () => {
       {/* Charts Row 2: Distribution Analysis */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 print:gap-2 mb-6 print:mb-4">
         <DivisionsChart
-          data={data?.charts?.topDivisions || []}
+          data={data.charts.topDivisions}
           title="Top 10 Divisions by Headcount"
           height={400}
           maxItems={10}
@@ -142,12 +222,12 @@ const WorkforceDashboard = () => {
         />
         
         <LocationChart
-          data={data?.charts?.locationDistribution || []}
+          data={data.charts.locationDistribution}
           title="Employee Distribution by Campus"
           height={400}
-          layout="vertical"
-          stacked={true}
           showLegend={true}
+          showLabels={true}
+          showPercentages={true}
         />
       </div>
 
@@ -164,7 +244,7 @@ const WorkforceDashboard = () => {
                 <span className="text-sm font-medium">New Faculty</span>
               </div>
               <span className="text-lg font-bold text-green-600 print:text-black">
-                {data?.metrics?.recentHires?.faculty || 0}
+                {data.metrics.recentHires.faculty}
               </span>
             </div>
             <div className="flex items-center justify-between">
@@ -173,7 +253,7 @@ const WorkforceDashboard = () => {
                 <span className="text-sm font-medium">New Staff</span>
               </div>
               <span className="text-lg font-bold text-blue-600 print:text-black">
-                {data?.metrics?.recentHires?.staff || 0}
+                {data.metrics.recentHires.staff}
               </span>
             </div>
             <div className="flex items-center justify-between">
@@ -182,7 +262,7 @@ const WorkforceDashboard = () => {
                 <span className="text-sm font-medium">New Students</span>
               </div>
               <span className="text-lg font-bold text-purple-600 print:text-black">
-                {data?.metrics?.recentHires?.students || 0}
+                {data.metrics.recentHires.students}
               </span>
             </div>
           </div>
@@ -196,25 +276,25 @@ const WorkforceDashboard = () => {
             <div className="flex justify-between items-center">
               <span className="text-sm text-gray-600 print:text-black">Average Tenure</span>
               <span className="font-semibold print:text-black">
-                {data?.metrics?.demographics?.averageTenure || '0'} years
+                {data.metrics.demographics.averageTenure} years
               </span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-sm text-gray-600 print:text-black">Avg Age</span>
               <span className="font-semibold print:text-black">
-                {data?.metrics?.demographics?.averageAge || '0'} years
+                {data.metrics.demographics.averageAge} years
               </span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-sm text-gray-600 print:text-black">Gender Ratio (F/M)</span>
               <span className="font-semibold print:text-black">
-                {data?.metrics?.demographics?.genderRatio || '50/50'}
+                {data.metrics.demographics.genderRatio}
               </span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-sm text-gray-600 print:text-black">Diversity Index</span>
               <span className="font-semibold print:text-black">
-                {data?.metrics?.demographics?.diversityIndex || '0'}%
+                {data.metrics.demographics.diversityIndex}%
               </span>
             </div>
           </div>
@@ -231,11 +311,11 @@ const WorkforceDashboard = () => {
                 <div className="flex justify-between">
                   <span className="text-sm font-medium">Omaha Campus</span>
                   <span className="text-sm font-bold print:text-black">
-                    {data?.metrics?.campuses?.omaha?.percentage || '0'}%
+                    {data.metrics.campuses.omaha.percentage}%
                   </span>
                 </div>
                 <div className="text-xs text-gray-500 print:text-black">
-                  {data?.metrics?.campuses?.omaha?.employees?.toLocaleString() || '0'} employees
+                  {data.metrics.campuses.omaha.employees.toLocaleString()} employees
                 </div>
               </div>
             </div>
@@ -245,18 +325,18 @@ const WorkforceDashboard = () => {
                 <div className="flex justify-between">
                   <span className="text-sm font-medium">Phoenix Campus</span>
                   <span className="text-sm font-bold print:text-black">
-                    {data?.metrics?.campuses?.phoenix?.percentage || '0'}%
+                    {data.metrics.campuses.phoenix.percentage}%
                   </span>
                 </div>
                 <div className="text-xs text-gray-500 print:text-black">
-                  {data?.metrics?.campuses?.phoenix?.employees?.toLocaleString() || '0'} employees
+                  {data.metrics.campuses.phoenix.employees.toLocaleString()} employees
                 </div>
               </div>
             </div>
             <div className="pt-2 border-t">
               <div className="text-xs text-gray-500 print:text-black">
                 Growth Rate: <span className="font-semibold text-green-600 print:text-black">
-                  +{data?.metrics?.campuses?.growthRate || '0'}%
+                  +{data.metrics.campuses.growthRate}%
                 </span> YoY
               </div>
             </div>
@@ -271,16 +351,16 @@ const WorkforceDashboard = () => {
         </h2>
         <div className="space-y-4 print:space-y-2 text-sm print:text-xs">
           <p className="text-gray-700 print:text-black">
-            <strong>Current Workforce Status:</strong> Creighton University maintains a total workforce of {data?.summary?.totalEmployees?.toLocaleString() || '2,847'} employees across {data?.summary?.totalPositions?.toLocaleString() || '2,950'} authorized positions in {filters.reportingPeriod || 'Q2 2025'}. The current vacancy rate of {data?.summary?.vacancyRate?.toFixed(1) || '3.5'}% reflects {data?.summary?.vacancies || '103'} open positions, indicating healthy organizational capacity for strategic growth.
+            <strong>Current Workforce Status:</strong> Creighton University maintains a total workforce of {data.summary.totalEmployees.toLocaleString()} employees across {data.summary.totalPositions.toLocaleString()} authorized positions in {filters?.reportingPeriod || 'Q2 2025'}. The current vacancy rate of {data.summary.vacancyRate.toFixed(1)}% reflects {data.summary.vacancies.toLocaleString()} open positions, indicating healthy organizational capacity for strategic growth.
           </p>
           <p className="text-gray-700 print:text-black">
-            <strong>Workforce Composition:</strong> Faculty represents {((data?.summary?.faculty / data?.summary?.totalEmployees) * 100 || 43.4).toFixed(1)}% of our workforce ({data?.summary?.faculty?.toLocaleString() || '1,234'} employees), while staff comprises {((data?.summary?.staff / data?.summary?.totalEmployees) * 100 || 51.2).toFixed(1)}% ({data?.summary?.staff?.toLocaleString() || '1,456'} employees). Student workers contribute {((data?.summary?.students / data?.summary?.totalEmployees) * 100 || 5.5).toFixed(1)}% ({data?.summary?.students?.toLocaleString() || '157'} employees), supporting both academic and operational functions.
+            <strong>Workforce Composition:</strong> Faculty represents {((data.summary.faculty / data.summary.totalEmployees) * 100).toFixed(1)}% of our workforce ({data.summary.faculty.toLocaleString()} employees), while staff comprises {((data.summary.staff / data.summary.totalEmployees) * 100).toFixed(1)}% ({data.summary.staff.toLocaleString()} employees). Student workers contribute {((data.summary.students / data.summary.totalEmployees) * 100).toFixed(1)}% ({data.summary.students.toLocaleString()} employees), supporting both academic and operational functions.
           </p>
           <p className="text-gray-700 print:text-black">
-            <strong>Geographic Distribution:</strong> The Omaha Campus hosts {data?.metrics?.campuses?.omaha?.percentage || '94.4'}% of our workforce ({data?.metrics?.campuses?.omaha?.employees?.toLocaleString() || '2,687'} employees), while the Phoenix Campus represents {data?.metrics?.campuses?.phoenix?.percentage || '5.6'}% ({data?.metrics?.campuses?.phoenix?.employees?.toLocaleString() || '160'} employees). This distribution aligns with our strategic campus development and program expansion initiatives.
+            <strong>Geographic Distribution:</strong> The Omaha Campus hosts {data.metrics.campuses.omaha.percentage}% of our workforce ({data.metrics.campuses.omaha.employees.toLocaleString()} employees), while the Phoenix Campus represents {data.metrics.campuses.phoenix.percentage}% ({data.metrics.campuses.phoenix.employees.toLocaleString()} employees). This distribution aligns with our strategic campus development and program expansion initiatives.
           </p>
           <p className="text-gray-700 print:text-black">
-            <strong>Strategic Outlook:</strong> Recent hiring trends show positive momentum with {data?.metrics?.recentHires?.faculty + data?.metrics?.recentHires?.staff + data?.metrics?.recentHires?.students || '45'} new hires in the last 30 days. Academic Affairs continues to be our largest division with {data?.charts?.topDivisions?.[0]?.total?.toLocaleString() || '567'} employees, followed by Student Affairs and Research & Innovation. Our workforce growth rate of +{data?.metrics?.campuses?.growthRate || '2.1'}% year-over-year demonstrates sustainable organizational expansion aligned with institutional goals.
+            <strong>Strategic Outlook:</strong> Recent hiring trends show positive momentum with {(data.metrics.recentHires.faculty + data.metrics.recentHires.staff + data.metrics.recentHires.students).toLocaleString()} new hires in the last 30 days. Academic Affairs continues to be our largest division with {data.charts.topDivisions[0].total.toLocaleString()} employees, followed by Student Affairs and Research & Innovation. Our workforce growth rate of +{data.metrics.campuses.growthRate}% year-over-year demonstrates sustainable organizational expansion aligned with institutional goals.
           </p>
         </div>
       </div>

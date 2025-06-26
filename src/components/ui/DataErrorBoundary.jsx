@@ -3,7 +3,6 @@ import {
   Database, 
   AlertTriangle, 
   RefreshCw, 
-  FileX, 
   CheckCircle,
   XCircle,
   Info
@@ -118,7 +117,12 @@ class DataErrorBoundary extends React.Component {
   validateDataStructure = () => {
     const { expectedSchema, data } = this.props;
     
-    if (!expectedSchema || !data) return;
+    // Skip validation if no schema is provided or schema is empty
+    if (!expectedSchema || !data || 
+        ((!expectedSchema.required || expectedSchema.required.length === 0) &&
+        (!expectedSchema.properties || Object.keys(expectedSchema.properties).length === 0))) {
+      return;
+    }
 
     const schemaValidation = this.performSchemaValidation(data, expectedSchema);
     

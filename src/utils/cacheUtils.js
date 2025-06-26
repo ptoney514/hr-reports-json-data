@@ -383,6 +383,20 @@ export class DataCache {
     return results;
   }
 
+  has(key, options = {}) {
+    const fullKey = this.generateKey(key, options.params);
+    
+    // Check memory cache first
+    const memoryEntry = memoryCache.get(fullKey);
+    if (memoryEntry && !memoryEntry.isExpired()) {
+      return true;
+    }
+    
+    // Check localStorage
+    const localResult = localStorage_operations.get(fullKey);
+    return localResult !== null;
+  }
+
   async clear(pattern) {
     if (pattern) {
       // Clear specific pattern

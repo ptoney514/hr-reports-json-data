@@ -65,14 +65,14 @@ const useTurnoverData = (customFilters = {}) => {
 
   // Filter turnover data based on active filters
   const filterData = useCallback((data, filters) => {
-    if (!data) return null;
+    if (!data || !data.currentFiscalYear) return null;
 
     let filteredData = { ...data };
 
     // Filter by fiscal year (historical data)
     if (filters.fiscalYear && filters.fiscalYear !== 'FY2024') {
-      const historicalData = data.historicalTrends.find(
-        trend => trend.fiscalYear === filters.fiscalYear
+      const historicalData = (data.historicalTrends || []).find(
+        trend => trend?.fiscalYear === filters.fiscalYear
       );
       
       if (historicalData) {
@@ -94,21 +94,21 @@ const useTurnoverData = (customFilters = {}) => {
       const employeeType = filters.employeeTypeFilter;
       
       // Filter turnover by category
-      filteredData.currentFiscalYear.turnoverByCategory = data.currentFiscalYear.turnoverByCategory.filter(
-        category => category.category === employeeType
+      filteredData.currentFiscalYear.turnoverByCategory = (data.currentFiscalYear?.turnoverByCategory || []).filter(
+        category => category?.category === employeeType
       );
 
       // Filter voluntary reasons by employee type
-      filteredData.currentFiscalYear.voluntaryTurnoverReasons = data.currentFiscalYear.voluntaryTurnoverReasons.map(
+      filteredData.currentFiscalYear.voluntaryTurnoverReasons = (data.currentFiscalYear?.voluntaryTurnoverReasons || []).map(
         reason => {
           const typeKey = `${employeeType.toLowerCase()}Count`;
           return {
             ...reason,
-            count: reason[typeKey] || 0,
-            percentage: reason[typeKey] ? (reason[typeKey] / reason.count * 100) : 0
+            count: reason?.[typeKey] || 0,
+            percentage: reason?.[typeKey] ? (reason[typeKey] / (reason.count || 1) * 100) : 0
           };
         }
-      ).filter(reason => reason.count > 0);
+      ).filter(reason => (reason?.count || 0) > 0);
     }
 
     // Filter by grade
@@ -123,29 +123,29 @@ const useTurnoverData = (customFilters = {}) => {
       
       const targetGrade = gradeMapping[filters.gradeFilter] || filters.gradeFilter;
       
-      filteredData.currentFiscalYear.departuresByGrade = data.currentFiscalYear.departuresByGrade.filter(
-        grade => grade.grade === targetGrade
+      filteredData.currentFiscalYear.departuresByGrade = (data.currentFiscalYear?.departuresByGrade || []).filter(
+        grade => grade?.grade === targetGrade
       );
     }
 
     // Filter by tenure range
     if (filters.tenureFilter && filters.tenureFilter !== 'All') {
-      filteredData.currentFiscalYear.departuresByTenure = data.currentFiscalYear.departuresByTenure.filter(
-        tenure => tenure.tenureRange === filters.tenureFilter
+      filteredData.currentFiscalYear.departuresByTenure = (data.currentFiscalYear?.departuresByTenure || []).filter(
+        tenure => tenure?.tenureRange === filters.tenureFilter
       );
     }
 
     // Filter by department
     if (filters.departmentFilter && filters.departmentFilter !== 'All') {
-      filteredData.turnoverByDepartment = data.turnoverByDepartment.filter(
-        dept => dept.department === filters.departmentFilter
+      filteredData.turnoverByDepartment = (data.turnoverByDepartment || []).filter(
+        dept => dept?.department === filters.departmentFilter
       );
     }
 
     // Filter by reason
     if (filters.reasonFilter && filters.reasonFilter !== 'All') {
-      filteredData.currentFiscalYear.voluntaryTurnoverReasons = data.currentFiscalYear.voluntaryTurnoverReasons.filter(
-        reason => reason.reason === filters.reasonFilter
+      filteredData.currentFiscalYear.voluntaryTurnoverReasons = (data.currentFiscalYear?.voluntaryTurnoverReasons || []).filter(
+        reason => reason?.reason === filters.reasonFilter
       );
     }
 
@@ -154,107 +154,107 @@ const useTurnoverData = (customFilters = {}) => {
 
   // Format data for easy consumption by components
   const formatDataForComponents = useCallback((data) => {
-    if (!data) return null;
+    if (!data || !data.currentFiscalYear || !data.historicalTrends) return null;
 
     return {
       // Summary metrics
       summary: {
-        overallTurnoverRate: data.currentFiscalYear.overallTurnover.annualizedTurnoverRate,
-        totalDepartures: data.currentFiscalYear.overallTurnover.totalDepartures,
-        voluntaryRate: data.currentFiscalYear.turnoverByCategory.reduce((sum, cat) => 
-          sum + cat.voluntaryRate, 0) / data.currentFiscalYear.turnoverByCategory.length,
-        involuntaryRate: data.currentFiscalYear.turnoverByCategory.reduce((sum, cat) => 
-          sum + cat.involuntaryRate, 0) / data.currentFiscalYear.turnoverByCategory.length,
-        changeFromPrevious: data.currentFiscalYear.overallTurnover.changeFromPreviousYear,
-        benchmarkComparison: data.benchmarkComparison.overallComparison.performance
+        overallTurnoverRate: data.currentFiscalYear?.overallTurnover?.annualizedTurnoverRate || 0,
+        totalDepartures: data.currentFiscalYear?.overallTurnover?.totalDepartures || 0,
+        voluntaryRate: (data.currentFiscalYear?.turnoverByCategory || []).reduce((sum, cat) => 
+          sum + (cat?.voluntaryRate || 0), 0) / Math.max((data.currentFiscalYear?.turnoverByCategory || []).length, 1),
+        involuntaryRate: (data.currentFiscalYear?.turnoverByCategory || []).reduce((sum, cat) => 
+          sum + (cat?.involuntaryRate || 0), 0) / Math.max((data.currentFiscalYear?.turnoverByCategory || []).length, 1),
+        changeFromPrevious: data.currentFiscalYear?.overallTurnover?.changeFromPreviousYear || 0,
+        benchmarkComparison: data.benchmarkComparison?.overallComparison?.performance || 'unknown'
       },
 
       // Chart data
       charts: {
         // Turnover by category for bar chart
-        categoryData: data.currentFiscalYear.turnoverByCategory.map(cat => ({
-          category: cat.category,
-          turnoverRate: cat.turnoverRate,
-          voluntary: cat.voluntary,
-          involuntary: cat.involuntary,
-          voluntaryRate: cat.voluntaryRate,
-          involuntaryRate: cat.involuntaryRate,
-          change: cat.changeFromPreviousYear
+        categoryData: (data.currentFiscalYear?.turnoverByCategory || []).map(cat => ({
+          category: cat?.category || '',
+          turnoverRate: cat?.turnoverRate || 0,
+          voluntary: cat?.voluntary || 0,
+          involuntary: cat?.involuntary || 0,
+          voluntaryRate: cat?.voluntaryRate || 0,
+          involuntaryRate: cat?.involuntaryRate || 0,
+          change: cat?.changeFromPreviousYear || 0
         })),
 
         // Voluntary reasons for pie chart
-        reasonsData: data.currentFiscalYear.voluntaryTurnoverReasons.map(reason => ({
-          reason: reason.reason.replace('/', ' /'),
-          count: reason.count,
-          percentage: reason.percentage,
-          faculty: reason.facultyCount,
-          staff: reason.staffCount,
-          students: reason.studentCount
+        reasonsData: (data.currentFiscalYear?.voluntaryTurnoverReasons || []).map(reason => ({
+          reason: (reason?.reason || '').replace('/', ' /'),
+          count: reason?.count || 0,
+          percentage: reason?.percentage || 0,
+          faculty: reason?.facultyCount || 0,
+          staff: reason?.staffCount || 0,
+          students: reason?.studentCount || 0
         })),
 
         // Tenure breakdown for bar chart
-        tenureData: data.currentFiscalYear.departuresByTenure.map(tenure => ({
-          tenure: tenure.tenureRange,
-          departures: tenure.departures,
-          total: tenure.totalInRange,
-          turnoverRate: tenure.turnoverRate,
-          voluntary: tenure.voluntary,
-          involuntary: tenure.involuntary,
-          percentage: tenure.percentOfDepartures
+        tenureData: (data.currentFiscalYear?.departuresByTenure || []).map(tenure => ({
+          tenure: tenure?.tenureRange || '',
+          departures: tenure?.departures || 0,
+          total: tenure?.totalInRange || 0,
+          turnoverRate: tenure?.turnoverRate || 0,
+          voluntary: tenure?.voluntary || 0,
+          involuntary: tenure?.involuntary || 0,
+          percentage: tenure?.percentOfDepartures || 0
         })),
 
         // Grade breakdown for horizontal bar chart
-        gradeData: data.currentFiscalYear.departuresByGrade.map(grade => ({
-          grade: grade.grade.split(' - ')[1] || grade.grade,
-          fullGrade: grade.grade,
-          departures: grade.departures,
-          total: grade.totalInGrade,
-          turnoverRate: grade.turnoverRate,
-          voluntary: grade.voluntary,
-          involuntary: grade.involuntary,
-          averageTenure: grade.averageTenure,
-          topReasons: grade.topReasons
+        gradeData: (data.currentFiscalYear?.departuresByGrade || []).map(grade => ({
+          grade: (grade?.grade || '').split(' - ')[1] || grade?.grade || '',
+          fullGrade: grade?.grade || '',
+          departures: grade?.departures || 0,
+          total: grade?.totalInGrade || 0,
+          turnoverRate: grade?.turnoverRate || 0,
+          voluntary: grade?.voluntary || 0,
+          involuntary: grade?.involuntary || 0,
+          averageTenure: grade?.averageTenure || 0,
+          topReasons: grade?.topReasons || []
         })),
 
         // Historical trends for line chart
-        trendsData: data.historicalTrends.map(trend => ({
-          year: trend.fiscalYear,
-          overall: trend.overallTurnoverRate,
-          faculty: trend.facultyRate,
-          staff: trend.staffRate,
-          voluntary: trend.voluntaryRate,
-          involuntary: trend.involuntaryRate,
-          context: trend.context
+        trendsData: (data.historicalTrends || []).map(trend => ({
+          year: trend?.fiscalYear || '',
+          overall: trend?.overallTurnoverRate || 0,
+          faculty: trend?.facultyRate || 0,
+          staff: trend?.staffRate || 0,
+          voluntary: trend?.voluntaryRate || 0,
+          involuntary: trend?.involuntaryRate || 0,
+          context: trend?.context || ''
         })),
 
         // Department risk analysis
-        departmentRiskData: data.turnoverByDepartment.map(dept => ({
-          department: dept.department,
-          turnoverRate: dept.turnoverRate,
-          departures: dept.departures,
-          total: dept.totalEmployees,
-          riskLevel: dept.riskLevel,
-          voluntary: dept.voluntary,
-          involuntary: dept.involuntary,
-          primaryReasons: dept.primaryReasons,
-          benchmarkComparison: dept.benchmarkComparison,
-          initiatives: dept.retentionInitiatives
+        departmentRiskData: (data.turnoverByDepartment || []).map(dept => ({
+          department: dept?.department || '',
+          turnoverRate: dept?.turnoverRate || 0,
+          departures: dept?.departures || 0,
+          total: dept?.totalEmployees || 0,
+          riskLevel: dept?.riskLevel || 'Low',
+          voluntary: dept?.voluntary || 0,
+          involuntary: dept?.involuntary || 0,
+          primaryReasons: dept?.primaryReasons || [],
+          benchmarkComparison: dept?.benchmarkComparison || {},
+          initiatives: dept?.retentionInitiatives || []
         }))
       },
 
       // Benchmark data
       benchmarks: {
-        overall: data.benchmarkComparison.overallComparison,
-        categories: data.benchmarkComparison.categoryComparisons,
-        regional: data.benchmarkComparison.regionalComparison
+        overall: data.benchmarkComparison?.overallComparison || {},
+        categories: data.benchmarkComparison?.categoryComparisons || [],
+        regional: data.benchmarkComparison?.regionalComparison || {}
       },
 
       // Cost analysis
       costs: {
-        totalCost: data.costAnalysis.totalEstimatedCost.FY2024,
-        costPerDeparture: data.costAnalysis.costPerDeparture,
-        breakdown: data.costAnalysis.totalEstimatedCost.breakdown,
-        savings: data.costAnalysis.savingsFromImprovement
+        totalCost: data.costAnalysis?.totalEstimatedCost?.FY2024 || 0,
+        costPerDeparture: data.costAnalysis?.costPerDeparture || 0,
+        breakdown: data.costAnalysis?.totalEstimatedCost?.breakdown || {},
+        savings: data.costAnalysis?.savingsFromImprovement || 0
       },
 
       // Raw data for advanced filtering
@@ -268,7 +268,7 @@ const useTurnoverData = (customFilters = {}) => {
 
     const fetchData = async () => {
       try {
-        const rawData = await loadData();
+        await loadData();
         if (isMounted) {
           actions.updateDataTimestamp();
         }
@@ -289,7 +289,7 @@ const useTurnoverData = (customFilters = {}) => {
   const filteredData = useMemo(() => {
     if (!dataCache) return null;
     return filterData(dataCache, activeFilters);
-  }, [dataCache, activeFilters, filterData]);
+  }, [activeFilters, filterData]);
 
   const formattedData = useMemo(() => {
     return formatDataForComponents(filteredData);
@@ -383,4 +383,5 @@ const useTurnoverData = (customFilters = {}) => {
   };
 };
 
-export default useTurnoverData; 
+export default useTurnoverData;
+export { useTurnoverData }; 

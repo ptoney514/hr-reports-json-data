@@ -1,13 +1,6 @@
 import React, { memo } from 'react';
-// Optimized imports for better tree-shaking
-import { LineChart } from 'recharts/lib/chart/LineChart';
-import { Line } from 'recharts/lib/cartesian/Line';
-import { XAxis } from 'recharts/lib/cartesian/XAxis';
-import { YAxis } from 'recharts/lib/cartesian/YAxis';
-import { CartesianGrid } from 'recharts/lib/cartesian/CartesianGrid';
-import { Tooltip } from 'recharts/lib/component/Tooltip';
-import { Legend } from 'recharts/lib/component/Legend';
-import { ResponsiveContainer } from 'recharts/lib/component/ResponsiveContainer';
+// Standard recharts imports
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { AlertCircle } from 'lucide-react';
 
 const StartersLeaversChart = memo(({ 
@@ -81,7 +74,12 @@ const StartersLeaversChart = memo(({
   };
 
   return (
-    <div className={`bg-white print:bg-white p-4 print:p-2 rounded-lg shadow-sm border print:border-gray ${className}`}>
+    <div 
+      id={`starters-leavers-chart-${Date.now()}`}
+      data-chart-id="starters-leavers-chart"
+      data-chart-title={title}
+      className={`bg-white print:bg-white p-4 print:p-2 rounded-lg shadow-sm border print:border-gray ${className}`}
+    >
       <h3 className="text-lg print:text-base font-semibold text-blue-700 print:text-black mb-3 print:mb-2">
         {title}
       </h3>

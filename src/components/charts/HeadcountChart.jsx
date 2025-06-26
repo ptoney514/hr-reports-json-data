@@ -1,15 +1,9 @@
-import React, { memo, useMemo } from 'react';
-// Optimized imports for better tree-shaking
-import { BarChart } from 'recharts/lib/chart/BarChart';
-import { Bar } from 'recharts/lib/cartesian/Bar';
-import { XAxis } from 'recharts/lib/cartesian/XAxis';
-import { YAxis } from 'recharts/lib/cartesian/YAxis';
-import { CartesianGrid } from 'recharts/lib/cartesian/CartesianGrid';
-import { Tooltip } from 'recharts/lib/component/Tooltip';
-import { Legend } from 'recharts/lib/component/Legend';
-import { ResponsiveContainer } from 'recharts/lib/component/ResponsiveContainer';
+import React, { memo, useMemo, useState, useRef, useEffect, useCallback } from 'react';
+// Standard recharts imports
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { AlertCircle } from 'lucide-react';
 import ChartErrorBoundary from '../ui/ChartErrorBoundary';
+import { generateChartAriaLabel, generateChartAriaDescription, handleChartKeyNavigation, announceToScreenReader } from '../../utils/accessibilityUtils';
 
 const HeadcountChart = memo(({ 
   data = [], 
@@ -18,8 +12,89 @@ const HeadcountChart = memo(({
   showLegend = true,
   className = ""
 }) => {
+  // Accessibility state
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [isKeyboardFocused, setIsKeyboardFocused] = useState(false);
+  const chartRef = useRef(null);
+  
   // Consistent color palette
   const colors = ['#4f46e5', '#0891b2', '#059669', '#d97706', '#dc2626', '#7c3aed'];
+
+  // Memoize data keys calculation for performance (moved before early return)
+  const dataKeys = useMemo(() => {
+    return data && data.length > 0 ? Object.keys(data[0]).filter(key => 
+      key !== 'period' && key !== 'quarter' && key !== 'month' && key !== 'name'
+    ) : [];
+  }, [data]);
+
+  // Get x-axis key
+  const xAxisKey = useMemo(() => {
+    return data.length > 0 ? (
+      data[0].period ? 'period' : 
+      data[0].quarter ? 'quarter' : 
+      data[0].month ? 'month' : 
+      data[0].name ? 'name' : 
+      Object.keys(data[0])[0]
+    ) : 'period';
+  }, [data]);
+
+  // Generate accessibility attributes
+  const ariaLabel = useMemo(() => generateChartAriaLabel('bar', data, title), [data, title]);
+  const ariaDescription = useMemo(() => generateChartAriaDescription(data, 'bar'), [data]);
+
+  // Keyboard navigation handler
+  const handleKeyDown = useCallback((event) => {
+    if (!isKeyboardFocused) return;
+    
+    handleChartKeyNavigation(event, data, selectedIndex, (newIndex) => {
+      setSelectedIndex(newIndex);
+      // Announce the selected data point
+      const item = data[newIndex];
+      if (item) {
+        const period = item[xAxisKey];
+        const values = dataKeys.map(key => `${key}: ${item[key]?.toLocaleString() || 0}`).join(', ');
+        announceToScreenReader(`${period}, ${values}`);
+      }
+    });
+  }, [isKeyboardFocused, data, selectedIndex, dataKeys, xAxisKey]);
+
+  // Focus handlers
+  const handleFocus = useCallback(() => {
+    setIsKeyboardFocused(true);
+    announceToScreenReader(`Focused on ${title}. ${ariaDescription}`);
+  }, [title, ariaDescription]);
+
+  const handleBlur = useCallback(() => {
+    setIsKeyboardFocused(false);
+  }, []);
+
+  // Effect to set up keyboard listeners
+  useEffect(() => {
+    const chartElement = chartRef.current;
+    if (chartElement) {
+      chartElement.addEventListener('keydown', handleKeyDown);
+      return () => {
+        chartElement.removeEventListener('keydown', handleKeyDown);
+      };
+    }
+  }, [handleKeyDown]);
+
+  // Custom tooltip formatter
+  const CustomTooltip = useCallback(({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
+          <p className="font-semibold text-gray-900 mb-2">{label}</p>
+          {payload.map((entry, index) => (
+            <p key={index} className="text-sm" style={{ color: entry.color }}>
+              {`${entry.dataKey}: ${entry.value.toLocaleString()}`}
+            </p>
+          ))}
+        </div>
+      );
+    }
+    return null;
+  }, []);
 
   // Error handling for missing or invalid data
   if (!data || data.length === 0) {
@@ -36,39 +111,6 @@ const HeadcountChart = memo(({
     );
   }
 
-  // Memoize data keys calculation for performance
-  const dataKeys = useMemo(() => {
-    return data.length > 0 ? Object.keys(data[0]).filter(key => 
-      key !== 'period' && key !== 'quarter' && key !== 'month' && key !== 'name'
-    ) : [];
-  }, [data]);
-
-  // Custom tooltip formatter
-  const CustomTooltip = ({ active, payload, label }) => {
-    if (active && payload && payload.length) {
-      return (
-        <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
-          <p className="font-semibold text-gray-900 mb-2">{label}</p>
-          {payload.map((entry, index) => (
-            <p key={index} className="text-sm" style={{ color: entry.color }}>
-              {`${entry.dataKey}: ${entry.value.toLocaleString()}`}
-            </p>
-          ))}
-        </div>
-      );
-    }
-    return null;
-  };
-
-  // Get x-axis key
-  const xAxisKey = data.length > 0 ? (
-    data[0].period ? 'period' : 
-    data[0].quarter ? 'quarter' : 
-    data[0].month ? 'month' : 
-    data[0].name ? 'name' : 
-    Object.keys(data[0])[0]
-  ) : 'period';
-
   return (
     <ChartErrorBoundary
       chartType="Bar Chart"
@@ -77,10 +119,43 @@ const HeadcountChart = memo(({
       className={className}
       onRetry={() => window.location.reload()}
     >
-      <div className={`bg-white print:bg-white p-4 print:p-2 rounded-lg shadow-sm border print:border-gray ${className}`}>
+      <div 
+        ref={chartRef}
+        id={`headcount-chart-${Date.now()}`}
+        data-chart-id="headcount-chart"
+        data-chart-title={title}
+        className={`bg-white print:bg-white p-4 print:p-2 rounded-lg shadow-sm border print:border-gray chart-focusable ${className}`}
+        role="img"
+        aria-label={ariaLabel}
+        aria-describedby={`headcount-chart-desc-${Date.now()}`}
+        tabIndex={0}
+        onFocus={handleFocus}
+        onBlur={handleBlur}
+      >
         <h3 className="text-lg print:text-base font-semibold text-blue-700 print:text-black mb-3 print:mb-2">
           {title}
         </h3>
+        
+        {/* Hidden description for screen readers */}
+        <div 
+          id={`headcount-chart-desc-${Date.now()}`}
+          className="sr-only"
+        >
+          {ariaDescription}
+          {isKeyboardFocused && data.length > 0 && (
+            <span>
+              Currently focused on data point {selectedIndex + 1} of {data.length}. 
+              {data[selectedIndex] && (
+                <span>
+                  {data[selectedIndex][xAxisKey]}: 
+                  {dataKeys.map(key => 
+                    ` ${key} ${data[selectedIndex][key]?.toLocaleString() || 0}`
+                  ).join(',')}
+                </span>
+              )}
+            </span>
+          )}
+        </div>
         <ResponsiveContainer width="100%" height={height} className="print:h-48">
           <BarChart 
             data={data} 

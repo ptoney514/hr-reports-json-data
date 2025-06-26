@@ -1,0 +1,652 @@
+/**
+ * Print Styles for TrioReports Dashboard
+ * Optimized for Letter/A4 size printing with professional layout
+ */
+
+/* ===== PRINT MEDIA QUERY ===== */
+@media print {
+  
+  /* ===== PAGE SETUP ===== */
+  @page {
+    size: A4;
+    margin: 0.75in 0.5in 1in 0.5in; /* top, right, bottom, left */
+    
+    /* Print Header */
+    @top-left {
+      content: "University System HR Analytics";
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+      font-size: 10pt;
+      font-weight: bold;
+      color: #1e40af;
+    }
+    
+    @top-right {
+      content: "Generated: " date();
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+      font-size: 9pt;
+      color: #6b7280;
+    }
+    
+    /* Print Footer */
+    @bottom-left {
+      content: "Confidential - University HR Data";
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+      font-size: 8pt;
+      color: #6b7280;
+    }
+    
+    @bottom-right {
+      content: "Page " counter(page) " of " counter(pages);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+      font-size: 9pt;
+      color: #6b7280;
+    }
+  }
+
+  /* ===== GLOBAL PRINT STYLES ===== */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  html {
+    font-size: 12pt;
+    line-height: 1.4;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+    font-size: 12pt;
+    line-height: 1.4;
+    color: #000 !important;
+    background: white !important;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* ===== HIDE INTERACTIVE ELEMENTS ===== */
+  .no-print,
+  button:not(.print-show),
+  .btn:not(.print-show),
+  input[type="button"]:not(.print-show),
+  input[type="submit"]:not(.print-show),
+  input[type="reset"]:not(.print-show),
+  select:not(.print-show),
+  textarea:not(.print-show),
+  input[type="text"]:not(.print-show),
+  input[type="email"]:not(.print-show),
+  input[type="password"]:not(.print-show),
+  .dropdown:not(.print-show),
+  .modal:not(.print-show),
+  .tooltip:not(.print-show),
+  .popover:not(.print-show),
+  nav:not(.print-show),
+  .navigation:not(.print-show),
+  .sidebar:not(.print-show),
+  .filter-controls:not(.print-show),
+  .export-button:not(.print-show),
+  .interactive-element:not(.print-show),
+  .hover-element:not(.print-show),
+  .cursor-pointer:not(.print-show) {
+    display: none !important;
+    visibility: hidden !important;
+  }
+
+  /* ===== LAYOUT OPTIMIZATION ===== */
+  .container,
+  .max-w-7xl,
+  .max-w-6xl,
+  .max-w-5xl,
+  .max-w-4xl {
+    max-width: none !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .p-4, .p-6, .p-8 {
+    padding: 8pt !important;
+  }
+
+  .m-4, .m-6, .m-8 {
+    margin: 8pt !important;
+  }
+
+  .gap-4, .gap-6, .gap-8 {
+    gap: 8pt !important;
+  }
+
+  /* ===== DASHBOARD SPECIFIC STYLES ===== */
+  .dashboard-container {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .dashboard-header {
+    background: white !important;
+    border-bottom: 2pt solid #1e40af !important;
+    padding: 12pt 0 !important;
+    margin-bottom: 16pt !important;
+    page-break-after: avoid !important;
+  }
+
+  .dashboard-title {
+    font-size: 18pt !important;
+    font-weight: bold !important;
+    color: #1e40af !important;
+    margin: 0 !important;
+    text-align: center !important;
+  }
+
+  .dashboard-subtitle {
+    font-size: 12pt !important;
+    color: #6b7280 !important;
+    text-align: center !important;
+    margin: 4pt 0 0 0 !important;
+  }
+
+  /* ===== FILTER SUMMARY STYLES ===== */
+  .print-filters {
+    display: block !important;
+    background: #f8fafc !important;
+    border: 1pt solid #e5e7eb !important;
+    padding: 8pt !important;
+    margin: 8pt 0 16pt 0 !important;
+    page-break-inside: avoid !important;
+  }
+
+  .print-filters h3 {
+    font-size: 12pt !important;
+    font-weight: bold !important;
+    color: #374151 !important;
+    margin: 0 0 6pt 0 !important;
+  }
+
+  .print-filters ul {
+    margin: 0 !important;
+    padding-left: 12pt !important;
+    list-style-type: disc !important;
+  }
+
+  .print-filters li {
+    font-size: 10pt !important;
+    color: #6b7280 !important;
+    margin: 2pt 0 !important;
+  }
+
+  /* ===== GRID LAYOUTS ===== */
+  .grid {
+    display: block !important;
+  }
+
+  .grid-cols-1,
+  .grid-cols-2,
+  .grid-cols-3,
+  .grid-cols-4,
+  .lg\\:grid-cols-2,
+  .lg\\:grid-cols-3,
+  .lg\\:grid-cols-4,
+  .md\\:grid-cols-2,
+  .md\\:grid-cols-3 {
+    display: block !important;
+  }
+
+  .grid > * {
+    width: 100% !important;
+    margin-bottom: 12pt !important;
+    page-break-inside: avoid !important;
+  }
+
+  /* ===== SUMMARY CARDS ===== */
+  .summary-card,
+  .metric-card,
+  .stat-card {
+    background: white !important;
+    border: 1pt solid #e5e7eb !important;
+    padding: 8pt !important;
+    margin: 4pt 0 !important;
+    page-break-inside: avoid !important;
+    display: inline-block !important;
+    width: 48% !important;
+    vertical-align: top !important;
+  }
+
+  .summary-card:nth-child(odd) {
+    margin-right: 4% !important;
+  }
+
+  .summary-card h3,
+  .metric-card h3,
+  .stat-card h3 {
+    font-size: 10pt !important;
+    font-weight: bold !important;
+    color: #374151 !important;
+    margin: 0 0 4pt 0 !important;
+  }
+
+  .summary-card .value,
+  .metric-card .value,
+  .stat-card .value {
+    font-size: 16pt !important;
+    font-weight: bold !important;
+    color: #1e40af !important;
+    margin: 0 !important;
+  }
+
+  .summary-card .change,
+  .metric-card .change,
+  .stat-card .change {
+    font-size: 9pt !important;
+    margin: 2pt 0 0 0 !important;
+  }
+
+  /* ===== CHART CONTAINERS ===== */
+  .chart-container,
+  .recharts-wrapper,
+  .chart-component {
+    background: white !important;
+    border: 1pt solid #e5e7eb !important;
+    padding: 8pt !important;
+    margin: 8pt 0 16pt 0 !important;
+    page-break-inside: avoid !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 200pt !important;
+  }
+
+  .chart-title {
+    font-size: 12pt !important;
+    font-weight: bold !important;
+    color: #374151 !important;
+    margin: 0 0 8pt 0 !important;
+    text-align: center !important;
+  }
+
+  /* ===== RECHARTS SPECIFIC STYLES ===== */
+  .recharts-wrapper {
+    background: white !important;
+  }
+
+  .recharts-surface {
+    background: white !important;
+  }
+
+  .recharts-cartesian-grid line {
+    stroke: #e5e7eb !important;
+    stroke-width: 0.5pt !important;
+  }
+
+  .recharts-text {
+    font-size: 9pt !important;
+    fill: #374151 !important;
+  }
+
+  .recharts-legend-item-text {
+    font-size: 9pt !important;
+    fill: #374151 !important;
+  }
+
+  .recharts-tooltip-wrapper {
+    display: none !important;
+  }
+
+  /* ===== DATA TABLES ===== */
+  .data-table,
+  table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    margin: 8pt 0 16pt 0 !important;
+    page-break-inside: auto !important;
+  }
+
+  .data-table th,
+  table th {
+    background: #f8fafc !important;
+    border: 1pt solid #e5e7eb !important;
+    padding: 6pt !important;
+    font-size: 10pt !important;
+    font-weight: bold !important;
+    color: #374151 !important;
+    text-align: left !important;
+  }
+
+  .data-table td,
+  table td {
+    border: 1pt solid #e5e7eb !important;
+    padding: 6pt !important;
+    font-size: 10pt !important;
+    color: #374151 !important;
+  }
+
+  .data-table tr:nth-child(even),
+  table tr:nth-child(even) {
+    background: #f9fafb !important;
+  }
+
+  /* ===== PAGE BREAKS ===== */
+  .page-break-before {
+    page-break-before: always !important;
+  }
+
+  .page-break-after {
+    page-break-after: always !important;
+  }
+
+  .page-break-inside-avoid {
+    page-break-inside: avoid !important;
+  }
+
+  .dashboard-section {
+    page-break-inside: avoid !important;
+    margin-bottom: 16pt !important;
+  }
+
+  .dashboard-section:not(:last-child) {
+    page-break-after: avoid !important;
+  }
+
+  .dashboard-section.break-after {
+    page-break-after: always !important;
+  }
+
+  /* ===== SECTION HEADERS ===== */
+  .section-header,
+  .section-title {
+    font-size: 14pt !important;
+    font-weight: bold !important;
+    color: #1e40af !important;
+    margin: 16pt 0 8pt 0 !important;
+    page-break-after: avoid !important;
+    border-bottom: 1pt solid #e5e7eb !important;
+    padding-bottom: 4pt !important;
+  }
+
+  .section-header:first-child,
+  .section-title:first-child {
+    margin-top: 0 !important;
+  }
+
+  /* ===== TYPOGRAPHY ===== */
+  h1 {
+    font-size: 18pt !important;
+    font-weight: bold !important;
+    color: #1e40af !important;
+    margin: 0 0 12pt 0 !important;
+    page-break-after: avoid !important;
+  }
+
+  h2 {
+    font-size: 16pt !important;
+    font-weight: bold !important;
+    color: #374151 !important;
+    margin: 16pt 0 8pt 0 !important;
+    page-break-after: avoid !important;
+  }
+
+  h3 {
+    font-size: 14pt !important;
+    font-weight: bold !important;
+    color: #374151 !important;
+    margin: 12pt 0 6pt 0 !important;
+    page-break-after: avoid !important;
+  }
+
+  h4 {
+    font-size: 12pt !important;
+    font-weight: bold !important;
+    color: #374151 !important;
+    margin: 8pt 0 4pt 0 !important;
+    page-break-after: avoid !important;
+  }
+
+  p {
+    font-size: 11pt !important;
+    line-height: 1.4 !important;
+    color: #374151 !important;
+    margin: 4pt 0 !important;
+  }
+
+  /* ===== COLORS FOR PRINT ===== */
+  .text-blue-600,
+  .text-blue-700 {
+    color: #1e40af !important;
+  }
+
+  .text-green-600,
+  .text-green-700 {
+    color: #059669 !important;
+  }
+
+  .text-orange-600,
+  .text-orange-700 {
+    color: #d97706 !important;
+  }
+
+  .text-gray-600,
+  .text-gray-700,
+  .text-gray-800,
+  .text-gray-900 {
+    color: #374151 !important;
+  }
+
+  .text-red-600,
+  .text-red-700 {
+    color: #dc2626 !important;
+  }
+
+  .bg-blue-50,
+  .bg-blue-100 {
+    background: #eff6ff !important;
+  }
+
+  .bg-green-50,
+  .bg-green-100 {
+    background: #f0fdf4 !important;
+  }
+
+  .bg-orange-50,
+  .bg-orange-100 {
+    background: #fffbeb !important;
+  }
+
+  .bg-gray-50,
+  .bg-gray-100 {
+    background: #f9fafb !important;
+  }
+
+  /* ===== BORDERS ===== */
+  .border {
+    border: 1pt solid #e5e7eb !important;
+  }
+
+  .border-t {
+    border-top: 1pt solid #e5e7eb !important;
+  }
+
+  .border-b {
+    border-bottom: 1pt solid #e5e7eb !important;
+  }
+
+  .border-l {
+    border-left: 1pt solid #e5e7eb !important;
+  }
+
+  .border-r {
+    border-right: 1pt solid #e5e7eb !important;
+  }
+
+  /* ===== SHADOWS (REMOVE FOR PRINT) ===== */
+  .shadow,
+  .shadow-sm,
+  .shadow-md,
+  .shadow-lg,
+  .shadow-xl {
+    box-shadow: none !important;
+  }
+
+  /* ===== ROUNDED CORNERS (MINIMAL FOR PRINT) ===== */
+  .rounded,
+  .rounded-sm,
+  .rounded-md,
+  .rounded-lg,
+  .rounded-xl {
+    border-radius: 2pt !important;
+  }
+
+  /* ===== PRINT-SPECIFIC UTILITIES ===== */
+  .print-only {
+    display: block !important;
+    visibility: visible !important;
+  }
+
+  .print-inline {
+    display: inline !important;
+    visibility: visible !important;
+  }
+
+  .print-inline-block {
+    display: inline-block !important;
+    visibility: visible !important;
+  }
+
+  /* ===== FLEXBOX ADJUSTMENTS ===== */
+  .flex {
+    display: block !important;
+  }
+
+  .flex > * {
+    display: block !important;
+    width: 100% !important;
+    margin-bottom: 4pt !important;
+  }
+
+  .flex.print-flex {
+    display: flex !important;
+  }
+
+  .flex.print-flex > * {
+    display: block !important;
+    width: auto !important;
+    margin-bottom: 0 !important;
+  }
+
+  /* ===== PRINT HEADER/FOOTER CONTENT ===== */
+  .print-header {
+    display: block !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    height: 40pt !important;
+    background: white !important;
+    border-bottom: 2pt solid #1e40af !important;
+    padding: 8pt !important;
+    z-index: 9999 !important;
+  }
+
+  .print-footer {
+    display: block !important;
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    height: 30pt !important;
+    background: white !important;
+    border-top: 1pt solid #e5e7eb !important;
+    padding: 6pt 8pt !important;
+    font-size: 9pt !important;
+    color: #6b7280 !important;
+    z-index: 9999 !important;
+  }
+
+  /* ===== CHART PRINT OPTIMIZATION ===== */
+  .recharts-responsive-container {
+    width: 100% !important;
+    height: 250pt !important;
+  }
+
+  .recharts-wrapper svg {
+    background: white !important;
+  }
+
+  /* Force chart backgrounds to white */
+  .recharts-bar,
+  .recharts-area,
+  .recharts-line {
+    opacity: 1 !important;
+  }
+
+  /* ===== ACCESSIBILITY FOR PRINT ===== */
+  .sr-only {
+    position: static !important;
+    width: auto !important;
+    height: auto !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: visible !important;
+    clip: auto !important;
+    white-space: normal !important;
+  }
+
+  /* ===== PRINT QUALITY OPTIMIZATION ===== */
+  img {
+    max-width: 100% !important;
+    height: auto !important;
+    page-break-inside: avoid !important;
+  }
+
+  canvas {
+    max-width: 100% !important;
+    height: auto !important;
+    page-break-inside: avoid !important;
+  }
+
+  /* ===== FORCE PRINT STYLES ===== */
+  * {
+    background-attachment: scroll !important;
+  }
+
+  /* ===== PRINT-SPECIFIC LAYOUT HELPERS ===== */
+  .print-two-column {
+    display: block !important;
+    width: 48% !important;
+    float: left !important;
+    margin-right: 4% !important;
+  }
+
+  .print-two-column:nth-child(even) {
+    margin-right: 0 !important;
+  }
+
+  .print-full-width {
+    width: 100% !important;
+    clear: both !important;
+  }
+
+  .print-clear {
+    clear: both !important;
+  }
+
+  /* ===== END PRINT STYLES ===== */
+}
+
+/* ===== PRINT PREVIEW STYLES (for screen) ===== */
+@media screen {
+  .print-preview {
+    background: #f5f5f5;
+    padding: 20px;
+  }
+
+  .print-preview .page {
+    background: white;
+    width: 8.5in;
+    min-height: 11in;
+    margin: 0 auto 20px auto;
+    padding: 0.75in 0.5in 1in 0.5in;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    page-break-after: always;
+  }
+} 
