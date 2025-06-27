@@ -8,7 +8,8 @@ import {
   ChevronDown, 
   Home,
   Menu,
-  X
+  X,
+  Database
 } from 'lucide-react';
 
 const Navigation = () => {
@@ -27,6 +28,13 @@ const Navigation = () => {
       path: '/dashboards',
       icon: Home,
       isActive: isActive('/dashboards')
+    },
+    {
+      id: 'excel-integration',
+      label: 'Excel Integration',
+      path: '/excel-integration',
+      icon: Database,
+      isActive: isActive('/excel-integration')
     },
     {
       id: 'hr-analytics',

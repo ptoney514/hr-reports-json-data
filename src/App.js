@@ -17,6 +17,7 @@ const ExportTestComponent = lazy(() => import('./components/ExportTestComponent'
 const PrintTestComponent = lazy(() => import('./components/PrintTestComponent'));
 const AccessibilityTestComponent = lazy(() => import('./components/AccessibilityTestComponent'));
 const DatabaseTestComponent = lazy(() => import('./components/DatabaseTestComponent'));
+const ExcelIntegrationDashboard = lazy(() => import('./components/ExcelIntegrationDashboard'));
 const RecruitingDashboard = lazy(() => import('./components/dashboards/RecruitingDashboard'));
 const ExitSurveyDashboard = lazy(() => import('./components/dashboards/ExitSurveyDashboard'));
 const CombinedWorkforceDashboard = lazy(() => import('./components/dashboards/CombinedWorkforceDashboard'));
@@ -87,6 +88,9 @@ function App() {
               <Route path="/test/print" element={<PrintTestComponent />} />
               <Route path="/test/accessibility" element={<AccessibilityTestComponent />} />
               <Route path="/test/database" element={<DatabaseTestComponent />} />
+              
+              {/* Excel Integration Route */}
+              <Route path="/excel-integration" element={<ExcelIntegrationDashboard />} />
               
               {/* Legacy route for existing I9 dashboard */}
               <Route path="/i9" element={<I9HealthDashboard />} />
