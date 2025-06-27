@@ -1,24 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   CheckCircle, 
   XCircle, 
-  AlertTriangle, 
   Play, 
   RefreshCw,
   Monitor,
-  Smartphone,
-  Tablet,
-  Wifi,
-  WifiOff,
   Database,
-  BarChart3,
-  Filter
+  BarChart3
 } from 'lucide-react';
 
 const TestSuite = () => {
   const [testResults, setTestResults] = useState({});
-  const [currentTest, setCurrentTest] = useState(null);
   const [isRunning, setIsRunning] = useState(false);
 
   const testCategories = [
@@ -78,11 +71,21 @@ const TestSuite = () => {
         { id: 'loading-states', name: 'Loading States', scenario: 'loading' },
         { id: 'invalid-filters', name: 'Invalid Filter Values', scenario: 'invalid-filters' }
       ]
+    },
+    {
+      id: 'database-integration',
+      name: 'Database Integration',
+      description: 'Test lowdb database functionality',
+      tests: [
+        { id: 'database-init', name: 'Database Initialization', component: 'DatabaseTest' },
+        { id: 'data-crud', name: 'Data CRUD Operations', component: 'DatabaseTest' },
+        { id: 'data-validation', name: 'Data Validation', component: 'DatabaseTest' },
+        { id: 'backup-restore', name: 'Backup & Restore', component: 'DatabaseTest' }
+      ]
     }
   ];
 
   const runTest = async (categoryId, testId) => {
-    setCurrentTest(`${categoryId}-${testId}`);
     setTestResults(prev => ({
       ...prev,
       [`${categoryId}-${testId}`]: { status: 'running', details: 'Test in progress...' }
@@ -117,65 +120,10 @@ const TestSuite = () => {
       }
     }
 
-    setCurrentTest(null);
     setIsRunning(false);
   };
 
-  const getStatusIcon = (status) => {
-    switch (status) {
-      case 'passed':
-        return <CheckCircle className="text-green-500" size={16} />;
-      case 'failed':
-        return <XCircle className="text-red-500" size={16} />;
-      case 'running':
-        return <RefreshCw className="text-blue-500 animate-spin" size={16} />;
-      default:
-        return <div className="w-4 h-4 border-2 border-gray-300 rounded-full" />;
-    }
-  };
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'passed':
-        return 'bg-green-50 border-green-200';
-      case 'failed':
-        return 'bg-red-50 border-red-200';
-      case 'running':
-        return 'bg-blue-50 border-blue-200';
-      default:
-        return 'bg-gray-50 border-gray-200';
-    }
-  };
-
-  const getViewportIcon = (viewport) => {
-    switch (viewport) {
-      case 'mobile':
-        return <Smartphone size={16} />;
-      case 'tablet':
-        return <Tablet size={16} />;
-      case 'desktop':
-        return <Monitor size={16} />;
-      default:
-        return <BarChart3 size={16} />;
-    }
-  };
-
-  const getCategoryIcon = (categoryId) => {
-    switch (categoryId) {
-      case 'visual-accuracy':
-        return <Monitor className="text-blue-600" size={20} />;
-      case 'filter-functionality':
-        return <Filter className="text-green-600" size={20} />;
-      case 'responsive-design':
-        return <Smartphone className="text-purple-600" size={20} />;
-      case 'chart-rendering':
-        return <BarChart3 className="text-orange-600" size={20} />;
-      case 'error-states':
-        return <AlertTriangle className="text-red-600" size={20} />;
-      default:
-        return <CheckCircle className="text-gray-600" size={20} />;
-    }
-  };
 
   const getTotalTests = () => testCategories.reduce((sum, cat) => sum + cat.tests.length, 0);
   const getPassedTests = () => Object.values(testResults).filter(r => r.status === 'passed').length;

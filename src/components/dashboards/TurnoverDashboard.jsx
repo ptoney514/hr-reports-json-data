@@ -7,12 +7,10 @@ import StartersLeaversChart from '../charts/StartersLeaversChart';
 import { 
   TrendingDown, 
   DollarSign, 
-  AlertTriangle, 
   BookOpen,
   Building2,
   Award,
-  Clock,
-  BarChart3
+  AlertTriangle
 } from 'lucide-react';
 
 // Fallback data to ensure the dashboard always works

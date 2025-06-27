@@ -58,6 +58,30 @@ const Navigation = () => {
           icon: FileBarChart,
           description: 'Immigration compliance tracking',
           isActive: isActive('/dashboards/i9')
+        },
+        {
+          id: 'recruiting',
+          label: 'Recruiting & Retention Analytics',
+          path: '/dashboards/recruiting',
+          icon: BarChart3,
+          description: 'Open positions, pipeline, and hiring trends',
+          isActive: isActive('/dashboards/recruiting')
+        },
+        {
+          id: 'exit-survey',
+          label: 'Exit Survey Insights',
+          path: '/dashboards/exit-survey',
+          icon: TrendingDown,
+          description: 'Exit survey results and key insights',
+          isActive: isActive('/dashboards/exit-survey')
+        },
+        {
+          id: 'combined-workforce',
+          label: 'Combined Workforce Analytics',
+          path: '/dashboards/combined-workforce',
+          icon: Users,
+          description: 'Comprehensive workforce and turnover analysis',
+          isActive: isActive('/dashboards/combined-workforce')
         }
       ]
     }

@@ -16,6 +16,10 @@ const ErrorTestComponent = lazy(() => import('./components/ErrorTestComponent'))
 const ExportTestComponent = lazy(() => import('./components/ExportTestComponent'));
 const PrintTestComponent = lazy(() => import('./components/PrintTestComponent'));
 const AccessibilityTestComponent = lazy(() => import('./components/AccessibilityTestComponent'));
+const DatabaseTestComponent = lazy(() => import('./components/DatabaseTestComponent'));
+const RecruitingDashboard = lazy(() => import('./components/dashboards/RecruitingDashboard'));
+const ExitSurveyDashboard = lazy(() => import('./components/dashboards/ExitSurveyDashboard'));
+const CombinedWorkforceDashboard = lazy(() => import('./components/dashboards/CombinedWorkforceDashboard'));
 
 function App() {
   // Initialize global error handling
@@ -72,6 +76,9 @@ function App() {
               <Route path="/dashboards/workforce" element={<WorkforceDashboard />} />
               <Route path="/dashboards/turnover" element={<TurnoverDashboard />} />
               <Route path="/dashboards/i9" element={<I9HealthDashboard />} />
+              <Route path="/dashboards/recruiting" element={<RecruitingDashboard />} />
+              <Route path="/dashboards/exit-survey" element={<ExitSurveyDashboard />} />
+              <Route path="/dashboards/combined-workforce" element={<CombinedWorkforceDashboard />} />
               
               {/* Test Suite Routes */}
               <Route path="/test" element={<TestSuite />} />
@@ -79,6 +86,7 @@ function App() {
               <Route path="/test/export" element={<ExportTestComponent />} />
               <Route path="/test/print" element={<PrintTestComponent />} />
               <Route path="/test/accessibility" element={<AccessibilityTestComponent />} />
+              <Route path="/test/database" element={<DatabaseTestComponent />} />
               
               {/* Legacy route for existing I9 dashboard */}
               <Route path="/i9" element={<I9HealthDashboard />} />

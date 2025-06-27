@@ -352,3 +352,24 @@ npx serve -s build
 - I-9 Dashboard: http://localhost:3000/dashboards/i9
 - Test Suite: http://localhost:3000/test
 - Error Testing: http://localhost:3000/test/errors 
+
+## Filter Rendering Bug Regression Test (2024-06)
+
+### Background
+A bug was discovered where objects (such as dateRange filters) were being rendered directly in the DashboardLayout filter summary, causing a React error: `Objects are not valid as a React child`. This was fixed by ensuring only string/number values or the `.label` property of objects are rendered.
+
+### How to Test
+1. **Navigate to all dashboards:**
+   - Workforce Dashboard
+   - Turnover Dashboard
+   - I-9 Dashboard
+2. **Apply various filters, including date ranges and dropdowns.**
+3. **Print preview** each dashboard to ensure the "Applied Filters" section renders all filter values as readable text (not `[object Object]`).
+4. **Check for errors:**
+   - No React errors should appear in the UI or browser console.
+   - All filter values should be human-readable.
+5. **Regression:**
+   - Repeat for all dashboards and test routes (including `/test/export`, `/test/print`, `/test/accessibility`).
+
+### Developer Note
+If you add new filters or change filter structures, always ensure that any object filter values have a `.label` property for display, or update the DashboardLayout print filter rendering logic to handle them safely. 
