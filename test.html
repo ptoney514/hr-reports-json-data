@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hello World - Test Page</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .hero {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            text-align: center;
+            position: relative;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="rgba(255,255,255,0.1)"><animate attributeName="opacity" values="0;1;0" dur="3s" repeatCount="indefinite"/></circle><circle cx="80" cy="30" r="1.5" fill="rgba(255,255,255,0.1)"><animate attributeName="opacity" values="0;1;0" dur="2s" repeatCount="indefinite" begin="1s"/></circle><circle cx="40" cy="70" r="1" fill="rgba(255,255,255,0.1)"><animate attributeName="opacity" values="0;1;0" dur="4s" repeatCount="indefinite" begin="2s"/></circle></svg>') repeat;
+            animation: float 20s infinite linear;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            100% { transform: translateY(-100px); }
+        }
+
+        .hello-world-container {
+            position: relative;
+            z-index: 2;
+        }
+
+        .hello-world-text {
+            font-size: 4rem;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            margin-bottom: 2rem;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 2s ease-out forwards;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animated-image {
+            width: 300px;
+            height: 300px;
+            margin: 2rem auto;
+            position: relative;
+            animation: bounce 3s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0) scale(1);
+            }
+            40% {
+                transform: translateY(-20px) scale(1.05);
+            }
+            60% {
+                transform: translateY(-10px) scale(1.02);
+            }
+        }
+
+        .hello-world-image {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #ffeaa7);
+            background-size: 400% 400%;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            animation: gradientShift 4s ease infinite, pulse 2s ease-in-out infinite alternate;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            border: 3px solid rgba(255,255,255,0.3);
+        }
+
+        @keyframes gradientShift {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 10px 30px rgba(0,0,0,0.3), 0 0 0 0 rgba(255,255,255,0.4);
+            }
+            100% {
+                box-shadow: 0 15px 40px rgba(0,0,0,0.4), 0 0 0 20px rgba(255,255,255,0);
+            }
+        }
+
+        .subtitle {
+            color: rgba(255,255,255,0.9);
+            font-size: 1.2rem;
+            margin-top: 1rem;
+            opacity: 0;
+            animation: fadeIn 3s ease-out 1s forwards;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+
+        .sparkles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .sparkle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: white;
+            border-radius: 50%;
+            animation: sparkle 2s linear infinite;
+        }
+
+        .sparkle:nth-child(1) { top: 20%; left: 20%; animation-delay: 0s; }
+        .sparkle:nth-child(2) { top: 30%; right: 25%; animation-delay: 0.5s; }
+        .sparkle:nth-child(3) { bottom: 30%; left: 30%; animation-delay: 1s; }
+        .sparkle:nth-child(4) { bottom: 20%; right: 20%; animation-delay: 1.5s; }
+        .sparkle:nth-child(5) { top: 50%; left: 10%; animation-delay: 0.3s; }
+        .sparkle:nth-child(6) { top: 60%; right: 15%; animation-delay: 0.8s; }
+
+        @keyframes sparkle {
+            0%, 100% {
+                opacity: 0;
+                transform: scale(0);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .cta-button {
+            margin-top: 3rem;
+            padding: 1rem 2rem;
+            background: rgba(255,255,255,0.2);
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50px;
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            opacity: 0;
+            animation: slideUp 2s ease-out 2s forwards;
+        }
+
+        @keyframes slideUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .cta-button {
+            transform: translateY(30px);
+        }
+
+        .cta-button:hover {
+            background: rgba(255,255,255,0.3);
+            border-color: rgba(255,255,255,0.5);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .hello-world-text {
+                font-size: 2.5rem;
+            }
+            
+            .animated-image {
+                width: 250px;
+                height: 250px;
+            }
+            
+            .hello-world-image {
+                font-size: 1.5rem;
+            }
+            
+            .subtitle {
+                font-size: 1rem;
+                padding: 0 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hello-world-text {
+                font-size: 2rem;
+            }
+            
+            .animated-image {
+                width: 200px;
+                height: 200px;
+            }
+            
+            .hello-world-image {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <section class="hero">
+        <div class="sparkles">
+            <div class="sparkle"></div>
+            <div class="sparkle"></div>
+            <div class="sparkle"></div>
+            <div class="sparkle"></div>
+            <div class="sparkle"></div>
+            <div class="sparkle"></div>
+        </div>
+        
+        <div class="hello-world-container">
+            <h1 class="hello-world-text">Hello World!</h1>
+            
+            <div class="animated-image">
+                <div class="hello-world-image">
+                    🌍 ✨
+                </div>
+            </div>
+            
+            <p class="subtitle">
+                Welcome to our amazing animated test page!<br>
+                Built with pure CSS animations and lots of love.
+            </p>
+            
+            <a href="#" class="cta-button" onclick="celebrateClick()">
+                Click Me! 🎉
+            </a>
+        </div>
+    </section>
+
+    <script>
+        function celebrateClick() {
+            // Create celebration effect
+            const button = event.target;
+            button.style.transform = 'scale(0.95)';
+            
+            setTimeout(() => {
+                button.style.transform = 'scale(1)';
+                alert('🎉 Congratulations! You clicked the magical button! 🎉');
+            }, 150);
+            
+            // Add some extra sparkles
+            createSparkleExplosion(event.clientX, event.clientY);
+        }
+
+        function createSparkleExplosion(x, y) {
+            for (let i = 0; i < 12; i++) {
+                const sparkle = document.createElement('div');
+                sparkle.style.position = 'fixed';
+                sparkle.style.left = x + 'px';
+                sparkle.style.top = y + 'px';
+                sparkle.style.width = '6px';
+                sparkle.style.height = '6px';
+                sparkle.style.background = '#fff';
+                sparkle.style.borderRadius = '50%';
+                sparkle.style.pointerEvents = 'none';
+                sparkle.style.zIndex = '9999';
+                
+                const angle = (i / 12) * Math.PI * 2;
+                const velocity = 100 + Math.random() * 50;
+                const vx = Math.cos(angle) * velocity;
+                const vy = Math.sin(angle) * velocity;
+                
+                document.body.appendChild(sparkle);
+                
+                let posX = 0;
+                let posY = 0;
+                let opacity = 1;
+                
+                const animate = () => {
+                    posX += vx * 0.02;
+                    posY += vy * 0.02;
+                    opacity -= 0.02;
+                    
+                    sparkle.style.transform = `translate(${posX}px, ${posY}px)`;
+                    sparkle.style.opacity = opacity;
+                    
+                    if (opacity > 0) {
+                        requestAnimationFrame(animate);
+                    } else {
+                        document.body.removeChild(sparkle);
+                    }
+                };
+                
+                requestAnimationFrame(animate);
+            }
+        }
+
+        // Add some random floating elements
+        function createFloatingElement() {
+            const element = document.createElement('div');
+            element.innerHTML = ['✨', '⭐', '💫', '🌟'][Math.floor(Math.random() * 4)];
+            element.style.position = 'fixed';
+            element.style.fontSize = '20px';
+            element.style.left = Math.random() * window.innerWidth + 'px';
+            element.style.top = window.innerHeight + 'px';
+            element.style.pointerEvents = 'none';
+            element.style.zIndex = '1';
+            element.style.opacity = '0.7';
+            
+            document.body.appendChild(element);
+            
+            let posY = window.innerHeight;
+            const speed = 1 + Math.random() * 2;
+            
+            const float = () => {
+                posY -= speed;
+                element.style.top = posY + 'px';
+                
+                if (posY > -50) {
+                    requestAnimationFrame(float);
+                } else {
+                    document.body.removeChild(element);
+                }
+            };
+            
+            requestAnimationFrame(float);
+        }
+
+        // Create floating elements periodically
+        setInterval(createFloatingElement, 3000);
+        
+        // Initial floating elements
+        setTimeout(() => createFloatingElement(), 1000);
+        setTimeout(() => createFloatingElement(), 2000);
+    </script>
+</body>
+</html> 
