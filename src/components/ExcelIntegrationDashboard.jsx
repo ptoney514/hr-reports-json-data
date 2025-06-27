@@ -19,6 +19,8 @@ const ExcelIntegrationDashboard = () => {
   const [validationResults, setValidationResults] = useState(null);
   const [previewData, setPreviewData] = useState(null);
   const [importStatus, setImportStatus] = useState(null);
+  const [currentDatabaseData, setCurrentDatabaseData] = useState(null);
+  const [loadingDatabaseData, setLoadingDatabaseData] = useState(false);
 
   // Expected column mappings for different data types
   const columnMappings = {
@@ -207,6 +209,9 @@ const ExcelIntegrationDashboard = () => {
         )
       );
 
+      // Refresh database data to show updated information
+      loadCurrentDatabaseData();
+
     } catch (error) {
       setImportStatus({ 
         status: 'error', 
@@ -319,6 +324,38 @@ const ExcelIntegrationDashboard = () => {
   const removeFile = (fileName) => {
     setUploadedFiles(prev => prev.filter(f => f.name !== fileName));
   };
+
+  // Load current database data
+  const loadCurrentDatabaseData = async () => {
+    setLoadingDatabaseData(true);
+    try {
+      // Dynamic import to avoid build issues
+      const { default: hrDatabase } = await import('../database/HRDatabase.js');
+      await hrDatabase.initialize();
+      
+      const workforceData = await hrDatabase.getWorkforceData();
+      const turnoverData = await hrDatabase.getTurnoverData();
+      
+      setCurrentDatabaseData({
+        workforce: workforceData,
+        turnover: turnoverData,
+        lastUpdated: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error('Error loading database data:', error);
+      setCurrentDatabaseData({
+        error: error.message,
+        lastUpdated: new Date().toISOString()
+      });
+    } finally {
+      setLoadingDatabaseData(false);
+    }
+  };
+
+  // Load database data on component mount
+  React.useEffect(() => {
+    loadCurrentDatabaseData();
+  }, []);
 
   const getFileStatusIcon = (status) => {
     switch (status) {
@@ -614,6 +651,165 @@ const ExcelIntegrationDashboard = () => {
             Remove any empty rows or columns before uploading.
           </p>
         </div>
+      </div>
+
+      {/* Current Database Data */}
+      <div className="bg-white rounded-lg shadow-sm border p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold text-gray-900">Current Database Data</h3>
+          <button
+            onClick={loadCurrentDatabaseData}
+            disabled={loadingDatabaseData}
+            className="flex items-center gap-2 px-3 py-1 text-blue-600 hover:bg-blue-50 rounded transition-colors disabled:opacity-50"
+          >
+            <RefreshCw className={loadingDatabaseData ? 'animate-spin' : ''} size={16} />
+            {loadingDatabaseData ? 'Loading...' : 'Refresh'}
+          </button>
+        </div>
+
+        {loadingDatabaseData ? (
+          <div className="flex items-center justify-center py-8">
+            <RefreshCw className="animate-spin text-blue-500" size={24} />
+            <span className="ml-2 text-gray-600">Loading database data...</span>
+          </div>
+        ) : currentDatabaseData?.error ? (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+            <div className="flex items-center gap-2">
+              <XCircle className="text-red-500" size={20} />
+              <span className="text-red-700 font-medium">Error Loading Database Data</span>
+            </div>
+            <p className="text-red-600 mt-2">{currentDatabaseData.error}</p>
+          </div>
+        ) : currentDatabaseData ? (
+          <div className="space-y-6">
+            {/* Workforce Data Summary */}
+            <div className="border rounded-lg p-4">
+              <h4 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
+                <Database size={16} className="text-blue-600" />
+                Workforce Data
+              </h4>
+              
+              {currentDatabaseData.workforce ? (
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                  <div className="bg-blue-50 rounded p-3">
+                    <span className="text-blue-600 font-medium">Total Headcount</span>
+                    <div className="text-2xl font-bold text-blue-800">
+                      {currentDatabaseData.workforce.currentPeriod?.headcount?.total || 0}
+                    </div>
+                  </div>
+                  <div className="bg-green-50 rounded p-3">
+                    <span className="text-green-600 font-medium">Faculty</span>
+                    <div className="text-2xl font-bold text-green-800">
+                      {currentDatabaseData.workforce.currentPeriod?.headcount?.faculty || 0}
+                    </div>
+                  </div>
+                  <div className="bg-purple-50 rounded p-3">
+                    <span className="text-purple-600 font-medium">Staff</span>
+                    <div className="text-2xl font-bold text-purple-800">
+                      {currentDatabaseData.workforce.currentPeriod?.headcount?.staff || 0}
+                    </div>
+                  </div>
+                  <div className="bg-orange-50 rounded p-3">
+                    <span className="text-orange-600 font-medium">Students</span>
+                    <div className="text-2xl font-bold text-orange-800">
+                      {currentDatabaseData.workforce.currentPeriod?.headcount?.students || 0}
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="text-gray-500 text-center py-4">
+                  No workforce data available
+                </div>
+              )}
+
+              {currentDatabaseData.workforce?.currentPeriod?.topDivisions && (
+                <div className="mt-4">
+                  <h5 className="text-sm font-medium text-gray-700 mb-2">Top Divisions</h5>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+                    {currentDatabaseData.workforce.currentPeriod.topDivisions.slice(0, 6).map((division, index) => (
+                      <div key={index} className="flex justify-between items-center bg-gray-50 rounded px-3 py-2">
+                        <span className="text-gray-700">{division.name}</span>
+                        <span className="font-medium text-gray-900">{division.count}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Turnover Data Summary */}
+            <div className="border rounded-lg p-4">
+              <h4 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
+                <Database size={16} className="text-red-600" />
+                Turnover Data
+              </h4>
+              
+              {currentDatabaseData.turnover ? (
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
+                  <div className="bg-red-50 rounded p-3">
+                    <span className="text-red-600 font-medium">Total Departures</span>
+                    <div className="text-2xl font-bold text-red-800">
+                      {currentDatabaseData.turnover.currentFiscalYear?.overallTurnover?.totalDepartures || 0}
+                    </div>
+                  </div>
+                  <div className="bg-yellow-50 rounded p-3">
+                    <span className="text-yellow-600 font-medium">Turnover Rate</span>
+                    <div className="text-2xl font-bold text-yellow-800">
+                      {currentDatabaseData.turnover.currentFiscalYear?.overallTurnover?.annualizedTurnoverRate || 0}%
+                    </div>
+                  </div>
+                  <div className="bg-indigo-50 rounded p-3">
+                    <span className="text-indigo-600 font-medium">Avg Headcount</span>
+                    <div className="text-2xl font-bold text-indigo-800">
+                      {currentDatabaseData.turnover.currentFiscalYear?.overallTurnover?.averageHeadcount || 0}
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="text-gray-500 text-center py-4">
+                  No turnover data available
+                </div>
+              )}
+
+              {currentDatabaseData.turnover?.currentFiscalYear?.voluntaryTurnoverReasons && (
+                <div className="mt-4">
+                  <h5 className="text-sm font-medium text-gray-700 mb-2">Top Turnover Reasons</h5>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+                    {currentDatabaseData.turnover.currentFiscalYear.voluntaryTurnoverReasons.slice(0, 6).map((reason, index) => (
+                      <div key={index} className="flex justify-between items-center bg-gray-50 rounded px-3 py-2">
+                        <span className="text-gray-700">{reason.name}</span>
+                        <span className="font-medium text-gray-900">{reason.value}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Data Metadata */}
+            <div className="bg-gray-50 rounded-lg p-4">
+              <h4 className="font-medium text-gray-900 mb-2">Data Information</h4>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                <div>
+                  <span className="text-gray-600">Workforce Period:</span>
+                  <div className="font-medium">{currentDatabaseData.workforce?.currentPeriod?.quarter || 'N/A'}</div>
+                </div>
+                <div>
+                  <span className="text-gray-600">Turnover Period:</span>
+                  <div className="font-medium">{currentDatabaseData.turnover?.currentFiscalYear?.period || 'N/A'}</div>
+                </div>
+                <div>
+                  <span className="text-gray-600">Last Refreshed:</span>
+                  <div className="font-medium">{new Date(currentDatabaseData.lastUpdated).toLocaleString()}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="text-gray-500 text-center py-8">
+            Click refresh to load current database data
+          </div>
+        )}
       </div>
     </div>
   );
