@@ -8,7 +8,9 @@ import {
   TrendingDown, 
   DollarSign, 
   BookOpen,
-  Building2
+  Building2,
+  Award,
+  AlertTriangle
 } from 'lucide-react';
 
 // Fallback data to ensure the dashboard always works

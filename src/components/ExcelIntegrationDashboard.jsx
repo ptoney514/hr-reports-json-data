@@ -7,14 +7,11 @@ import {
   CheckCircle, 
   XCircle, 
   AlertTriangle, 
-  Download,
   Eye,
   Database,
-  RefreshCw,
-  Users,
-  TrendingUp
+  RefreshCw
 } from 'lucide-react';
-import hrDatabase from '../database/HRDatabase';
+// import hrDatabase from '../database/HRDatabase';
 
 const ExcelIntegrationDashboard = () => {
   const [uploadedFiles, setUploadedFiles] = useState([]);
@@ -182,6 +179,8 @@ const ExcelIntegrationDashboard = () => {
     setImportStatus({ status: 'importing', message: 'Importing data to database...' });
 
     try {
+      // Dynamic import to avoid build issues
+      const { default: hrDatabase } = await import('../database/HRDatabase.js');
       await hrDatabase.initialize();
 
       if (dataType === 'workforce') {
