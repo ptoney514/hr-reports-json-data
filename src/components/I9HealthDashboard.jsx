@@ -4,7 +4,6 @@ import { Filter, Calendar, Download, AlertTriangle, CheckCircle, Clock, Users } 
 import './I9Dashboard.css';
 
 const I9HealthDashboard = () => {
-    const [timeFilter, setTimeFilter] = useState('Q2-25');
 
     // I-9 Compliance Data
     const currentMetrics = {

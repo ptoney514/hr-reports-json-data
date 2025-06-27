@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from 'recharts';
 import AccessibilityToggle from './ui/AccessibilityToggle';
 import AccessibleDataTable from './ui/AccessibleDataTable';
 import HeadcountChart from './charts/HeadcountChart';
