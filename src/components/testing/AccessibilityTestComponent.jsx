@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from 'recharts';
-import AccessibilityToggle from './ui/AccessibilityToggle';
-import AccessibleDataTable from './ui/AccessibleDataTable';
-import HeadcountChart from './charts/HeadcountChart';
-import { announceToScreenReader, generateChartAriaLabel } from '../utils/accessibilityUtils';
+import AccessibilityToggle from '../ui/AccessibilityToggle';
+import AccessibleDataTable from '../ui/AccessibleDataTable';
+import HeadcountChart from '../charts/HeadcountChart';
+import { announceToScreenReader, generateChartAriaLabel } from '../../utils/accessibilityUtils';
 
 const AccessibilityTestComponent = () => {
   const [testResults, setTestResults] = useState({});

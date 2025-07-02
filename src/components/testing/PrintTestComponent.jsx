@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { Printer, Eye, Download, FileText } from 'lucide-react';
-import DashboardLayout from './dashboards/DashboardLayout';
-import SummaryCard from './ui/SummaryCard';
-import HeadcountChart from './charts/HeadcountChart';
-import TurnoverPieChart from './charts/TurnoverPieChart';
-import LocationChart from './charts/LocationChart';
-import { PrintButton, PrintSection, PrintDataTable } from './ui/PrintUtilities';
+import DashboardLayout from '../dashboards/DashboardLayout';
+import SummaryCard from '../ui/SummaryCard';
+import HeadcountChart from '../charts/HeadcountChart';
+import TurnoverPieChart from '../charts/TurnoverPieChart';
+import LocationChart from '../charts/LocationChart';
+import { PrintButton, PrintSection, PrintDataTable } from '../ui/PrintUtilities';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 const PrintTestComponent = () => {

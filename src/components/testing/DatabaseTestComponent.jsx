@@ -12,7 +12,7 @@ const DatabaseTestComponent = () => {
     
     try {
       // Dynamic import to avoid build issues
-      const { testDatabaseSetup } = await import('../database/testDatabase.js');
+      const { testDatabaseSetup } = await import('../../database/testDatabase.js');
       console.log('Running database test...');
       const results = await testDatabaseSetup();
       setTestResults(results);

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { TestTube } from 'lucide-react';
-import ExportButton from './ui/ExportButton';
-import { PDFExporter, DataExporter } from '../utils/exportUtils';
+import ExportButton from '../ui/ExportButton';
+import { PDFExporter, DataExporter } from '../../utils/exportUtils';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 
 const ExportTestComponent = () => {

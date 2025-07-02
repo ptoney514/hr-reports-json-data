@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import HeadcountChart from './charts/HeadcountChart';
-import StartersLeaversChart from './charts/StartersLeaversChart';
-import LocationChart from './charts/LocationChart';
-import DivisionsChart from './charts/DivisionsChart';
-import TurnoverPieChart from './charts/TurnoverPieChart';
-import SummaryCard from './ui/SummaryCard';
+import HeadcountChart from '../charts/HeadcountChart';
+import StartersLeaversChart from '../charts/StartersLeaversChart';
+import LocationChart from '../charts/LocationChart';
+import DivisionsChart from '../charts/DivisionsChart';
+import TurnoverPieChart from '../charts/TurnoverPieChart';
+import SummaryCard from '../ui/SummaryCard';
 import { AlertTriangle, Database, RefreshCw } from 'lucide-react';
 
 const ErrorTestComponent = () => {
