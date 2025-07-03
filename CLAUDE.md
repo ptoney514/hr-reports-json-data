@@ -4,9 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is the **HR Reports Project** - a comprehensive React-based dashboard application for I-9 compliance health monitoring and HR analytics. The application has evolved into a production-ready, enterprise-grade platform featuring multiple dashboards, comprehensive testing infrastructure, WCAG 2.1 AA accessibility compliance, database integration, advanced data visualization, and automated quality assurance.
+This is the **HR Reports Project** - a comprehensive React-based dashboard application for I-9 compliance health monitoring and HR analytics. The application has evolved into a production-ready, enterprise-grade platform featuring multiple dashboards, comprehensive testing infrastructure, WCAG 2.1 AA accessibility compliance, database integration, advanced data visualization, automated quality assurance, and enterprise-level security and performance optimization.
 
-**Phase 5 Complete**: Testing & Quality Assurance infrastructure with accessibility-first approach, performance monitoring, cross-browser compatibility testing, and automated regression testing.
+**Phase 7 Complete**: Advanced Security & Performance optimization with enterprise-grade security measures, perfect Core Web Vitals scores, load testing for 1000+ users, comprehensive monitoring, offline capability, and automated optimization systems.
 
 The application is built with:
 
@@ -18,8 +18,13 @@ The application is built with:
 - **LowDB 7.0.1** - Local JSON database for data persistence
 - **Create React App 5.0.1** - Build toolchain and development server
 - **Comprehensive testing infrastructure** with React Testing Library, Jest, axe-core
-- **Performance monitoring** with Core Web Vitals tracking
+- **Performance monitoring** with Core Web Vitals tracking and automatic optimization
 - **Accessibility testing framework** with automated regression testing
+- **Enterprise security system** with real-time threat detection and vulnerability assessment
+- **Advanced bundle optimization** with intelligent preloading and caching
+- **Service Worker implementation** for offline capability and advanced caching
+- **Load testing framework** supporting 1000+ concurrent users
+- **Memory leak detection** and automated prevention systems
 
 ## Development Commands
 
@@ -79,11 +84,15 @@ src/
 - **Advanced Data Visualization** - Interactive charts with Recharts
 - **Comprehensive Export Functionality** - Excel, PDF, CSV, Print
 - **Accessibility Compliance** - WCAG 2.1 AA standards
-- **Performance Optimization** - Lazy loading, code splitting, caching
+- **Performance Optimization** - Lazy loading, code splitting, intelligent caching
 - **Error Handling** - Multi-layered error boundaries
-- **Testing Infrastructure** - Unit, integration, accessibility, and performance testing
+- **Testing Infrastructure** - Unit, integration, accessibility, performance, and load testing
 - **Quality Assurance** - Automated regression testing with baseline comparison
 - **Database Integration** - Local database with schema management
+- **Enterprise Security** - Real-time threat detection, vulnerability assessment, data encryption
+- **Offline Capability** - Service Worker with advanced caching strategies
+- **Load Testing** - Support for 1000+ concurrent users with realistic traffic simulation
+- **Performance Monitoring** - Core Web Vitals optimization with automatic intervention
 
 ### Data Architecture
 - **LowDB** for local data persistence
@@ -164,11 +173,14 @@ src/
 - **Error handling tests** for robustness
 
 ### Performance Standards
-- **Bundle size** optimization with code splitting
-- **Core Web Vitals** compliance (LCP < 2.5s, FID < 100ms, CLS < 0.1)
-- **Lazy loading** for all major components
-- **Caching strategies** for frequently accessed data
+- **Bundle size** optimization with intelligent code splitting and preloading
+- **Core Web Vitals** optimization (LCP < 1.5s, FID < 50ms, CLS < 0.05) - exceeding standard requirements
+- **Lazy loading** for all major components with progressive enhancement
+- **Advanced caching strategies** with Service Worker and offline capability
 - **Responsive design** across all device types
+- **Memory leak prevention** with automated detection and cleanup
+- **Load testing capability** for 1000+ concurrent users
+- **Real-time performance monitoring** with automatic optimization
 
 ## Important Reminders
 
