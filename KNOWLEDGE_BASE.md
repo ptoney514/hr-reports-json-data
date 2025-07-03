@@ -49,7 +49,8 @@ The application follows a modern React architecture with clear separation of con
 
 ### Data Management & Processing
 
-- **LowDB 7.0.1**: Lightweight JSON database for local data persistence
+- **Firebase 11.2.0**: Primary cloud database with real-time synchronization capabilities
+- **LowDB 7.0.1**: Lightweight JSON database for local fallback and offline support
 - **Date-fns 3.6.0**: Modern date utility library for date manipulation
 - **Lodash 4.17.21**: Utility library for data processing and manipulation
 - **Reselect 5.1.1**: Selector library for efficient state derivation
@@ -263,23 +264,83 @@ UI Updates with New Data
 
 ### Custom Hooks for Data Management
 
-#### useTurnoverData.js
+#### Firebase Integration (Phase 9)
+
+The application now uses Firebase/Firestore as the primary database with real-time synchronization capabilities:
+
+```jsx
+// useFirebaseWorkforceData.js - Enhanced hook with real-time capabilities
+const useFirebaseWorkforceData = (customFilters = {}) => {
+  const [firebaseData, setFirebaseData] = useState(null);
+  const [isRealTimeActive, setIsRealTimeActive] = useState(false);
+  const [lastSyncTime, setLastSyncTime] = useState(null);
+  
+  // Real-time subscription setup
+  const setupRealTimeSubscription = useCallback(() => {
+    const unsubscribe = firebaseService.subscribeToMetrics(
+      'workforce',
+      period,
+      (data) => {
+        if (data) {
+          const transformedData = transformFirebaseToComponentFormat(data);
+          setFirebaseData(transformedData);
+          setLastSyncTime(data.lastUpdated?.toDate?.() || new Date());
+        }
+      }
+    );
+    setIsRealTimeActive(true);
+    return unsubscribe;
+  }, [period]);
+  
+  return { 
+    data: formattedData, 
+    loading, 
+    error, 
+    isRealTime, 
+    lastSyncTime, 
+    refetch 
+  };
+};
+```
+
+#### Firebase Service Layer
+
+The FirebaseService provides comprehensive CRUD operations for all HR metrics:
+
+```javascript
+// FirebaseService.js - Core service for Firebase operations
+class FirebaseService {
+  // Workforce metrics operations
+  async setWorkforceMetrics(period, data) { /* ... */ }
+  async getWorkforceMetrics(period) { /* ... */ }
+  
+  // Real-time subscriptions
+  subscribeToMetrics(type, period, callback) { /* ... */ }
+  
+  // Data validation and transformation
+  validateMetricsData(data, type) { /* ... */ }
+}
+```
+
+#### Legacy Hooks (Maintained for Fallback)
+
+##### useTurnoverData.js
 ```jsx
 const useTurnoverData = (filters) => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   
-  // Data fetching logic with error handling
-  // Cache management
-  // Data transformation
+  // LowDB data fetching logic with error handling
+  // Cache management for local data
+  // Data transformation for component compatibility
   
   return { data, loading, error, refetch };
 };
 ```
 
-#### useWorkforceData.js
-Similar pattern for workforce-specific data with different filtering and aggregation logic.
+##### useWorkforceData.js
+Similar pattern for workforce-specific data with LowDB integration and local data management.
 
 ## Service Layer
 

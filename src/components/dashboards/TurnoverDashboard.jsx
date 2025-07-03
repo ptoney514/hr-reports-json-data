@@ -4,13 +4,16 @@ import SummaryCard from '../ui/SummaryCard';
 import TurnoverPieChart from '../charts/TurnoverPieChart';
 import DivisionsChart from '../charts/DivisionsChart';
 import StartersLeaversChart from '../charts/StartersLeaversChart';
+import useFirebaseTurnoverData from '../../hooks/useFirebaseTurnoverData';
 import { 
   TrendingDown, 
   DollarSign, 
   BookOpen,
   Building2,
   Award,
-  AlertTriangle
+  AlertTriangle,
+  Wifi,
+  WifiOff
 } from 'lucide-react';
 
 // Fallback data to ensure the dashboard always works
@@ -87,8 +90,17 @@ const FALLBACK_DATA = {
 };
 
 const TurnoverDashboard = () => {
-  // Simplified approach - always use fallback data to ensure dashboard works
-  const data = FALLBACK_DATA;
+  // Use Firebase data with fallback
+  const { 
+    data: firebaseData, 
+    loading, 
+    error, 
+    isRealTime, 
+    lastSyncTime 
+  } = useFirebaseTurnoverData('2025-Q1');
+
+  // Use Firebase data if available, otherwise fallback
+  const data = firebaseData || FALLBACK_DATA;
   const filters = { fiscalYear: '2024' };
 
   // Handle export functionality
@@ -115,7 +127,23 @@ const TurnoverDashboard = () => {
     ]
   };
 
-  const subtitle = `FY ${filters.fiscalYear || '2024'} | Generated: ${new Date().toLocaleDateString()}`;
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading turnover data...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Enhanced subtitle with real-time status
+  const realtimeStatus = isRealTime ? '🔴 Live' : '📊 Cached';
+  const dataSource = firebaseData ? 'Firebase' : 'Local';
+  const syncInfo = lastSyncTime ? ` | Last sync: ${lastSyncTime.toLocaleTimeString()}` : '';
+  const subtitle = `FY ${filters.fiscalYear || '2024'} | ${realtimeStatus} (${dataSource})${syncInfo}`;
 
   // Validate data structure to prevent object rendering errors
   if (!data || typeof data !== 'object') {

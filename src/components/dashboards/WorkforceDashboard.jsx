@@ -1,11 +1,12 @@
 import React from 'react';
-import { Users, Building2, UserPlus, AlertTriangle, MapPin } from 'lucide-react';
+import { Users, Building2, UserPlus, AlertTriangle, MapPin, Wifi, WifiOff } from 'lucide-react';
 import DashboardLayout from './DashboardLayout';
 import HeadcountChart from '../charts/HeadcountChart';
 import LocationChart from '../charts/LocationChart';
 import DivisionsChart from '../charts/DivisionsChart';
 import StartersLeaversChart from '../charts/StartersLeaversChart';
 import SummaryCard from '../ui/SummaryCard';
+import useFirebaseWorkforceData from '../../hooks/useFirebaseWorkforceData';
 
 // Hardcoded fallback data following I-9 dashboard pattern
 const WORKFORCE_FALLBACK_DATA = {
@@ -82,8 +83,18 @@ const WORKFORCE_FALLBACK_DATA = {
 };
 
 const WorkforceDashboard = () => {
-  // Use hardcoded data directly - following I-9 dashboard pattern
-  const data = WORKFORCE_FALLBACK_DATA;
+  // Use Firebase data with fallback to hardcoded data
+  const { 
+    data: firebaseData, 
+    loading, 
+    error, 
+    isRealTime, 
+    lastSyncTime, 
+    refetch 
+  } = useFirebaseWorkforceData({ reportingPeriod: 'Q2-2025' });
+
+  // Use Firebase data if available, otherwise fallback
+  const data = firebaseData || WORKFORCE_FALLBACK_DATA;
   const filters = { reportingPeriod: 'Q2-2025' };
 
   // Handle export functionality
@@ -91,13 +102,45 @@ const WorkforceDashboard = () => {
     console.log('Exporting workforce dashboard:', type, context);
   };
 
-  // Defensive check - ensure data is available
-  if (!data || !data.summary || !data.charts || !data.metrics) {
+  // Show loading state
+  if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500 mx-auto"></div>
           <p className="mt-4 text-gray-600">Loading workforce data...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state with fallback option
+  if (error && !firebaseData) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <AlertTriangle className="mx-auto h-16 w-16 text-red-500 mb-4" />
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">Unable to Load Data</h3>
+          <p className="text-gray-600 mb-4">{error}</p>
+          <button 
+            onClick={refetch}
+            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
+          >
+            Try Again
+          </button>
+          <p className="text-sm text-gray-500 mt-2">Using cached data if available</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Defensive check - ensure data is available
+  if (!data || !data.summary || !data.charts) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500 mx-auto"></div>
+          <p className="mt-4 text-gray-600">No data available</p>
         </div>
       </div>
     );
@@ -138,8 +181,11 @@ const WorkforceDashboard = () => {
     ]
   };
 
-  // Generate subtitle with current period
-  const subtitle = `${filters.reportingPeriod || 'Q2 2025'} | Generated: ${new Date().toLocaleDateString()}`;
+  // Generate subtitle with current period and real-time status
+  const realtimeStatus = isRealTime ? '🔴 Live' : '📊 Cached';
+  const dataSource = firebaseData ? 'Firebase' : 'Local';
+  const syncInfo = lastSyncTime ? ` | Last sync: ${lastSyncTime.toLocaleTimeString()}` : '';
+  const subtitle = `${filters.reportingPeriod || 'Q2 2025'} | ${realtimeStatus} (${dataSource})${syncInfo}`;
 
   return (
     <DashboardLayout

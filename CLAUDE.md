@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is the **HR Reports Project** - a comprehensive React-based dashboard application for I-9 compliance health monitoring and HR analytics. The application has evolved into a production-ready, enterprise-grade platform featuring multiple dashboards, comprehensive testing infrastructure, WCAG 2.1 AA accessibility compliance, database integration, advanced data visualization, automated quality assurance, and enterprise-level security and performance optimization.
 
-**Phase 7 Complete**: Advanced Security & Performance optimization with enterprise-grade security measures, perfect Core Web Vitals scores, load testing for 1000+ users, comprehensive monitoring, offline capability, and automated optimization systems.
+**Phase 9 Complete**: Firebase/Firestore Integration with real-time data synchronization, enterprise-grade cloud database architecture, comprehensive testing infrastructure, and seamless migration from LowDB to Firebase with zero downtime.
 
 The application is built with:
 
@@ -15,7 +15,8 @@ The application is built with:
 - **Tailwind CSS 3.4.17** - Utility-first CSS framework for styling
 - **Recharts 3.0.0** - Data visualization library for charts
 - **Lucide React 0.523.0** - Icon library
-- **LowDB 7.0.1** - Local JSON database for data persistence
+- **Firebase 11.2.0** - Cloud database with real-time synchronization
+- **LowDB 7.0.1** - Local JSON database for fallback support
 - **Create React App 5.0.1** - Build toolchain and development server
 - **Comprehensive testing infrastructure** with React Testing Library, Jest, axe-core
 - **Performance monitoring** with Core Web Vitals tracking and automatic optimization
@@ -25,6 +26,9 @@ The application is built with:
 - **Service Worker implementation** for offline capability and advanced caching
 - **Load testing framework** supporting 1000+ concurrent users
 - **Memory leak detection** and automated prevention systems
+- **Firebase/Firestore integration** with real-time data synchronization
+- **Comprehensive testing suite** for Firebase operations and data integrity
+- **Seamless data migration** from LowDB to Firebase with intelligent fallbacks
 
 ## Development Commands
 
@@ -95,12 +99,15 @@ src/
 - **Performance Monitoring** - Core Web Vitals optimization with automatic intervention
 
 ### Data Architecture
-- **LowDB** for local data persistence
-- **Schema validation** with AJV
-- **Custom hooks** for data fetching (useTurnoverData, useWorkforceData)
-- **API abstraction layer** for data operations
+- **Firebase/Firestore** for primary cloud data storage with real-time synchronization
+- **LowDB** for local fallback data persistence and offline support
+- **Schema validation** with AJV for data integrity
+- **Firebase hooks** for real-time data fetching (useFirebaseWorkforceData, useFirebaseTurnoverData)
+- **Service layer abstraction** for Firebase operations (FirebaseService.js)
+- **Data migration utilities** for seamless LowDB to Firebase transition
 - **Context state management** for cross-component data sharing
-- **Caching strategies** for performance optimization
+- **Intelligent caching strategies** with globalCache for performance optimization
+- **Real-time subscriptions** for live dashboard updates across users
 
 ### Styling Approach
 - **Tailwind CSS** utility-first approach for responsive design
