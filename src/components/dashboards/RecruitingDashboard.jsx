@@ -1,44 +1,72 @@
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ComposedChart, Line } from 'recharts';
-import { ArrowUpCircle } from 'lucide-react';
+import { ArrowUpCircle, Wifi, WifiOff } from 'lucide-react';
+import useFirebaseRecruitingData from '../../hooks/useFirebaseRecruitingData';
 
-const RecruitingDashboard = () => {
-  // Recruiting Metrics
-  const recruitingData = {
+// Fallback data to ensure the dashboard always works
+const FALLBACK_DATA = {
+  recruitingData: {
     totalOpenPositions: 127,
     postedPositions: 89,
     notPostedPositions: 38,
     newHiresYTD: 228,
     costPerHire: 4200
-  };
-
-  // Open positions by department
-  const openPositionsByDept = [
+  },
+  openPositionsByDept: [
     { name: 'Academic Affairs', open: 28, posted: 20, notPosted: 8, filled: 35 },
     { name: 'Student Services', open: 22, posted: 16, notPosted: 6, filled: 28 },
     { name: 'Administration', open: 19, posted: 15, notPosted: 4, filled: 32 },
     { name: 'Research', open: 16, posted: 12, notPosted: 4, filled: 24 },
     { name: 'Health Sciences', open: 24, posted: 16, notPosted: 8, filled: 41 },
     { name: 'Other', open: 18, posted: 10, notPosted: 8, filled: 68 }
-  ];
-
-  // Source of hires
-  const hireSourceData = [
+  ],
+  hireSourceData: [
     { source: 'Employee Referral', hires: 68, percentage: 30 },
     { source: 'University Career Page', hires: 52, percentage: 23 },
     { source: 'LinkedIn', hires: 34, percentage: 15 },
     { source: 'Higher Ed Jobs', hires: 29, percentage: 13 },
     { source: 'Indeed', hires: 25, percentage: 11 },
     { source: 'Other', hires: 20, percentage: 8 }
-  ];
-
-  // Time to fill trends
-  const timeToFillData = [
+  ],
+  timeToFillData: [
     { quarter: 'Q3-24', avgDays: 52, target: 45 },
     { quarter: 'Q4-24', avgDays: 48, target: 45 },
     { quarter: 'Q1-25', avgDays: 44, target: 45 },
     { quarter: 'Q2-25', avgDays: 45, target: 45 }
-  ];
+  ]
+};
+
+const RecruitingDashboard = () => {
+  // Use Firebase data with fallback
+  const { 
+    data: firebaseData, 
+    loading, 
+    error, 
+    isRealTime, 
+    lastSyncTime 
+  } = useFirebaseRecruitingData('2025-Q1');
+
+  // Use Firebase data if available, otherwise fallback
+  const data = firebaseData || FALLBACK_DATA;
+  const { recruitingData, openPositionsByDept, hireSourceData, timeToFillData } = data;
+
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading recruiting data...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Enhanced subtitle with real-time status
+  const realtimeStatus = isRealTime ? '🔴 Live' : '📊 Cached';
+  const dataSource = firebaseData ? 'Firebase' : 'Local';
+  const syncInfo = lastSyncTime ? ` | Last sync: ${lastSyncTime.toLocaleTimeString()}` : '';
+  const subtitle = `Q2 2025 | University-wide | ${realtimeStatus} (${dataSource})${syncInfo}`;
 
   return (
     <div className="text-xs">
@@ -46,7 +74,14 @@ const RecruitingDashboard = () => {
       <div className="bg-gray-50 p-4 min-h-screen">
         {/* Header */}
         <div className="mb-3 flex justify-between items-center">
-          <h1 className="text-xl font-bold text-blue-700">Recruiting & Retention Analytics Dashboard</h1>
+          <div>
+            <h1 className="text-xl font-bold text-blue-700">Recruiting & Retention Analytics Dashboard</h1>
+            <div className="flex items-center gap-2 mt-1">
+              <span className="text-sm text-gray-600">{subtitle}</span>
+              {isRealTime && <Wifi size={14} className="text-green-500" />}
+              {!isRealTime && <WifiOff size={14} className="text-gray-400" />}
+            </div>
+          </div>
           <div className="flex gap-2 text-xs">
             <span className="px-2 py-1 bg-blue-100 rounded">Q2 2025</span>
             <span className="px-2 py-1 bg-blue-100 rounded">University-wide</span>

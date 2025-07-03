@@ -1,5 +1,5 @@
 import React from 'react';
-import { Filter, Calendar, Download } from 'lucide-react';
+import { Filter, Calendar, Download, Wifi, WifiOff } from 'lucide-react';
 import MetricsGrid from './components/MetricsGrid';
 import ComplianceChart from './components/ComplianceChart';
 import TrendChart from './components/TrendChart';
@@ -7,6 +7,7 @@ import RiskIndicators from './components/RiskIndicators';
 import ProcessImprovements from './components/ProcessImprovements';
 import ComplianceTable from './components/ComplianceTable';
 import ExecutiveSummary from './components/ExecutiveSummary';
+import useFirebaseComplianceData from '../../hooks/useFirebaseComplianceData';
 import { 
   I9Metrics, 
   PreviousMetrics, 
@@ -30,80 +31,105 @@ const I9HealthDashboard: React.FC<I9HealthDashboardProps> = ({
   onExport,
   autoRefresh = false,
   refreshInterval = 300000, // 5 minutes
-  loading = false,
-  error = null,
+  loading: propLoading = false,
+  error: propError = null,
   className = '',
   ...ariaProps
 }) => {
-  // Default data (will be replaced with props when available)
-  const defaultCurrentMetrics: I9Metrics = currentMetrics || {
-    totalI9s: 619,
-    section2OnTime: 579,
-    section2Late: 40,
-    section2Compliance: 94,
-    overallCompliance: 90,
-    reverifications: 10,
-    auditReady: 88
-  };
+  // Use Firebase data when props are not provided
+  const { 
+    data: firebaseData, 
+    loading: firebaseLoading, 
+    error: firebaseError, 
+    isRealTime, 
+    lastSyncTime 
+  } = useFirebaseComplianceData('2025-Q1');
 
-  const defaultPreviousMetrics: PreviousMetrics = previousMetrics || {
-    totalI9s: 587,
-    section2Compliance: 91,
-    overallCompliance: 87
-  };
+  // Determine if we should use Firebase data or props
+  const shouldUseFirebase = !currentMetrics && !previousMetrics && !complianceByType;
+  const loading = shouldUseFirebase ? firebaseLoading : propLoading;
+  const error = shouldUseFirebase ? firebaseError : propError;
+  // Use Firebase data or props with fallbacks (type assertions for Firebase data)
+  const defaultCurrentMetrics: I9Metrics = currentMetrics || 
+    ((firebaseData as any)?.currentMetrics) || 
+    {
+      totalI9s: 619,
+      section2OnTime: 579,
+      section2Late: 40,
+      section2Compliance: 94,
+      overallCompliance: 90,
+      reverifications: 10,
+      auditReady: 88
+    };
 
-  const defaultComplianceByType: ComplianceByType[] = complianceByType || [
-    { name: 'Faculty/Staff', total: 363, onTime: 340, late: 23, rate: 94 },
-    { name: 'Students', total: 252, onTime: 235, late: 17, rate: 93 },
-    { name: 'Phoenix Campus', total: 4, onTime: 4, late: 0, rate: 100 }
-  ];
+  const defaultPreviousMetrics: PreviousMetrics = previousMetrics || 
+    ((firebaseData as any)?.previousMetrics) || 
+    {
+      totalI9s: 587,
+      section2Compliance: 91,
+      overallCompliance: 87
+    };
 
-  const defaultTrendData: TrendData[] = trendData || [
-    { quarter: 'Q1-24', compliance: 85, processed: 532 },
-    { quarter: 'Q2-24', compliance: 87, processed: 598 },
-    { quarter: 'Q3-24', compliance: 89, processed: 612 },
-    { quarter: 'Q4-24', compliance: 91, processed: 587 },
-    { quarter: 'Q1-25', compliance: 87, processed: 645 },
-    { quarter: 'Q2-25', compliance: 90, processed: 619 }
-  ];
+  const defaultComplianceByType: ComplianceByType[] = complianceByType || 
+    ((firebaseData as any)?.complianceByType) || 
+    [
+      { name: 'Faculty/Staff', total: 363, onTime: 340, late: 23, rate: 94 },
+      { name: 'Students', total: 252, onTime: 235, late: 17, rate: 93 },
+      { name: 'Phoenix Campus', total: 4, onTime: 4, late: 0, rate: 100 }
+    ];
 
-  const defaultRiskMetrics: RiskMetric[] = riskMetrics || [
-    { category: 'Late Section 2', count: 40, risk: 'Medium', color: '#f59e0b' },
-    { category: 'Missing Training', count: 12, risk: 'High', color: '#ef4444' },
-    { category: 'Audit Findings', count: 3, risk: 'High', color: '#ef4444' },
-    { category: 'Process Gaps', count: 8, risk: 'Medium', color: '#f59e0b' }
-  ];
+  const defaultTrendData: TrendData[] = trendData || 
+    ((firebaseData as any)?.trendData) || 
+    [
+      { quarter: 'Q1-24', compliance: 85, processed: 532 },
+      { quarter: 'Q2-24', compliance: 87, processed: 598 },
+      { quarter: 'Q3-24', compliance: 89, processed: 612 },
+      { quarter: 'Q4-24', compliance: 91, processed: 587 },
+      { quarter: 'Q1-25', compliance: 87, processed: 645 },
+      { quarter: 'Q2-25', compliance: 90, processed: 619 }
+    ];
 
-  const defaultImprovements: ProcessImprovement[] = improvements || [
-    { 
-      initiative: 'SOP v2 Implementation', 
-      status: 'Completed', 
-      progress: 100,
-      target: '+3% compliance',
-      owner: 'HR Team'
-    },
-    { 
-      initiative: 'Annual Training Program', 
-      status: 'In Progress', 
-      progress: 75,
-      target: '100% completion',
-      owner: 'Training Team'
-    },
-    { 
-      initiative: 'Interfolio Integration', 
-      status: 'In Progress', 
-      progress: 60,
-      target: 'Pilot completion',
-      owner: 'IT Team'
-    },
-    { 
-      initiative: 'Dashboard Automation', 
-      status: 'Completed', 
-      progress: 100,
-      target: '+15% efficiency',
-      owner: 'Analytics Team'
-    }
-  ];
+  const defaultRiskMetrics: RiskMetric[] = riskMetrics || 
+    ((firebaseData as any)?.riskMetrics) || 
+    [
+      { category: 'Late Section 2', count: 40, risk: 'Medium', color: '#f59e0b' },
+      { category: 'Missing Training', count: 12, risk: 'High', color: '#ef4444' },
+      { category: 'Audit Findings', count: 3, risk: 'High', color: '#ef4444' },
+      { category: 'Process Gaps', count: 8, risk: 'Medium', color: '#f59e0b' }
+    ];
+
+  const defaultImprovements: ProcessImprovement[] = improvements || 
+    ((firebaseData as any)?.improvements) || 
+    [
+      { 
+        initiative: 'SOP v2 Implementation', 
+        status: 'Completed', 
+        progress: 100,
+        target: '+3% compliance',
+        owner: 'HR Team'
+      },
+      { 
+        initiative: 'Annual Training Program', 
+        status: 'In Progress', 
+        progress: 75,
+        target: '100% completion',
+        owner: 'Training Team'
+      },
+      { 
+        initiative: 'Interfolio Integration', 
+        status: 'In Progress', 
+        progress: 60,
+        target: 'Pilot completion',
+        owner: 'IT Team'
+      },
+      { 
+        initiative: 'Dashboard Automation', 
+        status: 'Completed', 
+        progress: 100,
+        target: '+15% efficiency',
+        owner: 'Analytics Team'
+      }
+    ];
 
   const handlePrint = (): void => {
     window.print();
@@ -177,9 +203,25 @@ const I9HealthDashboard: React.FC<I9HealthDashboardProps> = ({
           <h1 className="text-2xl print:text-xl font-bold text-blue-700 print:text-black">
             I-9 Compliance Health Dashboard
           </h1>
-          <p className="text-sm print:text-xs text-gray-600 print:text-black">
-            Quarter: Q2 2025 | Generated: {new Date().toLocaleDateString()}
-          </p>
+          <div className="flex items-center gap-4">
+            <p className="text-sm print:text-xs text-gray-600 print:text-black">
+              Quarter: Q2 2025 | Generated: {new Date().toLocaleDateString()}
+            </p>
+            {shouldUseFirebase && (
+              <div className="flex items-center gap-2 text-sm text-gray-600">
+                <span className={isRealTime ? 'text-green-600' : 'text-gray-400'}>
+                  {isRealTime ? '🔴 Live' : '📊 Cached'} (Firebase)
+                </span>
+                {isRealTime && <Wifi size={14} className="text-green-500" />}
+                {!isRealTime && <WifiOff size={14} className="text-gray-400" />}
+                {lastSyncTime && (
+                  <span className="text-xs">
+                    | Last sync: {(lastSyncTime as Date).toLocaleTimeString()}
+                  </span>
+                )}
+              </div>
+            )}
+          </div>
         </div>
         <div className="flex gap-3 no-print">
           <button 

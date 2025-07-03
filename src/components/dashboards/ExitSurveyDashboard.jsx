@@ -1,35 +1,73 @@
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { ArrowDownCircle } from 'lucide-react';
+import { ArrowDownCircle, Wifi, WifiOff } from 'lucide-react';
+import useFirebaseExitSurveyData from '../../hooks/useFirebaseExitSurveyData';
 
-const ExitSurveyDashboard = () => {
-  // Exit Survey Insights
-  const exitSurveyData = {
+// Fallback data to ensure the dashboard always works
+const FALLBACK_DATA = {
+  exitSurveyData: {
     totalExits: 98,
     totalResponses: 20,
-    recommendationRate: 55, // 11 out of 20 would recommend
+    recommendationRate: 55,
     avgTenure: 2.4,
     exitInterviewCompletion: 20.4
-  };
-
-  // Exit reasons from survey data
-  const exitReasons = [
+  },
+  exitReasons: [
     { name: 'Career Advancement', value: 30 },
     { name: 'Supervisor Issues', value: 25 },
     { name: 'Compensation', value: 15 },
     { name: 'Work-Life Balance', value: 12 },
     { name: 'Retirement', value: 10 },
     { name: 'Other', value: 8 }
-  ];
-
-  // Exit survey satisfaction scores
-  const satisfactionData = [
+  ],
+  satisfactionData: [
     { category: 'Overall Experience', satisfied: 45, neutral: 30, dissatisfied: 25 },
     { category: 'Career Development', satisfied: 35, neutral: 25, dissatisfied: 40 },
     { category: 'Leadership', satisfied: 40, neutral: 35, dissatisfied: 25 },
     { category: 'Compensation', satisfied: 50, neutral: 20, dissatisfied: 30 },
     { category: 'Work Environment', satisfied: 60, neutral: 20, dissatisfied: 20 }
-  ];
+  ],
+  departmentExits: [
+    { department: 'School of Dentistry', exits: 12, responses: 4, responseRate: 33 },
+    { department: 'Student Services', exits: 15, responses: 3, responseRate: 20 },
+    { department: 'School of Medicine', exits: 18, responses: 3, responseRate: 17 },
+    { department: 'Information Technology', exits: 8, responses: 2, responseRate: 25 },
+    { department: 'Administration', exits: 22, responses: 5, responseRate: 23 },
+    { department: 'Other Departments', exits: 23, responses: 3, responseRate: 13 }
+  ]
+};
+
+const ExitSurveyDashboard = () => {
+  // Use Firebase data with fallback
+  const { 
+    data: firebaseData, 
+    loading, 
+    error, 
+    isRealTime, 
+    lastSyncTime 
+  } = useFirebaseExitSurveyData('2025-Q1');
+
+  // Use Firebase data if available, otherwise fallback
+  const data = firebaseData || FALLBACK_DATA;
+  const { exitSurveyData, exitReasons, satisfactionData, departmentExits } = data;
+
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading exit survey data...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Enhanced subtitle with real-time status
+  const realtimeStatus = isRealTime ? '🔴 Live' : '📊 Cached';
+  const dataSource = firebaseData ? 'Firebase' : 'Local';
+  const syncInfo = lastSyncTime ? ` | Last sync: ${lastSyncTime.toLocaleTimeString()}` : '';
+  const subtitle = `FY25 Q3 | 20 Responses | ${realtimeStatus} (${dataSource})${syncInfo}`;
 
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d'];
 
@@ -39,10 +77,17 @@ const ExitSurveyDashboard = () => {
       <div className="bg-gray-50 p-4 min-h-screen">
         {/* Header */}
         <div className="mb-3 flex justify-between items-center">
-          <h1 className="text-xl font-bold text-blue-700">Exit Survey Insights</h1>
+          <div>
+            <h1 className="text-xl font-bold text-blue-700">Exit Survey Insights</h1>
+            <div className="flex items-center gap-2 mt-1">
+              <span className="text-sm text-gray-600">{subtitle}</span>
+              {isRealTime && <Wifi size={14} className="text-green-500" />}
+              {!isRealTime && <WifiOff size={14} className="text-gray-400" />}
+            </div>
+          </div>
           <div className="flex gap-2 text-xs">
             <span className="px-2 py-1 bg-blue-100 rounded">FY25 Q3</span>
-            <span className="px-2 py-1 bg-blue-100 rounded">20 Responses</span>
+            <span className="px-2 py-1 bg-blue-100 rounded">{exitSurveyData.totalResponses} Responses</span>
           </div>
         </div>
 
@@ -199,42 +244,20 @@ const ExitSurveyDashboard = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  <tr className="border-b">
-                    <td className="p-2">School of Dentistry</td>
-                    <td className="p-2 text-center">12</td>
-                    <td className="p-2 text-center">4</td>
-                    <td className="p-2 text-center text-yellow-600">33%</td>
-                  </tr>
-                  <tr className="border-b">
-                    <td className="p-2">Student Services</td>
-                    <td className="p-2 text-center">15</td>
-                    <td className="p-2 text-center">3</td>
-                    <td className="p-2 text-center text-red-600">20%</td>
-                  </tr>
-                  <tr className="border-b">
-                    <td className="p-2">School of Medicine</td>
-                    <td className="p-2 text-center">18</td>
-                    <td className="p-2 text-center">3</td>
-                    <td className="p-2 text-center text-red-600">17%</td>
-                  </tr>
-                  <tr className="border-b">
-                    <td className="p-2">Information Technology</td>
-                    <td className="p-2 text-center">8</td>
-                    <td className="p-2 text-center">2</td>
-                    <td className="p-2 text-center text-yellow-600">25%</td>
-                  </tr>
-                  <tr className="border-b">
-                    <td className="p-2">Administration</td>
-                    <td className="p-2 text-center">22</td>
-                    <td className="p-2 text-center">5</td>
-                    <td className="p-2 text-center text-yellow-600">23%</td>
-                  </tr>
-                  <tr>
-                    <td className="p-2">Other Departments</td>
-                    <td className="p-2 text-center">23</td>
-                    <td className="p-2 text-center">3</td>
-                    <td className="p-2 text-center text-red-600">13%</td>
-                  </tr>
+                  {departmentExits.map((dept, index) => (
+                    <tr key={index} className="border-b">
+                      <td className="p-2">{dept.department}</td>
+                      <td className="p-2 text-center">{dept.exits}</td>
+                      <td className="p-2 text-center">{dept.responses}</td>
+                      <td className={`p-2 text-center ${
+                        dept.responseRate >= 30 ? 'text-green-600' : 
+                        dept.responseRate >= 20 ? 'text-yellow-600' : 
+                        'text-red-600'
+                      }`}>
+                        {dept.responseRate}%
+                      </td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>
