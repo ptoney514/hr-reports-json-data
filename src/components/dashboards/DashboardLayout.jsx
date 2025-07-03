@@ -76,12 +76,6 @@ const DashboardLayoutInner = ({
     };
   }, [title]);
 
-  // Announce filter changes
-  const handleFilterChange = (filterType, value) => {
-    actions.updateFilter(filterType, value);
-    announceToScreenReader(`${filterType} filter changed to ${value}`);
-  };
-
   // Extract values from state
   const { error, loading, ...filters } = state;
   const isLoading = false;
@@ -89,9 +83,10 @@ const DashboardLayoutInner = ({
   const lastUpdated = null;
   const hasActiveFilters = false;
 
-  // Handle filter changes
+  // Handle filter changes with screen reader announcement
   const handleFilterChange = (filterType, value) => {
     actions.updateFilter(filterType, value);
+    announceToScreenReader(`${filterType} filter changed to ${value}`);
   };
 
   // Handle export
