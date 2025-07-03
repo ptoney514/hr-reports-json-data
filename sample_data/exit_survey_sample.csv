@@ -1,0 +1,16 @@
+Employee_ID,Department,Exit_Date,Survey_Response,Exit_Reason,Satisfaction_Rating,Would_Recommend
+EMP201,Academic Affairs,2024-11-15,Yes,Career Advancement,4,Yes
+EMP202,Student Services,2024-10-30,No,Relocation,3,
+EMP203,Administration,2024-12-05,Yes,Retirement,5,Yes
+EMP204,Research,2024-09-20,Yes,Better Compensation,2,No
+EMP205,Health Sciences,2024-11-08,Yes,Work-Life Balance,3,Yes
+EMP206,Information Technology,2024-10-12,No,Performance Issues,2,
+EMP207,Academic Affairs,2024-12-01,Yes,Supervisor Issues,2,No
+EMP208,Student Services,2024-09-25,Yes,Family Reasons,4,Yes
+EMP209,Administration,2024-11-20,Yes,Downsizing,3,Yes
+EMP210,Research,2024-10-08,No,Graduate School,4,
+EMP211,Health Sciences,2024-12-10,Yes,Career Change,3,Yes
+EMP212,Information Technology,2024-09-15,Yes,Burnout,2,No
+EMP213,Academic Affairs,2024-11-25,Yes,Lack of Growth,2,No
+EMP214,Student Services,2024-10-18,No,Commute,3,
+EMP215,Administration,2024-12-08,Yes,New Opportunity,4,Yes

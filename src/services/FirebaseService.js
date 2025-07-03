@@ -417,6 +417,48 @@ class FirebaseService {
       console.error('Error toggling network:', error);
     }
   }
+
+  // ==================== DATABASE MANAGEMENT ====================
+
+  /**
+   * Clear all data for a specific dashboard and period (for testing)
+   * @param {string} dashboard - Dashboard type (workforce, turnover, etc.)
+   * @param {string} period - Period identifier
+   * @param {string} type - Period type
+   */
+  async clearDashboardData(dashboard, period, type = 'quarters') {
+    try {
+      const docRef = doc(db, 'dashboards', dashboard, type, period);
+      await setDoc(docRef, {});
+      this.cache.delete(`${dashboard}-${type}-${period}`);
+      console.log(`Cleared ${dashboard} data for ${period}`);
+      return true;
+    } catch (error) {
+      console.error(`Error clearing ${dashboard} data:`, error);
+      throw error;
+    }
+  }
+
+  /**
+   * Clear all data for a specific period across all dashboards (for testing)
+   * @param {string} period - Period identifier
+   * @param {string} type - Period type
+   */
+  async clearAllDataForPeriod(period, type = 'quarters') {
+    try {
+      const dashboards = ['workforce', 'turnover', 'compliance', 'recruiting', 'exitSurvey'];
+      const promises = dashboards.map(dashboard => 
+        this.clearDashboardData(dashboard, period, type)
+      );
+      
+      await Promise.all(promises);
+      console.log(`Cleared all dashboard data for ${period}`);
+      return true;
+    } catch (error) {
+      console.error('Error clearing all data:', error);
+      throw error;
+    }
+  }
 }
 
 // Create and export a singleton instance

@@ -1,0 +1,16 @@
+Employee_ID,Name,Employee_Type,I9_Date,Compliant,Section_2_Date,Training_Complete,Audit_Ready
+EMP301,Jennifer Adams,Faculty/Staff,2024-08-15,Yes,2024-08-17,Yes,Yes
+EMP302,Michael Brown,Faculty/Staff,2024-09-01,Yes,2024-09-04,Yes,Yes
+EMP303,Sarah Johnson,Students,2024-10-10,No,2024-10-15,No,No
+EMP304,David Wilson,Faculty/Staff,2024-07-20,Yes,2024-07-22,Yes,Yes
+EMP305,Lisa Garcia,Students,2024-11-05,Yes,2024-11-08,Yes,Yes
+EMP306,Robert Miller,Faculty/Staff,2024-06-12,Yes,2024-06-15,Yes,Yes
+EMP307,Amanda Davis,Phoenix Campus,2024-09-18,Yes,2024-09-20,Yes,Yes
+EMP308,James Taylor,Faculty/Staff,2024-08-30,No,2024-09-05,No,No
+EMP309,Maria Martinez,Students,2024-10-22,Yes,2024-10-25,Yes,Yes
+EMP310,Christopher Lee,Faculty/Staff,2024-07-08,Yes,2024-07-10,Yes,Yes
+EMP311,Nicole White,Students,2024-11-12,No,,No,No
+EMP312,Steven Anderson,Faculty/Staff,2024-06-25,Yes,2024-06-28,Yes,Yes
+EMP313,Rachel Thompson,Phoenix Campus,2024-09-05,Yes,2024-09-08,Yes,Yes
+EMP314,Paul Rodriguez,Faculty/Staff,2024-08-20,Yes,2024-08-23,Yes,Yes
+EMP315,Jessica Clark,Students,2024-10-15,No,2024-10-20,No,No

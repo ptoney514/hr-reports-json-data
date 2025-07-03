@@ -1,0 +1,13 @@
+Position_ID,Department,Position_Title,Status,Posted_Date,Source,Hire_Date,Salary_Range
+POS001,Academic Affairs,Assistant Professor,Hired,2024-09-15,HigherEdJobs,2024-12-01,65000-75000
+POS002,Student Services,Academic Advisor,Open,2024-11-20,LinkedIn,,45000-55000
+POS003,Administration,Budget Analyst,Hired,2024-10-05,Employee Referral,2024-11-15,58000-68000
+POS004,Research,Postdoc Researcher,Open,2024-12-01,University Website,,50000-60000
+POS005,Health Sciences,Clinical Coordinator,Posted,2024-11-10,Indeed,,55000-65000
+POS006,Information Technology,Software Developer,Hired,2024-08-25,LinkedIn,2024-10-10,70000-80000
+POS007,Academic Affairs,Department Chair,Posted,2024-10-15,HigherEdJobs,,90000-110000
+POS008,Student Services,Registrar,Open,2024-12-05,Employee Referral,,60000-70000
+POS009,Administration,HR Generalist,Hired,2024-09-30,CareerBuilder,2024-11-20,52000-62000
+POS010,Research,Lab Manager,Posted,2024-11-25,University Website,,65000-75000
+POS011,Health Sciences,Nurse Practitioner,Open,2024-10-20,Healthcare Jobs,,75000-85000
+POS012,Information Technology,Database Admin,Hired,2024-07-15,LinkedIn,2024-09-01,68000-78000

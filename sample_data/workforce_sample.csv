@@ -1,0 +1,16 @@
+Employee_ID,Name,Department,Position,Hire_Date,Salary,Grade,Status,Location,Manager
+EMP001,John Smith,Academic Affairs,Professor,2020-08-15,85000,C,Active,Main Campus,Dr. Johnson
+EMP002,Sarah Wilson,Student Services,Advisor,2021-01-10,52000,D,Active,Main Campus,Mike Brown
+EMP003,Michael Davis,Administration,Director,2019-03-22,95000,B,Active,Main Campus,CEO Office
+EMP004,Emily Chen,Research,Research Scientist,2022-06-01,72000,C,Active,Research Center,Dr. Rodriguez
+EMP005,David Martinez,Health Sciences,Clinical Instructor,2018-11-30,68000,C,Active,Medical Center,Dr. Thompson
+EMP006,Lisa Anderson,Information Technology,Systems Analyst,2021-09-15,65000,D,Active,Main Campus,IT Director
+EMP007,Robert Taylor,Academic Affairs,Associate Professor,2017-01-20,78000,C,Active,Main Campus,Dr. Johnson
+EMP008,Jennifer White,Student Services,Counselor,2020-05-12,48000,D,Active,Main Campus,Mike Brown
+EMP009,Christopher Lee,Administration,HR Specialist,2019-08-07,55000,D,Active,Main Campus,HR Director
+EMP010,Amanda Garcia,Research,Lab Technician,2022-02-28,42000,E,Active,Research Center,Dr. Rodriguez
+EMP011,James Wilson,Health Sciences,Nurse,2021-04-18,58000,D,Active,Medical Center,Nursing Director
+EMP012,Michelle Brown,Information Technology,Network Admin,2020-10-05,62000,D,Active,Main Campus,IT Director
+EMP013,Daniel Johnson,Academic Affairs,Lecturer,2022-08-20,55000,D,Active,Main Campus,Dr. Johnson
+EMP014,Karen Miller,Student Services,Financial Aid Officer,2019-12-01,51000,D,Active,Main Campus,Mike Brown
+EMP015,Steven Davis,Administration,Facilities Manager,2018-06-15,67000,C,Active,Main Campus,Operations Director
