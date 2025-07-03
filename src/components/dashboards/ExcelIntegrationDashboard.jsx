@@ -11,7 +11,7 @@ import {
   Database,
   RefreshCw
 } from 'lucide-react';
-// import hrDatabase from '../database/HRDatabase';
+// import hrDatabase from '../../database/HRDatabase';
 
 const ExcelIntegrationDashboard = () => {
   const [uploadedFiles, setUploadedFiles] = useState([]);
@@ -182,7 +182,7 @@ const ExcelIntegrationDashboard = () => {
 
     try {
       // Dynamic import to avoid build issues
-      const { default: hrDatabase } = await import('../database/HRDatabase.js');
+      const { default: hrDatabase } = await import('../../database/HRDatabase.js');
       await hrDatabase.initialize();
 
       if (dataType === 'workforce') {
@@ -330,7 +330,7 @@ const ExcelIntegrationDashboard = () => {
     setLoadingDatabaseData(true);
     try {
       // Dynamic import to avoid build issues
-      const { default: hrDatabase } = await import('../database/HRDatabase.js');
+      const { default: hrDatabase } = await import('../../database/HRDatabase.js');
       await hrDatabase.initialize();
       
       const workforceData = await hrDatabase.getWorkforceData();

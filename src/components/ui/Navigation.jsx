@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { 
   BarChart3, 
@@ -11,11 +11,15 @@ import {
   X,
   Database
 } from 'lucide-react';
+import { announceToScreenReader } from '../../utils/accessibilityUtils';
 
 const Navigation = () => {
   const [isHRAnalyticsOpen, setIsHRAnalyticsOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [focusedSubmenuIndex, setFocusedSubmenuIndex] = useState(-1);
   const location = useLocation();
+  const dropdownRef = useRef(null);
+  const submenuRefs = useRef([]);
 
   // Check if current path is active
   const isActive = (path) => location.pathname === path;
@@ -95,18 +99,110 @@ const Navigation = () => {
     }
   ];
 
-  const toggleHRAnalytics = () => {
-    setIsHRAnalyticsOpen(!isHRAnalyticsOpen);
-  };
+  const toggleHRAnalytics = useCallback(() => {
+    const newState = !isHRAnalyticsOpen;
+    setIsHRAnalyticsOpen(newState);
+    setFocusedSubmenuIndex(-1);
+    
+    if (newState) {
+      announceToScreenReader('HR Analytics menu opened');
+    } else {
+      announceToScreenReader('HR Analytics menu closed');
+    }
+  }, [isHRAnalyticsOpen]);
 
-  const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
-  };
+  const toggleMobileMenu = useCallback(() => {
+    const newState = !isMobileMenuOpen;
+    setIsMobileMenuOpen(newState);
+    
+    if (newState) {
+      announceToScreenReader('Mobile menu opened');
+    } else {
+      announceToScreenReader('Mobile menu closed');
+    }
+  }, [isMobileMenuOpen]);
 
-  const closeMobileMenu = () => {
+  const closeMobileMenu = useCallback(() => {
     setIsMobileMenuOpen(false);
     setIsHRAnalyticsOpen(false);
-  };
+    setFocusedSubmenuIndex(-1);
+    announceToScreenReader('Mobile menu closed');
+  }, []);
+
+  // Enhanced keyboard navigation for dropdown menu
+  const handleDropdownKeyDown = useCallback((event) => {
+    if (!isHRAnalyticsOpen) return;
+
+    const hrAnalyticsItem = navigationItems.find(item => item.hasSubmenu);
+    if (!hrAnalyticsItem) return;
+
+    const submenuItems = hrAnalyticsItem.submenu;
+    
+    switch (event.key) {
+      case 'ArrowDown':
+        event.preventDefault();
+        const nextIndex = focusedSubmenuIndex < submenuItems.length - 1 
+          ? focusedSubmenuIndex + 1 
+          : 0;
+        setFocusedSubmenuIndex(nextIndex);
+        submenuRefs.current[nextIndex]?.focus();
+        break;
+        
+      case 'ArrowUp':
+        event.preventDefault();
+        const prevIndex = focusedSubmenuIndex > 0 
+          ? focusedSubmenuIndex - 1 
+          : submenuItems.length - 1;
+        setFocusedSubmenuIndex(prevIndex);
+        submenuRefs.current[prevIndex]?.focus();
+        break;
+        
+      case 'Escape':
+        event.preventDefault();
+        setIsHRAnalyticsOpen(false);
+        setFocusedSubmenuIndex(-1);
+        dropdownRef.current?.focus();
+        announceToScreenReader('HR Analytics menu closed');
+        break;
+        
+      case 'Home':
+        event.preventDefault();
+        setFocusedSubmenuIndex(0);
+        submenuRefs.current[0]?.focus();
+        break;
+        
+      case 'End':
+        event.preventDefault();
+        const lastIndex = submenuItems.length - 1;
+        setFocusedSubmenuIndex(lastIndex);
+        submenuRefs.current[lastIndex]?.focus();
+        break;
+    }
+  }, [isHRAnalyticsOpen, focusedSubmenuIndex, navigationItems]);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsHRAnalyticsOpen(false);
+        setFocusedSubmenuIndex(-1);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Focus management for dropdown
+  useEffect(() => {
+    if (isHRAnalyticsOpen && focusedSubmenuIndex === -1) {
+      // Auto-focus first item when dropdown opens
+      setFocusedSubmenuIndex(0);
+      setTimeout(() => {
+        submenuRefs.current[0]?.focus();
+      }, 100);
+    }
+  }, [isHRAnalyticsOpen]);
 
   return (
     <nav className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
@@ -130,10 +226,19 @@ const Navigation = () => {
               
               if (item.hasSubmenu) {
                 return (
-                  <div key={item.id} className="relative">
+                  <div key={item.id} className="relative" ref={dropdownRef} onKeyDown={handleDropdownKeyDown}>
                     <button
                       onClick={toggleHRAnalytics}
-                      className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                      onKeyDown={(e) => {
+                        if (e.key === 'ArrowDown' && !isHRAnalyticsOpen) {
+                          e.preventDefault();
+                          toggleHRAnalytics();
+                        }
+                      }}
+                      aria-haspopup="true"
+                      aria-expanded={isHRAnalyticsOpen}
+                      aria-controls="hr-analytics-menu"
+                      className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
                         item.isActive
                           ? 'bg-blue-100 text-blue-700'
                           : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
@@ -149,17 +254,37 @@ const Navigation = () => {
 
                     {/* Dropdown Menu */}
                     {isHRAnalyticsOpen && (
-                      <div className="absolute top-full left-0 mt-1 w-64 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                      <div 
+                        id="hr-analytics-menu"
+                        role="menu"
+                        aria-labelledby="hr-analytics-button"
+                        className="absolute top-full left-0 mt-1 w-64 bg-white border border-gray-200 rounded-lg shadow-lg z-50"
+                      >
                         <div className="py-2">
-                          {item.submenu.map((subItem) => {
+                          {item.submenu.map((subItem, index) => {
                             const SubIconComponent = subItem.icon;
                             return (
                               <Link
                                 key={subItem.id}
+                                ref={(el) => (submenuRefs.current[index] = el)}
                                 to={subItem.path}
-                                onClick={() => setIsHRAnalyticsOpen(false)}
-                                className={`flex items-start gap-3 px-4 py-3 text-sm hover:bg-gray-50 transition-colors ${
+                                role="menuitem"
+                                tabIndex={focusedSubmenuIndex === index ? 0 : -1}
+                                onClick={() => {
+                                  setIsHRAnalyticsOpen(false);
+                                  setFocusedSubmenuIndex(-1);
+                                  announceToScreenReader(`Navigating to ${subItem.label}`);
+                                }}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter' || e.key === ' ') {
+                                    e.preventDefault();
+                                    e.target.click();
+                                  }
+                                }}
+                                className={`flex items-start gap-3 px-4 py-3 text-sm hover:bg-gray-50 focus:bg-blue-50 focus:outline-none transition-colors ${
                                   subItem.isActive ? 'bg-blue-50 border-r-2 border-blue-500' : ''
+                                } ${
+                                  focusedSubmenuIndex === index ? 'bg-blue-50' : ''
                                 }`}
                               >
                                 <SubIconComponent 
@@ -187,7 +312,8 @@ const Navigation = () => {
                   <Link
                     key={item.id}
                     to={item.path}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                    onClick={() => announceToScreenReader(`Navigating to ${item.label}`)}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none ${
                       item.isActive
                         ? 'bg-blue-100 text-blue-700'
                         : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
@@ -205,7 +331,10 @@ const Navigation = () => {
           <div className="md:hidden">
             <button
               onClick={toggleMobileMenu}
-              className="p-2 rounded-md text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition-colors"
+              aria-expanded={isMobileMenuOpen}
+              aria-controls="mobile-menu"
+              aria-label={isMobileMenuOpen ? 'Close mobile menu' : 'Open mobile menu'}
+              className="p-2 rounded-md text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition-colors focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none"
             >
               {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
             </button>
@@ -214,7 +343,7 @@ const Navigation = () => {
 
         {/* Mobile Navigation */}
         {isMobileMenuOpen && (
-          <div className="md:hidden border-t border-gray-200 bg-white">
+          <div id="mobile-menu" className="md:hidden border-t border-gray-200 bg-white">
             <div className="py-2 space-y-1">
               {navigationItems.map((item) => {
                 const IconComponent = item.icon;

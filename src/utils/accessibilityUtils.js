@@ -196,6 +196,239 @@ export const handleTableKeyNavigation = (event, rowCount, colCount, currentRow, 
 };
 
 /**
+ * Focus management utilities for enhanced keyboard navigation
+ */
+export const FocusManager = {
+  /**
+   * Store the last focused element
+   */
+  lastFocusedElement: null,
+
+  /**
+   * Save current focus
+   */
+  saveFocus() {
+    this.lastFocusedElement = document.activeElement;
+  },
+
+  /**
+   * Restore saved focus
+   */
+  restoreFocus() {
+    if (this.lastFocusedElement && this.lastFocusedElement.focus) {
+      this.lastFocusedElement.focus();
+      this.lastFocusedElement = null;
+    }
+  },
+
+  /**
+   * Focus on the first focusable element within a container
+   */
+  focusFirstElement(container) {
+    const focusableElements = this.getFocusableElements(container);
+    if (focusableElements.length > 0) {
+      focusableElements[0].focus();
+      return true;
+    }
+    return false;
+  },
+
+  /**
+   * Focus on the last focusable element within a container
+   */
+  focusLastElement(container) {
+    const focusableElements = this.getFocusableElements(container);
+    if (focusableElements.length > 0) {
+      focusableElements[focusableElements.length - 1].focus();
+      return true;
+    }
+    return false;
+  },
+
+  /**
+   * Get all focusable elements within a container
+   */
+  getFocusableElements(container) {
+    const focusableSelectors = [
+      'a[href]',
+      'button:not([disabled])',
+      'textarea:not([disabled])',
+      'input:not([disabled])',
+      'select:not([disabled])',
+      '[tabindex]:not([tabindex="-1"])',
+      '[contenteditable]'
+    ];
+
+    return Array.from(container.querySelectorAll(focusableSelectors.join(', ')))
+      .filter(element => {
+        return element.offsetWidth > 0 && element.offsetHeight > 0 && 
+               getComputedStyle(element).visibility !== 'hidden';
+      });
+  },
+
+  /**
+   * Trap focus within a container (for modals, dropdowns)
+   */
+  trapFocus(container, event) {
+    const focusableElements = this.getFocusableElements(container);
+    const firstElement = focusableElements[0];
+    const lastElement = focusableElements[focusableElements.length - 1];
+
+    if (event.key === 'Tab') {
+      if (event.shiftKey) {
+        // Shift + Tab
+        if (document.activeElement === firstElement) {
+          event.preventDefault();
+          lastElement.focus();
+        }
+      } else {
+        // Tab
+        if (document.activeElement === lastElement) {
+          event.preventDefault();
+          firstElement.focus();
+        }
+      }
+    }
+  }
+};
+
+/**
+ * Enhanced ARIA utilities for better screen reader support
+ */
+export const ARIAManager = {
+  /**
+   * Generate comprehensive ARIA attributes for interactive elements
+   */
+  generateInteractiveARIA(element, options = {}) {
+    const {
+      role,
+      label,
+      description,
+      expanded,
+      hasPopup,
+      controls,
+      describedBy,
+      labelledBy,
+      required,
+      invalid,
+      live = 'polite'
+    } = options;
+
+    const attributes = {};
+
+    if (role) attributes.role = role;
+    if (label) attributes['aria-label'] = label;
+    if (description) attributes['aria-description'] = description;
+    if (expanded !== undefined) attributes['aria-expanded'] = expanded;
+    if (hasPopup) attributes['aria-haspopup'] = hasPopup;
+    if (controls) attributes['aria-controls'] = controls;
+    if (describedBy) attributes['aria-describedby'] = describedBy;
+    if (labelledBy) attributes['aria-labelledby'] = labelledBy;
+    if (required) attributes['aria-required'] = required;
+    if (invalid !== undefined) attributes['aria-invalid'] = invalid;
+    if (live) attributes['aria-live'] = live;
+
+    return attributes;
+  },
+
+  /**
+   * Generate ARIA attributes for data tables
+   */
+  generateTableARIA(rowIndex, colIndex, rowCount, colCount, isHeader = false) {
+    const attributes = {
+      'role': isHeader ? 'columnheader' : 'gridcell',
+      'aria-rowindex': rowIndex + 1,
+      'aria-colindex': colIndex + 1,
+      'aria-rowcount': rowCount,
+      'aria-colcount': colCount
+    };
+
+    if (!isHeader) {
+      attributes['tabindex'] = '-1';
+    }
+
+    return attributes;
+  },
+
+  /**
+   * Generate ARIA attributes for charts
+   */
+  generateChartARIA(chartData, chartType, title) {
+    const dataPoints = chartData.length;
+    const hasData = dataPoints > 0;
+    
+    const attributes = {
+      'role': 'img',
+      'aria-label': generateChartAriaLabel(chartType, chartData, title),
+      'aria-describedby': `chart-description-${Date.now()}`,
+      'tabindex': '0'
+    };
+
+    if (hasData) {
+      attributes['aria-details'] = `chart-details-${Date.now()}`;
+    }
+
+    return attributes;
+  },
+
+  /**
+   * Create hidden text alternatives for complex content
+   */
+  createScreenReaderText(content, id = null) {
+    const element = document.createElement('div');
+    element.className = 'sr-only';
+    element.textContent = content;
+    if (id) element.id = id;
+    return element;
+  }
+};
+
+/**
+ * Skip link utilities for better navigation
+ */
+export const SkipLinkManager = {
+  /**
+   * Create skip links for main content areas
+   */
+  createSkipLinks(targets = []) {
+    const defaultTargets = [
+      { href: '#main-content', label: 'Skip to main content' },
+      { href: '#navigation', label: 'Skip to navigation' },
+      { href: '#filters', label: 'Skip to filters' }
+    ];
+
+    const allTargets = [...defaultTargets, ...targets];
+    
+    const skipLinksContainer = document.createElement('div');
+    skipLinksContainer.className = 'skip-links sr-only focus:not-sr-only focus:absolute focus:top-0 focus:left-0 focus:z-50 focus:bg-blue-600 focus:text-white focus:p-2';
+    
+    allTargets.forEach(target => {
+      const link = document.createElement('a');
+      link.href = target.href;
+      link.textContent = target.label;
+      link.className = 'skip-link block hover:underline';
+      skipLinksContainer.appendChild(link);
+    });
+
+    return skipLinksContainer;
+  },
+
+  /**
+   * Add skip link behavior
+   */
+  addSkipLinkBehavior(skipLink, targetSelector) {
+    skipLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      const target = document.querySelector(targetSelector);
+      if (target) {
+        target.focus();
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  }
+};
+
+/**
  * Announce content to screen readers
  */
 export const announceToScreenReader = (message, priority = 'polite') => {

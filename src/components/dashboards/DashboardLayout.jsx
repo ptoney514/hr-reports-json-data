@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { 
   RefreshCw, 
   Wifi, 
@@ -10,6 +10,7 @@ import NetworkErrorBoundary from '../ui/NetworkErrorBoundary';
 import DashboardHeader from '../ui/DashboardHeader';
 import DashboardSkeleton from '../ui/LoadingSkeleton';
 import AccessibilityToggle from '../ui/AccessibilityToggle';
+import { FocusManager, SkipLinkManager, announceToScreenReader } from '../../utils/accessibilityUtils';
 
 // Inner component that uses the dashboard context
 const DashboardLayoutInner = ({ 
@@ -25,6 +26,8 @@ const DashboardLayoutInner = ({
   gridCols = "grid-cols-1 lg:grid-cols-2",
   maxWidth = "max-w-7xl"
 }) => {
+  const mainContentRef = useRef(null);
+  const skipLinksRef = useRef(null);
   // Use default values instead of context
   const state = {
     loading: { workforce: false, turnover: false, general: false },
@@ -49,6 +52,34 @@ const DashboardLayoutInner = ({
     setLoading: () => {},
     setError: () => {},
     clearError: () => {}
+  };
+
+  // Initialize skip links and accessibility features
+  useEffect(() => {
+    // Create and insert skip links
+    const skipLinks = SkipLinkManager.createSkipLinks([
+      { href: '#dashboard-header', label: 'Skip to dashboard header' },
+      { href: '#dashboard-content', label: 'Skip to dashboard content' }
+    ]);
+
+    skipLinksRef.current = skipLinks;
+    document.body.insertBefore(skipLinks, document.body.firstChild);
+
+    // Announce page load to screen readers
+    announceToScreenReader(`${title} dashboard loaded`);
+
+    // Cleanup function
+    return () => {
+      if (skipLinksRef.current && document.body.contains(skipLinksRef.current)) {
+        document.body.removeChild(skipLinksRef.current);
+      }
+    };
+  }, [title]);
+
+  // Announce filter changes
+  const handleFilterChange = (filterType, value) => {
+    actions.updateFilter(filterType, value);
+    announceToScreenReader(`${filterType} filter changed to ${value}`);
   };
 
   // Extract values from state
@@ -233,22 +264,31 @@ const DashboardLayoutInner = ({
       </div>
 
       {/* Main container */}
-      <main id="main-content" className={`mx-auto px-4 py-4 print:p-0 ${maxWidth}`} role="main">
+      <main 
+        id="main-content" 
+        ref={mainContentRef}
+        className={`mx-auto px-4 py-4 print:p-0 ${maxWidth}`} 
+        role="main"
+        tabIndex="-1"
+        aria-labelledby="dashboard-title"
+      >
         {/* Network status */}
         <NetworkStatus />
 
         {/* Dashboard header */}
-        <DashboardHeader
-          title={title}
-          subtitle={subtitle}
-          filters={filters}
-          onFilterChange={handleFilterChange}
-          onExport={handleExport}
-          showFilters={showFilters}
-          showDateFilter={showDateFilter}
-          showExport={showExport}
-          availableFilters={availableFilters}
-        />
+        <section id="dashboard-header" aria-labelledby="dashboard-title">
+          <DashboardHeader
+            title={title}
+            subtitle={subtitle}
+            filters={filters}
+            onFilterChange={handleFilterChange}
+            onExport={handleExport}
+            showFilters={showFilters}
+            showDateFilter={showDateFilter}
+            showExport={showExport}
+            availableFilters={availableFilters}
+          />
+        </section>
 
         {/* Filter summary */}
         <FilterSummary />
@@ -274,13 +314,24 @@ const DashboardLayoutInner = ({
 
         {/* Dashboard content */}
         {!isLoading && !hasError && (
-          <div className={`grid gap-4 print:gap-2 print:block ${gridCols}`}>
-            {React.Children.map(children, (child, index) => (
-              <div key={index} className="dashboard-section page-break-inside-avoid">
-                {child}
-              </div>
-            ))}
-          </div>
+          <section 
+            id="dashboard-content" 
+            aria-label="Dashboard content and visualizations"
+            role="region"
+          >
+            <div className={`grid gap-4 print:gap-2 print:block ${gridCols}`}>
+              {React.Children.map(children, (child, index) => (
+                <div 
+                  key={index} 
+                  className="dashboard-section page-break-inside-avoid"
+                  role="group"
+                  aria-label={`Dashboard section ${index + 1}`}
+                >
+                  {child}
+                </div>
+              ))}
+            </div>
+          </section>
         )}
 
         {/* Data freshness indicator */}

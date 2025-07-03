@@ -1,12 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { Eye, EyeOff, Contrast, Zap, ZapOff, Settings } from 'lucide-react';
-import { highContrastUtils, announceToScreenReader } from '../../utils/accessibilityUtils';
+import React, { useState, useEffect, useRef } from 'react';
+import { Eye, EyeOff, Contrast, Zap, ZapOff, Settings, Type, Volume2, VolumeX, Keyboard } from 'lucide-react';
+import { highContrastUtils, announceToScreenReader, FocusManager } from '../../utils/accessibilityUtils';
 
 const AccessibilityToggle = ({ className = '' }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [highContrast, setHighContrast] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
   const [largeText, setLargeText] = useState(false);
+  const [keyboardNavigation, setKeyboardNavigation] = useState(false);
+  const [screenReaderOptimized, setScreenReaderOptimized] = useState(false);
+  const [soundEnabled, setSoundEnabled] = useState(true);
+  const panelRef = useRef(null);
 
   // Initialize accessibility settings on mount
   useEffect(() => {
@@ -26,6 +30,18 @@ const AccessibilityToggle = ({ className = '' }) => {
     const largeTextEnabled = localStorage.getItem('large-text') === 'true';
     setLargeText(largeTextEnabled);
 
+    // Check for keyboard navigation enhancement
+    const keyboardEnabled = localStorage.getItem('keyboard-navigation') === 'true';
+    setKeyboardNavigation(keyboardEnabled);
+
+    // Check for screen reader optimization
+    const screenReaderEnabled = localStorage.getItem('screen-reader-optimized') === 'true';
+    setScreenReaderOptimized(screenReaderEnabled);
+
+    // Check for sound preference
+    const soundEnabledPref = localStorage.getItem('sound-enabled') !== 'false';
+    setSoundEnabled(soundEnabledPref);
+
     // Apply initial settings
     if (highContrastEnabled) {
       highContrastUtils.applyHighContrastStyles();
@@ -37,6 +53,14 @@ const AccessibilityToggle = ({ className = '' }) => {
     
     if (largeTextEnabled) {
       document.documentElement.classList.add('large-text');
+    }
+
+    if (keyboardEnabled) {
+      document.documentElement.classList.add('keyboard-navigation-enhanced');
+    }
+
+    if (screenReaderEnabled) {
+      document.documentElement.classList.add('screen-reader-optimized');
     }
   }, []);
 
@@ -88,12 +112,70 @@ const AccessibilityToggle = ({ className = '' }) => {
     }
   };
 
+  // Toggle keyboard navigation enhancement
+  const toggleKeyboardNavigation = () => {
+    const newState = !keyboardNavigation;
+    setKeyboardNavigation(newState);
+    
+    if (newState) {
+      document.documentElement.classList.add('keyboard-navigation-enhanced');
+      localStorage.setItem('keyboard-navigation', 'true');
+      announceToScreenReader('Enhanced keyboard navigation enabled');
+    } else {
+      document.documentElement.classList.remove('keyboard-navigation-enhanced');
+      localStorage.setItem('keyboard-navigation', 'false');
+      announceToScreenReader('Enhanced keyboard navigation disabled');
+    }
+  };
+
+  // Toggle screen reader optimization
+  const toggleScreenReaderOptimized = () => {
+    const newState = !screenReaderOptimized;
+    setScreenReaderOptimized(newState);
+    
+    if (newState) {
+      document.documentElement.classList.add('screen-reader-optimized');
+      localStorage.setItem('screen-reader-optimized', 'true');
+      announceToScreenReader('Screen reader optimization enabled');
+    } else {
+      document.documentElement.classList.remove('screen-reader-optimized');
+      localStorage.setItem('screen-reader-optimized', 'false');
+      announceToScreenReader('Screen reader optimization disabled');
+    }
+  };
+
+  // Toggle sound feedback
+  const toggleSoundEnabled = () => {
+    const newState = !soundEnabled;
+    setSoundEnabled(newState);
+    
+    localStorage.setItem('sound-enabled', newState.toString());
+    announceToScreenReader(newState ? 'Sound feedback enabled' : 'Sound feedback disabled');
+  };
+
   // Handle keyboard navigation
   const handleKeyDown = (event) => {
     if (event.key === 'Escape') {
       setIsOpen(false);
+    } else if (isOpen && panelRef.current) {
+      FocusManager.trapFocus(panelRef.current, event);
     }
   };
+
+  // Focus management for panel
+  useEffect(() => {
+    if (isOpen && panelRef.current) {
+      // Save current focus
+      FocusManager.saveFocus();
+      // Focus first element in panel
+      setTimeout(() => {
+        FocusManager.focusFirstElement(panelRef.current);
+      }, 100);
+    } else if (!isOpen) {
+      // Restore focus when closing
+      FocusManager.restoreFocus();
+    }
+  }, [isOpen]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -128,9 +210,11 @@ const AccessibilityToggle = ({ className = '' }) => {
       {/* Dropdown Menu */}
       {isOpen && (
         <div
-          className="absolute top-full right-0 mt-2 w-72 bg-white border border-gray-200 rounded-lg shadow-lg z-50"
-          role="menu"
+          ref={panelRef}
+          className="absolute top-full right-0 mt-2 w-80 bg-white border border-gray-200 rounded-lg shadow-lg z-50"
+          role="dialog"
           aria-label="Accessibility options"
+          aria-modal="true"
         >
           <div className="p-4">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">
@@ -242,6 +326,112 @@ const AccessibilityToggle = ({ className = '' }) => {
                 <span
                   className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
                     largeText ? 'translate-x-6' : 'translate-x-1'
+                  }`}
+                />
+              </button>
+            </div>
+
+            {/* Keyboard Navigation Enhancement Toggle */}
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center">
+                <Keyboard size={20} className="text-gray-600 mr-3" />
+                <div>
+                  <label 
+                    htmlFor="keyboard-nav-toggle"
+                    className="text-sm font-medium text-gray-900 block"
+                  >
+                    Enhanced Keyboard Navigation
+                  </label>
+                  <p className="text-xs text-gray-600">
+                    Improved focus indicators and navigation
+                  </p>
+                </div>
+              </div>
+              <button
+                id="keyboard-nav-toggle"
+                role="switch"
+                aria-checked={keyboardNavigation}
+                onClick={toggleKeyboardNavigation}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+                  keyboardNavigation ? 'bg-blue-600' : 'bg-gray-200'
+                }`}
+              >
+                <span className="sr-only">Toggle enhanced keyboard navigation</span>
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    keyboardNavigation ? 'translate-x-6' : 'translate-x-1'
+                  }`}
+                />
+              </button>
+            </div>
+
+            {/* Screen Reader Optimization Toggle */}
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center">
+                <Volume2 size={20} className="text-gray-600 mr-3" />
+                <div>
+                  <label 
+                    htmlFor="screen-reader-toggle"
+                    className="text-sm font-medium text-gray-900 block"
+                  >
+                    Screen Reader Optimization
+                  </label>
+                  <p className="text-xs text-gray-600">
+                    Enhanced ARIA labels and descriptions
+                  </p>
+                </div>
+              </div>
+              <button
+                id="screen-reader-toggle"
+                role="switch"
+                aria-checked={screenReaderOptimized}
+                onClick={toggleScreenReaderOptimized}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+                  screenReaderOptimized ? 'bg-blue-600' : 'bg-gray-200'
+                }`}
+              >
+                <span className="sr-only">Toggle screen reader optimization</span>
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    screenReaderOptimized ? 'translate-x-6' : 'translate-x-1'
+                  }`}
+                />
+              </button>
+            </div>
+
+            {/* Sound Feedback Toggle */}
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center">
+                {soundEnabled ? (
+                  <Volume2 size={20} className="text-gray-600 mr-3" />
+                ) : (
+                  <VolumeX size={20} className="text-gray-600 mr-3" />
+                )}
+                <div>
+                  <label 
+                    htmlFor="sound-toggle"
+                    className="text-sm font-medium text-gray-900 block"
+                  >
+                    Sound Feedback
+                  </label>
+                  <p className="text-xs text-gray-600">
+                    Audio cues for interactions
+                  </p>
+                </div>
+              </div>
+              <button
+                id="sound-toggle"
+                role="switch"
+                aria-checked={soundEnabled}
+                onClick={toggleSoundEnabled}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+                  soundEnabled ? 'bg-blue-600' : 'bg-gray-200'
+                }`}
+              >
+                <span className="sr-only">Toggle sound feedback</span>
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    soundEnabled ? 'translate-x-6' : 'translate-x-1'
                   }`}
                 />
               </button>

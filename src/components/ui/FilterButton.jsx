@@ -1,5 +1,6 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Filter, X, ChevronDown, Check } from 'lucide-react';
+import { announceToScreenReader } from '../../utils/accessibilityUtils';
 
 const FilterButton = ({ 
   filters = {}, 
@@ -9,7 +10,9 @@ const FilterButton = ({
   className = ''
 }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [focusedFilterIndex, setFocusedFilterIndex] = useState(-1);
   const dropdownRef = useRef(null);
+  const filterRefs = useRef([]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -64,31 +67,77 @@ const FilterButton = ({
   // Merge with available filters
   const filterOptions = { ...defaultFilterOptions, ...availableFilters };
 
-  const handleFilterChange = (filterType, value) => {
+  const handleFilterChange = useCallback((filterType, value) => {
     if (onFilterChange) {
       onFilterChange(filterType, value);
+      announceToScreenReader(`${filterType} filter changed to ${value}`);
     }
-  };
+  }, [onFilterChange]);
 
-  const clearAllFilters = () => {
+  const clearAllFilters = useCallback(() => {
     Object.keys(filters).forEach(filterType => {
       if (filterType !== 'reportingPeriod' && filterType !== 'fiscalYear') {
         handleFilterChange(filterType, 'all');
       }
     });
-  };
+    announceToScreenReader('All filters cleared');
+  }, [filters, handleFilterChange]);
 
-  const FilterDropdown = ({ type, label, options }) => {
+  const handleKeyDown = useCallback((event) => {
+    if (!isOpen) return;
+
+    const filterTypes = Object.keys(filterOptions);
+    
+    switch (event.key) {
+      case 'ArrowDown':
+        event.preventDefault();
+        const nextIndex = focusedFilterIndex < filterTypes.length - 1 
+          ? focusedFilterIndex + 1 
+          : 0;
+        setFocusedFilterIndex(nextIndex);
+        filterRefs.current[nextIndex]?.focus();
+        break;
+        
+      case 'ArrowUp':
+        event.preventDefault();
+        const prevIndex = focusedFilterIndex > 0 
+          ? focusedFilterIndex - 1 
+          : filterTypes.length - 1;
+        setFocusedFilterIndex(prevIndex);
+        filterRefs.current[prevIndex]?.focus();
+        break;
+        
+      case 'Escape':
+        event.preventDefault();
+        setIsOpen(false);
+        setFocusedFilterIndex(-1);
+        announceToScreenReader('Filter panel closed');
+        break;
+        
+      case 'Tab':
+        // Allow normal tab behavior within the dropdown
+        break;
+    }
+  }, [isOpen, focusedFilterIndex, filterOptions]);
+
+  const FilterDropdown = ({ type, label, options, index }) => {
     const currentValue = filters[type] || 'all';
     
     return (
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label 
+          htmlFor={`filter-${type}`}
+          className="block text-sm font-medium text-gray-700 mb-2"
+        >
           {label}
         </label>
         <select
+          id={`filter-${type}`}
+          ref={(el) => (filterRefs.current[index] = el)}
           value={currentValue}
           onChange={(e) => handleFilterChange(type, e.target.value)}
+          onFocus={() => setFocusedFilterIndex(index)}
+          aria-describedby={`filter-${type}-desc`}
           className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
         >
           {options.map((option) => (
@@ -97,6 +146,9 @@ const FilterButton = ({
             </option>
           ))}
         </select>
+        <div id={`filter-${type}-desc`} className="sr-only">
+          Current selection: {options.find(opt => opt.value === currentValue)?.label}
+        </div>
       </div>
     );
   };
@@ -105,8 +157,24 @@ const FilterButton = ({
     <div className={`relative ${className}`} ref={dropdownRef}>
       {/* Filter Button */}
       <button
-        onClick={() => setIsOpen(!isOpen)}
-        className={`flex items-center gap-1 px-3 py-1 border rounded shadow-sm transition-colors ${
+        onClick={() => {
+          const newState = !isOpen;
+          setIsOpen(newState);
+          setFocusedFilterIndex(-1);
+          announceToScreenReader(newState ? 'Filter panel opened' : 'Filter panel closed');
+        }}
+        onKeyDown={(e) => {
+          if (e.key === 'ArrowDown' && !isOpen) {
+            e.preventDefault();
+            setIsOpen(true);
+            announceToScreenReader('Filter panel opened');
+          }
+        }}
+        aria-haspopup="true"
+        aria-expanded={isOpen}
+        aria-controls="filter-panel"
+        aria-label={`Filters${activeCount > 0 ? ` (${activeCount} active)` : ''}`}
+        className={`flex items-center gap-1 px-3 py-1 border rounded shadow-sm transition-colors focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none ${
           activeCount > 0
             ? 'bg-blue-50 border-blue-300 text-blue-700 hover:bg-blue-100'
             : 'bg-white border-gray-300 hover:bg-gray-50'
@@ -126,23 +194,34 @@ const FilterButton = ({
 
       {/* Dropdown Panel */}
       {isOpen && (
-        <div className="absolute top-full left-0 z-50 mt-1 w-80 bg-white border border-gray-200 rounded-lg shadow-lg">
+        <div 
+          id="filter-panel"
+          role="dialog"
+          aria-labelledby="filter-panel-title"
+          onKeyDown={handleKeyDown}
+          className="absolute top-full left-0 z-50 mt-1 w-80 bg-white border border-gray-200 rounded-lg shadow-lg"
+        >
           <div className="p-4">
             {/* Header */}
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">Filters</h3>
+              <h3 id="filter-panel-title" className="text-lg font-semibold text-gray-900">Filters</h3>
               <div className="flex items-center gap-2">
                 {activeCount > 0 && (
                   <button
                     onClick={clearAllFilters}
-                    className="text-sm text-blue-600 hover:text-blue-800"
+                    className="text-sm text-blue-600 hover:text-blue-800 focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 rounded px-2 py-1"
                   >
                     Clear All
                   </button>
                 )}
                 <button
-                  onClick={() => setIsOpen(false)}
-                  className="text-gray-400 hover:text-gray-600"
+                  onClick={() => {
+                    setIsOpen(false);
+                    setFocusedFilterIndex(-1);
+                    announceToScreenReader('Filter panel closed');
+                  }}
+                  aria-label="Close filter panel"
+                  className="text-gray-400 hover:text-gray-600 focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 rounded p-1"
                 >
                   <X size={16} />
                 </button>
@@ -157,6 +236,7 @@ const FilterButton = ({
                   type="reportingPeriod"
                   label="Reporting Period"
                   options={filterOptions.reportingPeriod}
+                  index={0}
                 />
               )}
 
@@ -166,6 +246,7 @@ const FilterButton = ({
                   type="location"
                   label="Location"
                   options={filterOptions.location}
+                  index={1}
                 />
               )}
 
@@ -175,6 +256,7 @@ const FilterButton = ({
                   type="employeeType"
                   label="Employee Type"
                   options={filterOptions.employeeType}
+                  index={2}
                 />
               )}
 
@@ -184,6 +266,7 @@ const FilterButton = ({
                   type="division"
                   label="Division"
                   options={filterOptions.division}
+                  index={3}
                 />
               )}
 
@@ -193,6 +276,7 @@ const FilterButton = ({
                   type="grade"
                   label="Grade Classification"
                   options={filterOptions.grade}
+                  index={4}
                 />
               )}
             </div>
@@ -200,8 +284,12 @@ const FilterButton = ({
             {/* Footer */}
             <div className="mt-4 pt-4 border-t border-gray-200 flex justify-end">
               <button
-                onClick={() => setIsOpen(false)}
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm"
+                onClick={() => {
+                  setIsOpen(false);
+                  setFocusedFilterIndex(-1);
+                  announceToScreenReader('Filters applied');
+                }}
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
               >
                 Apply Filters
               </button>
