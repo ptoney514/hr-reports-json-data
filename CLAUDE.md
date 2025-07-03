@@ -4,7 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is the **HR Reports Project** - a comprehensive React-based dashboard application for I-9 compliance health monitoring and HR analytics. The application has evolved into a production-ready, scalable platform featuring multiple dashboards, comprehensive testing infrastructure, accessibility compliance, database integration, and advanced data visualization capabilities.
+This is the **HR Reports Project** - a comprehensive React-based dashboard application for I-9 compliance health monitoring and HR analytics. The application has evolved into a production-ready, enterprise-grade platform featuring multiple dashboards, comprehensive testing infrastructure, WCAG 2.1 AA accessibility compliance, database integration, advanced data visualization, and automated quality assurance.
+
+**Phase 5 Complete**: Testing & Quality Assurance infrastructure with accessibility-first approach, performance monitoring, cross-browser compatibility testing, and automated regression testing.
 
 The application is built with:
 
@@ -15,7 +17,9 @@ The application is built with:
 - **Lucide React 0.523.0** - Icon library
 - **LowDB 7.0.1** - Local JSON database for data persistence
 - **Create React App 5.0.1** - Build toolchain and development server
-- **Comprehensive testing infrastructure** with React Testing Library
+- **Comprehensive testing infrastructure** with React Testing Library, Jest, axe-core
+- **Performance monitoring** with Core Web Vitals tracking
+- **Accessibility testing framework** with automated regression testing
 
 ## Development Commands
 
@@ -25,6 +29,12 @@ npm start
 
 # Run tests in interactive watch mode
 npm test
+
+# Run accessibility tests
+npm test -- --testNamePattern="accessibility"
+
+# Run performance tests
+npm test -- --testNamePattern="performance"
 
 # Build for production
 npm run build
@@ -51,14 +61,17 @@ npm run eject
 src/
 ├── components/
 │   ├── charts/           # Chart-specific components
+│   │   └── __tests__/    # Chart accessibility tests
 │   ├── dashboards/       # Dashboard page components
 │   └── ui/              # Reusable UI components
+│       └── __tests__/    # UI component tests
 ├── contexts/            # React Context providers
 ├── data/               # Data files and API layer
 ├── database/           # Local database setup
 ├── hooks/              # Custom React hooks
 ├── styles/             # CSS files
 └── utils/              # Utility functions
+    └── __tests__/       # Utility function tests
 ```
 
 ### Key Features
@@ -68,7 +81,8 @@ src/
 - **Accessibility Compliance** - WCAG 2.1 AA standards
 - **Performance Optimization** - Lazy loading, code splitting, caching
 - **Error Handling** - Multi-layered error boundaries
-- **Testing Infrastructure** - Unit, integration, and E2E testing
+- **Testing Infrastructure** - Unit, integration, accessibility, and performance testing
+- **Quality Assurance** - Automated regression testing with baseline comparison
 - **Database Integration** - Local database with schema management
 
 ### Data Architecture
@@ -143,8 +157,10 @@ src/
 ### Testing Requirements
 - **Unit tests** for all new components and utilities
 - **Integration tests** for complete user workflows
-- **Accessibility tests** for WCAG compliance
-- **Performance tests** for optimization validation
+- **Accessibility tests** for WCAG 2.1 AA compliance (required, zero-violations)
+- **Performance tests** for Core Web Vitals compliance
+- **Regression tests** for preventing accessibility and performance degradation
+- **Cross-browser tests** for compatibility verification
 - **Error handling tests** for robustness
 
 ### Performance Standards
