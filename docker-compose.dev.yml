@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  hr-reports-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: hr-reports-dev
+    ports:
+      - "3000:80"
+    environment:
+      - NODE_ENV=development
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - hr-reports-dev-network
+
+networks:
+  hr-reports-dev-network:
+    driver: bridge
