@@ -1,10 +1,59 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
-import { ArrowUpCircle, ArrowDownCircle, Filter, Calendar, Download } from 'lucide-react';
+import { ArrowUpCircle, ArrowDownCircle } from 'lucide-react';
 import DashboardHeader from '../ui/DashboardHeader';
 import ErrorBoundary from '../ui/ErrorBoundary';
 
 const CombinedWorkforceDashboard = () => {
+  // State for filters and actions
+  const [filters, setFilters] = useState({
+    reportingPeriod: 'Q3-2025',
+    location: 'all',
+    division: 'all',
+    employeeType: 'all'
+  });
+
+  // Handle filter changes
+  const handleFilterChange = (newFilters) => {
+    setFilters(prev => ({ ...prev, ...newFilters }));
+    // In a real app, this would trigger data refetch
+    console.log('Filters updated:', { ...filters, ...newFilters });
+  };
+
+  // Handle export functionality
+  const handleExport = (exportType) => {
+    console.log('Exporting data:', exportType, 'with filters:', filters);
+    // Implementation would depend on export type (PDF, Excel, CSV)
+  };
+
+  // Available filter options for the dashboard
+  const availableFilters = {
+    reportingPeriod: [
+      { value: 'Q3-2025', label: 'Q3 2025' },
+      { value: 'Q2-2025', label: 'Q2 2025' },
+      { value: 'Q1-2025', label: 'Q1 2025' },
+      { value: 'Q4-2024', label: 'Q4 2024' },
+      { value: 'Q3-2024', label: 'Q3 2024' }
+    ],
+    location: [
+      { value: 'all', label: 'All Locations' },
+      { value: 'omaha', label: 'Omaha Campus' },
+      { value: 'phoenix', label: 'Phoenix Campus' }
+    ],
+    division: [
+      { value: 'all', label: 'All Divisions' },
+      { value: 'medicine', label: 'School of Medicine' },
+      { value: 'arts-sciences', label: 'Arts & Sciences' },
+      { value: 'pharmacy', label: 'Pharmacy & Health Professions' },
+      { value: 'dentistry', label: 'Dentistry' },
+      { value: 'business', label: 'Business' }
+    ],
+    employeeType: [
+      { value: 'all', label: 'All Types' },
+      { value: 'faculty', label: 'Faculty' },
+      { value: 'staff', label: 'Staff' }
+    ]
+  };
   const headcountData = {
     total: 4249,
     faculty: 684,
@@ -53,30 +102,18 @@ const CombinedWorkforceDashboard = () => {
     <ErrorBoundary>
       <div className="min-h-screen bg-gray-50 py-8">
         <div className="max-w-7xl mx-auto px-4">
-          {/* Top Bar */}
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
-            <div>
-              <DashboardHeader 
-                title="Combined Workforce & Turnover Analytics"
-                subtitle="Comprehensive employee headcount and turnover analysis"
-                lastUpdated="Quarter ending 9/30/2024"
-              />
-            </div>
-            <div className="flex gap-2 items-center">
-              <button className="px-3 py-2 bg-white border border-gray-300 rounded-lg flex items-center gap-1 hover:bg-gray-50 text-sm">
-                <Filter size={16} />
-                <span>Filters</span>
-              </button>
-              <button className="px-3 py-2 bg-white border border-gray-300 rounded-lg flex items-center gap-1 hover:bg-gray-50 text-sm">
-                <Calendar size={16} />
-                <span>Q3-2025</span>
-              </button>
-              <button className="px-3 py-2 bg-blue-600 text-white rounded-lg flex items-center gap-1 hover:bg-blue-700 text-sm">
-                <Download size={16} />
-                <span>Export</span>
-              </button>
-            </div>
-          </div>
+          {/* Header with functional buttons */}
+          <DashboardHeader 
+            title="Combined Workforce & Turnover Analytics"
+            subtitle="Comprehensive employee headcount and turnover analysis | Quarter ending 9/30/2024"
+            filters={filters}
+            availableFilters={availableFilters}
+            onFilterChange={handleFilterChange}
+            onExport={handleExport}
+            showFilters={true}
+            showDateFilter={true}
+            showExport={true}
+          />
 
           {/* Summary Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mb-6">

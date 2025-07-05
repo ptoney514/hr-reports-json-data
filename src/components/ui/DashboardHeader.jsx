@@ -1,5 +1,5 @@
 import React from 'react';
-import { Filter, Calendar, Download } from 'lucide-react';
+import { Calendar } from 'lucide-react';
 import FilterButton from './FilterButton';
 import ExportButton from './ExportButton';
 
@@ -7,6 +7,7 @@ const DashboardHeader = ({
   title, 
   subtitle,
   filters = {}, 
+  availableFilters = {},
   onFilterChange,
   onExport,
   showFilters = true,
@@ -60,6 +61,7 @@ const DashboardHeader = ({
         {showFilters && (
           <FilterButton
             filters={filters}
+            availableFilters={availableFilters}
             onFilterChange={onFilterChange}
             activeCount={activeFilterCount}
           />
@@ -67,7 +69,13 @@ const DashboardHeader = ({
 
         {/* Date/Period Filter */}
         {showDateFilter && (
-          <button className="flex items-center gap-1 px-3 py-1 bg-white border rounded shadow-sm hover:bg-gray-50 transition-colors">
+          <button 
+            onClick={() => {
+              // For now, just console log - could be enhanced to show date picker
+              console.log('Date filter clicked:', getFilterDisplayValue());
+            }}
+            className="flex items-center gap-1 px-3 py-1 bg-white border rounded shadow-sm hover:bg-gray-50 transition-colors"
+          >
             <Calendar size={16} />
             <span className="text-sm">
               {getFilterDisplayValue()}

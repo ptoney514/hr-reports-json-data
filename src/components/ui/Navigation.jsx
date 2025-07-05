@@ -94,6 +94,14 @@ const Navigation = () => {
           icon: Users,
           description: 'Comprehensive workforce and turnover analysis',
           isActive: isActive('/dashboards/combined-workforce')
+        },
+        {
+          id: 'enhanced-workforce',
+          label: 'Enhanced Workforce Analytics',
+          path: '/dashboards/enhanced-workforce',
+          icon: Users,
+          description: 'Advanced workforce analytics with data import',
+          isActive: isActive('/dashboards/enhanced-workforce')
         }
       ]
     }
