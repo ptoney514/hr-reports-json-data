@@ -15,6 +15,7 @@ import {
   Trash2
 } from 'lucide-react';
 import firebaseService from '../../services/FirebaseService';
+import { generateWorkforceMetrics } from '../../utils/workforceDataProcessor';
 // import hrDatabase from '../../database/HRDatabase';
 
 const ExcelIntegrationDashboard = () => {
@@ -26,29 +27,204 @@ const ExcelIntegrationDashboard = () => {
   const [uploadingToFirebase, setUploadingToFirebase] = useState(false);
   const [clearingDatabase, setClearingDatabase] = useState(false);
 
-  // Expected column mappings for different data types
-  const columnMappings = {
-    workforce: {
-      required: ['Employee_ID', 'Name', 'Department', 'Position', 'Hire_Date'],
-      optional: ['Salary', 'Grade', 'Status', 'Location', 'Manager']
-    },
-    turnover: {
-      required: ['Employee_ID', 'Name', 'Department', 'Departure_Date', 'Reason'],
-      optional: ['Tenure_Years', 'Exit_Interview', 'Voluntary', 'Cost_Impact']
-    },
-    recruiting: {
-      required: ['Position_ID', 'Department', 'Position_Title', 'Status'],
-      optional: ['Posted_Date', 'Source', 'Hire_Date', 'Salary_Range']
-    },
-    exitSurvey: {
-      required: ['Employee_ID', 'Department', 'Exit_Date', 'Survey_Response'],
-      optional: ['Exit_Reason', 'Satisfaction_Rating', 'Would_Recommend']
-    },
-    compliance: {
-      required: ['Employee_ID', 'Name', 'Employee_Type', 'I9_Date', 'Compliant'],
-      optional: ['Section_2_Date', 'Training_Complete', 'Audit_Ready']
+  // Enhanced validation with column header normalization and fuzzy matching
+  const validateAggregateData = (data) => {
+    console.log('validateAggregateData called with:', data);
+    
+    if (!data || data.length === 0) {
+      console.log('No data found');
+      return { valid: false, error: 'No data found in file' };
     }
+
+    const requiredColumns = ['Quarter_End_Date', 'Division', 'Location'];
+    const columns = Object.keys(data[0] || {});
+    console.log('Available columns:', columns);
+    console.log('Required columns:', requiredColumns);
+    
+    // Normalize column headers for comparison
+    const normalizeHeader = (header) => {
+      return header.toString().trim().toLowerCase().replace(/[^a-z0-9]/g, '_');
+    };
+    
+    const normalizedAvailable = columns.map(col => ({
+      original: col,
+      normalized: normalizeHeader(col)
+    }));
+    
+    const normalizedRequired = requiredColumns.map(col => ({
+      original: col,
+      normalized: normalizeHeader(col)
+    }));
+    
+    console.log('Normalized available:', normalizedAvailable);
+    console.log('Normalized required:', normalizedRequired);
+    
+    // Check for missing columns using fuzzy matching
+    const missingColumns = [];
+    const foundColumns = [];
+    
+    normalizedRequired.forEach(required => {
+      const found = normalizedAvailable.find(available => 
+        available.normalized === required.normalized ||
+        available.normalized.includes(required.normalized) ||
+        required.normalized.includes(available.normalized)
+      );
+      
+      if (found) {
+        foundColumns.push(`${required.original} (found as: ${found.original})`);
+      } else {
+        missingColumns.push(required.original);
+      }
+    });
+    
+    console.log('Found columns:', foundColumns);
+    console.log('Missing columns:', missingColumns);
+
+    if (missingColumns.length > 0) {
+      console.log('Validation failed - missing columns');
+      return { 
+        valid: false, 
+        error: `Missing required columns: ${missingColumns.join(', ')}. Available columns: ${columns.join(', ')}`,
+        foundColumns,
+        missingColumns,
+        availableColumns: columns
+      };
+    }
+
+    console.log('Validation passed');
+    return { 
+      valid: true, 
+      totalRows: data.length, 
+      totalColumns: columns.length,
+      foundColumns,
+      availableColumns: columns
+    };
   };
+
+  // Convert quarterly aggregate data to individual employee records format for generateWorkforceMetrics
+  const convertQuarterlyToEmployeeRecords = (quarterlyRecords) => {
+    const employeeRecords = [];
+    let empId = 1;
+
+    quarterlyRecords.forEach(record => {
+      const { division, location, beFacultyHeadcount, beStaffHeadcount, 
+              nbeFacultyHeadcount, nbeStaffHeadcount, nbeStudentWorkerHeadcount } = record;
+
+      // Create individual employee records for each headcount category
+      // BE Faculty
+      for (let i = 0; i < beFacultyHeadcount; i++) {
+        employeeRecords.push({
+          id: empId++,
+          employeeId: `EMP${empId}`,
+          fullName: `Faculty Member ${i + 1}`,
+          division: division,
+          location: location,
+          department: division, // Use division as department
+          position: 'Faculty',
+          employeeType: 'Faculty',
+          employmentStatus: 'Full-time',
+          isActive: true,
+          hireDate: new Date('2020-01-01'), // Default hire date
+          tenure: 4 // Default tenure
+        });
+      }
+
+      // BE Staff
+      for (let i = 0; i < beStaffHeadcount; i++) {
+        employeeRecords.push({
+          id: empId++,
+          employeeId: `EMP${empId}`,
+          fullName: `Staff Member ${i + 1}`,
+          division: division,
+          location: location,
+          department: division,
+          position: 'Staff',
+          employeeType: 'Staff',
+          employmentStatus: 'Full-time',
+          isActive: true,
+          hireDate: new Date('2020-01-01'),
+          tenure: 4
+        });
+      }
+
+      // NBE Faculty
+      for (let i = 0; i < nbeFacultyHeadcount; i++) {
+        employeeRecords.push({
+          id: empId++,
+          employeeId: `EMP${empId}`,
+          fullName: `NBE Faculty ${i + 1}`,
+          division: division,
+          location: location,
+          department: division,
+          position: 'Faculty',
+          employeeType: 'Faculty',
+          employmentStatus: 'Part-time',
+          isActive: true,
+          hireDate: new Date('2021-01-01'),
+          tenure: 3
+        });
+      }
+
+      // NBE Staff
+      for (let i = 0; i < nbeStaffHeadcount; i++) {
+        employeeRecords.push({
+          id: empId++,
+          employeeId: `EMP${empId}`,
+          fullName: `NBE Staff ${i + 1}`,
+          division: division,
+          location: location,
+          department: division,
+          position: 'Staff',
+          employeeType: 'Staff',
+          employmentStatus: 'Part-time',
+          isActive: true,
+          hireDate: new Date('2021-01-01'),
+          tenure: 3
+        });
+      }
+
+      // NBE Student Workers
+      for (let i = 0; i < nbeStudentWorkerHeadcount; i++) {
+        employeeRecords.push({
+          id: empId++,
+          employeeId: `EMP${empId}`,
+          fullName: `Student Worker ${i + 1}`,
+          division: division,
+          location: location,
+          department: division,
+          position: 'Student Worker',
+          employeeType: 'Student',
+          employmentStatus: 'Part-time',
+          isActive: true,
+          hireDate: new Date('2023-01-01'),
+          tenure: 1
+        });
+      }
+    });
+
+    console.log(`Generated ${employeeRecords.length} individual employee records from ${quarterlyRecords.length} quarterly records`);
+    return employeeRecords;
+  };
+
+  // Simple data processing - direct field renaming
+  const processAggregateData = (rawData) => {
+    return rawData.map(row => ({
+      quarterEndDate: row.Quarter_End_Date,
+      division: row.Division?.trim() || '',
+      location: row.Location?.trim() || '',
+      beFacultyHeadcount: parseInt(row.BE_Faculty_Headcount, 10) || 0,
+      beStaffHeadcount: parseInt(row.BE_Staff_Headcount, 10) || 0,
+      nbeFacultyHeadcount: parseInt(row.NBE_Faculty_Headcount, 10) || 0,
+      nbeStaffHeadcount: parseInt(row.NBE_Staff_Headcount, 10) || 0,
+      nbeStudentWorkerHeadcount: parseInt(row.NBE_Student_Worker_Headcount, 10) || 0,
+      totalHeadcount: parseInt(row.Total_Headcount, 10) || 0,
+      beNewHires: parseInt(row.BE_New_Hires, 10) || 0,
+      beDepartures: parseInt(row.BE_Departures, 10) || 0,
+      nbeNewHires: parseInt(row.NBE_New_Hires, 10) || 0,
+      nbeDepartures: parseInt(row.NBE_Departures, 10) || 0
+    }));
+  };
+
 
   // File upload handler
   const onDrop = useCallback(async (acceptedFiles) => {
@@ -106,85 +282,30 @@ const ExcelIntegrationDashboard = () => {
     multiple: true
   });
 
-  // Validate data structure
-  const validateData = (fileData, dataType) => {
-    const mapping = columnMappings[dataType];
-    if (!mapping) return { valid: false, error: 'Unknown data type' };
-
+  // Simple validation function
+  const validateData = (fileData) => {
     const data = fileData.data;
-    if (!data || data.length === 0) {
-      return { valid: false, error: 'No data found in file' };
+    const validation = validateAggregateData(data);
+    
+    if (!validation.valid) {
+      return {
+        valid: false,
+        error: validation.error,
+        totalRows: 0,
+        totalColumns: 0
+      };
     }
 
-    const columns = Object.keys(data[0]);
-    const missingRequired = mapping.required.filter(col => !columns.includes(col));
-    const extraColumns = columns.filter(col => 
-      !mapping.required.includes(col) && !mapping.optional.includes(col)
-    );
-
-    const validation = {
-      valid: missingRequired.length === 0,
-      totalRows: data.length,
-      totalColumns: columns.length,
-      requiredColumns: mapping.required.length,
-      optionalColumns: mapping.optional.length,
-      missingRequired,
-      extraColumns,
-      foundColumns: columns,
-      dataQuality: analyzeDataQuality(data, mapping)
+    return {
+      valid: true,
+      totalRows: validation.totalRows,
+      totalColumns: validation.totalColumns,
+      requiredColumns: 3, // Quarter_End_Date, Division, Location
+      optionalColumns: 10, // All the headcount fields
+      foundColumns: Object.keys(data[0])
     };
-
-    return validation;
   };
 
-  // Analyze data quality
-  const analyzeDataQuality = (data, mapping) => {
-    const issues = [];
-    const stats = {
-      emptyRows: 0,
-      duplicateIds: 0,
-      invalidDates: 0,
-      missingRequiredData: 0
-    };
-
-    const seenIds = new Set();
-
-    data.forEach((row, index) => {
-      // Check for empty rows
-      const hasData = Object.values(row).some(value => value !== null && value !== '');
-      if (!hasData) stats.emptyRows++;
-
-      // Check for duplicate IDs
-      if (row.Employee_ID) {
-        if (seenIds.has(row.Employee_ID)) {
-          stats.duplicateIds++;
-        } else {
-          seenIds.add(row.Employee_ID);
-        }
-      }
-
-      // Check required fields
-      mapping.required.forEach(field => {
-        if (!row[field] || row[field] === '') {
-          stats.missingRequiredData++;
-        }
-      });
-
-      // Validate dates
-      ['Hire_Date', 'Departure_Date'].forEach(dateField => {
-        if (row[dateField] && !isValidDate(row[dateField])) {
-          stats.invalidDates++;
-        }
-      });
-    });
-
-    return { stats, issues };
-  };
-
-  const isValidDate = (dateString) => {
-    const date = new Date(dateString);
-    return date instanceof Date && !isNaN(date);
-  };
 
   // Preview file data
   const previewFile = (fileData) => {
@@ -192,31 +313,77 @@ const ExcelIntegrationDashboard = () => {
   };
 
 
-  // Upload data to Firebase
-  const uploadToFirebase = async (fileData, dataType) => {
+  // Enhanced Firebase upload with proper data transformation
+  const uploadToFirebase = async (fileData) => {
     setUploadingToFirebase(true);
-    setFirebaseStatus({ status: 'uploading', message: 'Uploading data to Firebase...' });
+    setFirebaseStatus({ status: 'uploading', message: 'Processing and uploading aggregate data to Firebase...' });
 
     try {
-      const transformedData = transformDataForFirebase(fileData.data, dataType);
+      // Process data with simple approach
+      const processedData = processAggregateData(fileData.data);
       
-      if (dataType === 'workforce') {
-        await firebaseService.setWorkforceMetrics('2025-Q1', transformedData);
-      } else if (dataType === 'turnover') {
-        await firebaseService.setTurnoverMetrics('2025-Q1', transformedData);
-      } else if (dataType === 'recruiting') {
-        await firebaseService.setRecruitingMetrics('2025-Q1', transformedData);
-      } else if (dataType === 'exitSurvey') {
-        await firebaseService.setExitSurveyMetrics('2025-Q1', transformedData);
-      } else if (dataType === 'compliance') {
-        await firebaseService.setComplianceMetrics('2025-Q1', transformedData);
+      // Group by quarter
+      const quarterlyData = {};
+      processedData.forEach(record => {
+        const quarter = record.quarterEndDate;
+        if (!quarterlyData[quarter]) {
+          quarterlyData[quarter] = [];
+        }
+        quarterlyData[quarter].push(record);
+      });
+      
+      // Upload each quarter's data to Firebase
+      let totalUploaded = 0;
+      let quartersProcessed = 0;
+      
+      for (const [quarterDate, quarterRecords] of Object.entries(quarterlyData)) {
+        // Convert date to academic quarter period format using the correct mapping
+        // Academic calendar: Q4 (June), Q1 (September), Q2 (December), Q3 (March)
+        const date = new Date(quarterDate);
+        const year = date.getFullYear();
+        const month = date.getMonth() + 1;
+        let period;
+        
+        // Use the exact mapping from quarterlyDataProcessor.js
+        if (quarterDate === '2024-06-30') period = 'Q4-2024';
+        else if (quarterDate === '2024-09-30') period = 'Q1-2025';
+        else if (quarterDate === '2024-12-31') period = 'Q2-2025';
+        else if (quarterDate === '2025-03-31') period = 'Q3-2025';
+        else {
+          // Fallback for other dates - derive academic quarter
+          if (month === 6) period = `Q4-${year}`;
+          else if (month === 9) period = `Q1-${year + 1}`;
+          else if (month === 12) period = `Q2-${year + 1}`;
+          else if (month === 3) period = `Q3-${year}`;
+          else {
+            console.warn(`Unknown quarter date format: ${quarterDate}`);
+            continue;
+          }
+        }
+        
+        // Transform quarterly records into dashboard metrics using the workforce data processor
+        console.log(`Processing ${quarterRecords.length} records for ${period}`);
+        
+        // Convert quarterly aggregate data to individual employee records format for processing
+        const employeeRecords = convertQuarterlyToEmployeeRecords(quarterRecords);
+        
+        // Generate dashboard metrics from the employee records
+        const dashboardMetrics = generateWorkforceMetrics(employeeRecords, period);
+        
+        // Upload the processed metrics to Firebase using the correct method
+        await firebaseService.setWorkforceMetrics(period, dashboardMetrics);
+        
+        totalUploaded += quarterRecords.length;
+        quartersProcessed++;
+        
+        console.log(`Successfully uploaded metrics for ${period}`);
       }
 
       setFirebaseStatus({ 
         status: 'success', 
-        message: `Successfully uploaded ${fileData.data.length} records to Firebase`,
-        dataType,
-        dashboardLinks: getDashboardLinks(dataType)
+        message: `Successfully processed and uploaded ${totalUploaded} records across ${quartersProcessed} quarters to Firebase`,
+        dataType: 'quarterlyAggregate',
+        dashboardLinks: { url: '/dashboards/enhanced-workforce', name: 'Enhanced Workforce Dashboard' }
       });
 
       // Update file status
@@ -239,242 +406,6 @@ const ExcelIntegrationDashboard = () => {
   };
 
 
-  const getLocationBreakdown = (data) => {
-    const locations = {};
-    data.forEach(row => {
-      const location = row.Location || 'Unknown';
-      locations[location] = (locations[location] || 0) + 1;
-    });
-    return Object.entries(locations).map(([name, count]) => ({ name, count }));
-  };
-
-  const getDivisionBreakdown = (data) => {
-    const divisions = {};
-    data.forEach(row => {
-      const department = row.Department || 'Unknown';
-      divisions[department] = (divisions[department] || 0) + 1;
-    });
-    return Object.entries(divisions)
-      .map(([name, count]) => ({ name, count }))
-      .sort((a, b) => b.count - a.count)
-      .slice(0, 10);
-  };
-
-  const getTurnoverByCategory = (data) => {
-    const categories = {};
-    data.forEach(row => {
-      const category = row.Category || 'Unknown';
-      categories[category] = (categories[category] || 0) + 1;
-    });
-    return Object.entries(categories).map(([name, count]) => ({ name, count }));
-  };
-
-  const getReasonBreakdown = (data) => {
-    const reasons = {};
-    data.forEach(row => {
-      const reason = row.Reason || 'Unknown';
-      reasons[reason] = (reasons[reason] || 0) + 1;
-    });
-    return Object.entries(reasons).map(([name, value]) => ({ name, value }));
-  };
-
-  const calculateTurnoverRate = (data) => {
-    // Simple calculation - in real implementation, this would be more sophisticated
-    return Math.round((data.length / (data.length * 1.2)) * 100 * 100) / 100;
-  };
-
-  // Transform data for Firebase format
-  const transformDataForFirebase = (data, dataType) => {
-    const now = new Date().toISOString();
-    
-    switch (dataType) {
-      case 'workforce':
-        return {
-          period: '2025-Q1',
-          totalEmployees: data.length,
-          lastUpdated: now,
-          byDepartment: getFirebaseDepartmentBreakdown(data),
-          byLocation: getFirebaseLocationBreakdown(data),
-          summary: {
-            totalHeadcount: data.length,
-            faculty: data.filter(row => row.Position?.toLowerCase().includes('faculty')).length,
-            staff: data.filter(row => row.Position?.toLowerCase().includes('staff')).length,
-            students: data.filter(row => row.Position?.toLowerCase().includes('student')).length
-          }
-        };
-      
-      case 'turnover':
-        return {
-          period: '2025-Q1',
-          totalSeparations: data.length,
-          turnoverRate: calculateTurnoverRate(data),
-          lastUpdated: now,
-          byDepartment: getFirebaseTurnoverDepartments(data),
-          byReason: getFirebaseTurnoverReasons(data),
-          voluntaryRate: Math.round((data.filter(row => row.Voluntary === 'Yes').length / data.length) * 100),
-          involuntaryRate: Math.round((data.filter(row => row.Voluntary === 'No').length / data.length) * 100),
-          trends: { quarterlyChange: 2.5 }
-        };
-      
-      case 'recruiting':
-        return {
-          period: '2025-Q1',
-          totalOpenPositions: data.filter(row => row.Status === 'Open').length,
-          newHiresYTD: data.filter(row => row.Status === 'Hired').length,
-          lastUpdated: now,
-          byDepartment: getFirebaseRecruitingDepartments(data),
-          hireSources: getFirebaseHireSources(data),
-          timeToFill: [
-            { quarter: 'Q1-25', avgDays: 44, target: 45 },
-            { quarter: 'Q2-25', avgDays: 45, target: 45 }
-          ]
-        };
-      
-      case 'exitSurvey':
-        return {
-          period: '2025-Q1',
-          totalExits: data.length,
-          totalResponses: data.filter(row => row.Survey_Response === 'Yes').length,
-          lastUpdated: now,
-          exitReasons: getFirebaseExitReasons(data),
-          satisfaction: getFirebaseSatisfactionData(data),
-          byDepartment: getFirebaseExitDepartments(data)
-        };
-      
-      case 'compliance':
-        return {
-          period: '2025-Q1',
-          totalI9s: data.length,
-          overallCompliance: Math.round((data.filter(row => row.Compliant === 'Yes').length / data.length) * 100),
-          lastUpdated: now,
-          byType: getFirebaseComplianceTypes(data),
-          risks: getFirebaseRisks(data)
-        };
-      
-      default:
-        return { period: '2025-Q1', data: data.slice(0, 100), lastUpdated: now };
-    }
-  };
-
-  // Helper functions for Firebase data transformation
-  const getFirebaseDepartmentBreakdown = (data) => {
-    const depts = {};
-    data.forEach(row => {
-      const dept = row.Department || 'Unknown';
-      depts[dept] = (depts[dept] || 0) + 1;
-    });
-    return depts;
-  };
-
-  const getFirebaseLocationBreakdown = (data) => {
-    const locations = {};
-    data.forEach(row => {
-      const location = row.Location || 'Main Campus';
-      locations[location] = (locations[location] || 0) + 1;
-    });
-    return locations;
-  };
-
-  const getFirebaseTurnoverDepartments = (data) => {
-    const depts = {};
-    data.forEach(row => {
-      const dept = row.Department || 'Unknown';
-      depts[dept] = Math.round(Math.random() * 15 + 5); // Sample rate
-    });
-    return depts;
-  };
-
-  const getFirebaseTurnoverReasons = (data) => {
-    const reasons = {};
-    data.forEach(row => {
-      const reason = row.Reason || 'Other';
-      reasons[reason] = (reasons[reason] || 0) + 1;
-    });
-    return reasons;
-  };
-
-  const getFirebaseRecruitingDepartments = (data) => {
-    const depts = {};
-    data.forEach(row => {
-      const dept = row.Department || 'Unknown';
-      if (!depts[dept]) depts[dept] = { open: 0, posted: 0, notPosted: 0, filled: 0 };
-      if (row.Status === 'Open') depts[dept].open++;
-      if (row.Status === 'Posted') depts[dept].posted++;
-      if (row.Status === 'Hired') depts[dept].filled++;
-    });
-    return depts;
-  };
-
-  const getFirebaseHireSources = (data) => {
-    const sources = {};
-    data.filter(row => row.Status === 'Hired').forEach(row => {
-      const source = row.Source || 'Other';
-      sources[source] = (sources[source] || 0) + 1;
-    });
-    return sources;
-  };
-
-  const getFirebaseExitReasons = (data) => {
-    const reasons = {};
-    data.forEach(row => {
-      const reason = row.Exit_Reason || 'Other';
-      reasons[reason] = (reasons[reason] || 0) + 10; // Percentage
-    });
-    return reasons;
-  };
-
-  const getFirebaseSatisfactionData = (data) => {
-    return {
-      'Overall Experience': { satisfied: 45, neutral: 30, dissatisfied: 25 },
-      'Career Development': { satisfied: 35, neutral: 25, dissatisfied: 40 },
-      'Leadership': { satisfied: 40, neutral: 35, dissatisfied: 25 },
-      'Compensation': { satisfied: 50, neutral: 20, dissatisfied: 30 },
-      'Work Environment': { satisfied: 60, neutral: 20, dissatisfied: 20 }
-    };
-  };
-
-  const getFirebaseExitDepartments = (data) => {
-    const depts = {};
-    data.forEach(row => {
-      const dept = row.Department || 'Unknown';
-      if (!depts[dept]) depts[dept] = { exits: 0, responses: 0 };
-      depts[dept].exits++;
-      if (row.Survey_Response === 'Yes') depts[dept].responses++;
-    });
-    return depts;
-  };
-
-  const getFirebaseComplianceTypes = (data) => {
-    const types = {};
-    data.forEach(row => {
-      const type = row.Employee_Type || 'Faculty/Staff';
-      if (!types[type]) types[type] = { total: 0, onTime: 0, late: 0, rate: 0 };
-      types[type].total++;
-      if (row.Compliant === 'Yes') types[type].onTime++;
-      else types[type].late++;
-      types[type].rate = Math.round((types[type].onTime / types[type].total) * 100);
-    });
-    return types;
-  };
-
-  const getFirebaseRisks = (data) => {
-    return {
-      'Late Section 2': { count: data.filter(row => row.Compliant === 'No').length, risk: 'Medium', color: '#f59e0b' },
-      'Missing Training': { count: Math.floor(data.length * 0.1), risk: 'High', color: '#ef4444' }
-    };
-  };
-
-  // Get dashboard navigation links based on data type
-  const getDashboardLinks = (dataType) => {
-    const links = {
-      workforce: { url: '/dashboards/workforce', name: 'Workforce Dashboard' },
-      turnover: { url: '/dashboards/turnover', name: 'Turnover Dashboard' },
-      recruiting: { url: '/dashboards/recruiting', name: 'Recruiting Dashboard' },
-      exitSurvey: { url: '/dashboards/exit-survey', name: 'Exit Survey Dashboard' },
-      compliance: { url: '/dashboards/i9', name: 'I9 Compliance Dashboard' }
-    };
-    return links[dataType] || null;
-  };
 
   const removeFile = (fileName) => {
     setUploadedFiles(prev => prev.filter(f => f.name !== fileName));
@@ -653,22 +584,18 @@ const ExcelIntegrationDashboard = () => {
                           Preview
                         </button>
                         
-                        <select
-                          onChange={(e) => {
-                            if (e.target.value) {
-                              const validation = validateData(fileData, e.target.value);
-                              setValidationResults({ ...validation, dataType: e.target.value, fileData });
-                            }
+                        <button
+                          onClick={() => {
+                            console.log('Starting validation with fileData:', fileData.data);
+                            const validation = validateData(fileData);
+                            console.log('Validation result:', validation);
+                            setValidationResults({ ...validation, dataType: 'quarterlyAggregate', fileData });
                           }}
-                          className="px-3 py-1 border rounded text-sm"
+                          className="flex items-center gap-1 px-3 py-1 bg-green-600 text-white hover:bg-green-700 rounded text-sm"
                         >
-                          <option value="">Select Data Type</option>
-                          <option value="workforce">Workforce Data</option>
-                          <option value="turnover">Turnover Data</option>
-                          <option value="recruiting">Recruiting Data</option>
-                          <option value="exitSurvey">Exit Survey Data</option>
-                          <option value="compliance">I9 Compliance Data</option>
-                        </select>
+                          <CheckCircle size={16} />
+                          Validate Aggregate Data
+                        </button>
                       </>
                     )}
                     
@@ -732,29 +659,55 @@ const ExcelIntegrationDashboard = () => {
               </div>
             </div>
 
-            {validationResults.missingRequired.length > 0 && (
+            {validationResults.error && (
               <div className="mt-3">
-                <p className="text-yellow-700 font-medium">Missing Required Columns:</p>
-                <p className="text-yellow-600 text-sm">{validationResults.missingRequired.join(', ')}</p>
+                <p className="text-red-700 font-medium">Validation Error:</p>
+                <p className="text-red-600 text-sm">{validationResults.error}</p>
+                
+                {validationResults.foundColumns && validationResults.foundColumns.length > 0 && (
+                  <div className="mt-2">
+                    <p className="text-green-700 font-medium text-sm">Found Columns:</p>
+                    <ul className="text-green-600 text-xs ml-4">
+                      {validationResults.foundColumns.map((col, index) => (
+                        <li key={index}>• {col}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                
+                {validationResults.missingColumns && validationResults.missingColumns.length > 0 && (
+                  <div className="mt-2">
+                    <p className="text-red-700 font-medium text-sm">Missing Columns:</p>
+                    <ul className="text-red-600 text-xs ml-4">
+                      {validationResults.missingColumns.map((col, index) => (
+                        <li key={index}>• {col}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </div>
             )}
-
-            {validationResults.extraColumns.length > 0 && (
+            
+            {validationResults.valid && validationResults.foundColumns && (
               <div className="mt-3">
-                <p className="text-blue-700 font-medium">Extra Columns Found:</p>
-                <p className="text-blue-600 text-sm">{validationResults.extraColumns.join(', ')}</p>
+                <p className="text-green-700 font-medium text-sm">Required Columns Found:</p>
+                <ul className="text-green-600 text-xs ml-4">
+                  {validationResults.foundColumns.map((col, index) => (
+                    <li key={index}>• {col}</li>
+                  ))}
+                </ul>
               </div>
             )}
           </div>
 
           {validationResults.valid && (
             <button
-              onClick={() => uploadToFirebase(validationResults.fileData, validationResults.dataType)}
+              onClick={() => uploadToFirebase(validationResults.fileData)}
               disabled={uploadingToFirebase}
               className="flex items-center gap-2 px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 font-medium shadow-sm hover:shadow-md transition-all"
             >
               <Cloud size={18} />
-              {uploadingToFirebase ? 'Uploading to Firebase...' : 'Upload to Firebase'}
+              {uploadingToFirebase ? 'Uploading to Firebase...' : 'Upload to Enhanced Workforce Dashboard'}
             </button>
           )}
         </div>
@@ -808,62 +761,57 @@ const ExcelIntegrationDashboard = () => {
 
       {/* Help Section */}
       <div className="bg-blue-50 rounded-lg border border-blue-200 p-6">
-        <h3 className="text-lg font-semibold text-blue-900 mb-3">Excel File Requirements</h3>
+        <h3 className="text-lg font-semibold text-blue-900 mb-3">Quarterly Aggregate Data Requirements</h3>
         
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="space-y-4">
           <div>
-            <h4 className="font-medium text-blue-800 mb-2">Workforce Data:</h4>
+            <h4 className="font-medium text-blue-800 mb-2">Required Columns:</h4>
             <div className="text-sm space-y-1">
-              <p className="text-blue-700"><strong>Required:</strong> Employee_ID, Name, Department, Position, Hire_Date</p>
-              <p className="text-blue-600"><strong>Optional:</strong> Salary, Grade, Status, Location, Manager</p>
+              <p className="text-blue-700">
+                <strong>Quarter_End_Date, Division, Location, BE_Faculty_Headcount, BE_Staff_Headcount, 
+                NBE_Faculty_Headcount, NBE_Staff_Headcount, NBE_Student_Worker_Headcount</strong>
+              </p>
             </div>
           </div>
           
           <div>
-            <h4 className="font-medium text-blue-800 mb-2">Turnover Data:</h4>
+            <h4 className="font-medium text-blue-800 mb-2">Optional Columns:</h4>
             <div className="text-sm space-y-1">
-              <p className="text-blue-700"><strong>Required:</strong> Employee_ID, Name, Department, Departure_Date, Reason</p>
-              <p className="text-blue-600"><strong>Optional:</strong> Tenure_Years, Exit_Interview, Voluntary, Cost_Impact</p>
+              <p className="text-blue-600">
+                <strong>Total_Headcount, BE_New_Hires, BE_Departures, NBE_New_Hires, NBE_Departures</strong>
+              </p>
             </div>
           </div>
 
           <div>
-            <h4 className="font-medium text-blue-800 mb-2">Recruiting Data:</h4>
+            <h4 className="font-medium text-blue-800 mb-2">Data Structure:</h4>
             <div className="text-sm space-y-1">
-              <p className="text-blue-700"><strong>Required:</strong> Position_ID, Department, Position_Title, Status</p>
-              <p className="text-blue-600"><strong>Optional:</strong> Posted_Date, Source, Hire_Date, Salary_Range</p>
-            </div>
-          </div>
-
-          <div>
-            <h4 className="font-medium text-blue-800 mb-2">Exit Survey Data:</h4>
-            <div className="text-sm space-y-1">
-              <p className="text-blue-700"><strong>Required:</strong> Employee_ID, Department, Exit_Date, Survey_Response</p>
-              <p className="text-blue-600"><strong>Optional:</strong> Exit_Reason, Satisfaction_Rating, Would_Recommend</p>
-            </div>
-          </div>
-
-          <div>
-            <h4 className="font-medium text-blue-800 mb-2">I9 Compliance Data:</h4>
-            <div className="text-sm space-y-1">
-              <p className="text-blue-700"><strong>Required:</strong> Employee_ID, Name, Employee_Type, I9_Date, Compliant</p>
-              <p className="text-blue-600"><strong>Optional:</strong> Section_2_Date, Training_Complete, Audit_Ready</p>
+              <p className="text-blue-700">• Each row represents one Division + Location combination for a specific quarter</p>
+              <p className="text-blue-700">• BE = Benefit Eligible employees (full compensation package)</p>
+              <p className="text-blue-700">• NBE = Non-Benefit Eligible employees (limited/no benefits)</p>
+              <p className="text-blue-700">• Use aggregate totals directly from Oracle HCM reports</p>
             </div>
           </div>
         </div>
 
-        <div className="mt-4 p-3 bg-blue-100 rounded">
-          <p className="text-sm text-blue-800">
-            <strong>Firebase Integration:</strong> Use the "Upload to Firebase" button to push data directly to the cloud database. 
-            All dashboards will automatically update with real-time data once uploaded.
+        <div className="mt-4 p-3 bg-green-100 rounded">
+          <p className="text-sm text-green-800">
+            <strong>Template Available:</strong> Download the HR_Quarterly_Data_Template.csv from the 
+            <code className="bg-green-200 px-1 rounded">/public/templates/</code> folder for the correct format.
           </p>
         </div>
 
         <div className="mt-2 p-3 bg-blue-100 rounded">
           <p className="text-sm text-blue-800">
-            <strong>Tips:</strong> Ensure your Excel file has column headers in the first row. 
-            Date columns should be in a standard format (MM/DD/YYYY or YYYY-MM-DD). 
-            Remove any empty rows or columns before uploading.
+            <strong>Firebase Integration:</strong> Processed data uploads directly to Enhanced Workforce Dashboard. 
+            All quarterly metrics and visualizations update automatically.
+          </p>
+        </div>
+
+        <div className="mt-2 p-3 bg-blue-100 rounded">
+          <p className="text-sm text-blue-800">
+            <strong>Tips:</strong> Quarter dates must be YYYY-MM-DD format (2024-06-30, 2024-09-30, etc.). 
+            All headcount fields should be numeric. Use 0 for empty values.
           </p>
         </div>
       </div>

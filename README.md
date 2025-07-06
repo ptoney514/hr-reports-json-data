@@ -1,71 +1,182 @@
-# Getting Started with Create React App
+# HR Reports Project
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A comprehensive React-based dashboard application for I-9 compliance health monitoring and HR analytics. Features multiple dashboards, comprehensive testing infrastructure, WCAG 2.1 AA accessibility compliance, database integration, and enterprise-level performance optimization.
 
-## Available Scripts
+## 🚀 Quick Start (Docker - Recommended)
 
-In the project directory, you can run:
+**For consistent cross-platform development (Mac/PC):**
 
-### `npm start`
+```bash
+# 1. Clone the repository
+git clone <repository-url>
+cd hr-trio-reports
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+# 2. Build and start Docker container
+docker-compose build --no-cache
+docker-compose up -d
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+# 3. Open the application
+# Navigate to: http://localhost:3000
+```
 
-### `npm test`
+**Access the Enhanced Workforce Dashboard:**
+- URL: http://localhost:3000/dashboards/enhanced-workforce
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## 🛠️ Development Setup
 
-### `npm run build`
+### Prerequisites
+- **Docker** and **Docker Compose** (recommended)
+- **Node.js** 18+ and **npm** (for local development)
+- **Git**
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### Session Start Checklist
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+**Run this at the beginning of each coding session:**
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```bash
+# Navigate to project
+cd hr-trio-reports
 
-### `npm run eject`
+# Pull latest changes (if team project)
+git pull
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+# Install dependencies
+npm install
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+# Rebuild Docker with latest changes
+docker-compose down && docker-compose build --no-cache && docker-compose up -d
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+## 🔄 Development Workflows
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+### Option 1: Development-First (Recommended)
+```bash
+# Fast development with hot reload
+npm start  # http://localhost:3000
 
-## Learn More
+# When ready to test production build
+docker-compose down
+docker-compose build --no-cache
+docker-compose up -d
+```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+### Option 2: Docker-First (Maximum Consistency)
+```bash
+# Always use Docker for development
+docker-compose down && docker-compose build --no-cache && docker-compose up -d
+```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## 📋 Available Commands
 
-### Code Splitting
+### Development
+```bash
+# Start development server
+npm start
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+# Run tests
+npm test
 
-### Analyzing the Bundle Size
+# Build for production
+npm run build
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+### Docker
+```bash
+# Build and start container
+docker-compose build --no-cache && docker-compose up -d
 
-### Making a Progressive Web App
+# View running containers
+docker ps
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+# View logs
+docker-compose logs -f
 
-### Advanced Configuration
+# Stop containers
+docker-compose down
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+# Clean up Docker system
+docker system prune -f
+```
 
-### Deployment
+## 🔧 When to Rebuild Docker
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+**Always rebuild the Docker container when:**
+- Starting a new coding session
+- Switching branches
+- Dependencies change (package.json modified)
+- Docker configuration changes
+- After major code changes
+- Before demos or presentations
 
-### `npm run build` fails to minify
+## 🏗️ Project Structure
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
-# TrioReports-DEMO
+```
+src/
+├── components/
+│   ├── charts/           # Chart components
+│   ├── dashboards/       # Dashboard pages
+│   └── ui/              # Reusable UI components
+├── contexts/            # React Context providers
+├── data/               # Data files and API layer
+├── hooks/              # Custom React hooks
+├── services/           # Service layer (Firebase, etc.)
+├── styles/             # CSS files
+└── utils/              # Utility functions
+```
+
+## 📊 Available Dashboards
+
+- **Workforce Dashboard** - Enhanced workforce analytics with division breakdowns
+- **Combined Workforce Analytics** - Comprehensive workforce metrics
+- **Turnover Dashboard** - Employee turnover analysis
+- **I-9 Health Dashboard** - Compliance monitoring
+- **Recruiting Dashboard** - Recruitment metrics
+- **Exit Survey Dashboard** - Exit interview analytics
+
+## 🌐 Technology Stack
+
+- **React 19.1.0** - Frontend framework
+- **Tailwind CSS 3.4.17** - Styling
+- **Recharts 3.0.0** - Data visualization
+- **Firebase 11.2.0** - Cloud database
+- **Docker** - Containerization
+- **React Router DOM** - Navigation
+- **Jest & React Testing Library** - Testing
+
+## 🤝 Contributing
+
+1. **Start session**: Rebuild Docker container
+2. **Development**: Use `npm start` for fast iteration
+3. **Testing**: Use Docker for production testing
+4. **Commit**: Ensure Docker build succeeds before committing
+
+## 📝 Development Notes
+
+- **Cross-platform**: Always test in Docker before committing
+- **Hot reload**: Use `npm start` for active development
+- **Production testing**: Use Docker for final validation
+- **Demos**: Always use Docker for presentations
+
+## 🐛 Troubleshooting
+
+### Docker Issues
+```bash
+# Clean rebuild
+docker-compose down
+docker system prune -f
+docker-compose build --no-cache
+docker-compose up -d
+```
+
+### Port Conflicts
+- Development server: http://localhost:3000
+- Ensure no other services are using port 3000
+
+### Build Failures
+- Run `npm install` to update dependencies
+- Check Docker daemon is running
+- Verify all files are saved before building
+
+---
+
+**For detailed development workflows and best practices, see [CLAUDE.md](./CLAUDE.md)**

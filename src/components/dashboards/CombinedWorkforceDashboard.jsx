@@ -7,7 +7,7 @@ import ErrorBoundary from '../ui/ErrorBoundary';
 const CombinedWorkforceDashboard = () => {
   // State for filters and actions
   const [filters, setFilters] = useState({
-    reportingPeriod: 'Q3-2025',
+    reportingPeriod: 'Q2-2025',
     location: 'all',
     division: 'all',
     employeeType: 'all'
@@ -21,9 +21,64 @@ const CombinedWorkforceDashboard = () => {
   };
 
   // Handle export functionality
-  const handleExport = (exportType) => {
+  const handleExport = async (exportType) => {
     console.log('Exporting data:', exportType, 'with filters:', filters);
-    // Implementation would depend on export type (PDF, Excel, CSV)
+    
+    const dashboardData = {
+      title: 'Combined Workforce Analytics',
+      data: {
+        headcount: headcountData,
+        history: historyData,
+        startersLeavers: startersLeaversData,
+        topDivisions: topDivisionsData,
+        turnoverReasons: turnoverReasons
+      },
+      filters: filters,
+      generatedAt: new Date().toLocaleString()
+    };
+    
+    try {
+      switch (exportType) {
+        case 'pdf':
+          // For now, just create a simple PDF
+          window.print();
+          break;
+        case 'excel':
+          // Create Excel export
+          const { DataExporter } = await import('../../utils/exportUtils');
+          const exporter = new DataExporter();
+          const excelData = [
+            { Metric: 'Total Headcount', Value: headcountData.total },
+            { Metric: 'Faculty', Value: headcountData.faculty },
+            { Metric: 'Staff', Value: headcountData.staff },
+            { Metric: 'New Hires', Value: 228 },
+            { Metric: 'Departures', Value: 174 }
+          ];
+          exporter.exportToExcel(excelData, 'combined-workforce-analytics.xlsx');
+          break;
+        case 'csv':
+          // Create CSV export
+          const { DataExporter: CSVExporter } = await import('../../utils/exportUtils');
+          const csvExporter = new CSVExporter();
+          const csvData = [
+            { Metric: 'Total Headcount', Value: headcountData.total },
+            { Metric: 'Faculty', Value: headcountData.faculty },
+            { Metric: 'Staff', Value: headcountData.staff },
+            { Metric: 'New Hires', Value: 228 },
+            { Metric: 'Departures', Value: 174 }
+          ];
+          csvExporter.exportToCSV(csvData, 'combined-workforce-analytics.csv');
+          break;
+        case 'print':
+          window.print();
+          break;
+        default:
+          console.log('Unknown export type:', exportType);
+      }
+    } catch (error) {
+      console.error('Export error:', error);
+      alert('Export failed: ' + error.message);
+    }
   };
 
   // Available filter options for the dashboard
@@ -104,8 +159,8 @@ const CombinedWorkforceDashboard = () => {
         <div className="max-w-7xl mx-auto px-4">
           {/* Header with functional buttons */}
           <DashboardHeader 
-            title="Combined Workforce & Turnover Analytics"
-            subtitle="Comprehensive employee headcount and turnover analysis | Quarter ending 9/30/2024"
+            title="Combined Workforce Analytics"
+            subtitle="Q2 2025 | Cached (Firebase) | Last sync: 9:52:35 AM"
             filters={filters}
             availableFilters={availableFilters}
             onFilterChange={handleFilterChange}

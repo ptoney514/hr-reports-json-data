@@ -1,0 +1,49 @@
+Quarter_End_Date,Division,Location,BE_Faculty_Headcount,BE_Staff_Headcount,NBE_Faculty_Headcount,NBE_Staff_Headcount,NBE_Student_Worker_Headcount,Total_Headcount,BE_New_Hires,BE_Departures,NBE_New_Hires,NBE_Departures
+2024-06-30,Arts & Sciences,Omaha,85,120,25,35,65,330,0,0,0,0
+2024-06-30,Arts & Sciences,Phoenix,45,80,15,20,40,200,0,0,0,0
+2024-06-30,Medicine,Omaha,120,200,30,45,50,445,0,0,0,0
+2024-06-30,Medicine,Phoenix,60,100,15,25,30,230,0,0,0,0
+2024-06-30,Pharmacy & Health Professions,Omaha,65,95,20,30,45,255,0,0,0,0
+2024-06-30,Pharmacy & Health Professions,Phoenix,35,60,10,15,25,145,0,0,0,0
+2024-06-30,Nursing,Omaha,55,85,15,25,35,215,0,0,0,0
+2024-06-30,Nursing,Phoenix,30,50,8,12,20,120,0,0,0,0
+2024-06-30,Business,Omaha,70,110,18,28,42,268,0,0,0,0
+2024-06-30,Business,Phoenix,40,65,12,18,25,160,0,0,0,0
+2024-06-30,Education,Omaha,45,75,12,20,30,182,0,0,0,0
+2024-06-30,Education,Phoenix,25,45,8,12,18,108,0,0,0,0
+2024-09-30,Arts & Sciences,Omaha,88,125,26,36,68,343,5,2,8,5
+2024-09-30,Arts & Sciences,Phoenix,47,82,16,21,42,208,3,1,6,3
+2024-09-30,Medicine,Omaha,125,205,32,47,52,461,7,2,10,7
+2024-09-30,Medicine,Phoenix,62,103,16,26,32,239,4,2,8,4
+2024-09-30,Pharmacy & Health Professions,Omaha,68,98,21,31,47,265,5,2,7,5
+2024-09-30,Pharmacy & Health Professions,Phoenix,37,62,11,16,26,152,3,1,5,3
+2024-09-30,Nursing,Omaha,57,88,16,26,37,224,4,2,6,4
+2024-09-30,Nursing,Phoenix,32,52,9,13,22,128,2,0,4,2
+2024-09-30,Business,Omaha,73,113,19,29,44,278,5,2,7,5
+2024-09-30,Business,Phoenix,42,67,13,19,27,168,3,1,5,3
+2024-09-30,Education,Omaha,47,78,13,21,32,191,4,2,6,4
+2024-09-30,Education,Phoenix,27,47,9,13,20,116,2,0,4,2
+2024-12-31,Arts & Sciences,Omaha,91,128,27,37,70,353,6,3,9,6
+2024-12-31,Arts & Sciences,Phoenix,49,85,17,22,44,217,4,2,7,4
+2024-12-31,Medicine,Omaha,128,210,33,48,54,473,8,5,11,8
+2024-12-31,Medicine,Phoenix,65,106,17,27,34,249,5,3,9,5
+2024-12-31,Pharmacy & Health Professions,Omaha,70,101,22,32,49,274,6,4,8,6
+2024-12-31,Pharmacy & Health Professions,Phoenix,39,64,12,17,28,160,4,2,6,4
+2024-12-31,Nursing,Omaha,59,91,17,27,39,233,5,3,7,5
+2024-12-31,Nursing,Phoenix,34,54,10,14,24,136,3,1,5,3
+2024-12-31,Business,Omaha,76,116,20,30,46,288,6,3,8,6
+2024-12-31,Business,Phoenix,44,70,14,20,29,177,4,2,6,4
+2024-12-31,Education,Omaha,49,81,14,22,34,200,5,3,7,5
+2024-12-31,Education,Phoenix,29,49,10,14,22,124,3,1,5,3
+2025-03-31,Arts & Sciences,Omaha,94,132,28,38,72,364,7,4,10,7
+2025-03-31,Arts & Sciences,Phoenix,51,88,18,23,46,226,5,3,8,5
+2025-03-31,Medicine,Omaha,132,215,34,50,56,487,9,5,12,9
+2025-03-31,Medicine,Phoenix,68,109,18,28,36,259,6,3,10,6
+2025-03-31,Pharmacy & Health Professions,Omaha,73,104,23,33,51,284,7,4,9,7
+2025-03-31,Pharmacy & Health Professions,Phoenix,41,67,13,18,30,169,5,3,7,5
+2025-03-31,Nursing,Omaha,62,94,18,28,41,243,6,4,8,6
+2025-03-31,Nursing,Phoenix,36,56,11,15,26,144,4,2,6,4
+2025-03-31,Business,Omaha,79,120,21,31,48,299,7,4,9,7
+2025-03-31,Business,Phoenix,46,73,15,21,31,186,5,3,7,5
+2025-03-31,Education,Omaha,52,84,15,23,36,210,6,4,8,6
+2025-03-31,Education,Phoenix,31,52,11,15,24,133,4,2,6,4

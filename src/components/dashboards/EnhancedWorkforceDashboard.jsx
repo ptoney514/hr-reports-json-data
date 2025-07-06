@@ -1,499 +1,649 @@
-import React, { useState, useCallback } from 'react';
-import { Users, Building2, UserPlus, AlertTriangle, MapPin, Upload, RefreshCw } from 'lucide-react';
-import DashboardLayout from './DashboardLayout';
-import HeadcountChart from '../charts/HeadcountChart';
-import LocationChart from '../charts/LocationChart';
-import DivisionsChart from '../charts/DivisionsChart';
-import StartersLeaversChart from '../charts/StartersLeaversChart';
-import SummaryCard from '../ui/SummaryCard';
+import React, { useState, useEffect, useCallback } from 'react';
+import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { X, Cloud } from 'lucide-react';
+import QuarterFilter from '../ui/QuarterFilter';
 import FileUploader from '../ui/FileUploader';
-import useFirebaseWorkforceData from '../../hooks/useFirebaseWorkforceData';
 import { 
-  mapColumns, 
-  normalizeEmployeeData, 
-  generateWorkforceMetrics, 
-  validateWorkforceData 
-} from '../../utils/workforceDataProcessor';
-
-// Expected columns for workforce data
-const EXPECTED_COLUMNS = [
-  'employee_id', 'name', 'first_name', 'last_name', 'department', 
-  'division', 'position', 'location', 'employee_type', 'hire_date'
-];
-
-// Enhanced fallback data (same as WorkforceDashboard)
-const WORKFORCE_FALLBACK_DATA = {
-  summary: {
-    totalEmployees: 2847,
-    totalPositions: 2950,
-    faculty: 1234,
-    staff: 1456,
-    students: 157,
-    vacancies: 103,
-    vacancyRate: 3.5,
-    employeeChange: 1.5,
-    facultyChange: 1.4,
-    staffChange: 1.5,
-    vacancyRateChange: -0.9
-  },
-  charts: {
-    historicalTrends: [
-      { quarter: 'Q2-2024', total: 2675, faculty: 1189, staff: 1342, students: 144 },
-      { quarter: 'Q3-2024', total: 2712, faculty: 1198, staff: 1368, students: 146 },
-      { quarter: 'Q4-2024', total: 2756, faculty: 1205, staff: 1398, students: 153 },
-      { quarter: 'Q1-2025', total: 2804, faculty: 1216, staff: 1434, students: 154 },
-      { quarter: 'Q2-2025', total: 2847, faculty: 1234, staff: 1456, students: 157 }
-    ],
-    startersLeavers: [
-      { month: 'Oct 2024', starters: 45, leavers: 32, netChange: 13 },
-      { month: 'Nov 2024', starters: 38, leavers: 28, netChange: 10 },
-      { month: 'Dec 2024', starters: 52, leavers: 41, netChange: 11 },
-      { month: 'Jan 2025', starters: 67, leavers: 35, netChange: 32 },
-      { month: 'Feb 2025', starters: 43, leavers: 31, netChange: 12 },
-      { month: 'Mar 2025', starters: 39, leavers: 27, netChange: 12 }
-    ],
-    topDivisions: [
-      { name: 'Academic Affairs', total: 567, faculty: 423, staff: 144, vacancies: 12, vacancyRate: 2.1 },
-      { name: 'Student Affairs', total: 234, faculty: 45, staff: 189, vacancies: 6, vacancyRate: 2.5 },
-      { name: 'Research & Innovation', total: 189, faculty: 134, staff: 55, vacancies: 8, vacancyRate: 4.1 },
-      { name: 'Information Technology', total: 156, faculty: 23, staff: 133, vacancies: 7, vacancyRate: 4.3 },
-      { name: 'Finance & Administration', total: 145, faculty: 12, staff: 133, vacancies: 4, vacancyRate: 2.7 }
-    ],
-    locationDistribution: [
-      { name: 'Omaha Campus', total: 2687, faculty: 1156, staff: 1374, students: 157, percentage: 94.4 },
-      { name: 'Phoenix Campus', total: 160, faculty: 78, staff: 82, students: 0, percentage: 5.6 }
-    ]
-  },
-  metrics: {
-    recentHires: { faculty: 23, staff: 34, students: 12 },
-    demographics: { averageTenure: '8.2', averageAge: '42', genderRatio: '52/48', diversityIndex: '34' },
-    campuses: {
-      omaha: { percentage: 94.4, employees: 2687 },
-      phoenix: { percentage: 5.6, employees: 160 },
-      growthRate: 2.1
-    }
-  }
-};
+  QUARTER_DATES, 
+  calculateQuarterMetrics, 
+  calculateDivisionBreakdown, 
+  calculateLocationBreakdown,
+  getPreviousQuarter,
+  generateSampleData 
+} from '../../utils/quarterlyDataProcessor';
+import firebaseService from '../../services/FirebaseService';
+import useFirebaseWorkforceData from '../../hooks/useFirebaseWorkforceData';
 
 const EnhancedWorkforceDashboard = () => {
-  // State for import functionality
-  const [importedData, setImportedData] = useState(null);
-  const [showImporter, setShowImporter] = useState(false);
-  const [processedMetrics, setProcessedMetrics] = useState(null);
-  const [importError, setImportError] = useState(null);
-  const [isProcessing, setIsProcessing] = useState(false);
-
-  // Firebase data hook
+  // State management for quarterly data
+  const [selectedQuarter, setSelectedQuarter] = useState('Q1-2025');
+  const [quarterlyData, setQuarterlyData] = useState(null);
+  
+  // Firebase data integration
   const { 
     data: firebaseData, 
-    loading, 
-    error: firebaseError, 
-    isRealTime, 
-    lastSyncTime, 
-    refetch 
-  } = useFirebaseWorkforceData({ reportingPeriod: 'Q2-2025' });
+    loading: firebaseLoading, 
+    error: firebaseError,
+    isRealTimeActive 
+  } = useFirebaseWorkforceData({
+    reportingPeriod: selectedQuarter || 'Q1-2025'
+  });
+  const [headcountData, setHeadcountData] = useState({
+    total: { value: 0, change: null, subtitle: "from previous quarter", changeType: "percentage" },
+    faculty: { value: 0, change: null, subtitle: "change", changeType: "percentage", indicator: "green" },
+    staff: { value: 0, change: null, subtitle: "change", changeType: "percentage", indicator: "yellow" },
+    starters: { value: 0, change: null, subtitle: "new hires", changeType: null, indicator: "teal" },
+    leavers: { value: 0, change: null, subtitle: "departures", changeType: null, indicator: "blue" }
+  });
 
-  // Determine data source priority: processed import > firebase > fallback
-  const data = processedMetrics || firebaseData || WORKFORCE_FALLBACK_DATA;
-  const dataSource = processedMetrics ? 'Imported' : (firebaseData ? 'Firebase' : 'Sample');
+  // Data source state
+  const [isUsingUploadedData, setIsUsingUploadedData] = useState(false);
+  const [dataSource, setDataSource] = useState('sample'); // 'sample', 'uploaded', 'firebase'
 
-  // Handle successful data import
-  const handleDataImported = useCallback(async (importResult) => {
-    setIsProcessing(true);
-    setImportError(null);
+  // Simple data processing - direct field renaming
+  const processAggregateData = (rawData) => {
+    return rawData.map(row => ({
+      Quarter_End_Date: row.Quarter_End_Date,
+      Division: row.Division?.trim() || '',
+      Location: row.Location?.trim() || '',
+      BE_Faculty_Headcount: parseInt(row.BE_Faculty_Headcount, 10) || 0,
+      BE_Staff_Headcount: parseInt(row.BE_Staff_Headcount, 10) || 0,
+      NBE_Faculty_Headcount: parseInt(row.NBE_Faculty_Headcount, 10) || 0,
+      NBE_Staff_Headcount: parseInt(row.NBE_Staff_Headcount, 10) || 0,
+      NBE_Student_Worker_Headcount: parseInt(row.NBE_Student_Worker_Headcount, 10) || 0,
+      Total_Headcount: parseInt(row.Total_Headcount, 10) || 0,
+      BE_New_Hires: parseInt(row.BE_New_Hires, 10) || 0,
+      BE_Departures: parseInt(row.BE_Departures, 10) || 0,
+      NBE_New_Hires: parseInt(row.NBE_New_Hires, 10) || 0,
+      NBE_Departures: parseInt(row.NBE_Departures, 10) || 0
+    }));
+  };
+
+  // Transform quarterly data to Firebase aggregate format
+  const transformToFirebaseFormat = (quarter, records) => {
+    // Aggregate totals across all records for this quarter
+    const totals = records.reduce((acc, record) => {
+      acc.totalEmployees += record.Total_Headcount || 0;
+      acc.faculty += (record.BE_Faculty_Headcount || 0) + (record.NBE_Faculty_Headcount || 0);
+      acc.staff += (record.BE_Staff_Headcount || 0) + (record.NBE_Staff_Headcount || 0);
+      acc.students += record.NBE_Student_Worker_Headcount || 0;
+      acc.newHires += (record.BE_New_Hires || 0) + (record.NBE_New_Hires || 0);
+      acc.departures += (record.BE_Departures || 0) + (record.NBE_Departures || 0);
+      return acc;
+    }, {
+      totalEmployees: 0,
+      faculty: 0,
+      staff: 0,
+      students: 0,
+      newHires: 0,
+      departures: 0
+    });
+
+    // Group by location and department
+    const byLocation = {};
+    const byDepartment = {};
     
+    records.forEach(record => {
+      // Location grouping
+      const location = record.Location || 'Unknown Location';
+      if (!byLocation[location]) byLocation[location] = 0;
+      byLocation[location] += record.Total_Headcount || 0;
+      
+      // Department grouping (using Division as department)
+      const department = record.Division || 'Unknown Division';
+      if (!byDepartment[department]) byDepartment[department] = 0;
+      byDepartment[department] += record.Total_Headcount || 0;
+    });
+
+    // Return Firebase-compatible aggregate format
+    return {
+      period: quarter,
+      totalEmployees: totals.totalEmployees,
+      demographics: {
+        faculty: totals.faculty,
+        staff: totals.staff,
+        students: totals.students
+      },
+      byLocation,
+      byDepartment,
+      trends: {
+        quarterlyGrowth: 2.5, // Estimated growth rate
+        newHires: totals.newHires,
+        departures: totals.departures,
+        netChange: totals.newHires - totals.departures
+      },
+      headcountChange: totals.newHires - totals.departures,
+      version: '1.0',
+      dataSource: 'uploaded_csv'
+    };
+  };
+
+  // File upload handler for FileUploader component
+  const handleDataImported = useCallback(async (importedData) => {
+    console.log('Data imported:', importedData);
+
     try {
-      const { data: rawData, headers, validation } = importResult;
+      // Process data using the same format Enhanced Workforce Dashboard expects
+      const processedData = processAggregateData(importedData.data);
       
-      // Map columns to standard format
-      const columnMapping = mapColumns(headers);
+      // Group by quarter and normalize quarter format
+      const groupedData = {};
+      processedData.forEach(record => {
+        let quarter = record.Quarter_End_Date;
+        
+        // Enhanced date format conversion to handle various formats
+        if (quarter && quarter.match(/\d{4}-\d{2}-\d{2}/)) {
+          // Convert "2024-06-30" to "Q2-2024" format
+          const date = new Date(quarter);
+          const year = date.getFullYear();
+          const month = date.getMonth() + 1; // getMonth() is 0-indexed
+          const quarterNum = Math.ceil(month / 3);
+          quarter = `Q${quarterNum}-${year}`;
+          console.log(`Converted date ${record.Quarter_End_Date} to quarter ${quarter}`);
+        }
+        
+        if (!groupedData[quarter]) {
+          groupedData[quarter] = [];
+        }
+        groupedData[quarter].push(record);
+      });
+
+      console.log('Grouped data by quarters:', Object.keys(groupedData));
+
+      // Save to Firebase
+      const quarterCount = Object.keys(groupedData).length;
+      let firebaseSuccessCount = 0;
+      let firebaseErrors = [];
       
-      // Normalize employee data
-      const normalizedEmployees = normalizeEmployeeData(rawData, columnMapping);
-      
-      // Validate the normalized data
-      const dataValidation = validateWorkforceData(normalizedEmployees);
-      
-      if (!dataValidation.isValid) {
-        throw new Error(`Data validation failed: ${dataValidation.errors.join(', ')}`);
+      for (const [quarter, records] of Object.entries(groupedData)) {
+        try {
+          // Transform quarterly data to Firebase aggregate format
+          const aggregateMetrics = transformToFirebaseFormat(quarter, records);
+          
+          // Convert quarter format to Firebase period (e.g., "Q2-2024" -> "2024-Q2")
+          let period = quarter;
+          
+          // Handle various quarter formats and convert to Firebase format
+          if (quarter.match(/Q(\d)-(\d{4})/)) {
+            // "Q2-2024" -> "2024-Q2"
+            period = quarter.replace(/Q(\d)-(\d{4})/, '$2-Q$1');
+          }
+          
+          console.log(`Converting quarter ${quarter} to Firebase period: ${period}`);
+          
+          await firebaseService.setWorkforceMetrics(period, aggregateMetrics);
+          console.log(`Saved workforce metrics to Firebase for period: ${period}`);
+          firebaseSuccessCount++;
+        } catch (error) {
+          console.error(`Failed to save Firebase data for quarter ${quarter}:`, error);
+          firebaseErrors.push(`${quarter}: ${error.message}`);
+        }
       }
       
-      // Generate dashboard metrics
-      const metrics = generateWorkforceMetrics(normalizedEmployees);
+      console.log(`Upload completed: ${processedData.length} records, ${firebaseSuccessCount} quarters saved to Firebase`);
+      if (firebaseErrors.length > 0) {
+        console.warn('Firebase save errors:', firebaseErrors);
+      }
       
-      // Store the results
-      setImportedData({
-        rawData,
-        normalizedEmployees,
-        columnMapping,
-        validation: dataValidation
-      });
-      setProcessedMetrics(metrics);
-      setShowImporter(false);
-      
+      setQuarterlyData(groupedData);
+      setIsUsingUploadedData(true);
+      setDataSource('uploaded');
+
+      // Auto-select the first uploaded quarter if none is selected or if current selection doesn't exist
+      const uploadedQuarters = Object.keys(groupedData);
+      if (uploadedQuarters.length > 0) {
+        const sortedQuarters = uploadedQuarters.sort((a, b) => {
+          const aMatch = a.match(/Q(\d)-(\d{4})/);
+          const bMatch = b.match(/Q(\d)-(\d{4})/);
+          
+          if (aMatch && bMatch) {
+            const [, aQ, aY] = aMatch;
+            const [, bQ, bY] = bMatch;
+            
+            if (aY !== bY) return parseInt(aY) - parseInt(bY);
+            return parseInt(aQ) - parseInt(bQ);
+          }
+          
+          return a.localeCompare(b);
+        });
+        
+        // Select the most recent quarter from uploaded data
+        const mostRecentQuarter = sortedQuarters[sortedQuarters.length - 1];
+        if (!selectedQuarter || !groupedData[selectedQuarter]) {
+          setSelectedQuarter(mostRecentQuarter);
+          console.log(`Auto-selected quarter: ${mostRecentQuarter}`);
+        }
+      }
+
     } catch (error) {
-      setImportError(error.message);
-    } finally {
-      setIsProcessing(false);
+      console.error('Data processing failed:', error);
+      
+      // Reset to sample data if processing fails
+      setIsUsingUploadedData(false);
+      setDataSource('sample');
+      
+      // Provide specific error messages based on error type
+      let errorMessage = 'Failed to process uploaded data';
+      
+      if (error.message?.includes('Quarter_End_Date')) {
+        errorMessage = 'Missing required column: Quarter_End_Date. Please check your file format.';
+      } else if (error.message?.includes('Division')) {
+        errorMessage = 'Missing required column: Division. Please check your file format.';
+      } else if (error.message?.includes('Location')) {
+        errorMessage = 'Missing required column: Location. Please check your file format.';
+      } else if (error.message?.includes('Firebase')) {
+        errorMessage = 'Data processed successfully but failed to save to database. Your data is still available in this session.';
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      console.error('Enhanced error details:', {
+        originalError: error,
+        processedMessage: errorMessage,
+        dataSource: dataSource,
+        hasQuarterlyData: !!quarterlyData
+      });
+      
+      throw new Error(errorMessage);
     }
   }, []);
 
-  // Handle import errors
-  const handleImportError = useCallback((error) => {
-    setImportError(error);
-  }, []);
-
-  // Reset to original data
-  const resetToOriginalData = () => {
-    setImportedData(null);
-    setProcessedMetrics(null);
-    setImportError(null);
-    setShowImporter(false);
-  };
-
-  // Handle export functionality
-  const handleExport = (type, context) => {
-    console.log('Exporting enhanced workforce dashboard:', type, context, {
-      hasImportedData: !!importedData,
-      dataSource
+  const handleUploadError = useCallback((error) => {
+    console.error('Upload error:', error);
+    
+    // Reset data source back to sample if upload fails
+    if (isUsingUploadedData) {
+      setIsUsingUploadedData(false);
+      setDataSource('sample');
+    }
+    
+    // Show user-friendly error message
+    let errorMessage = 'Upload failed. Please try again.';
+    if (typeof error === 'string') {
+      errorMessage = error;
+    } else if (error?.message) {
+      errorMessage = error.message;
+    }
+    
+    // Log detailed error for debugging
+    console.error('Detailed upload error:', {
+      error,
+      type: typeof error,
+      message: error?.message,
+      stack: error?.stack
     });
+  }, [isUsingUploadedData]);
+
+
+  // Reset to sample data
+  const resetToSampleData = () => {
+    const sampleData = generateSampleData();
+    const groupedData = {};
+    sampleData.forEach(record => {
+      const quarter = record.Quarter_End_Date;
+      if (!groupedData[quarter]) {
+        groupedData[quarter] = [];
+      }
+      groupedData[quarter].push(record);
+    });
+    
+    setQuarterlyData(groupedData);
+    setIsUsingUploadedData(false);
+    setDataSource('sample');
   };
 
-  // Available filters
-  const availableFilters = {
-    reportingPeriod: [
-      { value: 'Q2-2025', label: 'Q2 2025' },
-      { value: 'Q1-2025', label: 'Q1 2025' },
-      { value: 'Q4-2024', label: 'Q4 2024' }
-    ],
-    location: [
-      { value: 'all', label: 'All Locations' },
-      { value: 'omaha', label: 'Omaha Campus' },
-      { value: 'phoenix', label: 'Phoenix Campus' }
-    ],
-    employeeType: [
-      { value: 'all', label: 'All Types' },
-      { value: 'faculty', label: 'Faculty' },
-      { value: 'staff', label: 'Staff' },
-      { value: 'student', label: 'Students' }
-    ]
+  // Handle Firebase data integration
+  useEffect(() => {
+    if (firebaseData && Object.keys(firebaseData).length > 0) {
+      console.log('Firebase data loaded:', firebaseData);
+      // Firebase data has a different structure - don't set it to quarterlyData
+      // quarterlyData should only be used for uploaded CSV/Excel data
+      // Firebase data is used directly by the dashboard components
+      setIsUsingUploadedData(true); // Consider Firebase data as "uploaded" for UI purposes
+      setDataSource('firebase');
+    }
+  }, [firebaseData]);
+
+  // Initialize with sample data only if no uploaded or Firebase data
+  useEffect(() => {
+    if (!isUsingUploadedData && !quarterlyData && !firebaseData) {
+      console.log('No Firebase data found, using sample data');
+      // Generate sample data for demonstration
+      const sampleData = generateSampleData();
+      
+      // Group by quarter
+      const groupedData = {};
+      sampleData.forEach(record => {
+        const quarter = record.Quarter_End_Date;
+        if (!groupedData[quarter]) {
+          groupedData[quarter] = [];
+        }
+        groupedData[quarter].push(record);
+      });
+      
+      setQuarterlyData(groupedData);
+      setDataSource('sample');
+    }
+  }, [isUsingUploadedData, quarterlyData, firebaseData]);
+
+  // Update metrics when quarter or data changes
+  useEffect(() => {
+    if (dataSource === 'firebase' && firebaseData) {
+      // Use Firebase data directly for metrics
+      console.log('Using Firebase data for metrics');
+      const metrics = {
+        total: { value: firebaseData.summary?.totalEmployees || 0, change: firebaseData.summary?.employeeChange || 0, subtitle: "from previous quarter", changeType: "percentage" },
+        faculty: { value: firebaseData.summary?.faculty || 0, change: firebaseData.summary?.facultyChange || 0, subtitle: "change", changeType: "percentage", indicator: "green" },
+        staff: { value: firebaseData.summary?.staff || 0, change: firebaseData.summary?.staffChange || 0, subtitle: "change", changeType: "percentage", indicator: "yellow" },
+        starters: { value: (firebaseData.metrics?.recentHires?.faculty || 0) + (firebaseData.metrics?.recentHires?.staff || 0), change: null, subtitle: "new hires", changeType: null, indicator: "teal" },
+        leavers: { value: Math.floor((firebaseData.summary?.totalEmployees || 0) * 0.05), change: null, subtitle: "departures", changeType: null, indicator: "blue" }
+      };
+      setHeadcountData(metrics);
+    } else if (quarterlyData && selectedQuarter && dataSource !== 'firebase') {
+      console.log('Selected quarter:', selectedQuarter);
+      console.log('Available quarters in data:', Object.keys(quarterlyData));
+      
+      const currentQuarterData = quarterlyData[selectedQuarter] || [];
+      const previousQuarter = getPreviousQuarter(selectedQuarter);
+      const previousQuarterData = previousQuarter ? quarterlyData[previousQuarter] : null;
+      
+      console.log('Current quarter data:', currentQuarterData.length, 'records');
+      
+      const metrics = calculateQuarterMetrics(currentQuarterData, previousQuarterData);
+      setHeadcountData(metrics);
+    }
+  }, [quarterlyData, selectedQuarter, dataSource, firebaseData]);
+
+  // Calculate dynamic data based on selected quarter
+  const divisionsData = dataSource === 'firebase' && firebaseData
+    ? firebaseData.charts?.topDivisions || []
+    : quarterlyData && selectedQuarter 
+      ? calculateDivisionBreakdown(quarterlyData[selectedQuarter] || [])
+      : [];
+
+  const locationData = dataSource === 'firebase' && firebaseData
+    ? firebaseData.charts?.locationDistribution || []
+    : quarterlyData && selectedQuarter 
+      ? calculateLocationBreakdown(quarterlyData[selectedQuarter] || [])
+      : [];
+
+  // Calculate trend data across all quarters
+  const trendData = dataSource === 'firebase' && firebaseData
+    ? firebaseData.charts?.historicalTrends || []
+    : quarterlyData 
+      ? QUARTER_DATES.map(quarter => {
+          const quarterInfo = quarterlyData[quarter.value] || [];
+          const metrics = calculateQuarterMetrics(quarterInfo);
+          return {
+            quarter: quarter.quarter,
+            total: metrics.total.value,
+            faculty: metrics.faculty.value,
+            staff: metrics.staff.value
+          };
+        })
+      : [];
+
+  // Handle quarter change
+  const handleQuarterChange = (newQuarter) => {
+    setSelectedQuarter(newQuarter);
   };
 
-  // Generate subtitle with data source info
-  const realtimeStatus = importedData ? '📁 Imported' : (isRealTime ? '🔴 Live' : '📊 Cached');
-  const syncInfo = lastSyncTime ? ` | Last sync: ${lastSyncTime.toLocaleTimeString()}` : '';
-  const subtitle = `Q2 2025 | ${realtimeStatus} (${dataSource})${syncInfo}`;
+  // Get available quarters - combines default quarters with uploaded data quarters
+  const getAvailableQuarters = () => {
+    // If we have Firebase data, use the default QUARTER_DATES
+    if (dataSource === 'firebase') {
+      return QUARTER_DATES;
+    }
+    
+    // If we have uploaded quarterly data, filter based on what's available
+    if (quarterlyData && dataSource === 'uploaded') {
+      const uploadedQuarters = Object.keys(quarterlyData);
+      const allQuarters = [...QUARTER_DATES];
+      
+      // Add any uploaded quarters that aren't in the default list
+      uploadedQuarters.forEach(quarter => {
+        const exists = QUARTER_DATES.some(q => q.value === quarter);
+        if (!exists) {
+          // Create a quarter entry for uploaded data
+          let label = quarter;
+          let dateValue = null;
+          
+          // Try to extract date information from quarter format
+          if (quarter.match(/Q(\d)-(\d{4})/)) {
+            const [, quarterNum, year] = quarter.match(/Q(\d)-(\d{4})/);
+            const month = parseInt(quarterNum) * 3; // Q1=3, Q2=6, Q3=9, Q4=12
+            const endDay = (quarterNum === '2') ? 30 : (quarterNum === '4') ? 31 : 31; // June=30, others=31
+            dateValue = `${year}-${month.toString().padStart(2, '0')}-${endDay}`;
+            label = `${quarter} (${month}/${endDay}/${year})`;
+          }
+          
+          allQuarters.push({
+            value: quarter,
+            label: label,
+            quarter: quarter,
+            dateValue: dateValue
+          });
+        }
+      });
+      
+      // Sort quarters by year and quarter number
+      allQuarters.sort((a, b) => {
+        const aMatch = a.value.match(/Q(\d)-(\d{4})/);
+        const bMatch = b.value.match(/Q(\d)-(\d{4})/);
+        
+        if (aMatch && bMatch) {
+          const [, aQ, aY] = aMatch;
+          const [, bQ, bY] = bMatch;
+          
+          if (aY !== bY) return parseInt(aY) - parseInt(bY);
+          return parseInt(aQ) - parseInt(bQ);
+        }
+        
+        return a.value.localeCompare(b.value);
+      });
+      
+      // Only return quarters that have data
+      return allQuarters.filter(q => quarterlyData && quarterlyData[q.value]);
+    }
+    
+    // Default case - return all QUARTER_DATES
+    return QUARTER_DATES;
+  };
 
-  // Show loading state
-  if (loading && !importedData) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading workforce data...</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
-    <DashboardLayout
-      title="Combined Workforce Analytics"
-      subtitle={subtitle}
-      onExport={handleExport}
-      availableFilters={availableFilters}
-      gridCols="grid-cols-1"
-      maxWidth="max-w-7xl"
-      customActions={
-        <div className="flex gap-2">
-          {importedData && (
-            <button
-              onClick={resetToOriginalData}
-              className="flex items-center gap-2 px-3 py-2 text-sm bg-gray-600 text-white rounded-lg hover:bg-gray-700"
-            >
-              <RefreshCw size={16} />
-              Reset Data
-            </button>
-          )}
-          <button
-            onClick={() => setShowImporter(!showImporter)}
-            className="flex items-center gap-2 px-3 py-2 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700"
-          >
-            <Upload size={16} />
-            {showImporter ? 'Hide Importer' : 'Import Data'}
-          </button>
-        </div>
-      }
-    >
-      {/* Data Import Section */}
-      {showImporter && (
-        <div className="mb-6 p-6 bg-white rounded-lg shadow-sm border">
-          <FileUploader
-            onDataImported={handleDataImported}
-            onError={handleImportError}
-            expectedColumns={EXPECTED_COLUMNS}
-            title="Import Employee Data"
-            description="Upload your employee data file to generate real-time workforce analytics"
-          />
-          
-          {isProcessing && (
-            <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-              <div className="flex items-center gap-3">
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
-                <span className="text-blue-800">Processing your data...</span>
-              </div>
+    <div className="min-h-screen bg-gray-50 p-8">
+      <div className="max-w-6xl mx-auto">
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-3xl font-bold text-blue-700">Enhanced Workforce Dashboard</h1>
+          <div className="flex items-center gap-4">
+            <div className="w-64">
+              <QuarterFilter 
+                selectedQuarter={selectedQuarter}
+                onQuarterChange={handleQuarterChange}
+                availableQuarters={quarterlyData ? getAvailableQuarters() : QUARTER_DATES}
+              />
             </div>
-          )}
-          
-          {importError && (
-            <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-              <p className="text-red-800">{importError}</p>
-            </div>
-          )}
+          </div>
         </div>
-      )}
-
-      {/* Data Source Indicator */}
-      {importedData && (
-        <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-          <div className="flex items-center justify-between">
+        
+        {/* Upload Section */}
+        <div className="bg-white rounded-lg shadow-sm border p-6 mb-8">
+          <div className="flex justify-between items-center mb-4">
             <div>
-              <h4 className="font-medium text-green-900">Using Imported Data</h4>
-              <p className="text-sm text-green-700">
-                Showing analytics for {importedData.normalizedEmployees.length} employees 
-                from your uploaded file
+              <h2 className="text-lg font-semibold text-gray-900">Data Source</h2>
+              <p className="text-sm text-gray-600">
+                {dataSource === 'firebase' && 'Using Firebase data from Excel upload'}
+                {dataSource === 'uploaded' && 'Using uploaded workforce data'}
+                {dataSource === 'sample' && 'Using sample data for demonstration'}
+                {firebaseLoading && ' (Loading from Firebase...)'}
+                {firebaseError && ` (Firebase error: ${firebaseError.message})`}
               </p>
             </div>
-            <div className="text-sm text-green-600">
-              <div>✓ {importedData.validation.stats.validRows} valid records</div>
-              {importedData.validation.warnings.length > 0 && (
-                <div>⚠ {importedData.validation.warnings.length} warnings</div>
-              )}
-            </div>
+            {isUsingUploadedData && (
+              <button
+                onClick={resetToSampleData}
+                className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:border-gray-400"
+              >
+                <X size={16} />
+                Reset to Sample
+              </button>
+            )}
           </div>
-        </div>
-      )}
-
-      {/* Summary Cards Row */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 print:gap-2 mb-6 print:mb-4">
-        <SummaryCard
-          title="Total Employees"
-          value={data.summary.totalEmployees.toLocaleString()}
-          change={data.summary.employeeChange}
-          changeType="percentage"
-          subtitle={`${data.summary.totalPositions.toLocaleString()} total positions`}
-          icon={Users}
-          trend="positive"
-        />
-        
-        <SummaryCard
-          title="Faculty"
-          value={data.summary.faculty.toLocaleString()}
-          change={data.summary.facultyChange}
-          changeType="percentage"
-          subtitle={`${((data.summary.faculty / data.summary.totalEmployees) * 100).toFixed(1)}% of workforce`}
-          icon={Users}
-        />
-        
-        <SummaryCard
-          title="Staff"
-          value={data.summary.staff.toLocaleString()}
-          change={data.summary.staffChange}
-          changeType="percentage"
-          subtitle={`${((data.summary.staff / data.summary.totalEmployees) * 100).toFixed(1)}% of workforce`}
-          icon={Building2}
-        />
-        
-        <SummaryCard
-          title="Vacancy Rate"
-          value={`${data.summary.vacancyRate.toFixed(1)}%`}
-          change={data.summary.vacancyRateChange}
-          changeType="percentage"
-          subtitle={`${data.summary.vacancies.toLocaleString()} open positions`}
-          icon={AlertTriangle}
-          trend={data.summary.vacancyRateChange > 0 ? 'negative' : 'positive'}
-        />
-      </div>
-
-      {/* Charts Row 1: Historical Trends */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 print:gap-2 mb-6 print:mb-4">
-        <HeadcountChart
-          data={data.charts.historicalTrends}
-          title="5-Quarter Headcount Trend"
-          height={320}
-          showLegend={true}
-        />
-        
-        <StartersLeaversChart
-          data={data.charts.startersLeavers}
-          title="Monthly Hiring Activity"
-          height={320}
-          showLegend={true}
-          showGrid={true}
-        />
-      </div>
-
-      {/* Charts Row 2: Distribution Analysis */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 print:gap-2 mb-6 print:mb-4">
-        <DivisionsChart
-          data={data.charts.topDivisions}
-          title="Top Divisions by Headcount"
-          height={400}
-          maxItems={10}
-          sortBy="total"
-          layout="horizontal"
-          showRanking={true}
-        />
-        
-        <LocationChart
-          data={data.charts.locationDistribution}
-          title="Employee Distribution by Campus"
-          height={400}
-          showLegend={true}
-          showLabels={true}
-          showPercentages={true}
-        />
-      </div>
-
-      {/* Additional Metrics Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 print:gap-2 mb-6 print:mb-4">
-        <div className="bg-white print:bg-white p-4 print:p-2 rounded-lg shadow-sm border print:border-gray">
-          <h3 className="text-lg print:text-base font-semibold text-blue-700 print:text-black mb-3 print:mb-2">
-            Recent Hires (Last 30 Days)
-          </h3>
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <UserPlus className="text-green-500 print:text-black" size={16} />
-                <span className="text-sm font-medium">New Faculty</span>
-              </div>
-              <span className="text-lg font-bold text-green-600 print:text-black">
-                {data.metrics.recentHires.faculty}
-              </span>
-            </div>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <UserPlus className="text-blue-500 print:text-black" size={16} />
-                <span className="text-sm font-medium">New Staff</span>
-              </div>
-              <span className="text-lg font-bold text-blue-600 print:text-black">
-                {data.metrics.recentHires.staff}
-              </span>
-            </div>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <UserPlus className="text-purple-500 print:text-black" size={16} />
-                <span className="text-sm font-medium">New Students</span>
-              </div>
-              <span className="text-lg font-bold text-purple-600 print:text-black">
-                {data.metrics.recentHires.students}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white print:bg-white p-4 print:p-2 rounded-lg shadow-sm border print:border-gray">
-          <h3 className="text-lg print:text-base font-semibold text-blue-700 print:text-black mb-3 print:mb-2">
-            Demographics Overview
-          </h3>
-          <div className="space-y-3">
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-gray-600 print:text-black">Average Tenure</span>
-              <span className="font-semibold print:text-black">
-                {data.metrics.demographics.averageTenure} years
-              </span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-gray-600 print:text-black">Avg Age</span>
-              <span className="font-semibold print:text-black">
-                {data.metrics.demographics.averageAge} years
-              </span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-gray-600 print:text-black">Gender Ratio (F/M)</span>
-              <span className="font-semibold print:text-black">
-                {data.metrics.demographics.genderRatio}
-              </span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-gray-600 print:text-black">Diversity Index</span>
-              <span className="font-semibold print:text-black">
-                {data.metrics.demographics.diversityIndex}%
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white print:bg-white p-4 print:p-2 rounded-lg shadow-sm border print:border-gray">
-          <h3 className="text-lg print:text-base font-semibold text-blue-700 print:text-black mb-3 print:mb-2">
-            Campus Highlights
-          </h3>
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <MapPin className="text-blue-500 print:text-black" size={16} />
-              <div className="flex-1">
-                <div className="flex justify-between">
-                  <span className="text-sm font-medium">Omaha Campus</span>
-                  <span className="text-sm font-bold print:text-black">
-                    {data.metrics.campuses.omaha.percentage}%
-                  </span>
-                </div>
-                <div className="text-xs text-gray-500 print:text-black">
-                  {data.metrics.campuses.omaha.employees.toLocaleString()} employees
-                </div>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <MapPin className="text-orange-500 print:text-black" size={16} />
-              <div className="flex-1">
-                <div className="flex justify-between">
-                  <span className="text-sm font-medium">Phoenix Campus</span>
-                  <span className="text-sm font-bold print:text-black">
-                    {data.metrics.campuses.phoenix.percentage}%
-                  </span>
-                </div>
-                <div className="text-xs text-gray-500 print:text-black">
-                  {data.metrics.campuses.phoenix.employees.toLocaleString()} employees
-                </div>
-              </div>
-            </div>
-            <div className="pt-2 border-t">
-              <div className="text-xs text-gray-500 print:text-black">
-                Growth Rate: <span className="font-semibold text-green-600 print:text-black">
-                  +{data.metrics.campuses.growthRate}%
-                </span> YoY
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Executive Summary Section */}
-      <div className="bg-gray-50 print:bg-white p-6 print:p-4 rounded-lg border border-gray-200 print:border-gray">
-        <h2 className="text-xl print:text-lg font-bold text-blue-700 print:text-black mb-4 print:mb-3">
-          WORKFORCE ANALYTICS EXECUTIVE SUMMARY
-        </h2>
-        <div className="space-y-4 print:space-y-2 text-sm print:text-xs">
-          <p className="text-gray-700 print:text-black">
-            <strong>Data Source:</strong> {importedData ? 
-              `Analysis based on imported employee data (${importedData.normalizedEmployees.length} records processed)` :
-              `Analysis using ${dataSource.toLowerCase()} data for Q2 2025`
-            }. Current workforce of {data.summary.totalEmployees.toLocaleString()} employees across {data.summary.totalPositions.toLocaleString()} authorized positions with a {data.summary.vacancyRate.toFixed(1)}% vacancy rate.
-          </p>
-          <p className="text-gray-700 print:text-black">
-            <strong>Workforce Composition:</strong> Faculty represents {((data.summary.faculty / data.summary.totalEmployees) * 100).toFixed(1)}% ({data.summary.faculty.toLocaleString()} employees), staff comprises {((data.summary.staff / data.summary.totalEmployees) * 100).toFixed(1)}% ({data.summary.staff.toLocaleString()} employees), and student workers contribute {((data.summary.students / data.summary.totalEmployees) * 100).toFixed(1)}% ({data.summary.students.toLocaleString()} employees).
-          </p>
-          <p className="text-gray-700 print:text-black">
-            <strong>Strategic Outlook:</strong> Recent hiring trends show {(data.metrics.recentHires.faculty + data.metrics.recentHires.staff + data.metrics.recentHires.students)} new hires in the last 30 days. Campus distribution shows {data.metrics.campuses.omaha.percentage}% at Omaha Campus and {data.metrics.campuses.phoenix.percentage}% at Phoenix Campus, with a healthy year-over-year growth rate of +{data.metrics.campuses.growthRate}%.
-          </p>
-          {importedData && (
-            <p className="text-gray-700 print:text-black">
-              <strong>Data Quality:</strong> Successfully processed {importedData.validation.stats.validRows} valid employee records with {importedData.validation.warnings.length} data quality warnings. This real-time analysis provides current insights based on your organization's actual workforce data.
-            </p>
+          
+          {!isUsingUploadedData && (
+            <FileUploader
+              onDataImported={handleDataImported}
+              onError={handleUploadError}
+              expectedColumns={['Quarter_End_Date', 'Division', 'Location']}
+              title="Upload Workforce Data"
+              description="Required columns: Quarter_End_Date, Division, Location, headcount fields"
+            />
           )}
         </div>
+        
+        {/* Summary Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
+          {/* Total Headcount */}
+          <div className="bg-white p-6 rounded-lg shadow">
+            <h2 className="text-sm font-medium text-blue-500 mb-2">Total Headcount</h2>
+            <div className="flex items-end gap-2 mb-1">
+              <p className="text-4xl font-bold text-black">{(headcountData.total?.value || 0).toLocaleString()}</p>
+              <span className="text-sm font-medium text-red-500 mb-1">
+                {headcountData.total?.change || 0}%
+              </span>
+            </div>
+            <p className="text-xs text-gray-500">{headcountData.total?.subtitle || 'from previous quarter'}</p>
+          </div>
+          
+          {/* Faculty */}
+          <div className="bg-white p-6 rounded-lg shadow">
+            <h2 className="text-sm font-medium text-blue-500 mb-2">Faculty</h2>
+            <div className="flex items-center gap-2 mb-1">
+              <p className="text-4xl font-bold text-black">{headcountData.faculty?.value || 0}</p>
+              <div className="w-3 h-3 rounded-full bg-green-500"></div>
+            </div>
+            <p className="text-xs text-gray-500">{headcountData.faculty?.change || 0}% {headcountData.faculty?.subtitle || 'change'}</p>
+          </div>
+          
+          {/* Staff */}
+          <div className="bg-white p-6 rounded-lg shadow">
+            <h2 className="text-sm font-medium text-blue-500 mb-2">Staff</h2>
+            <div className="flex items-center gap-2 mb-1">
+              <p className="text-4xl font-bold text-black">{(headcountData.staff?.value || 0).toLocaleString()}</p>
+              <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+            </div>
+            <p className="text-xs text-gray-500">{headcountData.staff?.change || 0}% {headcountData.staff?.subtitle || 'change'}</p>
+          </div>
+
+          {/* Starters */}
+          <div className="bg-white p-6 rounded-lg shadow">
+            <h2 className="text-sm font-medium text-blue-500 mb-2">Starters</h2>
+            <div className="flex items-center gap-2 mb-1">
+              <div className="w-3 h-3 rounded-full bg-teal-500"></div>
+              <p className="text-4xl font-bold text-black">{headcountData.starters?.value || 0}</p>
+            </div>
+            <p className="text-xs text-gray-500">{headcountData.starters?.subtitle || 'new hires'}</p>
+          </div>
+
+          {/* Leavers */}
+          <div className="bg-white p-6 rounded-lg shadow">
+            <h2 className="text-sm font-medium text-blue-500 mb-2">Leavers</h2>
+            <div className="flex items-center gap-2 mb-1">
+              <div className="w-3 h-3 rounded-full bg-blue-600"></div>
+              <p className="text-4xl font-bold text-black">{headcountData.leavers?.value || 0}</p>
+            </div>
+            <p className="text-xs text-gray-500">{headcountData.leavers?.subtitle || 'departures'}</p>
+          </div>
+        </div>
+        
+        {/* Charts */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Top 10 Benefit Eligible Headcount by Division */}
+          <div className="bg-white p-6 rounded-lg shadow">
+            <h3 className="text-lg font-semibold mb-4">Top 10 Benefit Eligible Headcount by Division</h3>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={divisionsData} layout="horizontal">
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis type="number" />
+                <YAxis dataKey="division" type="category" width={120} />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="faculty" stackId="division" fill="#1e40af" name="(BE) Faculty" />
+                <Bar dataKey="staff" stackId="division" fill="#3b82f6" name="(BE) Staff" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+
+          {/* Headcount, Starters and Leavers Trend */}
+          <div className="bg-white p-6 rounded-lg shadow">
+            <h3 className="text-lg font-semibold mb-4">Headcount, Faculty, and Staff Trend</h3>
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={trendData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="quarter" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Line 
+                  type="monotone" 
+                  dataKey="total" 
+                  stroke="#1e40af" 
+                  strokeWidth={2}
+                  dot={{ fill: '#1e40af', strokeWidth: 2, r: 4 }}
+                  name="Total Benefit Eligible Headcount"
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="faculty" 
+                  stroke="#10b981" 
+                  strokeWidth={2}
+                  dot={{ fill: '#10b981', strokeWidth: 2, r: 4 }}
+                  name="Faculty"
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="staff" 
+                  stroke="#3b82f6" 
+                  strokeWidth={2}
+                  dot={{ fill: '#3b82f6', strokeWidth: 2, r: 4 }}
+                  name="Staff"
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+        
+        {/* Benefit Eligible Employees by Location */}
+        <div className="mt-8">
+          <div className="bg-white p-6 rounded-lg shadow">
+            <h3 className="text-lg font-semibold mb-4 text-blue-600">Benefit Eligible Employees by Location</h3>
+            <div className="space-y-6">
+              {locationData.map((location, index) => (
+                <div key={location.location} className="space-y-2">
+                  <div className="flex justify-between items-center">
+                    <span className="font-medium text-gray-900">{location.location}</span>
+                    <span className="font-bold text-gray-900">{(location.count || 0).toLocaleString()}</span>
+                  </div>
+                  <div className="relative">
+                    <div className="w-full bg-gray-200 rounded-full h-6">
+                      <div 
+                        className="bg-blue-500 h-6 rounded-full flex items-center justify-end pr-2" 
+                        style={{ width: `${location.percentage || 0}%` }}
+                      >
+                      </div>
+                    </div>
+                    <div className="text-sm text-gray-600 mt-1">
+                      {location.percentage || 0}% of total workforce
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
-    </DashboardLayout>
+    </div>
   );
 };
 

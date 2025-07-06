@@ -71,6 +71,97 @@ npm run analyze
 npm run eject
 ```
 
+## Docker Development Workflow
+
+### Session Start Checklist
+
+**Always run at the beginning of each coding session:**
+
+```bash
+# 1. Navigate to project directory
+cd "/Users/pernelltoney/My Projects/dev/hr-trio-reports"
+
+# 2. Pull latest changes (if team project)
+git pull
+
+# 3. Install any new dependencies
+npm install
+
+# 4. Rebuild Docker container with latest changes
+docker-compose down && docker-compose build --no-cache && docker-compose up -d
+```
+
+### Development Workflow Options
+
+#### Option 1: Development-First Approach (Recommended)
+```bash
+# 1. Start with development server for active coding
+npm start  # Port 3000 - hot reload, instant changes
+
+# 2. When ready to test production build
+docker-compose down
+docker-compose build --no-cache  
+docker-compose up -d
+
+# 3. Switch between as needed for development vs testing
+```
+
+#### Option 2: Docker-First Approach  
+```bash
+# Always work in Docker for maximum consistency
+docker-compose down && docker-compose build --no-cache && docker-compose up -d
+
+# Rebuild after changes (slower but more consistent)
+```
+
+### When to Rebuild Docker Container
+
+**Always rebuild when:**
+- Starting a new coding session
+- Switching branches or pulling changes
+- Dependencies change (package.json modified)
+- Docker/config files change (Dockerfile, docker-compose.yml)
+- After major code changes or new features
+- Before demos or testing sessions
+
+### Docker Commands
+
+```bash
+# Quick rebuild and restart
+docker-compose down && docker-compose build --no-cache && docker-compose up -d
+
+# Check container status
+docker ps
+
+# View container logs
+docker-compose logs -f
+
+# Stop containers
+docker-compose down
+
+# Clean up Docker system
+docker system prune -f
+
+# Build without cache (always use for development)
+docker-compose build --no-cache
+```
+
+### Cross-Platform Development (Mac/PC)
+
+**Best Practices:**
+- Always test changes in Docker before committing
+- Use Docker for demos and presentations
+- Rebuild Docker container at start of each session
+- Commit code only after Docker build succeeds
+- Use npm start for fast iteration, Docker for validation
+
+**Recommended Daily Workflow:**
+1. **Morning**: Rebuild Docker container with latest changes
+2. **Development**: Use `npm start` for fast iteration and hot reload  
+3. **Testing**: Switch to Docker when testing production features
+4. **Demos**: Always use Docker for consistent presentations
+5. **End of day**: Commit changes, test Docker build before closing
+
 ## Architecture
 
 ### Application Structure

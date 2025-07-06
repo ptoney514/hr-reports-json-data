@@ -30,28 +30,64 @@ const useFirebaseWorkforceData = (customFilters = {}) => {
   const [lastSyncTime, setLastSyncTime] = useState(null);
   const { handleError } = useErrorHandler('useFirebaseWorkforceData');
 
-  // Merge context filters with custom filters
+  // Merge context filters with custom filters with stable references
   const activeFilters = useMemo(() => ({
-    reportingPeriod: customFilters.reportingPeriod || state.reportingPeriod,
-    locationFilter: customFilters.locationFilter || state.locationFilter,
-    divisionFilter: customFilters.divisionFilter || state.divisionFilter,
-    departmentFilter: customFilters.departmentFilter || state.departmentFilter,
-    employeeTypeFilter: customFilters.employeeTypeFilter || state.employeeTypeFilter,
-    dateRange: customFilters.dateRange || state.dateRange
-  }), [customFilters, state]);
+    reportingPeriod: customFilters.reportingPeriod || state.reportingPeriod || 'Q2-2025',
+    locationFilter: customFilters.locationFilter || state.locationFilter || 'All',
+    divisionFilter: customFilters.divisionFilter || state.divisionFilter || 'All',
+    departmentFilter: customFilters.departmentFilter || state.departmentFilter || 'All',
+    employeeTypeFilter: customFilters.employeeTypeFilter || state.employeeTypeFilter || 'All',
+    dateRange: customFilters.dateRange || state.dateRange || null
+  }), [
+    customFilters.reportingPeriod,
+    customFilters.locationFilter, 
+    customFilters.divisionFilter,
+    customFilters.departmentFilter,
+    customFilters.employeeTypeFilter,
+    customFilters.dateRange,
+    state.reportingPeriod,
+    state.locationFilter,
+    state.divisionFilter,
+    state.departmentFilter,
+    state.employeeTypeFilter,
+    state.dateRange
+  ]);
 
   // Convert reporting period to Firebase period format
   const getFirebasePeriod = useCallback((reportingPeriod) => {
-    // Convert "Q2-2025" to "2025-Q2" format expected by Firebase
-    if (!reportingPeriod || reportingPeriod === 'Q2-2025') return '2025-Q1'; // Default current period
+    // Handle multiple period formats and normalize to Firebase format
+    if (!reportingPeriod) return '2025-Q1'; // Default current period
     
-    const match = reportingPeriod.match(/Q(\d)-(\d{4})/);
-    if (match) {
-      const [, quarter, year] = match;
+    // If already in Firebase format (2025-Q1), return as-is
+    if (/^\d{4}-Q\d$/.test(reportingPeriod)) {
+      return reportingPeriod;
+    }
+    
+    // Convert "Q2-2025" to "2025-Q2" format
+    const quarterMatch = reportingPeriod.match(/Q(\d)-(\d{4})/);
+    if (quarterMatch) {
+      const [, quarter, year] = quarterMatch;
       return `${year}-Q${quarter}`;
     }
     
-    return reportingPeriod;
+    // Handle date-based periods like "2025-03" (convert to quarter)
+    const monthMatch = reportingPeriod.match(/(\d{4})-(\d{2})/);
+    if (monthMatch) {
+      const [, year, month] = monthMatch;
+      const monthNum = parseInt(month, 10);
+      const quarter = Math.ceil(monthNum / 3); // 1-3=Q1, 4-6=Q2, 7-9=Q3, 10-12=Q4
+      return `${year}-Q${quarter}`;
+    }
+    
+    // Handle direct quarter format like "Q1-2025" (same as above case)
+    if (/^Q\d-\d{4}$/.test(reportingPeriod)) {
+      const [quarter, year] = reportingPeriod.split('-');
+      return `${year}-${quarter}`;
+    }
+    
+    // For any unrecognized format, default to current quarter
+    console.warn(`Unrecognized period format: ${reportingPeriod}, defaulting to 2025-Q1`);
+    return '2025-Q1';
   }, []);
 
   // Data validation schema for Firebase aggregate data
@@ -503,7 +539,7 @@ const useFirebaseWorkforceData = (customFilters = {}) => {
         setIsRealTimeActive(false);
       }
     };
-  }, [loadFirebaseData, setupRealTimeSubscription, actions]);
+  }, [activeFilters]); // Removed actions dependency to prevent infinite loop
 
   // Compute filtered and formatted data
   const filteredData = useMemo(() => {
