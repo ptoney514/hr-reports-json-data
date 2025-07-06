@@ -91,28 +91,18 @@ npm install
 docker-compose down && docker-compose build --no-cache && docker-compose up -d
 ```
 
-### Development Workflow Options
+### Development Workflow
 
-#### Option 1: Development-First Approach (Recommended)
+**Docker-Only Approach (Required)**
 ```bash
-# 1. Start with development server for active coding
-npm start  # Port 3000 - hot reload, instant changes
-
-# 2. When ready to test production build
-docker-compose down
-docker-compose build --no-cache  
-docker-compose up -d
-
-# 3. Switch between as needed for development vs testing
-```
-
-#### Option 2: Docker-First Approach  
-```bash
-# Always work in Docker for maximum consistency
+# Always work in Docker for maximum consistency and production parity
 docker-compose down && docker-compose build --no-cache && docker-compose up -d
 
-# Rebuild after changes (slower but more consistent)
+# Rebuild after changes - this is our only development method
+# Application available at: http://localhost:3000
 ```
+
+**Important**: We use Docker exclusively for all development work. No npm start or local development servers.
 
 ### When to Rebuild Docker Container
 
@@ -149,18 +139,18 @@ docker-compose build --no-cache
 ### Cross-Platform Development (Mac/PC)
 
 **Best Practices:**
-- Always test changes in Docker before committing
-- Use Docker for demos and presentations
+- Always work exclusively in Docker for all development
 - Rebuild Docker container at start of each session
 - Commit code only after Docker build succeeds
-- Use npm start for fast iteration, Docker for validation
+- Use Docker for all testing, demos, and presentations
+- Never use npm start or local development servers
 
 **Recommended Daily Workflow:**
 1. **Morning**: Rebuild Docker container with latest changes
-2. **Development**: Use `npm start` for fast iteration and hot reload  
-3. **Testing**: Switch to Docker when testing production features
-4. **Demos**: Always use Docker for consistent presentations
-5. **End of day**: Commit changes, test Docker build before closing
+2. **Development**: Work exclusively in Docker (http://localhost:3000)
+3. **Testing**: All testing done in Docker environment
+4. **Demos**: Docker is always ready for presentations
+5. **End of day**: Commit changes, ensure Docker build succeeds
 
 ## Architecture
 
