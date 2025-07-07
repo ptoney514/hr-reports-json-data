@@ -117,6 +117,58 @@ export const dateToQuarter = (date) => {
 };
 
 /**
+ * Convert a calendar quarter end date to system quarter string
+ * This handles the HR template format which uses calendar quarters
+ * @param {string} dateString - Date string like "2024-06-30" 
+ * @returns {string} Quarter string like "Q2-2024"
+ */
+export const calendarDateToQuarter = (dateString) => {
+  if (!dateString || typeof dateString !== 'string') return '';
+  
+  // Direct mapping for known HR template quarter end dates
+  const calendarQuarterMappings = {
+    '2024-06-30': 'Q2-2024',  // June 30 = Q2 (calendar quarter)
+    '2024-09-30': 'Q3-2024',  // Sept 30 = Q3 (calendar quarter)
+    '2024-12-31': 'Q4-2024',  // Dec 31 = Q4 (calendar quarter)
+    '2025-03-31': 'Q1-2025',  // Mar 31 = Q1 (calendar quarter, next year)
+    '2025-06-30': 'Q2-2025',  // June 30 = Q2 (calendar quarter)
+    '2025-09-30': 'Q3-2025',  // Sept 30 = Q3 (calendar quarter)
+    '2025-12-31': 'Q4-2025'   // Dec 31 = Q4 (calendar quarter)
+  };
+  
+  // Check direct mapping first
+  if (calendarQuarterMappings[dateString]) {
+    return calendarQuarterMappings[dateString];
+  }
+  
+  // Fallback: parse date and determine calendar quarter
+  try {
+    const date = new Date(dateString);
+    if (!isValid(date)) return '';
+    
+    const month = date.getMonth(); // 0-based
+    const year = date.getFullYear();
+    
+    // Calendar quarters (Jan-Mar = Q1, Apr-Jun = Q2, Jul-Sep = Q3, Oct-Dec = Q4)
+    let quarter;
+    if (month >= 9) { // Oct, Nov, Dec
+      quarter = 4;
+    } else if (month >= 6) { // Jul, Aug, Sep
+      quarter = 3;
+    } else if (month >= 3) { // Apr, May, Jun
+      quarter = 2;
+    } else { // Jan, Feb, Mar
+      quarter = 1;
+    }
+    
+    return `Q${quarter}-${year}`;
+  } catch (error) {
+    console.warn('Failed to parse calendar date:', dateString, error);
+    return '';
+  }
+};
+
+/**
  * Get the current quarter
  * @returns {string} Current quarter string like "Q2-2025"
  */

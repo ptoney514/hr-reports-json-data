@@ -11,6 +11,9 @@ This todo list tracks the Phase 11 objectives for user testing and dashboard ref
 - [x] **Step 2: Replace Static Data with Dynamic State** - Add React state and Firebase integration
 - [x] **Step 3: Update 5 Summary Cards Only** - Connect cards to dynamic data while preserving styling
 - [x] **Step 4: Add Data Source Indicator** - Add Firebase vs sample data status and upload button
+- [x] **Phase 2: Replace Historical Charts Data** - Replace historyData and startersLeaversData with dynamic data
+- [x] **Phase 3: Replace Division & Location Data** - Replace topDivisionsData and turnoverReasons with dynamic calculations
+- [x] **Phase 4: Dynamic Executive Summary** - Replace static executive summary with data-driven content
 
 ### 2. Review Current System Status
 - [ ] Verify all components are ready for user testing

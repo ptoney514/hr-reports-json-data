@@ -4,6 +4,7 @@
  */
 
 import { parse, format } from 'date-fns';
+import { calendarDateToQuarter } from './dateHelpers';
 
 /**
  * Available quarter end dates for filtering
@@ -165,13 +166,23 @@ export function processQuarterlyData(rawData) {
     throw new Error('No valid records found. Please check that your data includes Quarter_End_Date, Division, and Location columns.');
   }
   
-  // Group by quarter
+  // Group by quarter - convert calendar dates to quarter strings
   const quarterlyData = {};
   validData.forEach(record => {
-    const quarter = record.quarterEndDate;
+    // Convert quarter end date (like "2024-06-30") to quarter string (like "Q2-2024")
+    const quarter = calendarDateToQuarter(record.quarterEndDate);
+    
+    if (!quarter) {
+      console.warn('Could not convert quarter end date to quarter:', record.quarterEndDate);
+      return;
+    }
+    
     if (!quarterlyData[quarter]) {
       quarterlyData[quarter] = [];
     }
+    
+    // Add the quarter string to the record for easy access
+    record.quarter = quarter;
     quarterlyData[quarter].push(record);
   });
   
@@ -187,7 +198,7 @@ export function calculateQuarterMetrics(quarterData, previousQuarterData = null)
       total: { value: 0, change: null, subtitle: "from previous quarter" },
       faculty: { value: 0, change: null, subtitle: "change", indicator: "green" },
       staff: { value: 0, change: null, subtitle: "change", indicator: "yellow" },
-      starters: { value: 0, change: null, subtitle: "new hires", indicator: "teal" },
+      newHires: { value: 0, change: null, subtitle: "new hires", indicator: "teal" },
       leavers: { value: 0, change: null, subtitle: "departures", indicator: "blue" }
     };
   }
@@ -199,18 +210,19 @@ export function calculateQuarterMetrics(quarterData, previousQuarterData = null)
   const totalNBEStaff = quarterData.reduce((sum, row) => sum + (row.nbeStaffHeadcount || 0), 0);
   const totalNBEStudentWorker = quarterData.reduce((sum, row) => sum + (row.nbeStudentWorkerHeadcount || 0), 0);
   
+  // Only count Benefit Eligible (BE) employees per dashboard note
   const totalStarters = quarterData.reduce((sum, row) => 
-    sum + (row.beNewHires || 0) + (row.nbeNewHires || 0), 0
+    sum + (row.beNewHires || 0), 0
   );
   
   const totalLeavers = quarterData.reduce((sum, row) => 
-    sum + (row.beDepartures || 0) + (row.nbeDepartures || 0), 0
+    sum + (row.beDepartures || 0), 0
   );
   
-  // Calculate totals
-  const totalFaculty = totalBEFaculty + totalNBEFaculty;
-  const totalStaff = totalBEStaff + totalNBEStaff;
-  const grandTotal = totalFaculty + totalStaff + totalNBEStudentWorker;
+  // Calculate totals (BE only per dashboard note)
+  const totalFaculty = totalBEFaculty;
+  const totalStaff = totalBEStaff;
+  const grandTotal = totalFaculty + totalStaff;
   
   // Calculate changes if previous quarter data is available
   let totalChange = null;
@@ -220,23 +232,21 @@ export function calculateQuarterMetrics(quarterData, previousQuarterData = null)
   if (previousQuarterData && previousQuarterData.length > 0) {
     const prevBEFaculty = previousQuarterData.reduce((sum, row) => sum + (row.beFacultyHeadcount || 0), 0);
     const prevBEStaff = previousQuarterData.reduce((sum, row) => sum + (row.beStaffHeadcount || 0), 0);
-    const prevNBEFaculty = previousQuarterData.reduce((sum, row) => sum + (row.nbeFacultyHeadcount || 0), 0);
-    const prevNBEStaff = previousQuarterData.reduce((sum, row) => sum + (row.nbeStaffHeadcount || 0), 0);
-    const prevNBEStudentWorker = previousQuarterData.reduce((sum, row) => sum + (row.nbeStudentWorkerHeadcount || 0), 0);
     
-    const prevTotalFaculty = prevBEFaculty + prevNBEFaculty;
-    const prevTotalStaff = prevBEStaff + prevNBEStaff;
-    const prevGrandTotal = prevTotalFaculty + prevTotalStaff + prevNBEStudentWorker;
+    // BE only per dashboard note
+    const prevTotalFaculty = prevBEFaculty;
+    const prevTotalStaff = prevBEStaff;
+    const prevGrandTotal = prevTotalFaculty + prevTotalStaff;
     
-    // Calculate percentage changes
+    // Calculate percentage changes (return raw numbers, not formatted strings)
     if (prevGrandTotal > 0) {
-      totalChange = ((grandTotal - prevGrandTotal) / prevGrandTotal * 100).toFixed(2);
+      totalChange = ((grandTotal - prevGrandTotal) / prevGrandTotal * 100);
     }
     if (prevTotalFaculty > 0) {
-      facultyChange = ((totalFaculty - prevTotalFaculty) / prevTotalFaculty * 100).toFixed(2);
+      facultyChange = ((totalFaculty - prevTotalFaculty) / prevTotalFaculty * 100);
     }
     if (prevTotalStaff > 0) {
-      staffChange = ((totalStaff - prevTotalStaff) / prevTotalStaff * 100).toFixed(2);
+      staffChange = ((totalStaff - prevTotalStaff) / prevTotalStaff * 100);
     }
   }
   
@@ -261,7 +271,7 @@ export function calculateQuarterMetrics(quarterData, previousQuarterData = null)
       changeType: "percentage",
       indicator: "yellow" 
     },
-    starters: { 
+    newHires: { 
       value: totalStarters, 
       change: null, 
       subtitle: "new hires",
@@ -387,7 +397,7 @@ export function generateSampleData() {
         const nbeDepartures = qIndex > 0 ? Math.floor(Math.random() * 12) + 3 : 0;
         
         sampleData.push({
-          Quarter_End_Date: quarter.value,
+          Quarter_End_Date: quarter.dateValue, // Use actual calendar date instead of quarter string
           Division: division,
           Location: location,
           BE_Faculty_Headcount: beFacultyHeadcount,
