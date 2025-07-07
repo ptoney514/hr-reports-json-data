@@ -1,10 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
-import { ArrowUpCircle, ArrowDownCircle } from 'lucide-react';
-import DashboardHeader from '../ui/DashboardHeader';
+import { ArrowUpCircle, ArrowDownCircle, Cloud, Upload, ExternalLink } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import QuarterFilter from '../ui/QuarterFilter';
+import ExportButton from '../ui/ExportButton';
 import ErrorBoundary from '../ui/ErrorBoundary';
+import { 
+  QUARTER_DATES, 
+  calculateQuarterMetrics, 
+  getPreviousQuarter,
+  generateSampleData 
+} from '../../utils/quarterlyDataProcessor';
+import useFirebaseWorkforceData from '../../hooks/useFirebaseWorkforceData';
 
 const CombinedWorkforceDashboard = () => {
+  const navigate = useNavigate();
+  
   // State for filters and actions
   const [filters, setFilters] = useState({
     reportingPeriod: 'Q2-2025',
@@ -12,6 +23,32 @@ const CombinedWorkforceDashboard = () => {
     division: 'all',
     employeeType: 'all'
   });
+  
+  // Quarter filter state (matches Enhanced Workforce Dashboard)
+  const [selectedQuarter, setSelectedQuarter] = useState('Q2-2025');
+  
+  // Firebase data integration
+  const { 
+    data: firebaseData, 
+    loading: firebaseLoading, 
+    error: firebaseError,
+    isRealTimeActive 
+  } = useFirebaseWorkforceData({
+    reportingPeriod: selectedQuarter || 'Q2-2025'
+  });
+  
+  // Dynamic headcount data state
+  const [headcountData, setHeadcountData] = useState({
+    total: { value: 0, change: null, subtitle: "from previous quarter", changeType: "percentage" },
+    faculty: { value: 0, change: null, subtitle: "change", changeType: "percentage", indicator: "green" },
+    staff: { value: 0, change: null, subtitle: "change", changeType: "percentage", indicator: "yellow" },
+    starters: { value: 0, change: null, subtitle: "new hires", changeType: null, indicator: "teal" },
+    leavers: { value: 0, change: null, subtitle: "departures", changeType: null, indicator: "blue" }
+  });
+  
+  // Data source state
+  const [dataSource, setDataSource] = useState('sample'); // 'sample', 'firebase'
+  const [quarterlyData, setQuarterlyData] = useState(null);
 
   // Handle filter changes
   const handleFilterChange = (newFilters) => {
@@ -19,6 +56,79 @@ const CombinedWorkforceDashboard = () => {
     // In a real app, this would trigger data refetch
     console.log('Filters updated:', { ...filters, ...newFilters });
   };
+  
+  // Handle quarter changes (matches Enhanced Workforce Dashboard)
+  const handleQuarterChange = (newQuarter) => {
+    setSelectedQuarter(newQuarter);
+    // Also update the reportingPeriod in filters for consistency
+    setFilters(prev => ({ ...prev, reportingPeriod: newQuarter }));
+    console.log('Quarter changed to:', newQuarter);
+  };
+
+  // Navigate to Excel Integration for data upload
+  const navigateToUpload = () => {
+    navigate('/excel-integration');
+  };
+
+  // Handle Firebase data integration
+  useEffect(() => {
+    if (firebaseData && Object.keys(firebaseData).length > 0) {
+      console.log('Firebase data loaded:', firebaseData);
+      setDataSource('firebase');
+    } else {
+      setDataSource('sample');
+    }
+  }, [firebaseData]);
+
+  // Initialize with sample data only if no Firebase data
+  useEffect(() => {
+    if (!firebaseData || Object.keys(firebaseData).length === 0) {
+      console.log('No Firebase data found, using sample data');
+      // Generate sample data for demonstration
+      const sampleData = generateSampleData();
+      
+      // Group by quarter
+      const groupedData = {};
+      sampleData.forEach(record => {
+        const quarter = record.Quarter_End_Date;
+        if (!groupedData[quarter]) {
+          groupedData[quarter] = [];
+        }
+        groupedData[quarter].push(record);
+      });
+      
+      setQuarterlyData(groupedData);
+      setDataSource('sample');
+    }
+  }, [firebaseData]);
+
+  // Update metrics when quarter or data changes
+  useEffect(() => {
+    if (dataSource === 'firebase' && firebaseData) {
+      // Use Firebase data directly for metrics
+      console.log('Using Firebase data for metrics');
+      const metrics = {
+        total: { value: firebaseData.summary?.totalEmployees || 0, change: firebaseData.summary?.employeeChange || 0, subtitle: "from previous quarter", changeType: "percentage" },
+        faculty: { value: firebaseData.summary?.faculty || 0, change: firebaseData.summary?.facultyChange || 0, subtitle: "change", changeType: "percentage", indicator: "green" },
+        staff: { value: firebaseData.summary?.staff || 0, change: firebaseData.summary?.staffChange || 0, subtitle: "change", changeType: "percentage", indicator: "yellow" },
+        starters: { value: (firebaseData.metrics?.recentHires?.faculty || 0) + (firebaseData.metrics?.recentHires?.staff || 0), change: null, subtitle: "new hires", changeType: null, indicator: "teal" },
+        leavers: { value: Math.floor((firebaseData.summary?.totalEmployees || 0) * 0.05), change: null, subtitle: "departures", changeType: null, indicator: "blue" }
+      };
+      setHeadcountData(metrics);
+    } else if (quarterlyData && selectedQuarter) {
+      console.log('Selected quarter:', selectedQuarter);
+      console.log('Available quarters in data:', Object.keys(quarterlyData));
+      
+      const currentQuarterData = quarterlyData[selectedQuarter] || [];
+      const previousQuarter = getPreviousQuarter(selectedQuarter);
+      const previousQuarterData = previousQuarter ? quarterlyData[previousQuarter] : null;
+      
+      console.log('Current quarter data:', currentQuarterData.length, 'records');
+      
+      const metrics = calculateQuarterMetrics(currentQuarterData, previousQuarterData);
+      setHeadcountData(metrics);
+    }
+  }, [quarterlyData, selectedQuarter, dataSource, firebaseData]);
 
   // Handle export functionality
   const handleExport = async (exportType) => {
@@ -109,14 +219,6 @@ const CombinedWorkforceDashboard = () => {
       { value: 'staff', label: 'Staff' }
     ]
   };
-  const headcountData = {
-    total: 4249,
-    faculty: 684,
-    staff: 1439,
-    totalChange: -5.2,
-    facultyChange: -0.73,
-    staffChange: -0.14
-  };
 
   const historyData = [
     { quarter: 'Q2-24', employees: 4162 },
@@ -157,26 +259,125 @@ const CombinedWorkforceDashboard = () => {
     <ErrorBoundary>
       <div className="min-h-screen bg-gray-50 py-8">
         <div className="max-w-7xl mx-auto px-4">
-          {/* Header with functional buttons */}
-          <DashboardHeader 
-            title="Combined Workforce Analytics"
-            subtitle="Q2 2025 | Cached (Firebase) | Last sync: 9:52:35 AM"
-            filters={filters}
-            availableFilters={availableFilters}
-            onFilterChange={handleFilterChange}
-            onExport={handleExport}
-            showFilters={true}
-            showDateFilter={true}
-            showExport={true}
-          />
+          {/* Header with Title Above Filters */}
+          <div className="mb-6">
+            {/* Title Section */}
+            <div className="mb-4">
+              <h1 className="text-2xl font-bold text-blue-700">Combined Workforce Analytics</h1>
+            </div>
+            
+            {/* Data Source Section */}
+            <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
+              <div className="flex justify-between items-center mb-4">
+                <div>
+                  <h2 className="text-lg font-semibold text-gray-900">Data Source</h2>
+                  <p className="text-sm text-gray-600">
+                    {dataSource === 'firebase' && (
+                      <span className="flex items-center gap-2">
+                        <Cloud size={16} className="text-purple-500" />
+                        Using Firebase data from centralized upload
+                      </span>
+                    )}
+                    {dataSource === 'sample' && 'Using sample data for demonstration'}
+                    {firebaseLoading && ' (Loading from Firebase...)'}
+                    {firebaseError && ` (Firebase error: ${firebaseError.message})`}
+                  </p>
+                </div>
+                <button
+                  onClick={navigateToUpload}
+                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  <Upload size={16} />
+                  Upload Data
+                  <ExternalLink size={14} />
+                </button>
+              </div>
+              
+              {dataSource === 'sample' && (
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <p className="text-sm text-blue-700">
+                    <strong>No uploaded data found.</strong> Click "Upload Data" to go to the Excel Integration page and upload your quarterly workforce data.
+                  </p>
+                </div>
+              )}
+              
+              {dataSource === 'firebase' && (
+                <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                  <p className="text-sm text-green-700">
+                    <strong>✓ Data loaded from Firebase.</strong> Dashboard showing real-time data from your uploaded files.
+                  </p>
+                </div>
+              )}
+            </div>
+            
+            {/* Filters and Export Row */}
+            <div className="flex items-end gap-4">
+              <div className="w-64">
+                <QuarterFilter 
+                  selectedQuarter={selectedQuarter}
+                  onQuarterChange={handleQuarterChange}
+                  availableQuarters={QUARTER_DATES}
+                />
+              </div>
+              <div className="w-48">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Location
+                </label>
+                <select
+                  value={filters.location || 'all'}
+                  onChange={(e) => handleFilterChange({ location: e.target.value })}
+                  className="block w-full pl-3 pr-10 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                >
+                  {availableFilters.location.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="w-48">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Division
+                </label>
+                <select
+                  value={filters.division || 'all'}
+                  onChange={(e) => handleFilterChange({ division: e.target.value })}
+                  className="block w-full pl-3 pr-10 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                >
+                  {availableFilters.division.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="w-48">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Employee Type
+                </label>
+                <select
+                  value={filters.employeeType || 'all'}
+                  onChange={(e) => handleFilterChange({ employeeType: e.target.value })}
+                  className="block w-full pl-3 pr-10 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                >
+                  {availableFilters.employeeType.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <ExportButton onExport={handleExport} />
+            </div>
+          </div>
 
           {/* Summary Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mb-6">
             <div className="bg-white p-4 rounded-lg shadow-sm border col-span-2">
               <h2 className="text-sm font-medium text-blue-700 mb-2">Total Headcount</h2>
               <div className="flex items-end gap-2">
-                <span className="text-3xl font-bold">{headcountData.total.toLocaleString()}</span>
-                <span className="text-red-500 text-sm">{headcountData.totalChange}%</span>
+                <span className="text-3xl font-bold">{(headcountData.total?.value || 0).toLocaleString()}</span>
+                <span className="text-red-500 text-sm">{headcountData.total?.change || 0}%</span>
               </div>
               <p className="text-gray-500 text-sm">from previous quarter</p>
             </div>
@@ -184,30 +385,30 @@ const CombinedWorkforceDashboard = () => {
             <div className="bg-white p-4 rounded-lg shadow-sm border">
               <h2 className="text-sm font-medium text-blue-700 mb-2">Faculty</h2>
               <div className="flex items-end gap-2">
-                <span className="text-2xl font-bold">{headcountData.faculty}</span>
+                <span className="text-2xl font-bold">{headcountData.faculty?.value || 0}</span>
                 <ArrowUpCircle size={16} className="text-green-500" />
               </div>
-              <p className="text-gray-500 text-sm">{headcountData.facultyChange}% change</p>
+              <p className="text-gray-500 text-sm">{headcountData.faculty?.change || 0}% change</p>
             </div>
             
             <div className="bg-white p-4 rounded-lg shadow-sm border">
               <h2 className="text-sm font-medium text-blue-700 mb-2">Staff</h2>
               <div className="flex items-end gap-2">
-                <span className="text-2xl font-bold">{headcountData.staff.toLocaleString()}</span>
+                <span className="text-2xl font-bold">{(headcountData.staff?.value || 0).toLocaleString()}</span>
                 <ArrowDownCircle size={16} className="text-yellow-500" />
               </div>
-              <p className="text-gray-500 text-sm">{headcountData.staffChange}% change</p>
+              <p className="text-gray-500 text-sm">{headcountData.staff?.change || 0}% change</p>
             </div>
             
             <div className="bg-white p-4 rounded-lg shadow-sm border">
               <h2 className="text-sm font-medium text-blue-700 mb-2">New Hires</h2>
-              <div className="text-2xl font-bold">228</div>
+              <div className="text-2xl font-bold">{headcountData.starters?.value || 0}</div>
               <p className="text-gray-500 text-sm">this quarter</p>
             </div>
             
             <div className="bg-white p-4 rounded-lg shadow-sm border">
               <h2 className="text-sm font-medium text-blue-700 mb-2">Departures</h2>
-              <div className="text-2xl font-bold">174</div>
+              <div className="text-2xl font-bold">{headcountData.leavers?.value || 0}</div>
               <p className="text-gray-500 text-sm">this quarter</p>
             </div>
           </div>

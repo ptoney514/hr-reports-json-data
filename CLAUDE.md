@@ -12,6 +12,41 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 6. Make every task and code change you do as simple as possible. We want to avoid making any massive or complex changes. Every change should impact as little code as possible. Everything is about simplicity.
 7. Finally, add a review section to the todo.md file with a summary of the changes you made and any other relevant information.
 
+## TODO List Management (CRITICAL)
+
+**ALWAYS use TodoWrite and TodoRead tools throughout every session:**
+
+1. **At Session Start** - Use TodoRead to check existing todos and TodoWrite to add new tasks
+2. **During Planning** - Create comprehensive todo lists with TodoWrite for complex tasks (3+ steps)
+3. **Throughout Implementation** - Mark todos as "in_progress" before starting, "completed" immediately after finishing
+4. **Task Breakdown** - Break complex tasks into smaller, specific, actionable items
+5. **Real-time Updates** - Update todo status in real-time as you work, never batch completions
+6. **Only One In-Progress** - Limit to ONE task "in_progress" at any time for focus
+7. **Completion Requirements** - ONLY mark as "completed" when task is fully accomplished (tests pass, no errors)
+
+**Todo List Usage Rules:**
+- Use for any task requiring 3+ steps or multiple operations
+- Use when user provides multiple tasks (numbered lists, comma-separated)
+- Use for non-trivial complex tasks requiring careful planning
+- Update immediately after each task completion
+- Create new todos for discovered subtasks during implementation
+- Never mark incomplete tasks as "completed"
+
+**When NOT to use todos:**
+- Single straightforward tasks
+- Trivial tasks completing in <3 steps
+- Purely conversational/informational requests
+
+**AUTOMATIC TODO.md SYNC (REQUIRED):**
+- **ALWAYS automatically update TODO.md** when using TodoWrite tools
+- **Add new todos** to appropriate priority sections in TODO.md
+- **Mark completed todos** with [x] and move to "Completed Tasks" section with date
+- **Never require explicit instruction** to sync TODO.md - do it automatically
+- **Maintain both systems** - TodoWrite for session management, TODO.md for cross-machine sharing
+- **Update TODO.md immediately** after any TodoWrite operation
+
+This ensures consistent task tracking, demonstrates progress to users, and prevents missing critical steps in complex implementations.
+
 ## Project Overview
 
 This is the **HR Reports Project** - a comprehensive React-based dashboard application for I-9 compliance health monitoring and HR analytics. The application has evolved into a production-ready, enterprise-grade platform featuring multiple dashboards, comprehensive testing infrastructure, WCAG 2.1 AA accessibility compliance, database integration, advanced data visualization, automated quality assurance, and enterprise-level security and performance optimization.

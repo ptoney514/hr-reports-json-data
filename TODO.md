@@ -5,19 +5,26 @@ This todo list tracks the Phase 11 objectives for user testing and dashboard ref
 
 ## High Priority Tasks
 
-### 1. Review Current System Status
+### 1. Dynamic Data Integration for Combined Workforce Analytics
+- [x] **Phase 1: Add Dynamic Data Infrastructure** - Import dependencies and replace static data
+- [x] **Step 1: Import Required Dependencies** - Add useFirebaseWorkforceData hook and processor utilities
+- [x] **Step 2: Replace Static Data with Dynamic State** - Add React state and Firebase integration
+- [x] **Step 3: Update 5 Summary Cards Only** - Connect cards to dynamic data while preserving styling
+- [x] **Step 4: Add Data Source Indicator** - Add Firebase vs sample data status and upload button
+
+### 2. Review Current System Status
 - [ ] Verify all components are ready for user testing
 - [ ] Check Docker deployment status
 - [ ] Confirm Enhanced Workforce Analytics dashboard is accessible
 - [ ] Validate file import system functionality
 
-### 2. Prepare User Testing Session
+### 3. Prepare User Testing Session
 - [x] Set up Enhanced Workforce Analytics dashboard for testing
 - [x] Prepare sample data or template for testing
 - [x] Ensure all dashboard features are functional
 - [x] Document testing approach and focus areas
 
-### 3. Test File Import Functionality
+### 4. Test File Import Functionality
 - [ ] Test with sample employee data
 - [ ] Verify CSV/Excel parsing works correctly
 - [ ] Check data validation and preview functionality
@@ -25,59 +32,60 @@ This todo list tracks the Phase 11 objectives for user testing and dashboard ref
 
 ## Medium Priority Tasks
 
-### 4. Gather User Feedback
-- [ ] Document insights on visualizations and layout
-- [ ] Record user comments on data accuracy
-- [ ] Note UI/UX flow observations
-- [ ] Identify pain points or confusion areas
-
-### 5. Identify Visualization Gaps
-- [ ] Determine missing data visualizations
-- [ ] Identify unnecessary or redundant charts
-- [ ] Assess clarity and usefulness of current visualizations
-- [ ] Document specific improvement recommendations
-
-### 6. Refine Dashboard Based on Feedback
-- [ ] Add new visualizations as requested
-- [ ] Remove or modify existing visualizations
-- [ ] Improve data presentation based on user needs
-- [ ] Enhance overall dashboard layout and flow
-
-### 7. Adjust Data Structure Requirements
-- [ ] Modify data format based on actual user data
+### 5. Data Format Optimization
+- [ ] **Optimize CSV/Excel column requirements** - based on user's actual data format
 - [ ] Update column mapping and validation rules
 - [ ] Refine data processing logic
 - [ ] Ensure compatibility with various data formats
 
-### 9. Test Additional Dashboards
+### 6. Additional Dashboard Testing
+- [ ] **Test other dashboards** - (Turnover, I-9, Recruiting, Exit Survey) and export functionality
 - [ ] Test Turnover Analytics dashboard
 - [ ] Test I-9 Compliance dashboard
 - [ ] Test Recruiting dashboard
 - [ ] Test Exit Survey dashboard
 - [ ] Document any issues or improvements needed
 
-### 10. Verify Export Functionality
+### 7. Export Functionality Testing
 - [ ] Test PDF export across all dashboards
 - [ ] Test Excel export functionality
 - [ ] Test CSV export functionality
 - [ ] Test print functionality
 - [ ] Ensure exports include all relevant data
 
+### 8. Gather User Feedback (Detailed)
+- [ ] Document insights on visualizations and layout
+- [ ] Record user comments on data accuracy
+- [ ] Note UI/UX flow observations
+- [ ] Identify pain points or confusion areas
+
+### 9. Identify Visualization Gaps
+- [ ] Determine missing data visualizations
+- [ ] Identify unnecessary or redundant charts
+- [ ] Assess clarity and usefulness of current visualizations
+- [ ] Document specific improvement recommendations
+
+### 10. Refine Dashboard Based on Feedback
+- [ ] Add new visualizations as requested
+- [ ] Remove or modify existing visualizations
+- [ ] Improve data presentation based on user needs
+- [ ] Enhance overall dashboard layout and flow
+
 ## Low Priority Tasks
 
-### 8. Enhance Filter Functionality
+### 11. Documentation Updates
+- [ ] **Update WORKFORCE_DATA_FORMAT.md** - with any changes from user testing
+- [ ] Document any changes to data requirements
+- [ ] Update validation rules documentation
+- [ ] Revise user guidance based on testing
+
+### 12. Enhance Filter Functionality
 - [ ] Assess current filter system effectiveness
 - [ ] Add additional filter options if needed
 - [ ] Improve filter UI/UX based on user feedback
 - [ ] Test filter performance with large datasets
 
-### 11. Update Documentation
-- [ ] Update WORKFORCE_DATA_FORMAT.md with discoveries
-- [ ] Document any changes to data requirements
-- [ ] Update validation rules documentation
-- [ ] Revise user guidance based on testing
-
-### 12. Document Review Section
+### 13. Document Review Section
 - [ ] Summarize all changes made during Phase 11
 - [ ] Document lessons learned from user testing
 - [ ] Note any technical improvements implemented
@@ -115,6 +123,37 @@ The system is fully functional and technically sound. All major Phase 10 issues 
 *This section will be updated as tasks are completed with summaries of changes and relevant information.*
 
 ### Completed Tasks
+
+#### Phase 1: Dynamic Data Integration for Combined Workforce Analytics ✅
+**Status:** Complete  
+**Date:** July 6, 2025
+
+**Completed Items:**
+- [x] **Step 1: Import Required Dependencies** - Added useFirebaseWorkforceData hook, quarterlyDataProcessor utilities, useNavigate, and Lucide icons
+- [x] **Step 2: Replace Static Data with Dynamic State** - Added Firebase data integration, dynamic headcount state, data source tracking, and initialization effects
+- [x] **Step 3: Update 5 Summary Cards Only** - Connected all 5 cards to dynamic data while preserving existing styling and subtitles
+- [x] **Step 4: Add Data Source Indicator** - Added comprehensive data source section with Firebase status, upload button, and user feedback
+
+**Technical Implementation:**
+- **Imports Added**: useFirebaseWorkforceData, calculateQuarterMetrics, getPreviousQuarter, generateSampleData, Cloud/Upload/ExternalLink icons
+- **State Management**: Added dynamic headcountData state with proper structure for total, faculty, staff, starters, leavers
+- **Firebase Integration**: Full Firebase data loading with fallback to sample data when no uploads exist
+- **Cards Updated**: All 5 summary cards now display dynamic values with safe null checking (?.value || 0)
+- **Data Source UI**: Complete data source section showing Firebase vs sample status with upload navigation
+
+**Cards Successfully Connected:**
+1. **Total Headcount**: `headcountData.total.value` and `headcountData.total.change`
+2. **Faculty**: `headcountData.faculty.value` and `headcountData.faculty.change`  
+3. **Staff**: `headcountData.staff.value` and `headcountData.staff.change`
+4. **New Hires (Starters)**: `headcountData.starters.value`
+5. **Departures (Leavers)**: `headcountData.leavers.value`
+
+**Benefits Achieved:**
+- **Dynamic Data**: Cards now show real Firebase data when available
+- **Preserved Styling**: All existing CSS classes, colors, and layout maintained
+- **User Feedback**: Clear indication of data source (Firebase vs sample)
+- **Upload Integration**: Direct navigation to Excel Integration page
+- **Minimal Risk**: Only updated cards, left charts unchanged for incremental approach
 
 #### Task 2: Prepare User Testing Session ✅
 **Status:** Complete  
