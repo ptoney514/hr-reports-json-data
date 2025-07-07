@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
-import { ArrowUpCircle, ArrowDownCircle, Cloud, Upload, ExternalLink } from 'lucide-react';
+import { ArrowUpCircle, ArrowDownCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import QuarterFilter from '../ui/QuarterFilter';
 import ExportButton from '../ui/ExportButton';
@@ -80,11 +80,6 @@ const CombinedWorkforceDashboard = () => {
     setSelectedQuarter(newQuarter);
     // Also update the reportingPeriod in filters for consistency
     setFilters(prev => ({ ...prev, reportingPeriod: newQuarter }));
-  };
-
-  // Navigate to Excel Integration for data upload
-  const navigateToUpload = () => {
-    navigate('/excel-integration');
   };
 
   // Handle Firebase data integration
@@ -745,50 +740,6 @@ const CombinedWorkforceDashboard = () => {
               <p className="text-sm text-gray-600 mt-1">
                 <span className="font-medium">Note:</span> All workforce metrics below represent <strong>Benefit Eligible</strong> employees only.
               </p>
-            </div>
-            
-            {/* Data Source Section */}
-            <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
-              <div className="flex justify-between items-center mb-4">
-                <div>
-                  <h2 className="text-lg font-semibold text-gray-900">Data Source</h2>
-                  <p className="text-sm text-gray-600">
-                    {dataSource === 'firebase' && (
-                      <span className="flex items-center gap-2">
-                        <Cloud size={16} className="text-purple-500" />
-                        Using Firebase data from centralized upload
-                      </span>
-                    )}
-                    {dataSource === 'sample' && 'Using sample data for demonstration'}
-                    {firebaseLoading && ' (Loading from Firebase...)'}
-                    {firebaseError && ` (Firebase error: ${firebaseError.message})`}
-                  </p>
-                </div>
-                <button
-                  onClick={navigateToUpload}
-                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                >
-                  <Upload size={16} />
-                  Upload Data
-                  <ExternalLink size={14} />
-                </button>
-              </div>
-              
-              {dataSource === 'sample' && (
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                  <p className="text-sm text-blue-700">
-                    <strong>No uploaded data found.</strong> Click "Upload Data" to go to the Excel Integration page and upload your quarterly workforce data.
-                  </p>
-                </div>
-              )}
-              
-              {dataSource === 'firebase' && (
-                <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                  <p className="text-sm text-green-700">
-                    <strong>✓ Data loaded from Firebase.</strong> Dashboard showing real-time data from your uploaded files.
-                  </p>
-                </div>
-              )}
             </div>
             
             {/* Filters and Export Row */}

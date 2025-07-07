@@ -2,6 +2,7 @@ import React, { useEffect, Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Navigation from './components/ui/Navigation';
 import ErrorBoundary from './components/ui/ErrorBoundary';
+import { DataSourceProvider } from './contexts/DataSourceContext';
 import { setupGlobalErrorHandling } from './utils/errorHandler';
 import { DashboardSkeleton } from './components/ui/LoadingSkeleton';
 import './components/dashboards/I9Dashboard.css';
@@ -51,28 +52,29 @@ function App() {
   };
 
   return (
-    <ErrorBoundary
-      onError={handleAppError}
-      onRetry={handleAppRetry}
-      showHomeButton={false}
-    >
-      <Router>
-        <div className="App">
-          {/* Navigation Component */}
-          <Navigation />
-          
-          {/* Main Content with Suspense for lazy loading */}
-          <Suspense fallback={
-            <div className="p-4">
-              <DashboardSkeleton 
-                showHeader={true}
-                showSummaryCards={true}
-                showCharts={true}
-                summaryCardCount={4}
-                chartCount={4}
-              />
-            </div>
-          }>
+    <DataSourceProvider>
+      <ErrorBoundary
+        onError={handleAppError}
+        onRetry={handleAppRetry}
+        showHomeButton={false}
+      >
+        <Router>
+          <div className="App">
+            {/* Navigation Component */}
+            <Navigation />
+            
+            {/* Main Content with Suspense for lazy loading */}
+            <Suspense fallback={
+              <div className="p-4">
+                <DashboardSkeleton 
+                  showHeader={true}
+                  showSummaryCards={true}
+                  showCharts={true}
+                  summaryCardCount={4}
+                  chartCount={4}
+                />
+              </div>
+            }>
             <Routes>
               {/* Dashboard Routes */}
               <Route path="/dashboards" element={<DashboardIndex />} />
@@ -109,6 +111,7 @@ function App() {
         </div>
       </Router>
     </ErrorBoundary>
+  </DataSourceProvider>
   );
 }
 

@@ -12,10 +12,13 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import FileUploader from '../ui/FileUploader';
+import DataSourceManager from '../ui/DataSourceManager';
+import { useDataSource } from '../../contexts/DataSourceContext';
 import firebaseService from '../../services/FirebaseService';
 
 const ExcelIntegrationDashboard = () => {
   const navigate = useNavigate();
+  const { state, actions } = useDataSource();
   const [firebaseStatus, setFirebaseStatus] = useState(null);
   const [uploadingToFirebase, setUploadingToFirebase] = useState(false);
   const [clearingDatabase, setClearingDatabase] = useState(false);
@@ -112,6 +115,7 @@ const ExcelIntegrationDashboard = () => {
     console.log('Data imported:', importedData);
     setUploadingToFirebase(true);
     setFirebaseStatus({ status: 'uploading', message: 'Processing and uploading data to Firebase...' });
+    actions.setUploadStatus('uploading', 'Processing and uploading data to Firebase...');
 
     try {
       const processedData = processUploadedData(importedData.data);
@@ -167,6 +171,8 @@ const ExcelIntegrationDashboard = () => {
           dataType: 'quarterlyAggregate',
           dashboardLinks: { url: '/dashboards/enhanced-workforce', name: 'Enhanced Workforce Dashboard' }
         });
+        actions.setUploadStatus('success', `Successfully processed and uploaded ${processedData.length} records across ${firebaseSuccessCount} quarters to Firebase`);
+        actions.setDataAvailability({ workforce: true });
       } else {
         // Individual employee data - save differently
         setFirebaseStatus({ 
@@ -174,6 +180,7 @@ const ExcelIntegrationDashboard = () => {
           message: `Successfully processed ${processedData.length} individual employee records`,
           dataType: 'individualEmployees'
         });
+        actions.setUploadStatus('success', `Successfully processed ${processedData.length} individual employee records`);
       }
       
       setIsUsingUploadedData(true);
@@ -184,6 +191,7 @@ const ExcelIntegrationDashboard = () => {
         status: 'error', 
         message: `Upload failed: ${error.message}` 
       });
+      actions.setUploadStatus('error', `Upload failed: ${error.message}`);
     } finally {
       setUploadingToFirebase(false);
     }
@@ -195,12 +203,14 @@ const ExcelIntegrationDashboard = () => {
       status: 'error', 
       message: `Upload failed: ${error}` 
     });
-  }, []);
+    actions.setUploadStatus('error', `Upload failed: ${error}`);
+  }, [actions]);
 
   // Reset upload state
   const resetToSampleData = () => {
     setIsUsingUploadedData(false);
     setFirebaseStatus(null);
+    actions.resetUploadStatus();
   };
 
   // Navigate to Enhanced Workforce Dashboard
@@ -246,6 +256,14 @@ const ExcelIntegrationDashboard = () => {
           Supports both individual employee records and quarterly aggregate data.
         </p>
       </div>
+
+      {/* Data Source Manager */}
+      <DataSourceManager 
+        showUploadButton={false}
+        showStatusIndicator={true}
+        showDetailedStatus={true}
+        className="mb-6"
+      />
 
       {/* Quick Actions */}
       <div className="bg-white rounded-lg shadow-sm border p-6">

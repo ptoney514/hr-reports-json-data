@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { Cloud, Upload, ExternalLink } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import QuarterFilter from '../ui/QuarterFilter';
+import DataSourceManager from '../ui/DataSourceManager';
+import { useDataSource } from '../../contexts/DataSourceContext';
 import { 
   QUARTER_DATES, 
   calculateQuarterMetrics, 
@@ -16,6 +17,7 @@ import useFirebaseWorkforceData from '../../hooks/useFirebaseWorkforceData';
 
 const EnhancedWorkforceDashboard = () => {
   const navigate = useNavigate();
+  const { state: dataSourceState } = useDataSource();
   
   // State management for quarterly data
   const [selectedQuarter, setSelectedQuarter] = useState('Q1-2025');
@@ -38,28 +40,10 @@ const EnhancedWorkforceDashboard = () => {
     leavers: { value: 0, change: null, subtitle: "departures", changeType: null, indicator: "blue" }
   });
 
-  // Data source state
-  const [dataSource, setDataSource] = useState('sample'); // 'sample', 'firebase'
 
 
 
 
-
-
-  // Navigate to Excel Integration for data upload
-  const navigateToUpload = () => {
-    navigate('/excel-integration');
-  };
-
-  // Handle Firebase data integration
-  useEffect(() => {
-    if (firebaseData && Object.keys(firebaseData).length > 0) {
-      console.log('Firebase data loaded:', firebaseData);
-      setDataSource('firebase');
-    } else {
-      setDataSource('sample');
-    }
-  }, [firebaseData]);
 
   // Initialize with sample data only if no Firebase data
   useEffect(() => {
@@ -79,13 +63,12 @@ const EnhancedWorkforceDashboard = () => {
       });
       
       setQuarterlyData(groupedData);
-      setDataSource('sample');
     }
   }, [firebaseData]);
 
   // Update metrics when quarter or data changes
   useEffect(() => {
-    if (dataSource === 'firebase' && firebaseData) {
+    if (dataSourceState.dataSource === 'firebase' && firebaseData) {
       // Use Firebase data directly for metrics
       console.log('Using Firebase data for metrics');
       const metrics = {
@@ -109,23 +92,23 @@ const EnhancedWorkforceDashboard = () => {
       const metrics = calculateQuarterMetrics(currentQuarterData, previousQuarterData);
       setHeadcountData(metrics);
     }
-  }, [quarterlyData, selectedQuarter, dataSource, firebaseData]);
+  }, [quarterlyData, selectedQuarter, dataSourceState.dataSource, firebaseData]);
 
   // Calculate dynamic data based on selected quarter
-  const divisionsData = dataSource === 'firebase' && firebaseData
+  const divisionsData = dataSourceState.dataSource === 'firebase' && firebaseData
     ? firebaseData.charts?.topDivisions || []
     : quarterlyData && selectedQuarter 
       ? calculateDivisionBreakdown(quarterlyData[selectedQuarter] || [])
       : [];
 
-  const locationData = dataSource === 'firebase' && firebaseData
+  const locationData = dataSourceState.dataSource === 'firebase' && firebaseData
     ? firebaseData.charts?.locationDistribution || []
     : quarterlyData && selectedQuarter 
       ? calculateLocationBreakdown(quarterlyData[selectedQuarter] || [])
       : [];
 
   // Calculate trend data across all quarters
-  const trendData = dataSource === 'firebase' && firebaseData
+  const trendData = dataSourceState.dataSource === 'firebase' && firebaseData
     ? firebaseData.charts?.historicalTrends || []
     : quarterlyData 
       ? QUARTER_DATES.map(quarter => {
@@ -168,49 +151,14 @@ const EnhancedWorkforceDashboard = () => {
           </div>
         </div>
         
-        {/* Data Source Section */}
-        <div className="bg-white rounded-lg shadow-sm border p-6 mb-8">
-          <div className="flex justify-between items-center mb-4">
-            <div>
-              <h2 className="text-lg font-semibold text-gray-900">Data Source</h2>
-              <p className="text-sm text-gray-600">
-                {dataSource === 'firebase' && (
-                  <span className="flex items-center gap-2">
-                    <Cloud size={16} className="text-purple-500" />
-                    Using Firebase data from centralized upload
-                  </span>
-                )}
-                {dataSource === 'sample' && 'Using sample data for demonstration'}
-                {firebaseLoading && ' (Loading from Firebase...)'}
-                {firebaseError && ` (Firebase error: ${firebaseError.message})`}
-              </p>
-            </div>
-            <button
-              onClick={navigateToUpload}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              <Upload size={16} />
-              Upload Data
-              <ExternalLink size={14} />
-            </button>
-          </div>
-          
-          {dataSource === 'sample' && (
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <p className="text-sm text-blue-700">
-                <strong>No uploaded data found.</strong> Click "Upload Data" to go to the Excel Integration page and upload your quarterly workforce data.
-              </p>
-            </div>
-          )}
-          
-          {dataSource === 'firebase' && (
-            <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-              <p className="text-sm text-green-700">
-                <strong>✓ Data loaded from Firebase.</strong> Dashboard showing real-time data from your uploaded files.
-              </p>
-            </div>
-          )}
-        </div>
+        {/* Data Source Manager */}
+        <DataSourceManager 
+          showUploadButton={true}
+          showStatusIndicator={true}
+          showDetailedStatus={false}
+          uploadButtonText="Upload Data"
+          className="mb-8"
+        />
         
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
