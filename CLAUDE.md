@@ -375,6 +375,78 @@ src/
 - **Load testing capability** for 1000+ concurrent users
 - **Real-time performance monitoring** with automatic optimization
 
+## Chart Debugging Techniques
+
+### Complex Chart Update Issues
+**Problem**: Charts (especially Recharts) not updating when data or filters change despite correct data flow.
+
+**Diagnostic Approach**:
+1. **Visual Data Debugging**: Add debug panels showing exact data values with timestamps
+2. **Alternative Rendering**: Create simple HTML/CSS versions of charts to isolate Recharts issues
+3. **Multi-layer Force Re-rendering**: Apply multiple strategies simultaneously:
+   - Component-level keys with data dependencies
+   - Container-level keys with timestamps
+   - Disabled animations (`isAnimationActive={false}`)
+   - Enhanced data source validation
+
+**Example Debug Panel Implementation**:
+```jsx
+{/* DEBUG PANEL - Shows exact data values */}
+<div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded text-xs">
+  <div className="font-bold text-yellow-800 mb-2">
+    🐛 DEBUG DATA (Quarter: {selectedQuarter}) - Last Update: {new Date().toLocaleTimeString()}
+  </div>
+  <div className="grid grid-cols-1 gap-1 text-yellow-700">
+    <div>Array Length: {chartData.length}</div>
+    <div>Data Source: {dataSource}</div>
+    {chartData.map((item, index) => (
+      <div key={index} className="flex justify-between">
+        <span>{item.name}:</span>
+        <span>Value={item.value}</span>
+      </div>
+    ))}
+  </div>
+</div>
+
+{/* SIMPLE HTML BARS TEST */}
+<div className="mb-4 p-3 bg-green-50 border border-green-200 rounded">
+  <div className="font-bold text-green-800 mb-2">
+    🧪 SIMPLE HTML BARS TEST (Should definitely update)
+  </div>
+  {chartData.map((item, index) => (
+    <div key={`${selectedQuarter}-${index}`} className="flex items-center gap-2">
+      <span className="w-32">{item.name}</span>
+      <div 
+        className="bg-blue-600 h-4 transition-all duration-300" 
+        style={{ width: `${(item.value / maxValue) * 100}%` }}
+      />
+      <span>{item.value}</span>
+    </div>
+  ))}
+</div>
+```
+
+**Force Re-render Strategies**:
+```jsx
+{/* Container with timestamp key */}
+<div key={`chart-container-${selectedQuarter}-${Date.now()}`}>
+  <ResponsiveContainer width="100%" height={300}>
+    <BarChart 
+      key={`chart-${selectedQuarter}-${chartData.length}-${Date.now()}`}
+      data={chartData}
+    >
+      <Bar 
+        dataKey="value" 
+        fill="#1e40af"
+        isAnimationActive={false}  // Critical for update issues
+      />
+    </BarChart>
+  </ResponsiveContainer>
+</div>
+```
+
+**When to Use**: Chart display issues where data appears correct but visual updates don't occur. This technique helps isolate whether the issue is data flow, React rendering, or chart library-specific.
+
 ## Important Reminders
 
 ### Implementation Priorities

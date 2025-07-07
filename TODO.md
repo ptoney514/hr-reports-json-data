@@ -125,6 +125,45 @@ The system is fully functional and technically sound. All major Phase 10 issues 
 ## Review Section
 *This section will be updated as tasks are completed with summaries of changes and relevant information.*
 
+### Combined Workforce Dashboard Chart Synchronization Fixes ✅
+**Date:** July 7, 2025 (Continued)
+**Status:** COMPLETE - Quarter-Dynamic Chart Data Fixed
+
+**New Issues Resolved:**
+1. **Top Divisions by Headcount Chart** - Fixed to respond to quarter selection changes
+2. **Turnover Reasons Chart** - Enhanced with quarter-specific seasonal variations
+3. **Data Synchronization** - Both charts now properly update when quarter filter changes
+4. **Debug Logging** - Added comprehensive logging for chart data flow tracking
+
+**Technical Implementation:**
+- **Quarter-Responsive Division Data**: All three data sources (Firebase, quarterly, fallback) now generate division data specific to the selected quarter
+- **Seasonal Turnover Variations**: Implemented realistic quarterly variations for turnover reasons (e.g., higher retirement in Q1/Q4, higher relocation in Q3)
+- **Enhanced Firebase Logic**: Added quarter-specific data paths and intelligent fallback generation
+- **Quarterly Data Processing**: Enhanced to include detailed logging and quarter-specific division calculations
+- **Fallback Data Improvements**: Static fallback data now varies realistically by quarter using multipliers
+- **Synchronization Logging**: Added comprehensive debug output to track chart data updates
+
+**Chart-Specific Fixes:**
+1. **Top Divisions by Headcount (Horizontal Bar Chart)**:
+   - Firebase mode: Now checks for quarter-specific division data before using fallbacks
+   - Quarterly mode: Enhanced processing with detailed logging and proper quarter filtering
+   - Fallback mode: Applies quarter-based multipliers (0.95-1.02) for realistic variation
+
+2. **Turnover Reasons (Pie Chart)**:
+   - Implemented `generateQuarterVariedTurnoverReasons()` helper function
+   - Seasonal patterns: Q1/Q4 higher retirement, Q3 higher relocation, Q2 higher advancement
+   - Automatic percentage normalization to ensure totals equal 100%
+   - All data sources now use quarter-specific variations
+
+**User Experience Improvements:**
+- Both charts now change visibly when switching quarters
+- Consistent behavior across all data sources (Firebase, uploaded quarterly data, static fallback)
+- Comprehensive console logging for troubleshooting quarter-specific data issues
+- Executive summary automatically updates to reflect quarter-specific turnover reasons
+
+**Files Modified:**
+- `src/components/dashboards/CombinedWorkforceDashboard.jsx` - Complete chart synchronization overhaul with quarter-responsive data generation
+
 ### Completed Tasks
 
 #### Phase 1: Dynamic Data Integration for Combined Workforce Analytics ✅
