@@ -1,9 +1,9 @@
-import React from 'react';
-import DashboardLayout from './DashboardLayout';
+import React, { useState } from 'react';
 import SummaryCard from '../ui/SummaryCard';
 import TurnoverPieChart from '../charts/TurnoverPieChart';
-import DivisionsChart from '../charts/DivisionsChart';
-import StartersLeaversChart from '../charts/StartersLeaversChart';
+import PieBarCombinationChart from '../charts/PieBarCombinationChart';
+import QuarterFilter from '../ui/QuarterFilter';
+import ErrorBoundary from '../ui/ErrorBoundary';
 import useFirebaseTurnoverData from '../../hooks/useFirebaseTurnoverData';
 import { 
   TrendingDown, 
@@ -11,12 +11,10 @@ import {
   BookOpen,
   Building2,
   Award,
-  AlertTriangle,
-  Wifi,
-  WifiOff
+  AlertTriangle
 } from 'lucide-react';
 
-// Fallback data to ensure the dashboard always works
+// Simplified fallback data for consistent dashboard display
 const FALLBACK_DATA = {
   summary: {
     overallTurnoverRate: 12.5,
@@ -34,19 +32,19 @@ const FALLBACK_DATA = {
   },
   charts: {
     voluntaryReasons: [
-      { name: 'Career Advancement', value: 89, percentage: 39.2 },
-      { name: 'Compensation', value: 52, percentage: 22.9 },
-      { name: 'Work-Life Balance', value: 31, percentage: 13.7 },
-      { name: 'Relocation', value: 24, percentage: 10.6 },
-      { name: 'Retirement', value: 18, percentage: 7.9 }
+      { name: 'Career Advancement', value: 109, percentage: 38 },
+      { name: 'Compensation', value: 60, percentage: 21 },
+      { name: 'Work-Life Balance', value: 49, percentage: 17 },
+      { name: 'Retirement', value: 34, percentage: 12 },
+      { name: 'Relocation', value: 23, percentage: 8 },
+      { name: 'Other', value: 11, percentage: 4 }
     ],
     tenureAnalysis: [
-      { name: '0-1 years', value: 98, turnoverRate: 21.5 },
-      { name: '1-3 years', value: 76, turnoverRate: 12.2 },
-      { name: '3-5 years', value: 48, turnoverRate: 9.4 },
-      { name: '5-10 years', value: 42, turnoverRate: 6.2 },
-      { name: '10-15 years', value: 16, turnoverRate: 4.4 },
-      { name: '15+ years', value: 7, turnoverRate: 3.3 }
+      { name: '< 1 Year', value: 100, percentage: 35 },
+      { name: '1-3 Years', value: 83, percentage: 29 },
+      { name: '3-5 Years', value: 52, percentage: 18 },
+      { name: '5-10 Years', value: 29, percentage: 10 },
+      { name: '10+ Years', value: 23, percentage: 8 }
     ],
     gradeClassification: [
       { name: 'Faculty', value: 89, turnoverRate: 7.4 },
@@ -90,6 +88,23 @@ const FALLBACK_DATA = {
 };
 
 const TurnoverDashboard = () => {
+  // Quarter filter state (matches Enhanced Workforce Dashboard)
+  const [selectedQuarter, setSelectedQuarter] = useState('Q1-2025');
+  
+  // Available quarters for filter
+  const QUARTER_DATES = [
+    { value: 'Q1-2025', label: 'Q1 2025 (Jan-Mar)' },
+    { value: 'Q4-2024', label: 'Q4 2024 (Oct-Dec)' },
+    { value: 'Q3-2024', label: 'Q3 2024 (Jul-Sep)' },
+    { value: 'Q2-2024', label: 'Q2 2024 (Apr-Jun)' },
+    { value: 'Q1-2024', label: 'Q1 2024 (Jan-Mar)' }
+  ];
+
+  // Handle quarter changes
+  const handleQuarterChange = (newQuarter) => {
+    setSelectedQuarter(newQuarter);
+  };
+
   // Use Firebase data with fallback
   const { 
     data: firebaseData, 
@@ -97,35 +112,12 @@ const TurnoverDashboard = () => {
     error, 
     isRealTime, 
     lastSyncTime 
-  } = useFirebaseTurnoverData('2025-Q1');
+  } = useFirebaseTurnoverData(selectedQuarter);
 
   // Use Firebase data if available, otherwise fallback
   const data = firebaseData || FALLBACK_DATA;
-  const filters = { fiscalYear: '2024' };
+  const filters = { fiscalYear: selectedQuarter.split('-')[1] || '2024' };
 
-  // Handle export functionality
-  const handleExport = (type, context) => {
-    console.log('Exporting turnover dashboard:', type, context);
-  };
-
-  // Available filters for this dashboard
-  const availableFilters = {
-    fiscalYear: [
-      { value: '2024', label: 'FY 2024' },
-      { value: '2023', label: 'FY 2023' },
-      { value: '2022', label: 'FY 2022' },
-      { value: '2021', label: 'FY 2021' },
-      { value: '2020', label: 'FY 2020' }
-    ],
-    grade: [
-      { value: 'all', label: 'All Grades' },
-      { value: 'A', label: 'A - Executive' },
-      { value: 'C', label: 'C - Faculty' },
-      { value: 'D', label: 'D - Professional' },
-      { value: 'X', label: 'X - Support' },
-      { value: 'Y', label: 'Y - Student' }
-    ]
-  };
 
   // Show loading state
   if (loading) {
@@ -158,16 +150,36 @@ const TurnoverDashboard = () => {
   }
 
   return (
-    <DashboardLayout
-      title="Turnover Analysis Dashboard"
-      subtitle={subtitle}
-      onExport={handleExport}
-      availableFilters={availableFilters}
-      gridCols="grid-cols-1"
-      maxWidth="max-w-7xl"
-    >
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 print:gap-2 mb-6 print:mb-4">
+    <ErrorBoundary>
+      <div className="min-h-screen bg-gray-50 py-8 dashboard-container print:bg-white print:py-0">
+        <div className="max-w-7xl mx-auto px-4 print:max-w-none print:px-0 print:mx-0">
+          {/* Header with Title Above Filters */}
+          <div className="mb-6">
+            {/* Title Section */}
+            <div className="bg-white rounded-lg shadow-sm border p-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <TrendingDown className="text-blue-600" size={24} />
+                  <div>
+                    <h1 className="text-2xl font-bold text-gray-900">Turnover Analysis Dashboard</h1>
+                    <p className="text-gray-600 text-sm mt-1">
+                      {subtitle}
+                    </p>
+                  </div>
+                </div>
+                <div className="w-64">
+                  <QuarterFilter 
+                    selectedQuarter={selectedQuarter}
+                    onQuarterChange={handleQuarterChange}
+                    availableQuarters={QUARTER_DATES}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Summary Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 print:gap-2 mb-6 print:mb-4">
         <SummaryCard
           title="Overall Turnover Rate"
           value={`${data.summary?.overallTurnoverRate?.toFixed(1) || '0.0'}%`}
@@ -210,115 +222,99 @@ const TurnoverDashboard = () => {
         />
       </div>
 
-      {/* Charts Row 1: Primary Reasons + Tenure Analysis */}
+      {/* Charts Row 1: Primary Reasons for Voluntary Turnover + Departures by Tenure */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 print:gap-2 mb-6 print:mb-4">
-        <TurnoverPieChart
+        <PieBarCombinationChart
           data={data.charts?.voluntaryReasons || []}
-          title="Primary Voluntary Turnover Reasons"
+          title="Primary Reasons for Voluntary Turnover"
+          height={350}
+        />
+        
+        <TurnoverPieChart
+          data={data.charts?.tenureAnalysis || []}
+          title="Departures by Tenure"
           height={350}
           showLegend={true}
         />
-        
-        <DivisionsChart
-          data={data.charts?.tenureAnalysis || []}
-          title="Departures by Tenure Group"
-          height={350}
-          maxItems={8}
-          sortBy="turnoverRate"
-          layout="horizontal"
-          showRanking={false}
-        />
       </div>
 
-      {/* Charts Row 2: Benchmark Comparison + Grade Classification */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 print:gap-2 mb-6 print:mb-4">
-        <div className="bg-white print:bg-white p-4 print:p-2 rounded-lg shadow-sm border print:border-gray">
-          <h3 className="text-lg print:text-base font-semibold text-blue-700 print:text-black mb-3 print:mb-2">
+      {/* Charts Row 2: Full Width Benchmark Comparison */}
+      <div className="mb-6 print:mb-4">
+        <div className="bg-white print:bg-white p-6 print:p-4 rounded-lg shadow-sm border print:border-gray">
+          <h3 className="text-xl print:text-lg font-semibold text-blue-700 print:text-black mb-6 print:mb-4">
             Higher Education Benchmark Comparison
           </h3>
-          <div className="space-y-4">
-            <div className="space-y-3">
-              <div>
-                <div className="flex justify-between items-center mb-1">
-                  <span className="text-sm font-medium">Overall Turnover</span>
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-bold text-green-600 print:text-black">
-                      {data.benchmarks?.overall?.creighton || 0}%
-                    </span>
-                    <span className="text-xs text-gray-500 print:text-black">
-                      vs {data.benchmarks?.overall?.industry || 0}% industry
-                    </span>
-                  </div>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div 
-                    className="bg-green-500 h-2 rounded-full" 
-                    style={{ width: `${((data.benchmarks?.overall?.creighton || 0) / 20) * 100}%` }}
-                  ></div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div>
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-base font-medium">Overall Turnover</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-lg font-bold text-green-600 print:text-black">
+                    {data.benchmarks?.overall?.creighton || 0}%
+                  </span>
+                  <span className="text-sm text-gray-500 print:text-black">
+                    vs {data.benchmarks?.overall?.industry || 0}% industry
+                  </span>
                 </div>
               </div>
-              
-              <div>
-                <div className="flex justify-between items-center mb-1">
-                  <span className="text-sm font-medium">Faculty Turnover</span>
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-bold text-blue-600 print:text-black">
-                      {data.benchmarks?.faculty?.creighton || 0}%
-                    </span>
-                    <span className="text-xs text-gray-500 print:text-black">
-                      vs {data.benchmarks?.faculty?.industry || 0}% industry
-                    </span>
-                  </div>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div 
-                    className="bg-blue-500 h-2 rounded-full" 
-                    style={{ width: `${((data.benchmarks?.faculty?.creighton || 0) / 20) * 100}%` }}
-                  ></div>
-                </div>
-              </div>
-              
-              <div>
-                <div className="flex justify-between items-center mb-1">
-                  <span className="text-sm font-medium">Staff Turnover</span>
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-bold text-orange-600 print:text-black">
-                      {data.benchmarks?.staff?.creighton || 0}%
-                    </span>
-                    <span className="text-xs text-gray-500 print:text-black">
-                      vs {data.benchmarks?.staff?.industry || 0}% industry
-                    </span>
-                  </div>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div 
-                    className="bg-orange-500 h-2 rounded-full" 
-                    style={{ width: `${((data.benchmarks?.staff?.creighton || 0) / 20) * 100}%` }}
-                  ></div>
-                </div>
+              <div className="w-full bg-gray-200 rounded-full h-3">
+                <div 
+                  className="bg-green-500 h-3 rounded-full transition-all duration-300" 
+                  style={{ width: `${((data.benchmarks?.overall?.creighton || 0) / 20) * 100}%` }}
+                ></div>
               </div>
             </div>
             
-            <div className="bg-green-50 print:bg-white p-3 rounded-lg border border-green-200 print:border-gray">
-              <div className="flex items-center gap-2">
-                <Award className="text-green-600 print:text-black" size={16} />
-                <span className="text-sm font-semibold text-green-800 print:text-black">
-                  Performing 12% better than industry median
-                </span>
+            <div>
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-base font-medium">Faculty Turnover</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-lg font-bold text-blue-600 print:text-black">
+                    {data.benchmarks?.faculty?.creighton || 0}%
+                  </span>
+                  <span className="text-sm text-gray-500 print:text-black">
+                    vs {data.benchmarks?.faculty?.industry || 0}% industry
+                  </span>
+                </div>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-3">
+                <div 
+                  className="bg-blue-500 h-3 rounded-full transition-all duration-300" 
+                  style={{ width: `${((data.benchmarks?.faculty?.creighton || 0) / 20) * 100}%` }}
+                ></div>
+              </div>
+            </div>
+            
+            <div>
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-base font-medium">Staff Turnover</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-lg font-bold text-orange-600 print:text-black">
+                    {data.benchmarks?.staff?.creighton || 0}%
+                  </span>
+                  <span className="text-sm text-gray-500 print:text-black">
+                    vs {data.benchmarks?.staff?.industry || 0}% industry
+                  </span>
+                </div>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-3">
+                <div 
+                  className="bg-orange-500 h-3 rounded-full transition-all duration-300" 
+                  style={{ width: `${((data.benchmarks?.staff?.creighton || 0) / 20) * 100}%` }}
+                ></div>
               </div>
             </div>
           </div>
+          
+          <div className="bg-green-50 print:bg-white p-4 rounded-lg border border-green-200 print:border-gray mt-6">
+            <div className="flex items-center justify-center gap-3">
+              <Award className="text-green-600 print:text-black" size={20} />
+              <span className="text-lg font-semibold text-green-800 print:text-black">
+                Performing 12% better than industry median across all categories
+              </span>
+            </div>
+          </div>
         </div>
-        
-        <DivisionsChart
-          data={data.charts?.gradeClassification || []}
-          title="Departures by Grade Classification"
-          height={350}
-          maxItems={6}
-          sortBy="turnoverRate"
-          layout="horizontal"
-          showRanking={true}
-        />
       </div>
 
       {/* Additional Metrics Row */}
@@ -404,16 +400,6 @@ const TurnoverDashboard = () => {
         </div>
       </div>
 
-      {/* Historical Trends Chart */}
-      <div className="mb-6 print:mb-4">
-        <StartersLeaversChart
-          data={data.charts?.historicalTrends || []}
-          title="5-Year Turnover Trends"
-          height={300}
-          showComparison={true}
-        />
-      </div>
-
       {/* Executive Summary Section */}
       <div className="bg-gray-50 print:bg-white p-6 print:p-4 rounded-lg border border-gray-200 print:border-gray">
         <h2 className="text-xl print:text-lg font-bold text-blue-700 print:text-black mb-4 print:mb-3">
@@ -434,7 +420,9 @@ const TurnoverDashboard = () => {
           </p>
         </div>
       </div>
-    </DashboardLayout>
+        </div>
+      </div>
+    </ErrorBoundary>
   );
 };
 

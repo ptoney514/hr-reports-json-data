@@ -75,6 +75,38 @@ const transformData = (firebaseData) => {
       costImpactChange: -5.2
     },
     charts: {
+      // Transform voluntary turnover reasons for pie chart
+      voluntaryReasons: firebaseData.voluntaryTurnoverReasons 
+        ? Object.entries(firebaseData.voluntaryTurnoverReasons).map(([reason, data]) => ({
+            name: reason,
+            value: data.count || 0,
+            percentage: data.percentage || 0
+          }))
+        : [
+            { name: 'Career Advancement', value: 109, percentage: 38 },
+            { name: 'Compensation', value: 60, percentage: 21 },
+            { name: 'Work-Life Balance', value: 49, percentage: 17 },
+            { name: 'Retirement', value: 34, percentage: 12 },
+            { name: 'Relocation', value: 23, percentage: 8 },
+            { name: 'Other', value: 11, percentage: 4 }
+          ],
+      
+      // Transform departures by tenure for pie chart
+      tenureAnalysis: firebaseData.departuresByTenure
+        ? Object.entries(firebaseData.departuresByTenure).map(([tenure, data]) => ({
+            name: tenure,
+            value: data.count || 0,
+            percentage: data.percentage || 0
+          }))
+        : [
+            { name: '< 1 Year', value: 100, percentage: 35 },
+            { name: '1-3 Years', value: 83, percentage: 29 },
+            { name: '3-5 Years', value: 52, percentage: 18 },
+            { name: '5-10 Years', value: 29, percentage: 10 },
+            { name: '10+ Years', value: 23, percentage: 8 }
+          ],
+
+      // Legacy data for backward compatibility
       byReason: Object.entries(firebaseData.byReason || {}).map(([reason, count]) => ({
         reason,
         count: parseInt(count),
