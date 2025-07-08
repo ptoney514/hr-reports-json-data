@@ -59,23 +59,25 @@ function App() {
         showHomeButton={false}
       >
         <Router>
-          <div className="App">
-            {/* Navigation Component */}
+          <div className="App flex h-screen bg-gray-50">
+            {/* Sidebar Navigation Component */}
             <Navigation />
             
-            {/* Main Content with Suspense for lazy loading */}
-            <Suspense fallback={
-              <div className="p-4">
-                <DashboardSkeleton 
-                  showHeader={true}
-                  showSummaryCards={true}
-                  showCharts={true}
-                  summaryCardCount={4}
-                  chartCount={4}
-                />
-              </div>
-            }>
-            <Routes>
+            {/* Main Content Area */}
+            <main className="flex-1 overflow-y-auto">
+              {/* Main Content with Suspense for lazy loading */}
+              <Suspense fallback={
+                <div className="p-4">
+                  <DashboardSkeleton 
+                    showHeader={true}
+                    showSummaryCards={true}
+                    showCharts={true}
+                    summaryCardCount={4}
+                    chartCount={4}
+                  />
+                </div>
+              }>
+              <Routes>
               {/* Dashboard Routes */}
               <Route path="/dashboards" element={<DashboardIndex />} />
               <Route path="/dashboards/workforce" element={<WorkforceDashboard />} />
@@ -106,12 +108,13 @@ function App() {
               
               {/* Catch-all route - redirect to dashboards */}
               <Route path="*" element={<Navigate to="/dashboards" replace />} />
-            </Routes>
-          </Suspense>
-        </div>
-      </Router>
-    </ErrorBoundary>
-  </DataSourceProvider>
+              </Routes>
+              </Suspense>
+            </main>
+          </div>
+        </Router>
+      </ErrorBoundary>
+    </DataSourceProvider>
   );
 }
 

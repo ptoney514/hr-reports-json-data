@@ -577,8 +577,44 @@ const CombinedWorkforceDashboard = () => {
     try {
       switch (exportType) {
         case 'pdf':
-          // For now, just create a simple PDF
-          window.print();
+          // Use sophisticated PDFExporter for professional PDF generation
+          const { PDFExporter } = await import('../../utils/exportUtils');
+          const pdfExporter = new PDFExporter({
+            orientation: 'portrait',
+            includeHeader: true,
+            includeFooter: true,
+            includeBranding: true
+          });
+          
+          // Add header with title and filter information
+          const filterSummary = `Quarter: ${selectedQuarter} | Location: ${filters.location} | Division: ${filters.division} | Employee Type: ${filters.employeeType}`;
+          pdfExporter.addHeader('Combined Workforce Analytics', filterSummary);
+          
+          // Add summary metrics
+          const metricsData = [
+            { title: 'Total Headcount', value: headcountData.total?.value || 0, change: headcountData.total?.change, format: 'number' },
+            { title: 'Faculty', value: headcountData.faculty?.value || 0, change: headcountData.faculty?.change, format: 'number' },
+            { title: 'Staff', value: headcountData.staff?.value || 0, change: headcountData.staff?.change, format: 'number' },
+            { title: 'New Hires', value: headcountData.newHires?.value || 0, format: 'number' },
+            { title: 'Leavers', value: headcountData.leavers?.value || 0, format: 'number' }
+          ];
+          pdfExporter.addMetrics(metricsData);
+          
+          // Capture charts using html2canvas
+          await pdfExporter.addComponentCapture('historical-headcount-chart', 'Historical Headcount Trend');
+          await pdfExporter.addComponentCapture('new-hires-leavers-chart', 'New Hires vs Leavers');
+          await pdfExporter.addComponentCapture('top-divisions-chart', 'Top Divisions by Headcount');
+          await pdfExporter.addComponentCapture('turnover-reasons-chart', 'Turnover Reasons');
+          
+          // Add executive summary as text
+          pdfExporter.addTextSection('Executive Summary', [
+            executiveSummary.paragraph1,
+            executiveSummary.paragraph2
+          ]);
+          
+          // Save the PDF
+          const filename = `combined-workforce-analytics-${selectedQuarter.toLowerCase()}-${new Date().toISOString().slice(0, 10)}.pdf`;
+          await pdfExporter.save(filename);
           break;
         case 'excel':
           // Create Excel export
@@ -607,7 +643,13 @@ const CombinedWorkforceDashboard = () => {
           csvExporter.exportToCSV(csvData, 'combined-workforce-analytics.csv');
           break;
         case 'print':
+          // Add print-specific styling and trigger browser print
+          document.body.classList.add('print-mode');
           window.print();
+          // Remove print styling after print dialog closes
+          setTimeout(() => {
+            document.body.classList.remove('print-mode');
+          }, 1000);
           break;
         default:
           console.log('Unknown export type:', exportType);
@@ -730,8 +772,15 @@ const CombinedWorkforceDashboard = () => {
 
   return (
     <ErrorBoundary>
-      <div className="min-h-screen bg-gray-50 py-8">
-        <div className="max-w-7xl mx-auto px-4">
+      <div className="min-h-screen bg-gray-50 py-8 dashboard-container print:bg-white print:py-0">
+        <div className="max-w-7xl mx-auto px-4 print:max-w-none print:px-0 print:mx-0">
+          {/* Print-only header with filter information */}
+          <div className="print-only print-header">
+            <div className="dashboard-title">Combined Workforce Analytics</div>
+            <div className="dashboard-subtitle">
+              {`Report for ${selectedQuarter} | Location: ${filters.location || 'All'} | Division: ${filters.division || 'All'} | Employee Type: ${filters.employeeType || 'All'}`}
+            </div>
+          </div>
           {/* Header with Title Above Filters */}
           <div className="mb-6">
             {/* Title Section */}
@@ -743,7 +792,7 @@ const CombinedWorkforceDashboard = () => {
             </div>
             
             {/* Filters and Export Row */}
-            <div className="flex items-end gap-4">
+            <div className="flex items-end gap-4 no-print filter-controls">
               <div className="w-64">
                 <QuarterFilter 
                   selectedQuarter={selectedQuarter}
@@ -804,8 +853,8 @@ const CombinedWorkforceDashboard = () => {
           </div>
 
           {/* Summary Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mb-6">
-            <div className="bg-white p-4 rounded-lg shadow-sm border col-span-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mb-6 dashboard-section page-break-inside-avoid">
+            <div className="bg-white p-4 rounded-lg shadow-sm border col-span-2 summary-card print:col-span-1">
               <h2 className="text-sm font-medium text-blue-700 mb-2">Total Headcount</h2>
               <div className="flex items-end gap-2">
                 <span className="text-3xl font-bold">{(headcountData.total?.value || 0).toLocaleString()}</span>
@@ -814,7 +863,7 @@ const CombinedWorkforceDashboard = () => {
               <p className="text-gray-500 text-sm">from previous quarter</p>
             </div>
             
-            <div className="bg-white p-4 rounded-lg shadow-sm border">
+            <div className="bg-white p-4 rounded-lg shadow-sm border summary-card">
               <h2 className="text-sm font-medium text-blue-700 mb-2">Faculty</h2>
               <div className="flex items-end gap-2">
                 <span className="text-2xl font-bold">{headcountData.faculty?.value || 0}</span>
@@ -823,7 +872,7 @@ const CombinedWorkforceDashboard = () => {
               <p className="text-gray-500 text-sm">{formatPercentage(headcountData.faculty?.change)}% change</p>
             </div>
             
-            <div className="bg-white p-4 rounded-lg shadow-sm border">
+            <div className="bg-white p-4 rounded-lg shadow-sm border summary-card">
               <h2 className="text-sm font-medium text-blue-700 mb-2">Staff</h2>
               <div className="flex items-end gap-2">
                 <span className="text-2xl font-bold">{(headcountData.staff?.value || 0).toLocaleString()}</span>
@@ -832,13 +881,13 @@ const CombinedWorkforceDashboard = () => {
               <p className="text-gray-500 text-sm">{formatPercentage(headcountData.staff?.change)}% change</p>
             </div>
             
-            <div className="bg-white p-4 rounded-lg shadow-sm border">
+            <div className="bg-white p-4 rounded-lg shadow-sm border summary-card">
               <h2 className="text-sm font-medium text-blue-700 mb-2">New Hires</h2>
               <div className="text-2xl font-bold">{headcountData.newHires?.value || 0}</div>
               <p className="text-gray-500 text-sm">this quarter</p>
             </div>
             
-            <div className="bg-white p-4 rounded-lg shadow-sm border">
+            <div className="bg-white p-4 rounded-lg shadow-sm border summary-card">
               <h2 className="text-sm font-medium text-blue-700 mb-2">Leavers</h2>
               <div className="text-2xl font-bold">{headcountData.leavers?.value || 0}</div>
               <p className="text-gray-500 text-sm">this quarter</p>
@@ -847,8 +896,8 @@ const CombinedWorkforceDashboard = () => {
 
           {/* Charts Row 1 */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-            <div className="bg-white p-4 rounded-lg shadow-sm border">
-              <h2 className="text-lg font-medium text-blue-700 mb-4">Historical Headcount Trend</h2>
+            <div id="historical-headcount-chart" className="bg-white p-4 rounded-lg shadow-sm border chart-container page-break-inside-avoid" data-chart-title="Historical Headcount Trend">
+              <h2 className="text-lg font-medium text-blue-700 mb-4 chart-title">Historical Headcount Trend</h2>
               <ResponsiveContainer width="100%" height={250}>
                 <BarChart data={historyData}>
                   <CartesianGrid strokeDasharray="3 3" />
@@ -861,8 +910,8 @@ const CombinedWorkforceDashboard = () => {
               </ResponsiveContainer>
             </div>
 
-            <div className="bg-white p-4 rounded-lg shadow-sm border">
-              <h2 className="text-lg font-medium text-blue-700 mb-4">New Hires vs Leavers</h2>
+            <div id="new-hires-leavers-chart" className="bg-white p-4 rounded-lg shadow-sm border chart-container page-break-inside-avoid" data-chart-title="New Hires vs Leavers">
+              <h2 className="text-lg font-medium text-blue-700 mb-4 chart-title">New Hires vs Leavers</h2>
               {startersLeaversData && startersLeaversData.length > 0 ? (
                 <ResponsiveContainer width="100%" height={250}>
                   <LineChart data={startersLeaversData}>
@@ -890,8 +939,8 @@ const CombinedWorkforceDashboard = () => {
 
           {/* Charts Row 2 */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-            <div className="bg-white p-4 rounded-lg shadow-sm border">
-              <h2 className="text-lg font-medium text-blue-700 mb-4">Top Divisions by Headcount</h2>
+            <div id="top-divisions-chart" className="bg-white p-4 rounded-lg shadow-sm border chart-container page-break-inside-avoid" data-chart-title="Top Divisions by Headcount">
+              <h2 className="text-lg font-medium text-blue-700 mb-4 chart-title">Top Divisions by Headcount</h2>
               
               <div key={`chart-container-${selectedQuarter}-${Date.now()}`}>
                 <ResponsiveContainer width="100%" height={300}>
@@ -925,8 +974,8 @@ const CombinedWorkforceDashboard = () => {
               </div>
             </div>
 
-            <div className="bg-white p-4 rounded-lg shadow-sm border">
-              <h2 className="text-lg font-medium text-blue-700 mb-4">Turnover Reasons</h2>
+            <div id="turnover-reasons-chart" className="bg-white p-4 rounded-lg shadow-sm border chart-container page-break-inside-avoid" data-chart-title="Turnover Reasons">
+              <h2 className="text-lg font-medium text-blue-700 mb-4 chart-title">Turnover Reasons</h2>
               <ResponsiveContainer width="100%" height={300}>
                 <PieChart>
                   <Pie
