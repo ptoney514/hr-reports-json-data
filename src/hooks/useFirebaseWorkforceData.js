@@ -182,11 +182,20 @@ const useFirebaseWorkforceData = (customFilters = {}) => {
         filters: activeFilters
       });
 
+      // If it's just missing data, don't treat it as a hard error
+      if (error.message.includes('No workforce data found')) {
+        console.warn(`No Firebase data available for ${period}, will use fallback data`);
+        setLocalError(null); // Clear error so fallback data can be used
+        actions.clearError('workforce');
+        return null; // Return null so dashboard can use fallback data
+      }
+
+      // For actual Firebase connection errors, set error but don't throw
       const errorMessage = `Failed to load workforce data from Firebase: ${error.message}`;
       setLocalError(errorMessage);
       actions.setError('workforce', errorMessage);
       
-      throw error;
+      return null; // Return null instead of throwing so fallback data can be used
     } finally {
       setLocalLoading(false);
       actions.setLoading('workforce', false);

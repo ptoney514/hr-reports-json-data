@@ -7,7 +7,6 @@ import {
   Home,
   Menu,
   X,
-  Database,
   Settings,
   Shield,
   UserPlus,
@@ -32,11 +31,11 @@ const Navigation = () => {
       isActive: isActive('/dashboards')
     },
     {
-      id: 'excel-integration',
-      label: 'Excel Integration',
-      path: '/excel-integration',
-      icon: Settings,
-      isActive: isActive('/excel-integration')
+      id: 'combined-workforce',
+      label: 'Workforce Analytics',
+      path: '/dashboards/combined-workforce',
+      icon: UsersRound,
+      isActive: isActive('/dashboards/combined-workforce')
     },
     {
       id: 'workforce',
@@ -44,20 +43,6 @@ const Navigation = () => {
       path: '/dashboards/workforce',
       icon: Users,
       isActive: isActive('/dashboards/workforce')
-    },
-    {
-      id: 'combined-workforce',
-      label: 'Combined Workforce Analytics',
-      path: '/dashboards/combined-workforce',
-      icon: UsersRound,
-      isActive: isActive('/dashboards/combined-workforce')
-    },
-    {
-      id: 'enhanced-workforce',
-      label: 'Enhanced Workforce Analytics',
-      path: '/dashboards/enhanced-workforce',
-      icon: Database,
-      isActive: isActive('/dashboards/enhanced-workforce')
     },
     {
       id: 'turnover',
@@ -86,6 +71,13 @@ const Navigation = () => {
       path: '/dashboards/exit-survey',
       icon: MessageSquare,
       isActive: isActive('/dashboards/exit-survey')
+    },
+    {
+      id: 'excel-integration',
+      label: 'Excel Integration',
+      path: '/excel-integration',
+      icon: Settings,
+      isActive: isActive('/excel-integration')
     }
   ];
 

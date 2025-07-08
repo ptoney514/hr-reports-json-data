@@ -114,8 +114,8 @@ const WorkforceDashboard = () => {
     );
   }
 
-  // Show error state with fallback option
-  if (error && !firebaseData) {
+  // Show error state only for serious errors (not missing data)
+  if (error && !firebaseData && !error.includes('No workforce data found')) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
@@ -128,7 +128,7 @@ const WorkforceDashboard = () => {
           >
             Try Again
           </button>
-          <p className="text-sm text-gray-500 mt-2">Using cached data if available</p>
+          <p className="text-sm text-gray-500 mt-2">Using fallback data</p>
         </div>
       </div>
     );

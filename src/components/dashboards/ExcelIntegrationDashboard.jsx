@@ -169,7 +169,7 @@ const ExcelIntegrationDashboard = () => {
           status: 'success', 
           message: `Successfully processed and uploaded ${processedData.length} records across ${firebaseSuccessCount} quarters to Firebase`,
           dataType: 'quarterlyAggregate',
-          dashboardLinks: { url: '/dashboards/enhanced-workforce', name: 'Enhanced Workforce Dashboard' }
+          dashboardLinks: { url: '/dashboards/combined-workforce', name: 'Workforce Analytics' }
         });
         actions.setUploadStatus('success', `Successfully processed and uploaded ${processedData.length} records across ${firebaseSuccessCount} quarters to Firebase`);
         actions.setDataAvailability({ workforce: true });
@@ -215,7 +215,7 @@ const ExcelIntegrationDashboard = () => {
 
   // Navigate to Enhanced Workforce Dashboard
   const navigateToEnhancedWorkforce = () => {
-    navigate('/dashboards/enhanced-workforce');
+    navigate('/dashboards/combined-workforce');
   };
 
   // Clear Firebase database for testing
