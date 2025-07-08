@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
-import { ArrowUpCircle, ArrowDownCircle } from 'lucide-react';
+import { ArrowUpCircle, ArrowDownCircle, BarChart3 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import QuarterFilter from '../ui/QuarterFilter';
-import ExportButton from '../ui/ExportButton';
 import ErrorBoundary from '../ui/ErrorBoundary';
 import { 
   QUARTER_DATES, 
@@ -26,12 +25,9 @@ const CombinedWorkforceDashboard = () => {
     return Number(value).toFixed(2);
   };
   
-  // State for filters and actions
+  // State for filters and actions  
   const [filters, setFilters] = useState({
-    reportingPeriod: 'Q1-2025',
-    location: 'all',
-    division: 'all',
-    employeeType: 'all'
+    reportingPeriod: 'Q1-2025'
   });
   
   // Quarter filter state (matches Enhanced Workforce Dashboard)
@@ -71,7 +67,6 @@ const CombinedWorkforceDashboard = () => {
   // Handle filter changes
   const handleFilterChange = (newFilters) => {
     setFilters(prev => ({ ...prev, ...newFilters }));
-    // In a real app, this would trigger data refetch
     console.log('Filters updated:', { ...filters, ...newFilters });
   };
   
@@ -557,108 +552,6 @@ const CombinedWorkforceDashboard = () => {
     
   }, [dataSource, firebaseData, quarterlyData, selectedQuarter]);
 
-  // Handle export functionality
-  const handleExport = async (exportType) => {
-    console.log('Exporting data:', exportType, 'with filters:', filters);
-    
-    const dashboardData = {
-      title: 'Combined Workforce Analytics',
-      data: {
-        headcount: headcountData,
-        history: historyData,
-        startersLeavers: startersLeaversData,
-        topDivisions: topDivisionsData,
-        turnoverReasons: turnoverReasons
-      },
-      filters: filters,
-      generatedAt: new Date().toLocaleString()
-    };
-    
-    try {
-      switch (exportType) {
-        case 'pdf':
-          // Use sophisticated PDFExporter for professional PDF generation
-          const { PDFExporter } = await import('../../utils/exportUtils');
-          const pdfExporter = new PDFExporter({
-            orientation: 'portrait',
-            includeHeader: true,
-            includeFooter: true,
-            includeBranding: true
-          });
-          
-          // Add header with title and filter information
-          const filterSummary = `Quarter: ${selectedQuarter} | Location: ${filters.location} | Division: ${filters.division} | Employee Type: ${filters.employeeType}`;
-          pdfExporter.addHeader('Combined Workforce Analytics', filterSummary);
-          
-          // Add summary metrics
-          const metricsData = [
-            { title: 'Total Headcount', value: headcountData.total?.value || 0, change: headcountData.total?.change, format: 'number' },
-            { title: 'Faculty', value: headcountData.faculty?.value || 0, change: headcountData.faculty?.change, format: 'number' },
-            { title: 'Staff', value: headcountData.staff?.value || 0, change: headcountData.staff?.change, format: 'number' },
-            { title: 'New Hires', value: headcountData.newHires?.value || 0, format: 'number' },
-            { title: 'Leavers', value: headcountData.leavers?.value || 0, format: 'number' }
-          ];
-          pdfExporter.addMetrics(metricsData);
-          
-          // Capture charts using html2canvas
-          await pdfExporter.addComponentCapture('historical-headcount-chart', 'Historical Headcount Trend');
-          await pdfExporter.addComponentCapture('new-hires-leavers-chart', 'New Hires vs Leavers');
-          await pdfExporter.addComponentCapture('top-divisions-chart', 'Top Divisions by Headcount');
-          await pdfExporter.addComponentCapture('turnover-reasons-chart', 'Turnover Reasons');
-          
-          // Add executive summary as text
-          pdfExporter.addTextSection('Executive Summary', [
-            executiveSummary.paragraph1,
-            executiveSummary.paragraph2
-          ]);
-          
-          // Save the PDF
-          const filename = `combined-workforce-analytics-${selectedQuarter.toLowerCase()}-${new Date().toISOString().slice(0, 10)}.pdf`;
-          await pdfExporter.save(filename);
-          break;
-        case 'excel':
-          // Create Excel export
-          const { DataExporter } = await import('../../utils/exportUtils');
-          const exporter = new DataExporter();
-          const excelData = [
-            { Metric: 'Total Headcount', Value: headcountData.total.value },
-            { Metric: 'Faculty', Value: headcountData.faculty.value },
-            { Metric: 'Staff', Value: headcountData.staff.value },
-            { Metric: 'New Hires', Value: headcountData.newHires.value },
-            { Metric: 'Leavers', Value: headcountData.leavers.value }
-          ];
-          exporter.exportToExcel(excelData, 'combined-workforce-analytics.xlsx');
-          break;
-        case 'csv':
-          // Create CSV export
-          const { DataExporter: CSVExporter } = await import('../../utils/exportUtils');
-          const csvExporter = new CSVExporter();
-          const csvData = [
-            { Metric: 'Total Headcount', Value: headcountData.total.value },
-            { Metric: 'Faculty', Value: headcountData.faculty.value },
-            { Metric: 'Staff', Value: headcountData.staff.value },
-            { Metric: 'New Hires', Value: headcountData.newHires.value },
-            { Metric: 'Leavers', Value: headcountData.leavers.value }
-          ];
-          csvExporter.exportToCSV(csvData, 'combined-workforce-analytics.csv');
-          break;
-        case 'print':
-          // Add print-specific styling and trigger browser print
-          document.body.classList.add('print-mode');
-          window.print();
-          // Remove print styling after print dialog closes
-          setTimeout(() => {
-            document.body.classList.remove('print-mode');
-          }, 1000);
-          break;
-        default:
-          console.log('Unknown export type:', exportType);
-      }
-    } catch (error) {
-      console.error('Export error:', error);
-      alert('Export failed: ' + error.message);
-    }
-  };
 
   // Helper function to generate quarter-varied turnover reasons
   const generateQuarterVariedTurnoverReasons = (baseReasons, quarter) => {
@@ -735,34 +628,6 @@ const CombinedWorkforceDashboard = () => {
     }
   };
 
-  // Available filter options for the dashboard
-  const availableFilters = {
-    reportingPeriod: [
-      { value: 'Q3-2025', label: 'Q3 2025' },
-      { value: 'Q2-2025', label: 'Q2 2025' },
-      { value: 'Q1-2025', label: 'Q1 2025' },
-      { value: 'Q4-2024', label: 'Q4 2024' },
-      { value: 'Q3-2024', label: 'Q3 2024' }
-    ],
-    location: [
-      { value: 'all', label: 'All Locations' },
-      { value: 'omaha', label: 'Omaha Campus' },
-      { value: 'phoenix', label: 'Phoenix Campus' }
-    ],
-    division: [
-      { value: 'all', label: 'All Divisions' },
-      { value: 'medicine', label: 'School of Medicine' },
-      { value: 'arts-sciences', label: 'Arts & Sciences' },
-      { value: 'pharmacy', label: 'Pharmacy & Health Professions' },
-      { value: 'dentistry', label: 'Dentistry' },
-      { value: 'business', label: 'Business' }
-    ],
-    employeeType: [
-      { value: 'all', label: 'All Types' },
-      { value: 'faculty', label: 'Faculty' },
-      { value: 'staff', label: 'Staff' }
-    ]
-  };
 
   // Dynamic chart data is now managed by state - see above
 
@@ -774,81 +639,28 @@ const CombinedWorkforceDashboard = () => {
     <ErrorBoundary>
       <div className="min-h-screen bg-gray-50 py-8 dashboard-container print:bg-white print:py-0">
         <div className="max-w-7xl mx-auto px-4 print:max-w-none print:px-0 print:mx-0">
-          {/* Print-only header with filter information */}
-          <div className="print-only print-header">
-            <div className="dashboard-title">Combined Workforce Analytics</div>
-            <div className="dashboard-subtitle">
-              {`Report for ${selectedQuarter} | Location: ${filters.location || 'All'} | Division: ${filters.division || 'All'} | Employee Type: ${filters.employeeType || 'All'}`}
-            </div>
-          </div>
           {/* Header with Title Above Filters */}
           <div className="mb-6">
             {/* Title Section */}
-            <div className="mb-4">
-              <h1 className="text-2xl font-bold text-blue-700">Combined Workforce Analytics</h1>
-              <p className="text-sm text-gray-600 mt-1">
-                <span className="font-medium">Note:</span> All workforce metrics below represent <strong>Benefit Eligible</strong> employees only.
-              </p>
-            </div>
-            
-            {/* Filters and Export Row */}
-            <div className="flex items-end gap-4 no-print filter-controls">
-              <div className="w-64">
-                <QuarterFilter 
-                  selectedQuarter={selectedQuarter}
-                  onQuarterChange={handleQuarterChange}
-                  availableQuarters={QUARTER_DATES}
-                />
+            <div className="bg-white rounded-lg shadow-sm border p-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <BarChart3 className="text-blue-600" size={24} />
+                  <div>
+                    <h1 className="text-2xl font-bold text-gray-900">Combined Workforce Analytics</h1>
+                    <p className="text-gray-600 text-sm mt-1">
+                      <span className="font-medium">Note:</span> All workforce metrics below represent <strong>Benefit Eligible</strong> employees only.
+                    </p>
+                  </div>
+                </div>
+                <div className="w-64">
+                  <QuarterFilter 
+                    selectedQuarter={selectedQuarter}
+                    onQuarterChange={handleQuarterChange}
+                    availableQuarters={QUARTER_DATES}
+                  />
+                </div>
               </div>
-              <div className="w-48">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Location
-                </label>
-                <select
-                  value={filters.location || 'all'}
-                  onChange={(e) => handleFilterChange({ location: e.target.value })}
-                  className="block w-full pl-3 pr-10 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
-                >
-                  {availableFilters.location.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="w-48">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Division
-                </label>
-                <select
-                  value={filters.division || 'all'}
-                  onChange={(e) => handleFilterChange({ division: e.target.value })}
-                  className="block w-full pl-3 pr-10 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
-                >
-                  {availableFilters.division.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="w-48">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Employee Type
-                </label>
-                <select
-                  value={filters.employeeType || 'all'}
-                  onChange={(e) => handleFilterChange({ employeeType: e.target.value })}
-                  className="block w-full pl-3 pr-10 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
-                >
-                  {availableFilters.employeeType.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <ExportButton onExport={handleExport} />
             </div>
           </div>
 
