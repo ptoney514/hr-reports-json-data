@@ -58,24 +58,6 @@ const DashboardIndex = () => {
 
   const dashboards = [
     {
-      id: 'workforce',
-      title: 'Workforce Analytics',
-      description: 'Employee headcount, distribution, and workforce composition analysis',
-      path: '/dashboards/workforce',
-      icon: Users,
-      color: 'bg-blue-500',
-      hoverColor: 'hover:bg-blue-600',
-      borderColor: 'border-blue-200',
-      bgColor: 'bg-blue-50',
-      lastUpdated: new Date(Date.now() - 1000 * 60 * 15), // 15 minutes ago
-      status: 'healthy',
-      stats: [
-        { label: 'Total Employees', value: '2,847', trend: 'up', change: '+2.1%' },
-        { label: 'Vacancy Rate', value: '3.5%', trend: 'down', change: '-0.3%' },
-        { label: 'Growth Rate', value: '+2.1%', trend: 'up', change: '+0.8%' }
-      ]
-    },
-    {
       id: 'turnover',
       title: 'Turnover Analysis',
       description: 'Departure trends, retention metrics, and cost impact analysis',
@@ -117,7 +99,7 @@ const DashboardIndex = () => {
     {
       icon: Building2,
       label: 'Active Dashboards',
-      value: '3',
+      value: '2',
       description: 'Analytics dashboards',
       status: 'healthy',
       color: 'blue'

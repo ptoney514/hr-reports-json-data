@@ -53,50 +53,62 @@ const I9HealthDashboard: React.FC<I9HealthDashboardProps> = ({
   const defaultCurrentMetrics: I9Metrics = currentMetrics || 
     ((firebaseData as any)?.currentMetrics) || 
     {
-      totalI9s: 619,
-      section2OnTime: 579,
-      section2Late: 40,
-      section2Compliance: 94,
-      overallCompliance: 90,
-      reverifications: 10,
-      auditReady: 88
+      totalI9s: 847,
+      section2OnTime: 732,
+      section2Late: 115,
+      section2Compliance: 86,
+      overallCompliance: 88,
+      reverifications: 23,
+      auditReady: 82
     };
 
   const defaultPreviousMetrics: PreviousMetrics = previousMetrics || 
     ((firebaseData as any)?.previousMetrics) || 
     {
-      totalI9s: 587,
-      section2Compliance: 91,
-      overallCompliance: 87
+      totalI9s: 798,
+      section2Compliance: 89,
+      overallCompliance: 91
     };
 
   const defaultComplianceByType: ComplianceByType[] = complianceByType || 
     ((firebaseData as any)?.complianceByType) || 
     [
-      { name: 'Faculty/Staff', total: 363, onTime: 340, late: 23, rate: 94 },
-      { name: 'Students', total: 252, onTime: 235, late: 17, rate: 93 },
-      { name: 'Phoenix Campus', total: 4, onTime: 4, late: 0, rate: 100 }
+      { name: 'Faculty', total: 245, onTime: 228, late: 17, rate: 93 },
+      { name: 'Staff', total: 318, onTime: 285, late: 33, rate: 90 },
+      { name: 'Graduate Students', total: 156, onTime: 142, late: 14, rate: 91 },
+      { name: 'Undergraduate Students', total: 89, onTime: 71, late: 18, rate: 80 },
+      { name: 'Contractors', total: 24, onTime: 18, late: 6, rate: 75 },
+      { name: 'Temporary Workers', total: 12, onTime: 8, late: 4, rate: 67 },
+      { name: 'Visiting Scholars', total: 8, onTime: 7, late: 1, rate: 88 },
+      { name: 'Adjunct Faculty', total: 195, onTime: 173, late: 22, rate: 89 }
     ];
 
   const defaultTrendData: TrendData[] = trendData || 
     ((firebaseData as any)?.trendData) || 
     [
-      { quarter: 'Q1-24', compliance: 85, processed: 532 },
-      { quarter: 'Q2-24', compliance: 87, processed: 598 },
-      { quarter: 'Q3-24', compliance: 89, processed: 612 },
-      { quarter: 'Q4-24', compliance: 91, processed: 587 },
-      { quarter: 'Q1-25', compliance: 87, processed: 645 },
-      { quarter: 'Q2-25', compliance: 90, processed: 619 }
+      { quarter: 'Q1-24', compliance: 92, processed: 723 },
+      { quarter: 'Q2-24', compliance: 89, processed: 798 },
+      { quarter: 'Q3-24', compliance: 91, processed: 765 },
+      { quarter: 'Q4-24', compliance: 90, processed: 812 },
+      { quarter: 'Q1-25', compliance: 88, processed: 847 },
+      { quarter: 'Q2-25', compliance: 86, processed: 889 }
     ];
 
+  // Enhanced risk data with severity percentages and additional metadata
+  const enhancedRiskMetrics = [
+    { category: 'Late Section 2', count: 115, risk: 'High', color: '#ef4444', severity: 78, trend: 'increasing', description: 'Section 2 forms completed after deadline' },
+    { category: 'Missing Training', count: 34, risk: 'High', color: '#ef4444', severity: 72, trend: 'stable', description: 'HR staff without required I-9 training' },
+    { category: 'Documentation Issues', count: 28, risk: 'Medium', color: '#f59e0b', severity: 45, trend: 'decreasing', description: 'Incomplete or incorrect form documentation' },
+    { category: 'System Errors', count: 15, risk: 'Medium', color: '#f59e0b', severity: 38, trend: 'stable', description: 'Technical system processing errors' },
+    { category: 'Verification Delays', count: 19, risk: 'Medium', color: '#f59e0b', severity: 42, trend: 'increasing', description: 'Delayed employee document verification' },
+    { category: 'Audit Findings', count: 8, risk: 'Critical', color: '#dc2626', severity: 95, trend: 'stable', description: 'Critical compliance audit violations' },
+    { category: 'Process Gaps', count: 22, risk: 'Medium', color: '#f59e0b', severity: 48, trend: 'decreasing', description: 'Identified workflow inefficiencies' },
+    { category: 'Compliance Monitoring', count: 6, risk: 'Low', color: '#eab308', severity: 20, trend: 'stable', description: 'Routine monitoring alerts' }
+  ];
+
   const defaultRiskMetrics: RiskMetric[] = riskMetrics || 
-    ((firebaseData as any)?.riskMetrics) || 
-    [
-      { category: 'Late Section 2', count: 40, risk: 'Medium', color: '#f59e0b' },
-      { category: 'Missing Training', count: 12, risk: 'High', color: '#ef4444' },
-      { category: 'Audit Findings', count: 3, risk: 'High', color: '#ef4444' },
-      { category: 'Process Gaps', count: 8, risk: 'Medium', color: '#f59e0b' }
-    ];
+    ((firebaseData as any)?.riskMetrics) || enhancedRiskMetrics;
+
 
   const defaultImprovements: ProcessImprovement[] = improvements || 
     ((firebaseData as any)?.improvements) || 

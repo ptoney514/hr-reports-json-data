@@ -160,7 +160,6 @@ class BundleOptimizer {
     // Map chunk names to import functions
     const chunkMap = {
       'dashboard': () => import('../components/dashboards/DashboardIndex'),
-      'workforce': () => import('../components/dashboards/WorkforceDashboard'),
       'turnover': () => import('../components/dashboards/TurnoverDashboard'),
       'i9': () => import('../components/dashboards/I9HealthDashboard'),
       'recruiting': () => import('../components/dashboards/RecruitingDashboard'),
