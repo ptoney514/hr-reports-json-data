@@ -8,13 +8,11 @@ import { calendarDateToQuarter } from './dateHelpers';
 
 /**
  * Available quarter end dates for filtering
+ * Now dynamically loaded from QuarterConfigService
  */
-export const QUARTER_DATES = [
-  { value: 'Q2-2024', label: 'Q2 2024 (6/30/2024)', quarter: 'Q2-2024', dateValue: '2024-06-30' },
-  { value: 'Q3-2024', label: 'Q3 2024 (9/30/2024)', quarter: 'Q3-2024', dateValue: '2024-09-30' },
-  { value: 'Q4-2024', label: 'Q4 2024 (12/31/2024)', quarter: 'Q4-2024', dateValue: '2024-12-31' },
-  { value: 'Q1-2025', label: 'Q1 2025 (3/31/2025)', quarter: 'Q1-2025', dateValue: '2025-03-31' }
-];
+import { QUARTER_DATES as DYNAMIC_QUARTER_DATES, getPreviousQuarter as getConfigPreviousQuarter } from '../services/QuarterConfigService';
+
+export const QUARTER_DATES = DYNAMIC_QUARTER_DATES;
 
 /**
  * Expected column mappings for aggregate data
@@ -353,13 +351,11 @@ export function calculateLocationBreakdown(quarterData) {
 
 /**
  * Get previous quarter date
+ * Now uses QuarterConfigService for dynamic quarter management
  */
 export function getPreviousQuarter(currentQuarter) {
-  const currentIndex = QUARTER_DATES.findIndex(q => q.value === currentQuarter);
-  if (currentIndex > 0) {
-    return QUARTER_DATES[currentIndex - 1].value;
-  }
-  return null;
+  const previousQuarter = getConfigPreviousQuarter(currentQuarter);
+  return previousQuarter ? previousQuarter.value : null;
 }
 
 /**

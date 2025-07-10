@@ -18,6 +18,8 @@ const PrintTestComponent = lazy(() => import('./components/testing/PrintTestComp
 const AccessibilityTestComponent = lazy(() => import('./components/testing/AccessibilityTestComponent'));
 const DatabaseTestComponent = lazy(() => import('./components/testing/DatabaseTestComponent'));
 const FirebaseTestComponent = lazy(() => import('./components/testing/FirebaseTestComponent'));
+const WorkforceDataTester = lazy(() => import('./components/testing/WorkforceDataTester'));
+const ExcelUploadTester = lazy(() => import('./components/testing/ExcelUploadTester'));
 const ExcelIntegrationDashboard = lazy(() => import('./components/dashboards/ExcelIntegrationDashboard'));
 const RecruitingDashboard = lazy(() => import('./components/dashboards/RecruitingDashboard'));
 const ExitSurveyDashboard = lazy(() => import('./components/dashboards/ExitSurveyDashboard'));
@@ -92,6 +94,8 @@ function App() {
               <Route path="/test/accessibility" element={<AccessibilityTestComponent />} />
               <Route path="/test/database" element={<DatabaseTestComponent />} />
               <Route path="/test/firebase" element={<FirebaseTestComponent />} />
+              <Route path="/test/workforce-data" element={<WorkforceDataTester />} />
+              <Route path="/test/excel-upload" element={<ExcelUploadTester />} />
               
               {/* Excel Integration Route */}
               <Route path="/excel-integration" element={<ExcelIntegrationDashboard />} />

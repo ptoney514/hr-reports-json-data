@@ -8,7 +8,9 @@ import {
   XCircle,
   RefreshCw,
   Upload,
-  ArrowRight
+  ArrowRight,
+  Calculator,
+  FileSpreadsheet
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import FileUploader from '../ui/FileUploader';
@@ -218,6 +220,16 @@ const ExcelIntegrationDashboard = () => {
     navigate('/dashboards/combined-workforce');
   };
 
+  // Navigate to Workforce Data Tester
+  const navigateToDataTester = () => {
+    navigate('/test/workforce-data');
+  };
+
+  // Navigate to Excel Upload Tester
+  const navigateToUploadTester = () => {
+    navigate('/test/excel-upload');
+  };
+
   // Clear Firebase database for testing
   const clearDatabase = async () => {
     if (!window.confirm('Are you sure you want to clear all Firebase data for 2025-Q1? This action cannot be undone.')) {
@@ -274,7 +286,21 @@ const ExcelIntegrationDashboard = () => {
             className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
             <ArrowRight size={16} />
-            View Enhanced Workforce Dashboard
+            View Workforce Analytics
+          </button>
+          <button
+            onClick={navigateToDataTester}
+            className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+          >
+            <Calculator size={16} />
+            Test Data Accuracy
+          </button>
+          <button
+            onClick={navigateToUploadTester}
+            className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+          >
+            <FileSpreadsheet size={16} />
+            Test Excel Uploads
           </button>
           <button
             onClick={clearDatabase}
