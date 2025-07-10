@@ -2,22 +2,18 @@ import React, { useState, useCallback } from 'react';
 import { 
   Database,
   Cloud,
-  ExternalLink,
   Trash2,
   CheckCircle,
   XCircle,
   RefreshCw,
-  Upload,
-  ArrowRight
+  Upload
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 import FileUploader from '../ui/FileUploader';
 import DataSourceManager from '../ui/DataSourceManager';
 import { useDataSource } from '../../contexts/DataSourceContext';
 import firebaseService from '../../services/FirebaseService';
 
 const ExcelIntegrationDashboard = () => {
-  const navigate = useNavigate();
   const { state, actions } = useDataSource();
   const [firebaseStatus, setFirebaseStatus] = useState(null);
   const [uploadingToFirebase, setUploadingToFirebase] = useState(false);
@@ -213,10 +209,6 @@ const ExcelIntegrationDashboard = () => {
     actions.resetUploadStatus();
   };
 
-  // Navigate to Enhanced Workforce Dashboard
-  const navigateToEnhancedWorkforce = () => {
-    navigate('/dashboards/combined-workforce');
-  };
 
   // Clear Firebase database for testing
   const clearDatabase = async () => {
@@ -265,27 +257,6 @@ const ExcelIntegrationDashboard = () => {
         className="mb-6"
       />
 
-      {/* Quick Actions */}
-      <div className="bg-white rounded-lg shadow-sm border p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
-        <div className="flex flex-wrap gap-4">
-          <button
-            onClick={navigateToEnhancedWorkforce}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            <ArrowRight size={16} />
-            View Enhanced Workforce Dashboard
-          </button>
-          <button
-            onClick={clearDatabase}
-            disabled={clearingDatabase}
-            className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 transition-colors"
-          >
-            <Trash2 size={16} />
-            {clearingDatabase ? 'Clearing...' : 'Clear Database'}
-          </button>
-        </div>
-      </div>
 
       {/* Upload Section */}
       <div className="bg-white rounded-lg shadow-sm border p-6">
@@ -338,15 +309,6 @@ const ExcelIntegrationDashboard = () => {
               </span>
             </div>
             
-            {firebaseStatus.status === 'success' && firebaseStatus.dashboardLinks && (
-              <button
-                onClick={navigateToEnhancedWorkforce}
-                className="flex items-center gap-1 px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 text-sm"
-              >
-                <ExternalLink size={14} />
-                View Dashboard
-              </button>
-            )}
           </div>
         </div>
       )}
@@ -386,6 +348,29 @@ const ExcelIntegrationDashboard = () => {
             <strong>Smart Detection:</strong> The system automatically detects your data format and processes it accordingly. 
             Upload individual employee records for detailed analysis or quarterly aggregates for dashboard metrics.
           </p>
+        </div>
+      </div>
+
+      {/* Database Management Section */}
+      <div className="bg-white rounded-lg shadow-sm border p-6 border-red-200">
+        <h3 className="text-lg font-semibold text-red-900 mb-3">Database Management</h3>
+        <div className="bg-red-50 rounded-lg p-4">
+          <div className="flex items-start gap-3">
+            <div className="flex-1">
+              <h4 className="font-medium text-red-800 mb-1">Clear Database</h4>
+              <p className="text-sm text-red-700 mb-3">
+                Remove all uploaded data from Firebase for testing purposes. This action cannot be undone.
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={clearDatabase}
+            disabled={clearingDatabase}
+            className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 transition-colors"
+          >
+            <Trash2 size={16} />
+            {clearingDatabase ? 'Clearing Database...' : 'Clear Database'}
+          </button>
         </div>
       </div>
     </div>
