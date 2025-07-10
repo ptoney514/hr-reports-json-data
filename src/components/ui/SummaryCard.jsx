@@ -51,6 +51,12 @@ const SummaryCard = ({
           icon: TrendingDown,
           bg: 'bg-red-50'
         };
+      case 'custom-positive':
+        return {
+          text: 'text-blue-700 print:text-black',
+          icon: TrendingDown,
+          bg: 'bg-blue-50'
+        };
       default:
         return {
           text: 'text-gray-500 print:text-black',
