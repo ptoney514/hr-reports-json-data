@@ -1,5 +1,5 @@
 import React from 'react';
-import { CheckCircle, Clock, Users, AlertTriangle } from 'lucide-react';
+import { AlertTriangle, Clock, Users, RefreshCw } from 'lucide-react';
 import { MetricsGridProps } from '../../../types/components';
 import SummaryCard from '../../ui/SummaryCard';
 
@@ -56,18 +56,6 @@ const MetricsGrid: React.FC<MetricsGridProps> = ({
       {...ariaProps}
     >
       <SummaryCard
-        title="Overall Compliance"
-        value={`${currentMetrics.overallCompliance}%`}
-        change={complianceChange}
-        changeType="percentage"
-        subtitle={`Target: 95% | Prev: ${previousMetrics?.overallCompliance || 'N/A'}%`}
-        icon={CheckCircle}
-        trend={complianceChange > 0 ? 'positive' : complianceChange < 0 ? 'negative' : 'neutral'}
-        target="95%"
-        className="bg-white print:bg-white p-4 print:p-2 rounded-lg shadow-sm border print:border-gray"
-      />
-
-      <SummaryCard
         title="Section 2 Timeliness"
         value={`${currentMetrics.section2Compliance}%`}
         change={section2Change}
@@ -84,22 +72,34 @@ const MetricsGrid: React.FC<MetricsGridProps> = ({
         value={currentMetrics.totalI9s.toLocaleString()}
         change={totalFormsChange}
         changeType="number"
-        subtitle={`${totalFormsChange >= 0 ? '+' : ''}${totalFormsChange} vs prev quarter`}
+        subtitle="Total YTD: 1502"
         icon={Users}
         trend={totalFormsChange > 0 ? 'positive' : totalFormsChange < 0 ? 'negative' : 'neutral'}
-        target={previousMetrics?.totalI9s ? `${previousMetrics.totalI9s}` : undefined}
+        target={undefined}
         className="bg-white print:bg-white p-4 print:p-2 rounded-lg shadow-sm border print:border-gray"
       />
 
       <SummaryCard
-        title="Audit Readiness"
-        value={`${currentMetrics.auditReady}%`}
-        change={0}
-        changeType="percentage"
-        subtitle="Risk factors identified: 4"
+        title="Reverifications"
+        value="30"
+        change={-8}
+        changeType="number"
+        subtitle="8 fewer this quarter"
+        icon={RefreshCw}
+        trend="custom-positive"
+        target={undefined}
+        className="bg-white print:bg-white p-4 print:p-2 rounded-lg shadow-sm border print:border-gray"
+      />
+
+      <SummaryCard
+        title="Error Rate"
+        value="37"
+        change={2}
+        changeType="number"
+        subtitle="13 substantive, 24 technical"
         icon={AlertTriangle}
-        trend="neutral"
-        target="90%"
+        trend="negative"
+        target={undefined}
         className="bg-white print:bg-white p-4 print:p-2 rounded-lg shadow-sm border print:border-gray"
       />
     </div>

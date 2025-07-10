@@ -9,7 +9,6 @@ import './components/dashboards/I9Dashboard.css';
 
 // Lazy load dashboard components for better performance
 const DashboardIndex = lazy(() => import('./components/dashboards/DashboardIndex'));
-const WorkforceDashboard = lazy(() => import('./components/dashboards/WorkforceDashboard'));
 const TurnoverDashboard = lazy(() => import('./components/dashboards/TurnoverDashboard'));
 const I9HealthDashboard = lazy(() => import('./components/dashboards/I9HealthDashboard'));
 const TestSuite = lazy(() => import('./components/testing/TestSuite'));
@@ -79,7 +78,6 @@ function App() {
               <Routes>
               {/* Dashboard Routes */}
               <Route path="/dashboards" element={<DashboardIndex />} />
-              <Route path="/dashboards/workforce" element={<WorkforceDashboard />} />
               <Route path="/dashboards/turnover" element={<TurnoverDashboard />} />
               <Route path="/dashboards/i9" element={<I9HealthDashboard />} />
               <Route path="/dashboards/recruiting" element={<RecruitingDashboard />} />
