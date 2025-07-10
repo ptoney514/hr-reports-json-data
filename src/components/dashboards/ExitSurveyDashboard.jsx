@@ -1,6 +1,6 @@
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { ArrowDownCircle, Wifi, WifiOff } from 'lucide-react';
+import { ArrowDownCircle, Wifi, WifiOff, Filter, Download, LogOut } from 'lucide-react';
 import useFirebaseExitSurveyData from '../../hooks/useFirebaseExitSurveyData';
 
 // Fallback data to ensure the dashboard always works
@@ -63,37 +63,67 @@ const ExitSurveyDashboard = () => {
     );
   }
 
-  // Enhanced subtitle with real-time status
-  const realtimeStatus = isRealTime ? '🔴 Live' : '📊 Cached';
-  const dataSource = firebaseData ? 'Firebase' : 'Local';
-  const syncInfo = lastSyncTime ? ` | Last sync: ${lastSyncTime.toLocaleTimeString()}` : '';
-  const subtitle = `FY25 Q3 | 20 Responses | ${realtimeStatus} (${dataSource})${syncInfo}`;
-
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d'];
 
+  const handleFilterClick = () => {
+    console.log('Filter clicked');
+  };
+
+  const handleExportClick = () => {
+    window.print();
+  };
+
   return (
-    <div className="text-xs">
-      {/* PAGE 2: EXIT SURVEY INSIGHTS */}
-      <div className="bg-gray-50 p-4 min-h-screen">
-        {/* Header */}
-        <div className="mb-3 flex justify-between items-center">
-          <div>
-            <h1 className="text-xl font-bold text-blue-700">Exit Survey Insights</h1>
-            <div className="flex items-center gap-2 mt-1">
-              <span className="text-sm text-gray-600">{subtitle}</span>
-              {isRealTime && <Wifi size={14} className="text-green-500" />}
-              {!isRealTime && <WifiOff size={14} className="text-gray-400" />}
+    <div className="min-h-screen bg-gray-50 py-8 dashboard-container print:bg-white print:py-0">
+      <div className="max-w-7xl mx-auto px-4 print:max-w-none print:px-0 print:mx-0">
+        {/* Header - Clean minimal style matching Turnover dashboard */}
+        <div className="mb-6 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <LogOut className="text-blue-600" size={24} />
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">Exit Survey Insights</h1>
+              <div className="flex items-center gap-4 mt-1">
+                <p className="text-gray-600 text-sm">
+                  FY25 Q3 | {exitSurveyData.totalResponses} Responses | Generated: {new Date().toLocaleDateString()}
+                </p>
+                <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <span className={isRealTime ? 'text-green-600' : 'text-gray-400'}>
+                    {isRealTime ? '🔴 Live' : '📊 Cached'} ({firebaseData ? 'Firebase' : 'Local'})
+                  </span>
+                  {isRealTime && <Wifi size={14} className="text-green-500" />}
+                  {!isRealTime && <WifiOff size={14} className="text-gray-400" />}
+                  {lastSyncTime && (
+                    <span className="text-xs">
+                      | Last sync: {lastSyncTime.toLocaleTimeString()}
+                    </span>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
-          <div className="flex gap-2 text-xs">
-            <span className="px-2 py-1 bg-blue-100 rounded">FY25 Q3</span>
-            <span className="px-2 py-1 bg-blue-100 rounded">{exitSurveyData.totalResponses} Responses</span>
+          <div className="flex gap-3 no-print">
+            <button 
+              className="flex items-center gap-1 px-3 py-1 bg-white border rounded shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onClick={handleFilterClick}
+              aria-label="Open filters"
+            >
+              <Filter size={16} />
+              <span>Filters</span>
+            </button>
+            <button 
+              className="flex items-center gap-1 px-3 py-1 bg-blue-600 text-white rounded shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onClick={handleExportClick}
+              aria-label="Export dashboard as PDF"
+            >
+              <Download size={16} />
+              <span>Print PDF</span>
+            </button>
           </div>
         </div>
 
         {/* Exit Survey Summary Cards */}
-        <div className="grid grid-cols-4 gap-2 mb-3">
-          <div className="bg-white p-3 rounded-lg shadow-sm border">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 print:gap-2 mb-6 print:mb-4">
+          <div className="bg-white print:bg-white p-4 print:p-2 rounded-lg shadow-sm border print:border-gray">
             <h2 className="text-xs font-medium text-blue-700 mb-1">Response Rate</h2>
             <div className="flex items-end gap-1">
               <span className="text-2xl font-bold">{exitSurveyData.exitInterviewCompletion}%</span>
@@ -103,7 +133,7 @@ const ExitSurveyDashboard = () => {
             </div>
             <p className="text-gray-500 text-xs">{exitSurveyData.totalResponses} of {exitSurveyData.totalExits} exits</p>
           </div>
-          <div className="bg-white p-3 rounded-lg shadow-sm border">
+          <div className="bg-white print:bg-white p-4 print:p-2 rounded-lg shadow-sm border print:border-gray">
             <h2 className="text-xs font-medium text-blue-700 mb-1">Would Recommend</h2>
             <div className="flex items-end gap-1">
               <span className="text-2xl font-bold">{exitSurveyData.recommendationRate}%</span>
@@ -113,7 +143,7 @@ const ExitSurveyDashboard = () => {
             </div>
             <p className="text-gray-500 text-xs">11 of 20 respondents</p>
           </div>
-          <div className="bg-white p-3 rounded-lg shadow-sm border">
+          <div className="bg-white print:bg-white p-4 print:p-2 rounded-lg shadow-sm border print:border-gray">
             <h2 className="text-xs font-medium text-blue-700 mb-1">Avg Tenure at Exit</h2>
             <div className="flex items-end gap-1">
               <span className="text-2xl font-bold">{exitSurveyData.avgTenure}</span>
@@ -121,7 +151,7 @@ const ExitSurveyDashboard = () => {
             </div>
             <p className="text-gray-500 text-xs">64% left in first 3 years</p>
           </div>
-          <div className="bg-white p-3 rounded-lg shadow-sm border">
+          <div className="bg-white print:bg-white p-4 print:p-2 rounded-lg shadow-sm border print:border-gray">
             <h2 className="text-xs font-medium text-blue-700 mb-1">Top Exit Reason</h2>
             <div className="text-lg font-bold">Career Growth</div>
             <p className="text-gray-500 text-xs">30% of responses</p>
@@ -129,8 +159,8 @@ const ExitSurveyDashboard = () => {
         </div>
 
         {/* Charts Row */}
-        <div className="grid grid-cols-2 gap-3 mb-3">
-          <div className="bg-white p-3 rounded-lg shadow-sm border">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 print:gap-2 mb-6 print:mb-4">
+          <div className="bg-white print:bg-white p-6 print:p-4 rounded-lg shadow-sm border print:border-gray">
             <h2 className="text-sm font-medium text-blue-700 mb-2">Primary Reasons for Leaving</h2>
             <div className="grid grid-cols-3 gap-2">
               <div className="col-span-1">
@@ -174,7 +204,7 @@ const ExitSurveyDashboard = () => {
               </div>
             </div>
           </div>
-          <div className="bg-white p-3 rounded-lg shadow-sm border">
+          <div className="bg-white print:bg-white p-6 print:p-4 rounded-lg shadow-sm border print:border-gray">
             <h2 className="text-sm font-medium text-blue-700 mb-2">Exit Survey Satisfaction Scores</h2>
             <ResponsiveContainer width="100%" height={180}>
               <BarChart
@@ -195,7 +225,7 @@ const ExitSurveyDashboard = () => {
         </div>
 
         {/* Exit Survey Key Insights */}
-        <div className="bg-white p-3 rounded-lg shadow-sm border mb-3">
+        <div className="bg-white print:bg-white p-6 print:p-4 rounded-lg shadow-sm border print:border-gray mb-6 print:mb-4">
           <h2 className="text-sm font-medium text-blue-700 mb-2">Exit Survey Key Insights</h2>
           <div className="grid grid-cols-3 gap-4 text-xs">
             <div>
@@ -230,7 +260,7 @@ const ExitSurveyDashboard = () => {
         </div>
 
         {/* Department Exit Trends */}
-        <div className="bg-white p-3 rounded-lg shadow-sm border">
+        <div className="bg-white print:bg-white p-6 print:p-4 rounded-lg shadow-sm border print:border-gray">
           <h2 className="text-sm font-medium text-blue-700 mb-2">Exit Survey Responses by Department</h2>
           <div className="grid grid-cols-2 gap-6">
             <div>
@@ -277,7 +307,6 @@ const ExitSurveyDashboard = () => {
           </div>
         </div>
       </div>
-      {/* TODO: Add export, print, and accessibility features as in other dashboards */}
     </div>
   );
 };
