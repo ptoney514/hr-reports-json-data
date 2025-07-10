@@ -3,7 +3,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsive
 import { ArrowDownCircle, Wifi, WifiOff, Filter, Download, LogOut } from 'lucide-react';
 import useFirebaseExitSurveyData from '../../hooks/useFirebaseExitSurveyData';
 
-// Fallback data to ensure the dashboard always works
+// Enhanced fallback data matching the screenshot for better visual testing
 const FALLBACK_DATA = {
   exitSurveyData: {
     totalExits: 98,
@@ -21,11 +21,11 @@ const FALLBACK_DATA = {
     { name: 'Other', value: 8 }
   ],
   satisfactionData: [
-    { category: 'Overall Experience', satisfied: 45, neutral: 30, dissatisfied: 25 },
-    { category: 'Career Development', satisfied: 35, neutral: 25, dissatisfied: 40 },
-    { category: 'Leadership', satisfied: 40, neutral: 35, dissatisfied: 25 },
-    { category: 'Compensation', satisfied: 50, neutral: 20, dissatisfied: 30 },
-    { category: 'Work Environment', satisfied: 60, neutral: 20, dissatisfied: 20 }
+    { category: 'Overall Experience', satisfied: 40, neutral: 35, dissatisfied: 25 },
+    { category: 'Career Development', satisfied: 30, neutral: 30, dissatisfied: 40 },
+    { category: 'Leadership', satisfied: 45, neutral: 30, dissatisfied: 25 },
+    { category: 'Compensation', satisfied: 35, neutral: 35, dissatisfied: 30 },
+    { category: 'Work Environment', satisfied: 65, neutral: 20, dissatisfied: 15 }
   ],
   departmentExits: [
     { department: 'School of Dentistry', exits: 12, responses: 4, responseRate: 33 },
@@ -34,7 +34,29 @@ const FALLBACK_DATA = {
     { department: 'Information Technology', exits: 8, responses: 2, responseRate: 25 },
     { department: 'Administration', exits: 22, responses: 5, responseRate: 23 },
     { department: 'Other Departments', exits: 23, responses: 3, responseRate: 13 }
-  ]
+  ],
+  keyInsights: {
+    areasOfConcern: [
+      "25% cite supervisor relationships as primary issue",
+      "40% dissatisfied with career development opportunities", 
+      "Early tenure departures (64% leave within 3 years)",
+      "Leadership communication gaps identified"
+    ],
+    positiveFeedback: [
+      "60% satisfied with work environment",
+      "Students & colleagues highly valued",
+      "Benefits package generally well-received", 
+      "University culture appreciated by most"
+    ],
+    actionItems: [
+      "Improve exit survey response rates (currently 20%)",
+      "Management training for supervisors",
+      "Enhanced career development programs",
+      "Improved onboarding for retention",
+      "Regular check-ins for new hires"
+    ]
+  },
+  summaryText: "With a 20% response rate (20 of 98 exits), the exit survey provides valuable but limited insights. 55% of respondents would recommend Creighton as a workplace. Key improvement areas include supervisor relationships, career development opportunities, and early career support.\n\nPositive aspects include strong university culture, meaningful work with students, and competitive benefits. Improving exit survey participation and focusing on management development could significantly improve retention insights and outcomes."
 };
 
 const ExitSurveyDashboard = () => {
@@ -49,10 +71,17 @@ const ExitSurveyDashboard = () => {
 
   // Use Firebase data if available, otherwise fallback
   const data = firebaseData || FALLBACK_DATA;
-  const { exitSurveyData, exitReasons, satisfactionData, departmentExits } = data;
+  const { 
+    exitSurveyData = FALLBACK_DATA.exitSurveyData, 
+    exitReasons = FALLBACK_DATA.exitReasons, 
+    satisfactionData = FALLBACK_DATA.satisfactionData, 
+    departmentExits = FALLBACK_DATA.departmentExits, 
+    keyInsights = FALLBACK_DATA.keyInsights, 
+    summaryText = FALLBACK_DATA.summaryText 
+  } = data;
 
-  // Show loading state
-  if (loading) {
+  // Show loading state only if Firebase is actively loading AND no fallback data available
+  if (loading && !data) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
@@ -65,6 +94,16 @@ const ExitSurveyDashboard = () => {
 
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d'];
 
+  // Debug logging to check data
+  console.log('Exit Survey Data Debug:', {
+    firebaseData,
+    fallbackData: FALLBACK_DATA,
+    finalData: data,
+    exitReasons,
+    satisfactionData,
+    exitSurveyData
+  });
+
   const handleFilterClick = () => {
     console.log('Filter clicked');
   };
@@ -76,48 +115,22 @@ const ExitSurveyDashboard = () => {
   return (
     <div className="min-h-screen bg-gray-50 py-8 dashboard-container print:bg-white print:py-0">
       <div className="max-w-7xl mx-auto px-4 print:max-w-none print:px-0 print:mx-0">
-        {/* Header - Clean minimal style matching Turnover dashboard */}
+        {/* Header - Match Turnover dashboard layout exactly */}
         <div className="mb-6 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <LogOut className="text-blue-600" size={24} />
             <div>
               <h1 className="text-2xl font-bold text-gray-900">Exit Survey Insights</h1>
-              <div className="flex items-center gap-4 mt-1">
-                <p className="text-gray-600 text-sm">
-                  FY25 Q3 | {exitSurveyData.totalResponses} Responses | Generated: {new Date().toLocaleDateString()}
-                </p>
-                <div className="flex items-center gap-2 text-sm text-gray-600">
-                  <span className={isRealTime ? 'text-green-600' : 'text-gray-400'}>
-                    {isRealTime ? '🔴 Live' : '📊 Cached'} ({firebaseData ? 'Firebase' : 'Local'})
-                  </span>
-                  {isRealTime && <Wifi size={14} className="text-green-500" />}
-                  {!isRealTime && <WifiOff size={14} className="text-gray-400" />}
-                  {lastSyncTime && (
-                    <span className="text-xs">
-                      | Last sync: {lastSyncTime.toLocaleTimeString()}
-                    </span>
-                  )}
-                </div>
-              </div>
+              <p className="text-gray-600 text-sm mt-1">
+                FY 2025 | {isRealTime ? '🔴 Live' : '📊 Cached'} ({firebaseData ? 'Firebase' : 'Local'})
+              </p>
             </div>
           </div>
-          <div className="flex gap-3 no-print">
-            <button 
-              className="flex items-center gap-1 px-3 py-1 bg-white border rounded shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              onClick={handleFilterClick}
-              aria-label="Open filters"
-            >
-              <Filter size={16} />
-              <span>Filters</span>
-            </button>
-            <button 
-              className="flex items-center gap-1 px-3 py-1 bg-blue-600 text-white rounded shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              onClick={handleExportClick}
-              aria-label="Export dashboard as PDF"
-            >
-              <Download size={16} />
-              <span>Print PDF</span>
-            </button>
+          <div className="flex items-center gap-3 no-print">
+            <div className="flex items-center gap-2 text-sm text-gray-600">
+              <span className="px-2 py-1 bg-blue-100 rounded">FY25 Q3</span>
+              <span className="px-2 py-1 bg-blue-100 rounded">{exitSurveyData.totalResponses} Responses</span>
+            </div>
           </div>
         </div>
 
@@ -231,29 +244,41 @@ const ExitSurveyDashboard = () => {
             <div>
               <h3 className="font-medium text-gray-800 mb-1">⚠️ Areas of Concern</h3>
               <ul className="space-y-1 text-gray-600">
-                <li>• 25% cite supervisor relationships as primary issue</li>
-                <li>• 40% dissatisfied with career development opportunities</li>
-                <li>• Early tenure departures (64% leave within 3 years)</li>
-                <li>• Leadership communication gaps identified</li>
+                {keyInsights?.areasOfConcern?.map((item, index) => (
+                  <li key={index}>• {item}</li>
+                )) || [
+                  <li key="1">• 25% cite supervisor relationships as primary issue</li>,
+                  <li key="2">• 40% dissatisfied with career development opportunities</li>,
+                  <li key="3">• Early tenure departures (64% leave within 3 years)</li>,
+                  <li key="4">• Leadership communication gaps identified</li>
+                ]}
               </ul>
             </div>
             <div>
               <h3 className="font-medium text-gray-800 mb-1">✅ Positive Feedback</h3>
               <ul className="space-y-1 text-gray-600">
-                <li>• 60% satisfied with work environment</li>
-                <li>• Students & colleagues highly valued</li>
-                <li>• Benefits package generally well-received</li>
-                <li>• University culture appreciated by most</li>
+                {keyInsights?.positiveFeedback?.map((item, index) => (
+                  <li key={index}>• {item}</li>
+                )) || [
+                  <li key="1">• 60% satisfied with work environment</li>,
+                  <li key="2">• Students & colleagues highly valued</li>,
+                  <li key="3">• Benefits package generally well-received</li>,
+                  <li key="4">• University culture appreciated by most</li>
+                ]}
               </ul>
             </div>
             <div>
               <h3 className="font-medium text-gray-800 mb-1">🎯 Action Items</h3>
               <ul className="space-y-1 text-gray-600">
-                <li>• Improve exit survey response rates (currently 20%)</li>
-                <li>• Management training for supervisors</li>
-                <li>• Enhanced career development programs</li>
-                <li>• Improved onboarding for retention</li>
-                <li>• Regular check-ins for new hires</li>
+                {keyInsights?.actionItems?.map((item, index) => (
+                  <li key={index}>• {item}</li>
+                )) || [
+                  <li key="1">• Improve exit survey response rates (currently 20%)</li>,
+                  <li key="2">• Management training for supervisors</li>,
+                  <li key="3">• Enhanced career development programs</li>,
+                  <li key="4">• Improved onboarding for retention</li>,
+                  <li key="5">• Regular check-ins for new hires</li>
+                ]}
               </ul>
             </div>
           </div>
@@ -293,16 +318,26 @@ const ExitSurveyDashboard = () => {
             </div>
             <div className="bg-blue-50 p-3 rounded">
               <h3 className="font-medium text-blue-800 mb-2">Q3 Exit Survey Summary</h3>
-              <p className="text-xs text-blue-700 mb-2">
-                With a 20% response rate (20 of 98 exits), the exit survey provides valuable but limited insights. 
-                55% of respondents would recommend Creighton as a workplace. Key improvement areas include supervisor 
-                relationships, career development opportunities, and early career support.
-              </p>
-              <p className="text-xs text-blue-700">
-                Positive aspects include strong university culture, meaningful work with students, and competitive 
-                benefits. Improving exit survey participation and focusing on management development could significantly 
-                improve retention insights and outcomes.
-              </p>
+              <div className="text-xs text-blue-700">
+                {summaryText ? summaryText.split('\n\n').map((paragraph, index) => (
+                  <p key={index} className={index > 0 ? "mt-2" : ""}>
+                    {paragraph}
+                  </p>
+                )) : (
+                  <>
+                    <p className="mb-2">
+                      With a 20% response rate (20 of 98 exits), the exit survey provides valuable but limited insights. 
+                      55% of respondents would recommend Creighton as a workplace. Key improvement areas include supervisor 
+                      relationships, career development opportunities, and early career support.
+                    </p>
+                    <p>
+                      Positive aspects include strong university culture, meaningful work with students, and competitive 
+                      benefits. Improving exit survey participation and focusing on management development could significantly 
+                      improve retention insights and outcomes.
+                    </p>
+                  </>
+                )}
+              </div>
             </div>
           </div>
         </div>
