@@ -8,8 +8,97 @@ import { format, parse, addMonths, startOfQuarter, endOfQuarter } from 'date-fns
 
 class QuarterConfigService {
   constructor() {
-    this.config = quarterConfig;
-    this.quarters = this.config.quarters;
+    try {
+      // Validate imported config
+      if (!quarterConfig) {
+        console.error('Quarter config not found, using fallback configuration');
+        this.config = this.getDefaultConfig();
+        this.quarters = this.config.quarters;
+        return;
+      }
+
+      // Validate config structure
+      if (!quarterConfig.quarters || !Array.isArray(quarterConfig.quarters)) {
+        console.error('Invalid quarter config structure, using fallback configuration');
+        this.config = this.getDefaultConfig();
+        this.quarters = this.config.quarters;
+        return;
+      }
+
+      // Config is valid, use it
+      this.config = quarterConfig;
+      this.quarters = this.config.quarters;
+      
+      console.log('QuarterConfigService initialized successfully with', this.quarters.length, 'quarters');
+    } catch (error) {
+      console.error('Error initializing QuarterConfigService:', error);
+      this.config = this.getDefaultConfig();
+      this.quarters = this.config.quarters;
+    }
+  }
+
+  /**
+   * Get default configuration as fallback
+   * @returns {Object} Default quarter configuration
+   */
+  getDefaultConfig() {
+    return {
+      fiscal_year_start: "July",
+      fiscal_year_type: "calendar",
+      auto_generate_future_quarters: true,
+      quarters: [
+        {
+          id: "Q1-2024",
+          label: "Q1 2024 (3/31/2024)",
+          quarter: "Q1-2024",
+          end_date: "2024-03-31",
+          start_date: "2024-01-01",
+          active: true,
+          fiscal_year: 2024,
+          display_order: 1
+        },
+        {
+          id: "Q2-2024",
+          label: "Q2 2024 (6/30/2024)",
+          quarter: "Q2-2024",
+          end_date: "2024-06-30",
+          start_date: "2024-04-01",
+          active: true,
+          fiscal_year: 2024,
+          display_order: 2
+        },
+        {
+          id: "Q3-2024",
+          label: "Q3 2024 (9/30/2024)",
+          quarter: "Q3-2024",
+          end_date: "2024-09-30",
+          start_date: "2024-07-01",
+          active: true,
+          fiscal_year: 2024,
+          display_order: 3
+        },
+        {
+          id: "Q4-2024",
+          label: "Q4 2024 (12/31/2024)",
+          quarter: "Q4-2024",
+          end_date: "2024-12-31",
+          start_date: "2024-10-01",
+          active: true,
+          fiscal_year: 2024,
+          display_order: 4
+        },
+        {
+          id: "Q1-2025",
+          label: "Q1 2025 (3/31/2025)",
+          quarter: "Q1-2025",
+          end_date: "2025-03-31",
+          start_date: "2025-01-01",
+          active: true,
+          fiscal_year: 2025,
+          display_order: 5
+        }
+      ]
+    };
   }
 
   /**
@@ -17,8 +106,13 @@ class QuarterConfigService {
    * @returns {Array} Array of quarter objects with value, label, quarter, dateValue
    */
   getQuarters() {
+    if (!this.quarters || !Array.isArray(this.quarters)) {
+      console.error('Quarters not available in getQuarters()');
+      return [];
+    }
+    
     return this.quarters
-      .filter(q => q.active)
+      .filter(q => q && q.active)
       .sort((a, b) => a.display_order - b.display_order)
       .map(quarter => ({
         value: quarter.id,
@@ -116,11 +210,21 @@ class QuarterConfigService {
    * @returns {Object|null} Previous quarter object
    */
   getPreviousQuarter(quarterId) {
-    const quarter = this.quarters.find(q => q.id === quarterId);
+    if (!this.quarters || !Array.isArray(this.quarters)) {
+      console.error('Quarters not available in getPreviousQuarter()');
+      return null;
+    }
+    
+    const quarter = this.quarters.find(q => q && q.id === quarterId);
     if (!quarter) return null;
 
     const quarters = this.getQuarters();
-    const currentIndex = quarters.findIndex(q => q.value === quarterId);
+    if (!quarters || quarters.length === 0) {
+      console.error('No quarters available from getQuarters()');
+      return null;
+    }
+    
+    const currentIndex = quarters.findIndex(q => q && q.value === quarterId);
     
     if (currentIndex > 0) {
       return quarters[currentIndex - 1];

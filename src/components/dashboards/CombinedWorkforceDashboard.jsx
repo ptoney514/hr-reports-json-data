@@ -59,6 +59,8 @@ const CombinedWorkforceDashboard = () => {
   // Data source state
   const [dataSource, setDataSource] = useState('sample'); // 'sample', 'firebase'
   const [quarterlyData, setQuarterlyData] = useState(null);
+  const [quarterConfigLoading, setQuarterConfigLoading] = useState(true);
+  const [quarterConfigError, setQuarterConfigError] = useState(null);
   
   // Additional metrics state for the 3 new components
   const [additionalMetrics, setAdditionalMetrics] = useState({
@@ -118,8 +120,38 @@ const CombinedWorkforceDashboard = () => {
     }
   }, [firebaseData]);
 
+  // Initialize quarter config and handle any loading issues
+  useEffect(() => {
+    const initializeQuarterConfig = async () => {
+      try {
+        setQuarterConfigLoading(true);
+        setQuarterConfigError(null);
+        
+        // Test if QUARTER_DATES is available (from quarterlyDataProcessor)
+        if (QUARTER_DATES && QUARTER_DATES.length > 0) {
+          console.log('Quarter configuration loaded successfully:', QUARTER_DATES.length, 'quarters');
+          setQuarterConfigLoading(false);
+        } else {
+          throw new Error('QUARTER_DATES not available');
+        }
+      } catch (error) {
+        console.error('Quarter configuration initialization failed:', error);
+        setQuarterConfigError(error.message);
+        setQuarterConfigLoading(false);
+      }
+    };
+
+    initializeQuarterConfig();
+  }, []);
+
   // Initialize with sample data only if no Firebase data
   useEffect(() => {
+    // Don't initialize data if quarter config is still loading or has errors
+    if (quarterConfigLoading || quarterConfigError) {
+      console.log('Waiting for quarter config to be ready...');
+      return;
+    }
+    
     if (!firebaseData || Object.keys(firebaseData).length === 0) {
       console.log('No Firebase data found, using sample data');
       // Generate sample data for demonstration
@@ -147,10 +179,16 @@ const CombinedWorkforceDashboard = () => {
         setDataSource('sample');
       }
     }
-  }, [firebaseData]);
+  }, [firebaseData, quarterConfigLoading, quarterConfigError]);
 
   // Update metrics when quarter or data changes
   useEffect(() => {
+    // Don't process metrics if quarter config is still loading or has errors
+    if (quarterConfigLoading || quarterConfigError) {
+      console.log('Waiting for quarter config before processing metrics...');
+      return;
+    }
+    
     if (dataSource === 'firebase' && firebaseData && Object.keys(firebaseData).length > 0) {
       // Use Firebase data directly for metrics
       console.log('Using Firebase data for metrics');
@@ -203,10 +241,15 @@ const CombinedWorkforceDashboard = () => {
       const metrics = calculateQuarterMetrics(currentQuarterData, previousQuarterData);
       setHeadcountData(metrics);
     }
-  }, [quarterlyData, selectedQuarter, dataSource, firebaseData]);
+  }, [quarterlyData, selectedQuarter, dataSource, firebaseData, quarterConfigLoading, quarterConfigError]);
 
   // Update chart data when data source changes
   useEffect(() => {
+    // Don't process chart data if quarter config is still loading or has errors
+    if (quarterConfigLoading || quarterConfigError) {
+      console.log('Waiting for quarter config before processing chart data...');
+      return;
+    }
     
     if (dataSource === 'firebase' && firebaseData && Object.keys(firebaseData).length > 0) {
       // Use Firebase data for chart data
@@ -514,7 +557,7 @@ const CombinedWorkforceDashboard = () => {
     }
     
     
-  }, [dataSource, firebaseData, quarterlyData, selectedQuarter]);
+  }, [dataSource, firebaseData, quarterlyData, selectedQuarter, quarterConfigLoading, quarterConfigError]);
 
   // Generate static data for 5-Quarter Headcount Trend chart
   useEffect(() => {
@@ -786,6 +829,49 @@ const CombinedWorkforceDashboard = () => {
 
   // Get enhanced insights for cards
   const cardInsights = getEnhancedCardData();
+
+  // Show loading state while quarter config is initializing
+  if (quarterConfigLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 py-8 dashboard-container print:bg-white print:py-0">
+        <div className="max-w-7xl mx-auto px-4 print:max-w-none print:px-0 print:mx-0">
+          <div className="flex items-center justify-center h-64">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+              <p className="mt-4 text-gray-600">Loading quarter configuration...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state if quarter config failed to load
+  if (quarterConfigError) {
+    return (
+      <div className="min-h-screen bg-gray-50 py-8 dashboard-container print:bg-white print:py-0">
+        <div className="max-w-7xl mx-auto px-4 print:max-w-none print:px-0 print:mx-0">
+          <div className="flex items-center justify-center h-64">
+            <div className="text-center">
+              <div className="rounded-full h-12 w-12 bg-red-100 flex items-center justify-center mx-auto mb-4">
+                <span className="text-red-600 text-xl">⚠️</span>
+              </div>
+              <h2 className="text-xl font-semibold text-gray-900 mb-2">Configuration Error</h2>
+              <p className="text-gray-600 mb-4">
+                There was an issue loading the quarter configuration: {quarterConfigError}
+              </p>
+              <button
+                onClick={() => window.location.reload()}
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+              >
+                Reload Page
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <ErrorBoundary>
