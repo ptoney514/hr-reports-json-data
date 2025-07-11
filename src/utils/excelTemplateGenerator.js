@@ -33,7 +33,6 @@ export const generateComprehensiveTemplate = () => {
   // 2. Create Employee Master sheet (optional individual records)
   const employeeMasterData = generateEmployeeMasterSample();
   const employeeSheet = XLSX.utils.json_to_sheet(employeeMasterData);
-  addEmployeeDataValidation(employeeSheet);
   XLSX.utils.book_append_sheet(workbook, employeeSheet, 'Employee_Master');
   
   // 3. Create Data Dictionary sheet
@@ -691,6 +690,483 @@ export const generateQuarterSpecificTemplate = (quarterIds) => {
   return workbook;
 };
 
+/**
+ * Generate comprehensive multi-tab template for Combined Workforce Analytics Dashboard
+ * Optimized for Oracle HCM data integration with easy mapping
+ */
+export const generateCombinedWorkforceTemplate = () => {
+  const workbook = XLSX.utils.book_new();
+  const quarters = getQuarters();
+  
+  // Get last 5 quarters for trending analysis
+  const recentQuarters = quarters.slice(-5);
+  
+  // 1. Summary Data Tab - Primary aggregate data for all quarters
+  const summaryData = generateSummaryDataSheet(recentQuarters);
+  const summarySheet = XLSX.utils.json_to_sheet(summaryData);
+  addSummaryDataValidation(summarySheet);
+  XLSX.utils.book_append_sheet(workbook, summarySheet, 'Summary_Data');
+  
+  // 2. Location Breakdown Tab
+  const locationData = generateLocationBreakdownSheet(recentQuarters);
+  const locationSheet = XLSX.utils.json_to_sheet(locationData);
+  XLSX.utils.book_append_sheet(workbook, locationSheet, 'Location_Breakdown');
+  
+  // 3. Division Analysis Tab
+  const divisionData = generateDivisionAnalysisSheet(recentQuarters);
+  const divisionSheet = XLSX.utils.json_to_sheet(divisionData);
+  XLSX.utils.book_append_sheet(workbook, divisionSheet, 'Division_Analysis');
+  
+  // 4. Hiring Activity Tab
+  const hiringData = generateHiringActivitySheet(recentQuarters);
+  const hiringSheet = XLSX.utils.json_to_sheet(hiringData);
+  XLSX.utils.book_append_sheet(workbook, hiringSheet, 'Hiring_Activity');
+  
+  // 5. Demographics Metrics Tab
+  const demographicsData = generateDemographicsSheet(recentQuarters);
+  const demographicsSheet = XLSX.utils.json_to_sheet(demographicsData);
+  XLSX.utils.book_append_sheet(workbook, demographicsSheet, 'Demographics_Metrics');
+  
+  // 6. Oracle HCM Mapping Guide
+  const mappingGuide = createOracleHCMMappingGuide();
+  const mappingSheet = XLSX.utils.json_to_sheet(mappingGuide);
+  XLSX.utils.book_append_sheet(workbook, mappingSheet, 'Oracle_HCM_Mapping');
+  
+  // 7. Instructions Tab
+  const instructions = createCombinedWorkforceInstructions();
+  const instructionsSheet = XLSX.utils.json_to_sheet(instructions);
+  XLSX.utils.book_append_sheet(workbook, instructionsSheet, 'Instructions');
+  
+  return workbook;
+};
+
+/**
+ * Generate Summary Data sheet - Primary tab for Firebase import
+ */
+const generateSummaryDataSheet = (quarters) => {
+  const divisions = [
+    'Arts & Sciences',
+    'School of Medicine', 
+    'Medicine',
+    'Pharmacy & Health Professions',
+    'Dentistry',
+    'Business',
+    'Engineering',
+    'Education',
+    'Nursing',
+    'Law'
+  ];
+  
+  const locations = ['Omaha Campus', 'Phoenix Campus'];
+  const data = [];
+  
+  quarters.forEach(quarter => {
+    divisions.forEach(division => {
+      locations.forEach(location => {
+        // Generate realistic numbers based on division size and location
+        const divisionMultiplier = getDivisionMultiplier(division);
+        const locationMultiplier = location === 'Omaha Campus' ? 0.80 : 0.20;
+        const quarterMultiplier = getQuarterMultiplier(quarter.quarter);
+        
+        const baseCount = Math.floor(150 * divisionMultiplier * locationMultiplier * quarterMultiplier);
+        
+        const beFacultyCount = Math.floor(baseCount * 0.60);
+        const beStaffCount = Math.floor(baseCount * 0.35);
+        const nbeStudentCount = Math.floor(baseCount * 0.05);
+        const totalCount = beFacultyCount + beStaffCount + nbeStudentCount;
+        
+        // Generate hiring activity
+        const beNewHires = Math.floor(totalCount * 0.025 + Math.random() * 5);
+        const beDepartures = Math.floor(totalCount * 0.02 + Math.random() * 3);
+        const nbeNewHires = Math.floor(nbeStudentCount * 0.15);
+        const nbeDepartures = Math.floor(nbeStudentCount * 0.12);
+        
+        data.push({
+          Quarter_End_Date: quarter.dateValue,
+          Division: division,
+          Location: location,
+          BE_Faculty_Headcount: beFacultyCount,
+          BE_Staff_Headcount: beStaffCount,
+          NBE_Faculty_Headcount: 0, // Typically minimal
+          NBE_Staff_Headcount: 0, // Typically minimal  
+          NBE_Student_Worker_Headcount: nbeStudentCount,
+          Total_Headcount: totalCount,
+          BE_New_Hires: beNewHires,
+          BE_Departures: beDepartures,
+          NBE_New_Hires: nbeNewHires,
+          NBE_Departures: nbeDepartures,
+          // Additional metrics for enhanced analytics
+          Open_Positions: Math.floor(Math.random() * 8),
+          Average_Time_to_Fill: Math.floor(30 + Math.random() * 45),
+          Retention_Rate_Percent: (88 + Math.random() * 10).toFixed(1)
+        });
+      });
+    });
+  });
+  
+  return data;
+};
+
+/**
+ * Generate Location Breakdown sheet
+ */
+const generateLocationBreakdownSheet = (quarters) => {
+  const locations = ['Omaha Campus', 'Phoenix Campus', 'Remote Work', 'Lincoln Campus'];
+  const data = [];
+  
+  quarters.forEach(quarter => {
+    let totalEmployees = 0;
+    const locationTotals = [];
+    
+    locations.forEach(location => {
+      const multiplier = location === 'Omaha Campus' ? 0.75 : 
+                       location === 'Phoenix Campus' ? 0.20 : 
+                       location === 'Remote Work' ? 0.03 : 0.02;
+      
+      const employees = Math.floor(3200 * multiplier * getQuarterMultiplier(quarter.quarter));
+      totalEmployees += employees;
+      
+      locationTotals.push({
+        Quarter_End_Date: quarter.dateValue,
+        Location: location,
+        Total_Employees: employees,
+        Faculty_Count: Math.floor(employees * 0.58),
+        Staff_Count: Math.floor(employees * 0.37),
+        Student_Workers: Math.floor(employees * 0.05),
+        Percentage_of_Total: 0, // Will be calculated
+        Growth_Rate_Percent: (Math.random() * 6 - 3).toFixed(1) // -3% to +3%
+      });
+    });
+    
+    // Calculate percentages
+    locationTotals.forEach(item => {
+      item.Percentage_of_Total = ((item.Total_Employees / totalEmployees) * 100).toFixed(1);
+      data.push(item);
+    });
+  });
+  
+  return data;
+};
+
+/**
+ * Generate Division Analysis sheet
+ */
+const generateDivisionAnalysisSheet = (quarters) => {
+  const divisions = [
+    'Arts & Sciences', 'School of Medicine', 'Medicine', 'Pharmacy & Health Professions',
+    'Dentistry', 'Business', 'Engineering', 'Education', 'Nursing', 'Law'
+  ];
+  const data = [];
+  
+  quarters.forEach(quarter => {
+    divisions.forEach(division => {
+      const multiplier = getDivisionMultiplier(division);
+      const quarterMultiplier = getQuarterMultiplier(quarter.quarter);
+      const totalEmployees = Math.floor(320 * multiplier * quarterMultiplier);
+      
+      const facultyCount = Math.floor(totalEmployees * (0.55 + Math.random() * 0.15));
+      const staffCount = totalEmployees - facultyCount;
+      
+      data.push({
+        Quarter_End_Date: quarter.dateValue,
+        Division: division,
+        Total_Headcount: totalEmployees,
+        Faculty_Headcount: facultyCount,
+        Staff_Headcount: staffCount,
+        Faculty_to_Staff_Ratio: (facultyCount / staffCount).toFixed(2),
+        Average_Faculty_Tenure: (5 + Math.random() * 8).toFixed(1),
+        Average_Staff_Tenure: (4 + Math.random() * 6).toFixed(1),
+        Division_Growth_Rate: (Math.random() * 8 - 4).toFixed(1), // -4% to +4%
+        Budget_per_Employee: Math.floor(75000 + Math.random() * 50000)
+      });
+    });
+  });
+  
+  return data;
+};
+
+/**
+ * Generate Hiring Activity sheet
+ */
+const generateHiringActivitySheet = (quarters) => {
+  const data = [];
+  
+  quarters.forEach(quarter => {
+    // Generate monthly data for the quarter
+    const months = getMonthsInQuarter(quarter.quarter);
+    
+    months.forEach(month => {
+      const facultyHires = Math.floor(15 + Math.random() * 25);
+      const staffHires = Math.floor(20 + Math.random() * 35);
+      const studentHires = Math.floor(8 + Math.random() * 15);
+      
+      const facultyDepartures = Math.floor(12 + Math.random() * 18);
+      const staffDepartures = Math.floor(15 + Math.random() * 25);
+      const studentDepartures = Math.floor(6 + Math.random() * 12);
+      
+      data.push({
+        Quarter_End_Date: quarter.dateValue,
+        Month: month,
+        Faculty_New_Hires: facultyHires,
+        Staff_New_Hires: staffHires,
+        Student_New_Hires: studentHires,
+        Total_New_Hires: facultyHires + staffHires + studentHires,
+        Faculty_Departures: facultyDepartures,
+        Staff_Departures: staffDepartures,
+        Student_Departures: studentDepartures,
+        Total_Departures: facultyDepartures + staffDepartures + studentDepartures,
+        Net_Change: (facultyHires + staffHires + studentHires) - (facultyDepartures + staffDepartures + studentDepartures),
+        Time_to_Fill_Days: Math.floor(25 + Math.random() * 40),
+        Cost_per_Hire: Math.floor(3000 + Math.random() * 2000)
+      });
+    });
+  });
+  
+  return data;
+};
+
+/**
+ * Generate Demographics sheet
+ */
+const generateDemographicsSheet = (quarters) => {
+  const data = [];
+  
+  quarters.forEach(quarter => {
+    const totalEmployees = Math.floor(3200 * getQuarterMultiplier(quarter.quarter));
+    
+    data.push({
+      Quarter_End_Date: quarter.dateValue,
+      Total_Employees: totalEmployees,
+      Average_Age: (40 + Math.random() * 8).toFixed(1),
+      Average_Tenure_Years: (6.5 + Math.random() * 4).toFixed(1),
+      Age_22_30_Count: Math.floor(totalEmployees * 0.25),
+      Age_31_40_Count: Math.floor(totalEmployees * 0.30),
+      Age_41_50_Count: Math.floor(totalEmployees * 0.25),
+      Age_51_65_Count: Math.floor(totalEmployees * 0.20),
+      Tenure_0_2_Years: Math.floor(totalEmployees * 0.30),
+      Tenure_3_5_Years: Math.floor(totalEmployees * 0.25),
+      Tenure_6_10_Years: Math.floor(totalEmployees * 0.25),
+      Tenure_10_Plus_Years: Math.floor(totalEmployees * 0.20),
+      Gender_Male_Percent: (48 + Math.random() * 4).toFixed(1),
+      Gender_Female_Percent: (52 - Math.random() * 4).toFixed(1),
+      Diversity_Index: Math.floor(30 + Math.random() * 15),
+      Remote_Workers_Count: Math.floor(totalEmployees * 0.15),
+      Part_Time_Employees: Math.floor(totalEmployees * 0.08)
+    });
+  });
+  
+  return data;
+};
+
+/**
+ * Create Oracle HCM Mapping Guide
+ */
+const createOracleHCMMappingGuide = () => {
+  return [
+    {
+      Template_Column: 'Quarter_End_Date',
+      Oracle_HCM_Field: 'EFFECTIVE_END_DATE or PERIOD_END_DATE',
+      Description: 'Last day of the quarter in YYYY-MM-DD format',
+      Sample_Oracle_Value: '31-DEC-2024',
+      Sample_Template_Value: '2024-12-31',
+      Transformation_Notes: 'Convert Oracle date format to YYYY-MM-DD',
+      Required: 'Yes'
+    },
+    {
+      Template_Column: 'Division',
+      Oracle_HCM_Field: 'ORGANIZATION_NAME or BUSINESS_GROUP',
+      Description: 'Academic or administrative division',
+      Sample_Oracle_Value: 'College of Arts and Sciences',
+      Sample_Template_Value: 'Arts & Sciences',
+      Transformation_Notes: 'Standardize division names for consistency',
+      Required: 'Yes'
+    },
+    {
+      Template_Column: 'Location',
+      Oracle_HCM_Field: 'LOCATION_NAME or WORK_LOCATION',
+      Description: 'Campus or facility location',
+      Sample_Oracle_Value: 'Omaha Main Campus',
+      Sample_Template_Value: 'Omaha Campus',
+      Transformation_Notes: 'Use standardized location names',
+      Required: 'Yes'
+    },
+    {
+      Template_Column: 'BE_Faculty_Headcount',
+      Oracle_HCM_Field: 'COUNT(*) WHERE JOB_FAMILY=Faculty AND BENEFIT_ELIGIBLE=Y',
+      Description: 'Count of benefit eligible faculty',
+      Sample_Oracle_Value: 'Query result: 125',
+      Sample_Template_Value: '125',
+      Transformation_Notes: 'Aggregate count by quarter/division/location',
+      Required: 'Yes'
+    },
+    {
+      Template_Column: 'BE_Staff_Headcount',
+      Oracle_HCM_Field: 'COUNT(*) WHERE JOB_FAMILY=Staff AND BENEFIT_ELIGIBLE=Y',
+      Description: 'Count of benefit eligible staff',
+      Sample_Oracle_Value: 'Query result: 85',
+      Sample_Template_Value: '85',
+      Transformation_Notes: 'Aggregate count by quarter/division/location',
+      Required: 'Yes'
+    },
+    {
+      Template_Column: 'NBE_Student_Worker_Headcount',
+      Oracle_HCM_Field: 'COUNT(*) WHERE JOB_FAMILY=Student AND BENEFIT_ELIGIBLE=N',
+      Description: 'Count of non-benefit eligible student workers',
+      Sample_Oracle_Value: 'Query result: 25',
+      Sample_Template_Value: '25',
+      Transformation_Notes: 'Aggregate count by quarter/division/location',
+      Required: 'No'
+    },
+    {
+      Template_Column: 'BE_New_Hires',
+      Oracle_HCM_Field: 'COUNT(*) WHERE HIRE_DATE BETWEEN quarter_start AND quarter_end',
+      Description: 'New benefit eligible hires in quarter',
+      Sample_Oracle_Value: 'Query result: 8',
+      Sample_Template_Value: '8',
+      Transformation_Notes: 'Filter by hire date within quarter',
+      Required: 'No'
+    },
+    {
+      Template_Column: 'BE_Departures',
+      Oracle_HCM_Field: 'COUNT(*) WHERE TERMINATION_DATE BETWEEN quarter_start AND quarter_end',
+      Description: 'Benefit eligible departures in quarter',
+      Sample_Oracle_Value: 'Query result: 5',
+      Sample_Template_Value: '5',
+      Transformation_Notes: 'Filter by termination date within quarter',
+      Required: 'No'
+    }
+  ];
+};
+
+/**
+ * Create Combined Workforce Instructions
+ */
+const createCombinedWorkforceInstructions = () => {
+  return [
+    {
+      Step: 1,
+      Section: 'Overview',
+      Instruction: 'This template supports the Combined Workforce Analytics Dashboard',
+      Details: 'Multi-tab design optimized for Oracle HCM data integration with comprehensive workforce metrics.',
+      Required_Action: 'Review all tabs and understand the data structure before beginning'
+    },
+    {
+      Step: 2,
+      Section: 'Data Preparation',
+      Instruction: 'Export quarterly data from Oracle HCM',
+      Details: 'Use Oracle standard reports or custom queries to extract headcount by division, location, and quarter.',
+      Required_Action: 'Generate aggregated counts - do not export individual employee records'
+    },
+    {
+      Step: 3,
+      Section: 'Data Mapping',
+      Instruction: 'Use the Oracle_HCM_Mapping tab for field mapping',
+      Details: 'This tab provides exact Oracle field names and transformation instructions for each template column.',
+      Required_Action: 'Map your Oracle fields to template columns using the provided guide'
+    },
+    {
+      Step: 4,
+      Section: 'Primary Data Entry',
+      Instruction: 'Complete the Summary_Data tab first',
+      Details: 'This is the main tab used for Firebase import. All other tabs provide supplementary analytics.',
+      Required_Action: 'Ensure all required fields are completed with accurate aggregate counts'
+    },
+    {
+      Step: 5,
+      Section: 'Data Validation',
+      Instruction: 'Verify totals and check for consistency',
+      Details: 'Total_Headcount should equal sum of BE_Faculty + BE_Staff + NBE_Student_Worker counts.',
+      Required_Action: 'Use built-in Excel formulas to validate data accuracy'
+    },
+    {
+      Step: 6,
+      Section: 'Upload Process',
+      Instruction: 'Save as .xlsx and upload via Excel Integration Dashboard',
+      Details: 'The system will automatically detect and process the multi-tab structure.',
+      Required_Action: 'Upload the complete Excel file - system will process all relevant tabs'
+    },
+    {
+      Step: 7,
+      Section: 'Dashboard Verification',
+      Instruction: 'Review the Combined Workforce Analytics Dashboard',
+      Details: 'Verify all charts and metrics display correctly with your uploaded data.',
+      Required_Action: 'Check summary cards, trend charts, and division breakdowns for accuracy'
+    }
+  ];
+};
+
+// Helper functions
+const getDivisionMultiplier = (division) => ({
+  'Arts & Sciences': 1.2,
+  'School of Medicine': 1.4,
+  'Medicine': 1.3,
+  'Pharmacy & Health Professions': 0.8,
+  'Dentistry': 0.6,
+  'Business': 0.9,
+  'Engineering': 0.7,
+  'Education': 0.5,
+  'Nursing': 0.8,
+  'Law': 0.4
+})[division] || 1.0;
+
+const getQuarterMultiplier = (quarter) => ({
+  'Q1-2024': 0.95,
+  'Q2-2024': 0.97,
+  'Q3-2024': 0.98,
+  'Q4-2024': 1.0,
+  'Q1-2025': 1.02,
+  'Q2-2025': 1.04,
+  'Q3-2025': 1.05,
+  'Q4-2025': 1.06
+})[quarter] || 1.0;
+
+const getMonthsInQuarter = (quarter) => {
+  const quarterMap = {
+    'Q1': ['January', 'February', 'March'],
+    'Q2': ['April', 'May', 'June'],
+    'Q3': ['July', 'August', 'September'],
+    'Q4': ['October', 'November', 'December']
+  };
+  const quarterNum = quarter.substring(0, 2);
+  return quarterMap[quarterNum] || ['Month 1', 'Month 2', 'Month 3'];
+};
+
+/**
+ * Add data validation to Summary Data sheet
+ */
+const addSummaryDataValidation = (worksheet) => {
+  if (!worksheet['!comments']) {
+    worksheet['!comments'] = [];
+  }
+  
+  // Add header comments for key fields
+  const headerComments = {
+    'A1': 'Quarter end date in YYYY-MM-DD format (e.g., 2024-12-31)',
+    'B1': 'Standard division name (see Oracle_HCM_Mapping tab)',
+    'C1': 'Campus location (see Oracle_HCM_Mapping tab)',
+    'D1': 'Count of benefit eligible faculty members',
+    'E1': 'Count of benefit eligible staff members',
+    'I1': 'Total headcount (should equal sum of individual counts)'
+  };
+  
+  Object.entries(headerComments).forEach(([cell, comment]) => {
+    worksheet['!comments'].push({
+      ref: cell,
+      author: 'Template',
+      t: comment
+    });
+  });
+};
+
+/**
+ * Download Combined Workforce Template
+ */
+export const downloadCombinedWorkforceTemplate = (filename = 'Combined_Workforce_Analytics_Template.xlsx') => {
+  const workbook = generateCombinedWorkforceTemplate();
+  XLSX.writeFile(workbook, filename);
+  return filename;
+};
+
 export default {
   generateComprehensiveTemplate,
   downloadComprehensiveTemplate,
@@ -698,5 +1174,7 @@ export default {
   generateQuarterSampleData,
   createDataDictionary,
   createInstructionsSheet,
-  createValidationRulesSheet
+  createValidationRulesSheet,
+  generateCombinedWorkforceTemplate,
+  downloadCombinedWorkforceTemplate
 };

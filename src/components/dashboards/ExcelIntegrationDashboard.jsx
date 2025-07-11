@@ -9,13 +9,15 @@ import {
   Upload,
   ArrowRight,
   Calculator,
-  FileSpreadsheet
+  FileSpreadsheet,
+  Download
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import FileUploader from '../ui/FileUploader';
 import DataSourceManager from '../ui/DataSourceManager';
 import { useDataSource } from '../../contexts/DataSourceContext';
 import firebaseService from '../../services/FirebaseService';
+import { downloadCombinedWorkforceTemplate } from '../../utils/excelTemplateGenerator';
 
 const ExcelIntegrationDashboard = () => {
   const { state, actions } = useDataSource();
@@ -232,6 +234,22 @@ const ExcelIntegrationDashboard = () => {
     navigate('/test/excel-upload');
   };
 
+  // Download comprehensive template for Combined Workforce Analytics
+  const handleDownloadTemplate = () => {
+    try {
+      downloadCombinedWorkforceTemplate();
+      setFirebaseStatus({
+        status: 'success',
+        message: 'Template downloaded successfully! Use this comprehensive template to upload quarterly workforce data.'
+      });
+    } catch (error) {
+      setFirebaseStatus({
+        status: 'error',
+        message: `Failed to download template: ${error.message}`
+      });
+    }
+  };
+
   // Clear Firebase database for testing
   const clearDatabase = async () => {
     const currentQuarter = 'Q1-2025'; // Default quarter for testing
@@ -355,6 +373,13 @@ const ExcelIntegrationDashboard = () => {
             Test Excel Uploads
           </button>
           <button
+            onClick={handleDownloadTemplate}
+            className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+          >
+            <Download size={16} />
+            Download Template
+          </button>
+          <button
             onClick={clearDatabase}
             disabled={clearingDatabase}
             className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 transition-colors"
@@ -439,27 +464,51 @@ const ExcelIntegrationDashboard = () => {
 
       {/* Help Section */}
       <div className="bg-blue-50 rounded-lg border border-blue-200 p-6">
-        <h3 className="text-lg font-semibold text-blue-900 mb-3">Supported Data Formats</h3>
+        <div className="flex justify-between items-start mb-4">
+          <h3 className="text-lg font-semibold text-blue-900">Comprehensive Excel Template</h3>
+          <button
+            onClick={handleDownloadTemplate}
+            className="flex items-center gap-2 px-3 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm"
+          >
+            <Download size={14} />
+            Download Template
+          </button>
+        </div>
         
-        <div>
-          <h4 className="font-medium text-blue-800 mb-2">Quarterly Aggregate Data (Only Supported Format)</h4>
-          <div className="text-sm space-y-1">
-            <p className="text-blue-700">
-              <strong>Required:</strong> Quarter_End_Date, Division, Location, BE_Faculty_Headcount, BE_Staff_Headcount
-            </p>
-            <p className="text-blue-600">
-              <strong>Optional:</strong> Total_Headcount, BE_New_Hires, BE_Departures, NBE_New_Hires, NBE_Departures
-            </p>
-            <p className="text-blue-800 mt-2">
-              <strong>Privacy Note:</strong> Individual employee records are NOT supported for security and privacy reasons.
+        <div className="space-y-4">
+          <div>
+            <h4 className="font-medium text-blue-800 mb-2">Multi-Tab Template Features</h4>
+            <div className="text-sm space-y-1 text-blue-700">
+              <p><strong>✓ Summary Data:</strong> Primary aggregate data for Firebase import</p>
+              <p><strong>✓ Location Breakdown:</strong> Campus-specific workforce metrics</p>
+              <p><strong>✓ Division Analysis:</strong> Department-level employee composition</p>
+              <p><strong>✓ Hiring Activity:</strong> New hires and departures by quarter</p>
+              <p><strong>✓ Demographics:</strong> Age groups, tenure, and diversity metrics</p>
+              <p><strong>✓ Oracle HCM Mapping:</strong> Field mapping guide for easy data transfer</p>
+              <p><strong>✓ Instructions:</strong> Step-by-step usage guide</p>
+            </div>
+          </div>
+
+          <div className="bg-blue-100 rounded p-3">
+            <p className="text-sm text-blue-800">
+              <strong>Oracle HCM Ready:</strong> Template includes field mapping guide to easily transform your Oracle HCM CSV exports into our required format.
             </p>
           </div>
-        </div>
 
-        <div className="mt-4 p-3 bg-blue-100 rounded">
-          <p className="text-sm text-blue-800">
-            <strong>Aggregate Data Only:</strong> Upload quarterly aggregates only - no individual employee data for privacy and security.
-          </p>
+          <div>
+            <h4 className="font-medium text-blue-800 mb-2">Data Requirements</h4>
+            <div className="text-sm space-y-1">
+              <p className="text-blue-700">
+                <strong>Required:</strong> Quarter_End_Date, Division, Location, BE_Faculty_Headcount, BE_Staff_Headcount
+              </p>
+              <p className="text-blue-600">
+                <strong>Optional:</strong> Total_Headcount, BE_New_Hires, BE_Departures, NBE_New_Hires, NBE_Departures
+              </p>
+              <p className="text-blue-800 mt-2">
+                <strong>Privacy Note:</strong> Individual employee records are NOT supported for security and privacy reasons.
+              </p>
+            </div>
+          </div>
         </div>
       </div>
 
