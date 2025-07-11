@@ -702,6 +702,13 @@ const CombinedWorkforceDashboard = () => {
 
   // Generate quarter-responsive data for New Hires vs Leavers chart
   useEffect(() => {
+    // If we're in empty state, don't generate any chart data
+    if (dataSource === 'empty') {
+      console.log('Using empty state for StartersLeaversChart');
+      setStartersLeaversData([]);
+      return;
+    }
+    
     if (headcountData.newHires?.value !== undefined && headcountData.leavers?.value !== undefined) {
       console.log('Generating StartersLeaversData for quarter:', selectedQuarter);
       
@@ -722,7 +729,7 @@ const CombinedWorkforceDashboard = () => {
       console.log('No headcountData available for StartersLeaversChart generation');
       setStartersLeaversData([]);
     }
-  }, [headcountData, selectedQuarter]);
+  }, [headcountData, selectedQuarter, dataSource]);
 
   // Helper function to generate 6 months of data around selected quarter
   const generateMonthsForQuarter = (quarter, avgHires, avgLeavers) => {

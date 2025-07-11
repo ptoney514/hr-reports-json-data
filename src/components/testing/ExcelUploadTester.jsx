@@ -27,14 +27,6 @@ const ExcelUploadTester = () => {
   // Test scenarios
   const testScenarios = [
     {
-      id: 'individual-employees',
-      name: 'Individual Employee Records',
-      description: 'Test upload of individual employee records with personal data',
-      expectedColumns: ['Employee_ID', 'First_Name', 'Last_Name', 'Department', 'Division'],
-      expectedRows: 150,
-      dataType: 'individual'
-    },
-    {
       id: 'quarterly-aggregates',
       name: 'Quarterly Aggregate Data',
       description: 'Test upload of quarterly summary data by division and location',

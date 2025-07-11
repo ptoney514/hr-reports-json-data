@@ -106,8 +106,11 @@ const ExcelIntegrationDashboard = () => {
         netChange: totals.newHires - totals.departures
       },
       headcountChange: totals.newHires - totals.departures,
-      version: '1.0',
-      dataSource: 'uploaded_csv'
+      version: '2.0',
+      dataSource: 'aggregate_quarterly_upload',
+      lastUpdated: new Date(),
+      uploadSource: 'Excel Integration Dashboard',
+      dataType: 'aggregate'
     };
   };
 
@@ -438,36 +441,24 @@ const ExcelIntegrationDashboard = () => {
       <div className="bg-blue-50 rounded-lg border border-blue-200 p-6">
         <h3 className="text-lg font-semibold text-blue-900 mb-3">Supported Data Formats</h3>
         
-        <div className="grid md:grid-cols-2 gap-6">
-          <div>
-            <h4 className="font-medium text-blue-800 mb-2">Individual Employee Records</h4>
-            <div className="text-sm space-y-1">
-              <p className="text-blue-700">
-                <strong>Required:</strong> Employee_ID, First_Name, Last_Name, Department, Division, Position
-              </p>
-              <p className="text-blue-600">
-                <strong>Optional:</strong> Location, Employment_Status, Hire_Date, Salary, Employee_Type
-              </p>
-            </div>
-          </div>
-          
-          <div>
-            <h4 className="font-medium text-blue-800 mb-2">Quarterly Aggregate Data</h4>
-            <div className="text-sm space-y-1">
-              <p className="text-blue-700">
-                <strong>Required:</strong> Quarter_End_Date, Division, Location, BE_Faculty_Headcount, BE_Staff_Headcount
-              </p>
-              <p className="text-blue-600">
-                <strong>Optional:</strong> Total_Headcount, BE_New_Hires, BE_Departures, NBE_New_Hires, NBE_Departures
-              </p>
-            </div>
+        <div>
+          <h4 className="font-medium text-blue-800 mb-2">Quarterly Aggregate Data (Only Supported Format)</h4>
+          <div className="text-sm space-y-1">
+            <p className="text-blue-700">
+              <strong>Required:</strong> Quarter_End_Date, Division, Location, BE_Faculty_Headcount, BE_Staff_Headcount
+            </p>
+            <p className="text-blue-600">
+              <strong>Optional:</strong> Total_Headcount, BE_New_Hires, BE_Departures, NBE_New_Hires, NBE_Departures
+            </p>
+            <p className="text-blue-800 mt-2">
+              <strong>Privacy Note:</strong> Individual employee records are NOT supported for security and privacy reasons.
+            </p>
           </div>
         </div>
 
         <div className="mt-4 p-3 bg-blue-100 rounded">
           <p className="text-sm text-blue-800">
-            <strong>Smart Detection:</strong> The system automatically detects your data format and processes it accordingly. 
-            Upload individual employee records for detailed analysis or quarterly aggregates for dashboard metrics.
+            <strong>Aggregate Data Only:</strong> Upload quarterly aggregates only - no individual employee data for privacy and security.
           </p>
         </div>
       </div>

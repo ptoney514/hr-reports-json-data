@@ -632,39 +632,6 @@ const addDataValidationToSheet = (worksheet, data) => {
   });
 };
 
-/**
- * Add validation to employee data sheet
- */
-const addEmployeeDataValidation = (worksheet) => {
-  // Similar to quarter validation, add comments for employee fields
-  const employeeComments = {
-    'Employee_ID': 'Must be unique identifier for each employee',
-    'Employee_Type': 'Must be: Faculty, Staff, Student, or Administration',
-    'Hire_Date': 'Use YYYY-MM-DD format (e.g., 2020-08-15)',
-    'Salary': 'Annual salary amount (optional, for confidential data)'
-  };
-  
-  if (!worksheet['!comments']) {
-    worksheet['!comments'] = [];
-  }
-  
-  Object.entries(employeeComments).forEach(([field, comment]) => {
-    // Find column index for field
-    const range = XLSX.utils.decode_range(worksheet['!ref']);
-    for (let col = range.s.c; col <= range.e.c; col++) {
-      const cellRef = XLSX.utils.encode_cell({ r: 0, c: col });
-      const cell = worksheet[cellRef];
-      if (cell && cell.v === field) {
-        worksheet['!comments'].push({
-          ref: cellRef,
-          author: 'Template',
-          t: comment
-        });
-        break;
-      }
-    }
-  });
-};
 
 /**
  * Get field-specific comment for data validation

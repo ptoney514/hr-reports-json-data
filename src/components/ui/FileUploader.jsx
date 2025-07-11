@@ -9,8 +9,8 @@ const FileUploader = ({
   acceptedTypes = ['xlsx', 'xls', 'csv'],
   maxFileSize = 10 * 1024 * 1024, // 10MB
   expectedColumns = [],
-  title = "Upload Employee Data",
-  description = "Drag and drop your Excel or CSV file here, or click to browse",
+  title = "Upload Workforce Data",
+  description = "Drag and drop your Excel or CSV file with aggregate quarterly data here, or click to browse",
   className = ""
 }) => {
   const [uploadState, setUploadState] = useState('idle'); // idle, uploading, validating, success, error
@@ -125,24 +125,31 @@ const FileUploader = ({
       Object.values(row).every(value => !value || value.toString().trim() === '')
     ).length;
 
-    // Check for duplicate employee IDs
-    const idFields = ['employee_id', 'employeeid', 'id', 'emp_id'];
-    const idField = parsedData.headers.find(h => 
-      idFields.some(id => h.toLowerCase().includes(id))
+    // Check for duplicate quarter/division/location combinations
+    const quarterField = parsedData.headers.find(h => 
+      h.toLowerCase().includes('quarter')
+    );
+    const divisionField = parsedData.headers.find(h => 
+      h.toLowerCase().includes('division')
+    );
+    const locationField = parsedData.headers.find(h => 
+      h.toLowerCase().includes('location')
     );
     
-    if (idField) {
-      const ids = data.map(row => row[idField]).filter(id => id);
-      const uniqueIds = new Set(ids);
-      results.dataQuality.duplicateIds = ids.length - uniqueIds.size;
+    if (quarterField && divisionField && locationField) {
+      const combinations = data.map(row => 
+        `${row[quarterField]}-${row[divisionField]}-${row[locationField]}`
+      ).filter(combo => combo);
+      const uniqueCombinations = new Set(combinations);
+      results.dataQuality.duplicateIds = combinations.length - uniqueCombinations.size;
       
       if (results.dataQuality.duplicateIds > 0) {
-        results.warnings.push(`Found ${results.dataQuality.duplicateIds} duplicate employee IDs`);
+        results.warnings.push(`Found ${results.dataQuality.duplicateIds} duplicate quarter/division/location combinations`);
       }
     }
 
     // Check for missing required fields
-    const requiredFields = ['name', 'department', 'position'];
+    const requiredFields = ['quarter', 'division', 'location'];
     requiredFields.forEach(field => {
       const found = parsedData.headers.find(h => 
         h.toLowerCase().includes(field.toLowerCase())
@@ -255,36 +262,40 @@ const FileUploader = ({
   const downloadTemplate = () => {
     const sampleData = [
       {
-        'Employee_ID': 'EMP001',
-        'First_Name': 'John',
-        'Last_Name': 'Doe',
-        'Department': 'Academic Affairs',
+        'Quarter_End_Date': '2024-12-31',
         'Division': 'Arts & Sciences',
-        'Position': 'Professor',
         'Location': 'Omaha Campus',
-        'Employment_Status': 'Full-time',
-        'Hire_Date': '2020-08-15',
-        'Salary': '75000',
-        'Employee_Type': 'Faculty'
+        'BE_Faculty_Headcount': 125,
+        'BE_Staff_Headcount': 85,
+        'NBE_Faculty_Headcount': 0,
+        'NBE_Staff_Headcount': 0,
+        'NBE_Student_Worker_Headcount': 25,
+        'Total_Headcount': 235,
+        'BE_New_Hires': 5,
+        'BE_Departures': 3,
+        'NBE_New_Hires': 8,
+        'NBE_Departures': 6
       },
       {
-        'Employee_ID': 'EMP002',
-        'First_Name': 'Jane',
-        'Last_Name': 'Smith',
-        'Department': 'Student Affairs',
-        'Division': 'Student Services',
-        'Position': 'Advisor',
+        'Quarter_End_Date': '2024-12-31',
+        'Division': 'School of Medicine',
         'Location': 'Omaha Campus',
-        'Employment_Status': 'Full-time',
-        'Hire_Date': '2019-06-01',
-        'Salary': '45000',
-        'Employee_Type': 'Staff'
+        'BE_Faculty_Headcount': 95,
+        'BE_Staff_Headcount': 110,
+        'NBE_Faculty_Headcount': 0,
+        'NBE_Staff_Headcount': 5,
+        'NBE_Student_Worker_Headcount': 15,
+        'Total_Headcount': 225,
+        'BE_New_Hires': 3,
+        'BE_Departures': 2,
+        'NBE_New_Hires': 4,
+        'NBE_Departures': 3
       }
     ];
 
     const worksheet = XLSX.utils.json_to_sheet(sampleData);
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Employee_Data');
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Quarterly_Data');
     XLSX.writeFile(workbook, 'workforce_data_template.xlsx');
   };
 
@@ -327,7 +338,7 @@ const FileUploader = ({
           <input {...getInputProps()} />
           <Upload className="mx-auto h-12 w-12 text-gray-400 mb-4" />
           <p className="text-lg font-medium text-gray-900 mb-2">
-            {isDragActive ? 'Drop the file here' : 'Upload your employee data'}
+            {isDragActive ? 'Drop the file here' : 'Upload your workforce data'}
           </p>
           <p className="text-sm text-gray-600 mb-4">
             Supports .xlsx, .xls, and .csv files up to {(maxFileSize / 1024 / 1024).toFixed(1)}MB

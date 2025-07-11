@@ -289,11 +289,15 @@ const useFirebaseWorkforceData = (customFilters = {}) => {
           { range: '10+ years', count: Math.floor(firebaseData.totalEmployees * 0.20) }
         ]
       },
+      // Include version and dataSource at root level for test compatibility
+      version: firebaseData.version || '2.0',
+      dataSource: firebaseData.dataSource || 'firebase',
       metadata: {
         source: 'firebase',
         lastUpdated: firebaseData.lastUpdated,
         period: firebaseData.period,
-        version: firebaseData.version || '1.0'
+        version: firebaseData.version || '2.0',
+        dataSource: firebaseData.dataSource || 'firebase'
       }
     };
   }, []);
@@ -505,6 +509,10 @@ const useFirebaseWorkforceData = (customFilters = {}) => {
         ageGroups: data.demographics?.ageGroups || [],
         tenure: data.demographics?.tenure || []
       },
+
+      // Include version and dataSource at root level for tests
+      version: data?.version || '2.0',
+      dataSource: data?.dataSource || 'firebase',
 
       // Firebase-specific metadata
       firebase: {

@@ -5,94 +5,6 @@
 
 import * as XLSX from 'xlsx';
 
-/**
- * Generate realistic individual employee records
- */
-export const generateIndividualEmployeeData = (count = 100) => {
-  const divisions = [
-    'Arts & Sciences', 'School of Medicine', 'Medicine', 
-    'Pharmacy & Health Professions', 'Dentistry', 'Business', 
-    'Engineering', 'Education', 'Law', 'Nursing'
-  ];
-  
-  const departments = {
-    'Arts & Sciences': ['English', 'Mathematics', 'History', 'Psychology', 'Biology'],
-    'School of Medicine': ['Internal Medicine', 'Surgery', 'Pediatrics', 'Radiology', 'Pathology'],
-    'Medicine': ['Cardiology', 'Neurology', 'Oncology', 'Emergency Medicine', 'Family Medicine'],
-    'Pharmacy & Health Professions': ['Pharmacy', 'Physical Therapy', 'Occupational Therapy', 'Nursing', 'Public Health'],
-    'Dentistry': ['General Dentistry', 'Oral Surgery', 'Orthodontics', 'Periodontics', 'Endodontics'],
-    'Business': ['Accounting', 'Marketing', 'Management', 'Finance', 'Information Systems'],
-    'Engineering': ['Computer Science', 'Electrical Engineering', 'Mechanical Engineering', 'Civil Engineering', 'Biomedical Engineering'],
-    'Education': ['Elementary Education', 'Secondary Education', 'Special Education', 'Educational Leadership', 'Counseling'],
-    'Law': ['Constitutional Law', 'Criminal Law', 'Corporate Law', 'Environmental Law', 'Health Law'],
-    'Nursing': ['Adult Health', 'Pediatric Nursing', 'Mental Health', 'Community Health', 'Nurse Administration']
-  };
-
-  const positions = {
-    Faculty: ['Professor', 'Associate Professor', 'Assistant Professor', 'Instructor', 'Lecturer'],
-    Staff: ['Manager', 'Coordinator', 'Specialist', 'Analyst', 'Administrator', 'Assistant', 'Director']
-  };
-
-  const locations = ['Omaha Campus', 'Phoenix Campus'];
-  
-  const firstNames = [
-    'John', 'Jane', 'Michael', 'Sarah', 'David', 'Lisa', 'Robert', 'Jennifer', 'William', 'Jessica',
-    'James', 'Emily', 'Christopher', 'Ashley', 'Daniel', 'Melissa', 'Matthew', 'Amanda', 'Anthony', 'Nicole'
-  ];
-  
-  const lastNames = [
-    'Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller', 'Davis', 'Rodriguez', 'Martinez',
-    'Hernandez', 'Lopez', 'Gonzalez', 'Wilson', 'Anderson', 'Thomas', 'Taylor', 'Moore', 'Jackson', 'Martin'
-  ];
-
-  const employees = [];
-  
-  for (let i = 0; i < count; i++) {
-    const employeeType = Math.random() < 0.6 ? 'Faculty' : 'Staff'; // 60% faculty, 40% staff
-    const division = divisions[Math.floor(Math.random() * divisions.length)];
-    const department = departments[division][Math.floor(Math.random() * departments[division].length)];
-    const position = positions[employeeType][Math.floor(Math.random() * positions[employeeType].length)];
-    const location = Math.random() < 0.75 ? 'Omaha Campus' : 'Phoenix Campus'; // 75% Omaha, 25% Phoenix
-    const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
-    const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
-    
-    // Generate realistic hire dates (last 10 years)
-    const hireDate = new Date();
-    hireDate.setFullYear(hireDate.getFullYear() - Math.floor(Math.random() * 10));
-    hireDate.setMonth(Math.floor(Math.random() * 12));
-    hireDate.setDate(Math.floor(Math.random() * 28) + 1);
-    
-    // Generate realistic salaries based on type and position
-    let baseSalary;
-    if (employeeType === 'Faculty') {
-      baseSalary = position.includes('Professor') ? 
-        (position === 'Professor' ? 85000 : position === 'Associate Professor' ? 70000 : 55000) : 45000;
-    } else {
-      baseSalary = position.includes('Director') ? 75000 : 
-                   position.includes('Manager') ? 60000 : 45000;
-    }
-    
-    const salary = baseSalary + Math.floor(Math.random() * 20000) - 10000; // ±$10k variation
-
-    employees.push({
-      Employee_ID: `EMP${String(i + 1).padStart(4, '0')}`,
-      First_Name: firstName,
-      Last_Name: lastName,
-      Department: department,
-      Division: division,
-      Position: position,
-      Location: location,
-      Employee_Type: employeeType,
-      Employment_Status: Math.random() < 0.9 ? 'Full-time' : 'Part-time',
-      Hire_Date: hireDate.toISOString().split('T')[0],
-      Salary: salary,
-      Email: `${firstName.toLowerCase()}.${lastName.toLowerCase()}@university.edu`,
-      Phone: `(555) ${String(Math.floor(Math.random() * 900) + 100)}-${String(Math.floor(Math.random() * 9000) + 1000)}`
-    });
-  }
-  
-  return employees;
-};
 
 /**
  * Generate quarterly aggregate data
@@ -178,35 +90,18 @@ export const generateQuarterlyAggregateData = () => {
 };
 
 /**
- * Create and download Excel file with test data
+ * Create and download Excel file with test data (aggregate data only)
  */
-export const createTestExcelFile = (dataType = 'both', filename = null) => {
+export const createTestExcelFile = (dataType = 'aggregate', filename = null) => {
   const workbook = XLSX.utils.book_new();
   
-  if (dataType === 'individual' || dataType === 'both') {
-    const employeeData = generateIndividualEmployeeData(150);
-    const employeeSheet = XLSX.utils.json_to_sheet(employeeData);
-    XLSX.utils.book_append_sheet(workbook, employeeSheet, 'Employee_Records');
-  }
-  
-  if (dataType === 'aggregate' || dataType === 'both') {
-    const aggregateData = generateQuarterlyAggregateData();
-    const aggregateSheet = XLSX.utils.json_to_sheet(aggregateData);
-    XLSX.utils.book_append_sheet(workbook, aggregateSheet, 'Quarterly_Aggregates');
-  }
+  // Only support aggregate data
+  const aggregateData = generateQuarterlyAggregateData();
+  const aggregateSheet = XLSX.utils.json_to_sheet(aggregateData);
+  XLSX.utils.book_append_sheet(workbook, aggregateSheet, 'Quarterly_Aggregates');
   
   // Add a data dictionary sheet
   const dataDictionary = [
-    { Field: 'Employee_ID', Description: 'Unique employee identifier', Example: 'EMP0001' },
-    { Field: 'First_Name', Description: 'Employee first name', Example: 'John' },
-    { Field: 'Last_Name', Description: 'Employee last name', Example: 'Doe' },
-    { Field: 'Department', Description: 'Department name', Example: 'Mathematics' },
-    { Field: 'Division', Description: 'Division or college', Example: 'Arts & Sciences' },
-    { Field: 'Position', Description: 'Job title', Example: 'Professor' },
-    { Field: 'Location', Description: 'Campus location', Example: 'Omaha Campus' },
-    { Field: 'Employee_Type', Description: 'Type of employee', Example: 'Faculty' },
-    { Field: 'Employment_Status', Description: 'Employment status', Example: 'Full-time' },
-    { Field: 'Hire_Date', Description: 'Date of hire (YYYY-MM-DD)', Example: '2020-08-15' },
     { Field: 'Quarter_End_Date', Description: 'End date of quarter (YYYY-MM-DD)', Example: '2024-12-31' },
     { Field: 'BE_Faculty_Headcount', Description: 'Benefit eligible faculty count', Example: '25' },
     { Field: 'BE_Staff_Headcount', Description: 'Benefit eligible staff count', Example: '15' },
@@ -219,9 +114,7 @@ export const createTestExcelFile = (dataType = 'both', filename = null) => {
   XLSX.utils.book_append_sheet(workbook, dictionarySheet, 'Data_Dictionary');
   
   // Create filename if not provided
-  const defaultFilename = dataType === 'individual' ? 'test_employee_records.xlsx' :
-                         dataType === 'aggregate' ? 'test_quarterly_aggregates.xlsx' :
-                         'test_hr_data_complete.xlsx';
+  const defaultFilename = 'test_quarterly_aggregates.xlsx';
   
   const finalFilename = filename || defaultFilename;
   
@@ -292,12 +185,9 @@ export const createValidationTestData = () => {
 };
 
 /**
- * Export test datasets as files
+ * Export test datasets as files (aggregate data only)
  */
 export const exportTestDatasets = () => {
-  // Create individual employee records file
-  createTestExcelFile('individual', 'test_individual_employees.xlsx');
-  
   // Create quarterly aggregate file
   createTestExcelFile('aggregate', 'test_quarterly_aggregates.xlsx');
   
@@ -326,11 +216,6 @@ export const exportTestDatasets = () => {
   const q3Sheet = XLSX.utils.json_to_sheet(q3Data);
   XLSX.utils.book_append_sheet(comprehensiveWorkbook, q3Sheet, 'Q3_2024_Summary');
   
-  // Add Employee Master (sample)
-  const employeeMaster = generateIndividualEmployeeData(50);
-  const employeeSheet = XLSX.utils.json_to_sheet(employeeMaster);
-  XLSX.utils.book_append_sheet(comprehensiveWorkbook, employeeSheet, 'Employee_Master');
-  
   // Add Data Dictionary
   const dataDictionary = [
     { Field: 'Quarter_End_Date', Description: 'Quarter end date (YYYY-MM-DD)', Required: 'Yes', Example: '2025-03-31' },
@@ -348,7 +233,6 @@ export const exportTestDatasets = () => {
   XLSX.writeFile(comprehensiveWorkbook, 'HR_Analytics_Data_Template.xlsx');
   
   return [
-    'test_individual_employees.xlsx',
     'test_quarterly_aggregates.xlsx', 
     'test_validation_data.xlsx',
     'HR_Analytics_Data_Template.xlsx'
@@ -356,7 +240,6 @@ export const exportTestDatasets = () => {
 };
 
 export default {
-  generateIndividualEmployeeData,
   generateQuarterlyAggregateData,
   createTestExcelFile,
   createValidationTestData,
