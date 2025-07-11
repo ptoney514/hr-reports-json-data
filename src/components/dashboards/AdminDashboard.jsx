@@ -15,21 +15,26 @@ import {
 } from 'lucide-react';
 import { getQuarters } from '../../services/QuarterConfigService';
 import firebaseService from '../../services/FirebaseService';
-import DataGrid from '../admin/DataGrid';
-import PeriodSelector from '../admin/PeriodSelector';
+import QuarterlyDataTable from '../admin/QuarterlyDataTable';
+import SummaryCards from '../admin/SummaryCards';
+import TableFilters from '../admin/TableFilters';
 import DataImportExport from '../admin/DataImportExport';
 
 const AdminDashboard = () => {
   // State management
-  const [selectedPeriod, setSelectedPeriod] = useState('2025-Q1');
   const [selectedDashboard, setSelectedDashboard] = useState('workforce');
   const [isEditMode, setIsEditMode] = useState(false);
-  const [data, setData] = useState(null);
-  const [originalData, setOriginalData] = useState(null);
+  const [allQuartersData, setAllQuartersData] = useState({});
+  const [originalData, setOriginalData] = useState({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [status, setStatus] = useState(null);
   const [hasChanges, setHasChanges] = useState(false);
+  
+  // Filter states
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [dateRange, setDateRange] = useState({ start: '', end: '' });
 
   // Available dashboard types
   const dashboardTypes = [
@@ -40,37 +45,56 @@ const AdminDashboard = () => {
     { id: 'exitSurvey', label: 'Exit Survey Data', icon: BarChart3 }
   ];
 
-  // Load data for selected period and dashboard
-  const loadData = useCallback(async () => {
+  // Load data for all quarters of selected dashboard
+  const loadAllQuartersData = useCallback(async () => {
     setLoading(true);
     setError(null);
     
     try {
-      console.log(`Loading ${selectedDashboard} data for ${selectedPeriod}`);
+      console.log(`Loading all quarters for ${selectedDashboard} dashboard`);
       
-      const firebaseData = await firebaseService.getMetricsByDashboard(
-        selectedDashboard, 
-        selectedPeriod, 
-        'quarters'
-      );
+      // Get available quarters (last 8 quarters for better performance)
+      const quarters = getQuarters().slice(-8);
+      const quarterPromises = quarters.map(async (quarter) => {
+        try {
+          // Convert quarter format to Firebase format
+          let firebasePeriod = quarter.quarter;
+          if (quarter.quarter.match(/^Q\d-\d{4}$/)) {
+            firebasePeriod = quarter.quarter.replace(/^Q(\d)-(\d{4})$/, '$2-Q$1');
+          }
+          
+          const data = await firebaseService.getMetricsByDashboard(
+            selectedDashboard, 
+            firebasePeriod, 
+            'quarters'
+          );
+          
+          return data ? { [firebasePeriod]: data } : null;
+        } catch (error) {
+          console.warn(`Failed to load data for ${quarter.quarter}:`, error);
+          return null;
+        }
+      });
       
-      if (firebaseData) {
-        setData(firebaseData);
-        setOriginalData(JSON.parse(JSON.stringify(firebaseData))); // Deep copy
-        setStatus({
-          type: 'success',
-          message: `Successfully loaded ${selectedDashboard} data for ${selectedPeriod}`
-        });
-      } else {
-        setData(null);
-        setOriginalData(null);
-        setStatus({
-          type: 'warning',
-          message: `No ${selectedDashboard} data found for ${selectedPeriod}`
-        });
-      }
+      const results = await Promise.all(quarterPromises);
+      const allData = results.reduce((acc, result) => {
+        if (result) {
+          return { ...acc, ...result };
+        }
+        return acc;
+      }, {});
+      
+      setAllQuartersData(allData);
+      setOriginalData(JSON.parse(JSON.stringify(allData))); // Deep copy
+      
+      const quarterCount = Object.keys(allData).length;
+      setStatus({
+        type: 'success',
+        message: `Successfully loaded ${selectedDashboard} data for ${quarterCount} quarters`
+      });
+      
     } catch (err) {
-      console.error('Error loading data:', err);
+      console.error('Error loading quarters data:', err);
       setError(`Failed to load ${selectedDashboard} data: ${err.message}`);
       setStatus({
         type: 'error',
@@ -79,66 +103,93 @@ const AdminDashboard = () => {
     } finally {
       setLoading(false);
     }
-  }, [selectedPeriod, selectedDashboard]);
+  }, [selectedDashboard]);
 
-  // Load data when period or dashboard changes
+  // Load data when dashboard changes
   useEffect(() => {
-    loadData();
-  }, [loadData]);
+    loadAllQuartersData();
+  }, [loadAllQuartersData]);
 
-  // Handle data changes
-  const handleDataChange = useCallback((newData) => {
-    setData(newData);
-    setHasChanges(JSON.stringify(newData) !== JSON.stringify(originalData));
-  }, [originalData]);
+  // Handle single quarter data changes
+  const handleQuarterDataChange = useCallback((period, newData) => {
+    const updatedAllData = {
+      ...allQuartersData,
+      [period]: newData
+    };
+    setAllQuartersData(updatedAllData);
+    setHasChanges(JSON.stringify(updatedAllData) !== JSON.stringify(originalData));
+  }, [allQuartersData, originalData]);
 
   // Save changes to Firebase
   const saveChanges = async () => {
-    if (!data || !hasChanges) return;
+    if (!allQuartersData || !hasChanges) return;
 
     setLoading(true);
     setError(null);
 
     try {
-      // Add metadata for audit trail
-      const dataToSave = {
-        ...data,
-        lastUpdated: new Date(),
-        lastEditedBy: 'Admin Dashboard',
-        editTimestamp: new Date(),
-        version: data.version || '2.0'
-      };
+      let savedCount = 0;
+      const errors = [];
 
-      // Save to Firebase using the appropriate method
-      switch (selectedDashboard) {
-        case 'workforce':
-          await firebaseService.setWorkforceMetrics(selectedPeriod, dataToSave);
-          break;
-        case 'turnover':
-          await firebaseService.setTurnoverMetrics(selectedPeriod, dataToSave);
-          break;
-        case 'compliance':
-          await firebaseService.setComplianceMetrics(selectedPeriod, dataToSave);
-          break;
-        case 'recruiting':
-          await firebaseService.setRecruitingMetrics(selectedPeriod, dataToSave);
-          break;
-        case 'exitSurvey':
-          await firebaseService.setExitSurveyMetrics(selectedPeriod, dataToSave);
-          break;
-        default:
-          throw new Error(`Unknown dashboard type: ${selectedDashboard}`);
+      // Save each changed quarter
+      for (const [period, data] of Object.entries(allQuartersData)) {
+        // Only save if this quarter's data has changed
+        const originalQuarterData = originalData[period];
+        if (JSON.stringify(data) !== JSON.stringify(originalQuarterData)) {
+          try {
+            // Add metadata for audit trail
+            const dataToSave = {
+              ...data,
+              lastUpdated: new Date(),
+              lastEditedBy: 'Admin Dashboard',
+              editTimestamp: new Date(),
+              version: data.version || '2.0'
+            };
+
+            // Save to Firebase using the appropriate method
+            switch (selectedDashboard) {
+              case 'workforce':
+                await firebaseService.setWorkforceMetrics(period, dataToSave);
+                break;
+              case 'turnover':
+                await firebaseService.setTurnoverMetrics(period, dataToSave);
+                break;
+              case 'compliance':
+                await firebaseService.setComplianceMetrics(period, dataToSave);
+                break;
+              case 'recruiting':
+                await firebaseService.setRecruitingMetrics(period, dataToSave);
+                break;
+              case 'exitSurvey':
+                await firebaseService.setExitSurveyMetrics(period, dataToSave);
+                break;
+              default:
+                throw new Error(`Unknown dashboard type: ${selectedDashboard}`);
+            }
+            
+            savedCount++;
+          } catch (err) {
+            errors.push(`${period}: ${err.message}`);
+          }
+        }
       }
 
       // Update state
-      setOriginalData(JSON.parse(JSON.stringify(dataToSave)));
+      setOriginalData(JSON.parse(JSON.stringify(allQuartersData)));
       setHasChanges(false);
       setIsEditMode(false);
       
-      setStatus({
-        type: 'success',
-        message: `Successfully saved ${selectedDashboard} data for ${selectedPeriod}`
-      });
+      if (errors.length > 0) {
+        setStatus({
+          type: 'warning',
+          message: `Saved ${savedCount} quarters, but ${errors.length} failed: ${errors.join(', ')}`
+        });
+      } else {
+        setStatus({
+          type: 'success',
+          message: `Successfully saved ${savedCount} quarters of ${selectedDashboard} data`
+        });
+      }
 
     } catch (err) {
       console.error('Error saving data:', err);
@@ -154,7 +205,7 @@ const AdminDashboard = () => {
 
   // Cancel editing and revert changes
   const cancelEdit = () => {
-    setData(JSON.parse(JSON.stringify(originalData)));
+    setAllQuartersData(JSON.parse(JSON.stringify(originalData)));
     setHasChanges(false);
     setIsEditMode(false);
     setStatus({
@@ -163,14 +214,69 @@ const AdminDashboard = () => {
     });
   };
 
-  // Handle data import from file
-  const handleDataImport = useCallback((importedData) => {
-    setData(importedData);
-    setHasChanges(true);
+  // Handle filter functions
+  const handleBulkExport = useCallback(() => {
+    const exportData = {
+      dashboardType: selectedDashboard,
+      exportDate: new Date().toISOString(),
+      quarters: allQuartersData
+    };
+
+    const dataStr = JSON.stringify(exportData, null, 2);
+    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(dataBlob);
+    
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${selectedDashboard}-all-quarters-export.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
     setStatus({
-      type: 'info',
-      message: 'Data imported successfully. Remember to save changes to update Firebase.'
+      type: 'success',
+      message: `Exported ${Object.keys(allQuartersData).length} quarters of ${selectedDashboard} data`
     });
+  }, [allQuartersData, selectedDashboard]);
+
+  const handleBulkImport = useCallback(() => {
+    // Create hidden file input
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+    input.onchange = (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        try {
+          const importedData = JSON.parse(event.target.result);
+          if (importedData.quarters) {
+            setAllQuartersData(importedData.quarters);
+            setHasChanges(true);
+            setStatus({
+              type: 'info',
+              message: `Imported ${Object.keys(importedData.quarters).length} quarters. Remember to save changes.`
+            });
+          }
+        } catch (error) {
+          setStatus({
+            type: 'error',
+            message: `Failed to import data: ${error.message}`
+          });
+        }
+      };
+      reader.readAsText(file);
+    };
+    input.click();
+  }, []);
+
+  const resetFilters = useCallback(() => {
+    setSearchTerm('');
+    setStatusFilter('all');
+    setDateRange({ start: '', end: '' });
   }, []);
 
   return (
@@ -189,14 +295,8 @@ const AdminDashboard = () => {
       {/* Controls */}
       <div className="bg-white rounded-lg shadow-sm border p-6">
         <div className="flex flex-wrap gap-4 items-center justify-between">
-          {/* Period and Dashboard Selection */}
+          {/* Dashboard Selection */}
           <div className="flex gap-4 items-center">
-            <PeriodSelector 
-              selectedPeriod={selectedPeriod}
-              onPeriodChange={setSelectedPeriod}
-              className="min-w-[150px]"
-            />
-            
             <select
               value={selectedDashboard}
               onChange={(e) => setSelectedDashboard(e.target.value)}
@@ -208,12 +308,16 @@ const AdminDashboard = () => {
                 </option>
               ))}
             </select>
+            
+            <span className="text-sm text-gray-600">
+              {Object.keys(allQuartersData).length} quarters loaded
+            </span>
           </div>
 
           {/* Action Buttons */}
           <div className="flex gap-2">
             <button
-              onClick={loadData}
+              onClick={loadAllQuartersData}
               disabled={loading}
               className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:border-gray-400 disabled:opacity-50"
             >
@@ -221,8 +325,7 @@ const AdminDashboard = () => {
               Refresh
             </button>
 
-
-            {data && !isEditMode && (
+            {Object.keys(allQuartersData).length > 0 && !isEditMode && (
               <button
                 onClick={() => setIsEditMode(true)}
                 className="flex items-center gap-2 px-3 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700"
@@ -291,38 +394,48 @@ const AdminDashboard = () => {
         </div>
       )}
 
+      {/* Summary Cards */}
+      <SummaryCards 
+        allQuartersData={allQuartersData}
+        dashboardType={selectedDashboard}
+      />
+
+      {/* Table Filters */}
+      <TableFilters
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
+        statusFilter={statusFilter}
+        onStatusFilterChange={setStatusFilter}
+        dateRange={dateRange}
+        onDateRangeChange={setDateRange}
+        onReset={resetFilters}
+        onBulkExport={handleBulkExport}
+        onBulkImport={handleBulkImport}
+        quarterCount={Object.keys(allQuartersData).length}
+      />
+
       {/* Data Display */}
       {loading ? (
         <div className="bg-white rounded-lg shadow-sm border p-8">
           <div className="flex items-center justify-center">
             <RefreshCw className="animate-spin text-blue-500" size={24} />
-            <span className="ml-2 text-gray-600">Loading data...</span>
+            <span className="ml-2 text-gray-600">Loading quarters data...</span>
           </div>
         </div>
-      ) : data ? (
-        <>
-          <DataGrid
-            data={data}
-            isEditMode={isEditMode}
-            onChange={handleDataChange}
-            dashboardType={selectedDashboard}
-            period={selectedPeriod}
-          />
-          
-          {/* Import/Export Section */}
-          <DataImportExport
-            data={data}
-            onImport={handleDataImport}
-            dashboardType={selectedDashboard}
-            period={selectedPeriod}
-          />
-        </>
+      ) : Object.keys(allQuartersData).length > 0 ? (
+        <QuarterlyDataTable
+          allQuartersData={allQuartersData}
+          isEditMode={isEditMode}
+          onDataChange={handleQuarterDataChange}
+          dashboardType={selectedDashboard}
+          onQuarterSelect={(period) => console.log('Selected quarter:', period)}
+        />
       ) : (
         <div className="bg-white rounded-lg shadow-sm border p-8">
           <div className="text-center text-gray-500">
             <Database size={48} className="mx-auto mb-4 text-gray-400" />
             <h3 className="text-lg font-medium mb-2">No Data Found</h3>
-            <p>No {selectedDashboard} data available for {selectedPeriod}</p>
+            <p>No {selectedDashboard} data available across any quarters</p>
             <p className="text-sm mt-2">Upload data through the Excel Integration Dashboard first.</p>
           </div>
         </div>
