@@ -11,7 +11,8 @@ import {
   Shield,
   UserPlus,
   MessageSquare,
-  UsersRound
+  UsersRound,
+  Database
 } from 'lucide-react';
 import { announceToScreenReader } from '../../utils/accessibilityUtils';
 
@@ -71,6 +72,13 @@ const Navigation = () => {
       path: '/excel-integration',
       icon: Settings,
       isActive: isActive('/excel-integration')
+    },
+    {
+      id: 'admin',
+      label: 'Admin Dashboard',
+      path: '/admin',
+      icon: Database,
+      isActive: isActive('/admin')
     }
   ];
 
