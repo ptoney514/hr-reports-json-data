@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { BarChart3, Users, Building2, UserPlus, UserMinus, MapPin, Download, ChevronDown } from 'lucide-react';
+import { BarChart3, Users, Building2, UserPlus, UserMinus, MapPin, Download, ChevronDown, Database, Cloud, Settings } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import SummaryCard from '../ui/SummaryCard';
 import QuarterFilter, { CompactQuarterFilter } from '../ui/QuarterFilter';
@@ -57,10 +57,11 @@ const CombinedWorkforceDashboard = () => {
   });
   
   // Data source state
-  const [dataSource, setDataSource] = useState('sample'); // 'sample', 'firebase'
+  const [dataSource, setDataSource] = useState('sample'); // 'sample', 'firebase', 'empty'
   const [quarterlyData, setQuarterlyData] = useState(null);
   const [quarterConfigLoading, setQuarterConfigLoading] = useState(true);
   const [quarterConfigError, setQuarterConfigError] = useState(null);
+  const [testingMode, setTestingMode] = useState(false); // For manual testing controls
   
   // Additional metrics state for the 3 new components
   const [additionalMetrics, setAdditionalMetrics] = useState({
@@ -96,6 +97,33 @@ const CombinedWorkforceDashboard = () => {
   const [executiveSummary, setExecutiveSummary] = useState({ paragraph1: '', paragraph2: '' });
   const [locationData, setLocationData] = useState([]);
 
+  // Empty state data for testing
+  const emptyStateData = {
+    headcount: {
+      total: { value: 0, change: null, subtitle: "no data available", changeType: "percentage" },
+      faculty: { value: 0, change: null, subtitle: "no data available", changeType: "percentage", indicator: "green" },
+      staff: { value: 0, change: null, subtitle: "no data available", changeType: "percentage", indicator: "yellow" },
+      newHires: { value: 0, change: null, subtitle: "no data available", changeType: null, indicator: "teal" },
+      leavers: { value: 0, change: null, subtitle: "no data available", changeType: null, indicator: "blue" }
+    },
+    charts: {
+      fiveQuarter: [],
+      startersLeavers: [],
+      topDivisions: [],
+      turnoverReasons: [],
+      location: []
+    },
+    additionalMetrics: {
+      recentHires: { faculty: 0, staff: 0, students: 0 },
+      demographics: { averageTenure: 'N/A', averageAge: 'N/A', genderRatio: 'N/A', diversityIndex: 'N/A' },
+      campuses: {
+        omaha: { percentage: 0, employees: 0 },
+        phoenix: { percentage: 0, employees: 0 },
+        growthRate: 0
+      }
+    }
+  };
+
 
   // Handle filter changes
   const handleFilterChange = (newFilters) => {
@@ -110,15 +138,53 @@ const CombinedWorkforceDashboard = () => {
     setFilters(prev => ({ ...prev, reportingPeriod: newQuarter }));
   };
 
-  // Handle Firebase data integration
+  // Handle testing mode toggle
+  const toggleTestingMode = () => {
+    setTestingMode(!testingMode);
+  };
+
+  // Handle data source manual switch (for testing)
+  const handleDataSourceSwitch = (newSource) => {
+    if (newSource === 'empty') {
+      localStorage.setItem('firebase_data_cleared', Date.now().toString());
+    } else {
+      localStorage.removeItem('firebase_data_cleared');
+    }
+    setDataSource(newSource);
+  };
+
+  // Handle Firebase data integration with empty state detection
   useEffect(() => {
+    if (testingMode && dataSource === 'empty') {
+      // In testing mode, keep empty state if manually set
+      return;
+    }
+    
     if (firebaseData && Object.keys(firebaseData).length > 0) {
       console.log('Firebase data loaded:', firebaseData);
       setDataSource('firebase');
     } else {
+      // Check if we just cleared Firebase data (for testing)
+      // If we recently cleared data, show empty state instead of sample
+      const recentlyClearedData = localStorage.getItem('firebase_data_cleared');
+      if (recentlyClearedData) {
+        const clearedTime = parseInt(recentlyClearedData);
+        const now = Date.now();
+        // If cleared within last 5 minutes, show empty state
+        if (now - clearedTime < 5 * 60 * 1000) {
+          console.log('Recently cleared Firebase data, showing empty state');
+          setDataSource('empty');
+          return;
+        } else {
+          // Clear the flag after 5 minutes
+          localStorage.removeItem('firebase_data_cleared');
+        }
+      }
+      
+      console.log('No Firebase data found, using sample data');
       setDataSource('sample');
     }
-  }, [firebaseData]);
+  }, [firebaseData, testingMode, dataSource]);
 
   // Initialize quarter config and handle any loading issues
   useEffect(() => {
@@ -154,29 +220,44 @@ const CombinedWorkforceDashboard = () => {
     
     if (!firebaseData || Object.keys(firebaseData).length === 0) {
       console.log('No Firebase data found, using sample data');
-      // Generate sample data for demonstration
-      const sampleData = generateSampleData();
       
-      // Process sample data through the same pipeline as template data
-      // This ensures field names are normalized and consistent
       try {
-        const processedData = processQuarterlyData(sampleData);
-        setQuarterlyData(processedData);
-        setDataSource('sample');
-        console.log('Sample data processed through normalization pipeline:', Object.keys(processedData));
+        // Generate sample data for demonstration
+        const sampleData = generateSampleData();
+        
+        // Validate that sample data was generated successfully
+        if (!sampleData || sampleData.length === 0) {
+          console.error('Sample data generation failed, using empty state');
+          setDataSource('empty');
+          return;
+        }
+        
+        // Process sample data through the same pipeline as template data
+        // This ensures field names are normalized and consistent
+        try {
+          const processedData = processQuarterlyData(sampleData);
+          setQuarterlyData(processedData);
+          setDataSource('sample');
+          console.log('Sample data processed through normalization pipeline:', Object.keys(processedData));
+        } catch (error) {
+          console.error('Error processing sample data:', error);
+          // Fallback to basic grouping if processing fails
+          const groupedData = {};
+          sampleData.forEach(record => {
+            const quarter = record.Quarter_End_Date;
+            if (!groupedData[quarter]) {
+              groupedData[quarter] = [];
+            }
+            groupedData[quarter].push(record);
+          });
+          setQuarterlyData(groupedData);
+          setDataSource('sample');
+        }
       } catch (error) {
-        console.error('Error processing sample data:', error);
-        // Fallback to basic grouping if processing fails
-        const groupedData = {};
-        sampleData.forEach(record => {
-          const quarter = record.Quarter_End_Date;
-          if (!groupedData[quarter]) {
-            groupedData[quarter] = [];
-          }
-          groupedData[quarter].push(record);
-        });
-        setQuarterlyData(groupedData);
-        setDataSource('sample');
+        console.error('Error generating sample data:', error);
+        // If all sample data generation fails, use empty state
+        console.log('Falling back to empty state due to sample data generation failure');
+        setDataSource('empty');
       }
     }
   }, [firebaseData, quarterConfigLoading, quarterConfigError]);
@@ -189,7 +270,12 @@ const CombinedWorkforceDashboard = () => {
       return;
     }
     
-    if (dataSource === 'firebase' && firebaseData && Object.keys(firebaseData).length > 0) {
+    if (dataSource === 'empty') {
+      // Use empty state data
+      console.log('Using empty state data for metrics');
+      setHeadcountData(emptyStateData.headcount);
+      setAdditionalMetrics(emptyStateData.additionalMetrics);
+    } else if (dataSource === 'firebase' && firebaseData && Object.keys(firebaseData).length > 0) {
       // Use Firebase data directly for metrics
       console.log('Using Firebase data for metrics');
       const metrics = {
@@ -251,7 +337,15 @@ const CombinedWorkforceDashboard = () => {
       return;
     }
     
-    if (dataSource === 'firebase' && firebaseData && Object.keys(firebaseData).length > 0) {
+    if (dataSource === 'empty') {
+      // Use empty state data for all charts
+      console.log('Using empty state data for charts');
+      setFiveQuarterData(emptyStateData.charts.fiveQuarter);
+      setStartersLeaversData(emptyStateData.charts.startersLeavers);
+      setTopDivisionsData(emptyStateData.charts.topDivisions);
+      setTurnoverReasons(emptyStateData.charts.turnoverReasons);
+      setLocationData(emptyStateData.charts.location);
+    } else if (dataSource === 'firebase' && firebaseData && Object.keys(firebaseData).length > 0) {
       // Use Firebase data for chart data
       
       
@@ -886,9 +980,29 @@ const CombinedWorkforceDashboard = () => {
                   <BarChart3 className="text-blue-600" size={24} />
                   <div>
                     <h1 className="text-2xl font-bold text-gray-900">Workforce Analytics</h1>
-                    <p className="text-gray-600 text-sm mt-1">
-                      <span className="font-medium">Note:</span> All workforce metrics below represent <strong>Benefit Eligible</strong> employees only.
-                    </p>
+                    <div className="flex items-center gap-4 mt-1">
+                      <p className="text-gray-600 text-sm">
+                        <span className="font-medium">Note:</span> All workforce metrics below represent <strong>Benefit Eligible</strong> employees only.
+                      </p>
+                      <div className="flex items-center gap-2">
+                        {dataSource === 'firebase' ? (
+                          <div className="flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs">
+                            <Cloud size={12} />
+                            <span>Firebase Data</span>
+                          </div>
+                        ) : dataSource === 'empty' ? (
+                          <div className="flex items-center gap-1 px-2 py-1 bg-red-100 text-red-700 rounded-full text-xs">
+                            <Database size={12} />
+                            <span>No Data</span>
+                          </div>
+                        ) : (
+                          <div className="flex items-center gap-1 px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs">
+                            <Database size={12} />
+                            <span>Sample Data</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
@@ -897,6 +1011,50 @@ const CombinedWorkforceDashboard = () => {
                     onQuarterChange={handleQuarterChange}
                     availableQuarters={QUARTER_DATES}
                   />
+                  
+                  {/* Testing Controls */}
+                  <div className="relative">
+                    <button 
+                      onClick={toggleTestingMode}
+                      className="flex items-center gap-2 bg-gray-600 hover:bg-gray-700 text-white px-3 py-2 rounded-lg font-medium transition-colors duration-200"
+                    >
+                      <Settings size={16} />
+                      <span>Testing</span>
+                    </button>
+                    
+                    {testingMode && (
+                      <div className="absolute right-0 top-full mt-2 bg-white border border-gray-200 rounded-lg shadow-lg p-3 z-10">
+                        <div className="text-sm font-medium text-gray-700 mb-2">Data Source Override</div>
+                        <div className="space-y-1">
+                          <button
+                            onClick={() => handleDataSourceSwitch('firebase')}
+                            className={`block w-full text-left px-3 py-2 rounded text-sm ${
+                              dataSource === 'firebase' ? 'bg-green-100 text-green-700' : 'hover:bg-gray-100'
+                            }`}
+                          >
+                            Firebase Data
+                          </button>
+                          <button
+                            onClick={() => handleDataSourceSwitch('sample')}
+                            className={`block w-full text-left px-3 py-2 rounded text-sm ${
+                              dataSource === 'sample' ? 'bg-gray-100 text-gray-700' : 'hover:bg-gray-100'
+                            }`}
+                          >
+                            Sample Data
+                          </button>
+                          <button
+                            onClick={() => handleDataSourceSwitch('empty')}
+                            className={`block w-full text-left px-3 py-2 rounded text-sm ${
+                              dataSource === 'empty' ? 'bg-red-100 text-red-700' : 'hover:bg-gray-100'
+                            }`}
+                          >
+                            Empty State
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  
                   <button 
                     onClick={() => console.log('Export functionality coming soon')}
                     className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200"
@@ -909,6 +1067,39 @@ const CombinedWorkforceDashboard = () => {
               </div>
             </div>
           </div>
+
+          {/* Data State Warning */}
+          {dataSource === 'sample' && (
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 bg-yellow-500 rounded-full flex items-center justify-center">
+                  <span className="text-white text-xs">!</span>
+                </div>
+                <div>
+                  <h3 className="font-medium text-yellow-800">No Firebase Data Found</h3>
+                  <p className="text-yellow-700 text-sm mt-1">
+                    Currently showing sample data. Upload data via the Excel Integration Dashboard to see real metrics.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+          
+          {dataSource === 'empty' && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 bg-red-500 rounded-full flex items-center justify-center">
+                  <span className="text-white text-xs">!</span>
+                </div>
+                <div>
+                  <h3 className="font-medium text-red-800">No Data Available</h3>
+                  <p className="text-red-700 text-sm mt-1">
+                    Firebase database is empty. All metrics show zero values. Upload data via the Excel Integration Dashboard to see real metrics.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Summary Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 print:gap-2 mb-6 print:mb-4 dashboard-section page-break-inside-avoid">

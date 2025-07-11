@@ -4,6 +4,7 @@ import {
   getDoc, 
   setDoc, 
   updateDoc, 
+  deleteDoc,
   onSnapshot, 
   query, 
   orderBy, 
@@ -429,9 +430,18 @@ class FirebaseService {
   async clearDashboardData(dashboard, period, type = 'quarters') {
     try {
       const docRef = doc(db, 'dashboards', dashboard, type, period);
-      await setDoc(docRef, {});
+      
+      // Check if document exists before attempting to delete
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        await deleteDoc(docRef);
+        console.log(`Deleted ${dashboard} data for ${period}`);
+      } else {
+        console.log(`No ${dashboard} data found for ${period} - nothing to clear`);
+      }
+      
+      // Clear from cache regardless
       this.cache.delete(`${dashboard}-${type}-${period}`);
-      console.log(`Cleared ${dashboard} data for ${period}`);
       return true;
     } catch (error) {
       console.error(`Error clearing ${dashboard} data:`, error);
@@ -440,19 +450,61 @@ class FirebaseService {
   }
 
   /**
+   * Normalize period format for consistency
+   * @param {string} period - Period identifier (Q1-2025 or 2025-Q1)
+   * @returns {Array} Array of normalized period formats to try
+   */
+  normalizePeriodFormats(period) {
+    const formats = [];
+    
+    // Handle Q1-2025 format
+    if (period.match(/^Q\d-\d{4}$/)) {
+      formats.push(period); // Q1-2025
+      formats.push(period.replace(/^Q(\d)-(\d{4})$/, '$2-Q$1')); // 2025-Q1
+    }
+    // Handle 2025-Q1 format
+    else if (period.match(/^\d{4}-Q\d$/)) {
+      formats.push(period); // 2025-Q1
+      formats.push(period.replace(/^(\d{4})-Q(\d)$/, 'Q$2-$1')); // Q1-2025
+    }
+    // Handle other formats or invalid formats
+    else {
+      formats.push(period);
+    }
+    
+    return formats;
+  }
+
+  /**
    * Clear all data for a specific period across all dashboards (for testing)
-   * @param {string} period - Period identifier
+   * @param {string} period - Period identifier (supports both Q1-2025 and 2025-Q1 formats)
    * @param {string} type - Period type
    */
   async clearAllDataForPeriod(period, type = 'quarters') {
     try {
       const dashboards = ['workforce', 'turnover', 'compliance', 'recruiting', 'exitSurvey'];
-      const promises = dashboards.map(dashboard => 
-        this.clearDashboardData(dashboard, period, type)
-      );
+      const periodFormats = this.normalizePeriodFormats(period);
       
-      await Promise.all(promises);
-      console.log(`Cleared all dashboard data for ${period}`);
+      console.log(`Clearing data for period formats: ${periodFormats.join(', ')}`);
+      
+      // Clear data for all possible period formats
+      const clearPromises = [];
+      for (const dashboard of dashboards) {
+        for (const periodFormat of periodFormats) {
+          clearPromises.push(this.clearDashboardData(dashboard, periodFormat, type));
+        }
+      }
+      
+      await Promise.all(clearPromises);
+      
+      // Clear cache for all period formats
+      for (const dashboard of dashboards) {
+        for (const periodFormat of periodFormats) {
+          this.cache.delete(`${dashboard}-${type}-${periodFormat}`);
+        }
+      }
+      
+      console.log(`Cleared all dashboard data for ${period} (formats: ${periodFormats.join(', ')})`);
       return true;
     } catch (error) {
       console.error('Error clearing all data:', error);

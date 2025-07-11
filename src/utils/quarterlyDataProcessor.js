@@ -362,11 +362,38 @@ export function getPreviousQuarter(currentQuarter) {
  * Generate sample aggregate data for testing
  */
 export function generateSampleData() {
-  const sampleData = [];
-  const divisions = ['Arts & Sciences', 'Medicine', 'Pharmacy & Health Professions', 'Nursing', 'Business', 'Education'];
-  const locations = ['Omaha', 'Phoenix'];
-  
-  QUARTER_DATES.forEach((quarter, qIndex) => {
+  try {
+    const sampleData = [];
+    const divisions = ['Arts & Sciences', 'Medicine', 'Pharmacy & Health Professions', 'Nursing', 'Business', 'Education'];
+    const locations = ['Omaha', 'Phoenix'];
+    
+    // Fallback quarters if QUARTER_DATES is not available
+    const fallbackQuarters = [
+      { id: 'Q1-2024', end_date: '2024-03-31', dateValue: '2024-03-31' },
+      { id: 'Q2-2024', end_date: '2024-06-30', dateValue: '2024-06-30' },
+      { id: 'Q3-2024', end_date: '2024-09-30', dateValue: '2024-09-30' },
+      { id: 'Q4-2024', end_date: '2024-12-31', dateValue: '2024-12-31' },
+      { id: 'Q1-2025', end_date: '2025-03-31', dateValue: '2025-03-31' },
+      { id: 'Q2-2025', end_date: '2025-06-30', dateValue: '2025-06-30' },
+      { id: 'Q3-2025', end_date: '2025-09-30', dateValue: '2025-09-30' },
+      { id: 'Q4-2025', end_date: '2025-12-31', dateValue: '2025-12-31' }
+    ];
+    
+    // Use QUARTER_DATES if available, otherwise use fallback
+    let quartersToUse = fallbackQuarters;
+    
+    try {
+      if (QUARTER_DATES && Array.isArray(QUARTER_DATES) && QUARTER_DATES.length > 0) {
+        console.log('Using QUARTER_DATES for sample data generation');
+        quartersToUse = QUARTER_DATES;
+      } else {
+        console.log('QUARTER_DATES not available, using fallback quarters for sample data generation');
+      }
+    } catch (error) {
+      console.error('Error accessing QUARTER_DATES, using fallback quarters:', error);
+    }
+    
+    quartersToUse.forEach((quarter, qIndex) => {
     // Generate aggregate data for each division/location combination
     divisions.forEach(division => {
       locations.forEach(location => {
@@ -393,7 +420,7 @@ export function generateSampleData() {
         const nbeDepartures = qIndex > 0 ? Math.floor(Math.random() * 12) + 3 : 0;
         
         sampleData.push({
-          Quarter_End_Date: quarter.dateValue, // Use actual calendar date instead of quarter string
+          Quarter_End_Date: quarter.end_date || quarter.dateValue, // Use actual calendar date instead of quarter string
           Division: division,
           Location: location,
           BE_Faculty_Headcount: beFacultyHeadcount,
@@ -409,9 +436,32 @@ export function generateSampleData() {
         });
       });
     });
-  });
-  
-  return sampleData;
+    });
+    
+    console.log('Generated sample data:', sampleData.length, 'records');
+    return sampleData;
+    
+  } catch (error) {
+    console.error('Error generating sample data:', error);
+    // Return minimal fallback data to prevent crashes
+    return [
+      {
+        Quarter_End_Date: '2025-03-31',
+        Division: 'Arts & Sciences',
+        Location: 'Omaha',
+        BE_Faculty_Headcount: 100,
+        BE_Staff_Headcount: 150,
+        NBE_Faculty_Headcount: 25,
+        NBE_Staff_Headcount: 50,
+        NBE_Student_Worker_Headcount: 30,
+        Total_Headcount: 355,
+        BE_New_Hires: 5,
+        BE_Departures: 3,
+        NBE_New_Hires: 10,
+        NBE_Departures: 7
+      }
+    ];
+  }
 }
 
 export default {

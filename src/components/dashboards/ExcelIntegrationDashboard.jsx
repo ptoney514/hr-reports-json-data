@@ -231,23 +231,73 @@ const ExcelIntegrationDashboard = () => {
 
   // Clear Firebase database for testing
   const clearDatabase = async () => {
-    if (!window.confirm('Are you sure you want to clear all Firebase data for 2025-Q1? This action cannot be undone.')) {
+    const currentQuarter = 'Q1-2025'; // Default quarter for testing
+    
+    if (!window.confirm(`Are you sure you want to clear all Firebase data for ${currentQuarter}? This action cannot be undone.`)) {
       return;
     }
 
     setClearingDatabase(true);
-    setFirebaseStatus({ status: 'uploading', message: 'Clearing Firebase database...' });
+    setFirebaseStatus({ status: 'uploading', message: `Clearing Firebase database for ${currentQuarter}...` });
 
     try {
-      await firebaseService.clearAllDataForPeriod('2025-Q1');
+      await firebaseService.clearAllDataForPeriod(currentQuarter);
+      
+      // Set flag to indicate data was recently cleared (for empty state detection)
+      localStorage.setItem('firebase_data_cleared', Date.now().toString());
+      
       setFirebaseStatus({ 
         status: 'success', 
-        message: 'Successfully cleared all Firebase data for 2025-Q1'
+        message: `Successfully cleared all Firebase data for ${currentQuarter}. Visit Combined Workforce Dashboard to verify empty state.`,
+        dashboardLinks: { url: '/dashboards/combined-workforce', name: 'Combined Workforce Dashboard' }
       });
+      
+      // Reset local state
+      setIsUsingUploadedData(false);
+      actions.setDataAvailability({ workforce: false });
+      actions.resetUploadStatus();
     } catch (error) {
       setFirebaseStatus({ 
         status: 'error', 
         message: `Failed to clear database: ${error.message}` 
+      });
+    } finally {
+      setClearingDatabase(false);
+    }
+  };
+
+  // Clear all quarters for complete testing reset
+  const clearAllQuarters = async () => {
+    const allQuarters = ['Q1-2024', 'Q2-2024', 'Q3-2024', 'Q4-2024', 'Q1-2025', 'Q2-2025', 'Q3-2025', 'Q4-2025'];
+    
+    if (!window.confirm(`Are you sure you want to clear ALL Firebase data for all quarters (${allQuarters.join(', ')})? This action cannot be undone.`)) {
+      return;
+    }
+
+    setClearingDatabase(true);
+    setFirebaseStatus({ status: 'uploading', message: 'Clearing all Firebase data across all quarters...' });
+
+    try {
+      const promises = allQuarters.map(quarter => firebaseService.clearAllDataForPeriod(quarter));
+      await Promise.all(promises);
+      
+      // Set flag to indicate data was recently cleared (for empty state detection)
+      localStorage.setItem('firebase_data_cleared', Date.now().toString());
+      
+      setFirebaseStatus({ 
+        status: 'success', 
+        message: `Successfully cleared all Firebase data for all quarters. Visit Combined Workforce Dashboard to verify empty state.`,
+        dashboardLinks: { url: '/dashboards/combined-workforce', name: 'Combined Workforce Dashboard' }
+      });
+      
+      // Reset local state
+      setIsUsingUploadedData(false);
+      actions.setDataAvailability({ workforce: false });
+      actions.resetUploadStatus();
+    } catch (error) {
+      setFirebaseStatus({ 
+        status: 'error', 
+        message: `Failed to clear all data: ${error.message}` 
       });
     } finally {
       setClearingDatabase(false);
@@ -307,7 +357,15 @@ const ExcelIntegrationDashboard = () => {
             className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 transition-colors"
           >
             <Trash2 size={16} />
-            {clearingDatabase ? 'Clearing...' : 'Clear Database'}
+            {clearingDatabase ? 'Clearing...' : 'Clear Current Quarter'}
+          </button>
+          <button
+            onClick={clearAllQuarters}
+            disabled={clearingDatabase}
+            className="flex items-center gap-2 px-4 py-2 bg-red-800 text-white rounded-lg hover:bg-red-900 disabled:opacity-50 transition-colors"
+          >
+            <Trash2 size={16} />
+            {clearingDatabase ? 'Clearing...' : 'Clear All Quarters'}
           </button>
         </div>
       </div>
@@ -363,6 +421,15 @@ const ExcelIntegrationDashboard = () => {
               </span>
             </div>
             
+            {firebaseStatus.dashboardLinks && (
+              <button
+                onClick={() => navigate(firebaseStatus.dashboardLinks.url)}
+                className="flex items-center gap-2 px-3 py-1 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+              >
+                <ArrowRight size={14} />
+                {firebaseStatus.dashboardLinks.name}
+              </button>
+            )}
           </div>
         </div>
       )}

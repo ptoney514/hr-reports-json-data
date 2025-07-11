@@ -8,12 +8,16 @@ import { format, parse, addMonths, startOfQuarter, endOfQuarter } from 'date-fns
 
 class QuarterConfigService {
   constructor() {
+    // Initialize with empty arrays to prevent undefined errors
+    this.quarters = [];
+    this.config = null;
+    
     try {
       // Validate imported config
       if (!quarterConfig) {
         console.error('Quarter config not found, using fallback configuration');
         this.config = this.getDefaultConfig();
-        this.quarters = this.config.quarters;
+        this.quarters = this.config.quarters || [];
         return;
       }
 
@@ -21,19 +25,37 @@ class QuarterConfigService {
       if (!quarterConfig.quarters || !Array.isArray(quarterConfig.quarters)) {
         console.error('Invalid quarter config structure, using fallback configuration');
         this.config = this.getDefaultConfig();
-        this.quarters = this.config.quarters;
+        this.quarters = this.config.quarters || [];
         return;
       }
 
       // Config is valid, use it
       this.config = quarterConfig;
-      this.quarters = this.config.quarters;
+      this.quarters = this.config.quarters || [];
       
       console.log('QuarterConfigService initialized successfully with', this.quarters.length, 'quarters');
     } catch (error) {
       console.error('Error initializing QuarterConfigService:', error);
-      this.config = this.getDefaultConfig();
-      this.quarters = this.config.quarters;
+      try {
+        this.config = this.getDefaultConfig();
+        this.quarters = this.config.quarters || [];
+      } catch (fallbackError) {
+        console.error('Even fallback config failed:', fallbackError);
+        // Ultimate fallback - minimal working configuration
+        this.quarters = [
+          {
+            id: 'Q1-2025',
+            label: 'Q1 2025 (3/31/2025)',
+            quarter: 'Q1-2025',
+            end_date: '2025-03-31',
+            start_date: '2025-01-01',
+            active: true,
+            fiscal_year: 2025,
+            display_order: 1
+          }
+        ];
+        this.config = { quarters: this.quarters };
+      }
     }
   }
 
@@ -464,25 +486,23 @@ const quarterConfigService = new QuarterConfigService();
 // Export compatible QUARTER_DATES for backward compatibility
 export const QUARTER_DATES = quarterConfigService.getQuarters();
 
-// Export service functions
-export const {
-  getQuarters,
-  getQuarterById,
-  getMostRecentQuarter,
-  getCurrentQuarter,
-  getPreviousQuarter,
-  getNextQuarter,
-  isValidQuarterFormat,
-  dateToQuarterId,
-  generateFutureQuarters,
-  addQuarter,
-  updateQuarter,
-  deactivateQuarter,
-  getMetadata,
-  exportConfig,
-  importConfig,
-  getQuartersByFiscalYear,
-  getFiscalYears
-} = quarterConfigService;
+// Export service functions - but bind them to the service instance
+export const getQuarters = () => quarterConfigService.getQuarters();
+export const getQuarterById = (id) => quarterConfigService.getQuarterById(id);
+export const getMostRecentQuarter = () => quarterConfigService.getMostRecentQuarter();
+export const getCurrentQuarter = () => quarterConfigService.getCurrentQuarter();
+export const getPreviousQuarter = (id) => quarterConfigService.getPreviousQuarter(id);
+export const getNextQuarter = (id) => quarterConfigService.getNextQuarter(id);
+export const isValidQuarterFormat = (id) => quarterConfigService.isValidQuarterFormat(id);
+export const dateToQuarterId = (date) => quarterConfigService.dateToQuarterId(date);
+export const generateFutureQuarters = (years) => quarterConfigService.generateFutureQuarters(years);
+export const addQuarter = (data) => quarterConfigService.addQuarter(data);
+export const updateQuarter = (id, updates) => quarterConfigService.updateQuarter(id, updates);
+export const deactivateQuarter = (id) => quarterConfigService.deactivateQuarter(id);
+export const getMetadata = () => quarterConfigService.getMetadata();
+export const exportConfig = () => quarterConfigService.exportConfig();
+export const importConfig = (config) => quarterConfigService.importConfig(config);
+export const getQuartersByFiscalYear = (year) => quarterConfigService.getQuartersByFiscalYear(year);
+export const getFiscalYears = () => quarterConfigService.getFiscalYears();
 
 export default quarterConfigService;

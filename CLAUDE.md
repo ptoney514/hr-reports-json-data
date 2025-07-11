@@ -136,7 +136,7 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 **Requirements before merging to main:**
 - ✅ All functionality tested and working
 - ✅ No console errors or warnings
-- ✅ Docker container builds and runs successfully
+- ✅ Application runs successfully in Docker environment
 - ✅ Documentation updated (CLAUDE.md, CHANGELOG.md, relevant docs)
 - ✅ Code follows project patterns and standards
 - ✅ TODO.md updated with completed tasks
@@ -230,9 +230,9 @@ npm run eject
 
 ### Efficient Development Approach
 
-**Docker-Only Development with Smart Rebuilding Strategy**
+**Docker-Only Development with Automated Management**
 
-We use Docker exclusively for all development work to ensure maximum consistency and production parity, but we optimize the workflow to avoid unnecessary rebuilds.
+We use Docker exclusively for all development work to ensure maximum consistency and production parity. Docker container management is handled automatically by external scripts, so no manual restart/rebuild commands are needed.
 
 ### Session Start Checklist
 
@@ -248,118 +248,39 @@ git pull
 # 3. Check if container is running
 docker ps
 
-# 4. Start container if not running (builds automatically if needed)
-docker-compose up -d
-
 # Application available at: http://localhost:3000
 ```
 
-### Development Workflow by Change Type
+### Development Workflow
 
-#### For Code Changes (Most Common)
-```bash
-# Method 1: Hot reload (if volumes are properly configured)
-# Just save your files - changes should appear automatically
-
-# Method 2: If hot reload doesn't work, restart container
-docker-compose restart hr-reports-app
-
-# Method 3: If restart doesn't work, recreate container without rebuild
-docker-compose up --force-recreate --no-deps hr-reports-app
-```
+#### For Code Changes
+- **Save your files** - Changes are automatically detected and applied
+- **No manual restart needed** - Container management is automated
+- **Hot reload enabled** - Most changes appear immediately
 
 #### For Dependency Changes
-```bash
-# When package.json or package-lock.json changes
-docker-compose down
-docker-compose build --no-cache hr-reports-app
-docker-compose up -d
-```
+- **Update package.json** - Dependencies are automatically managed
+- **No manual rebuild needed** - Container rebuilding is automated
 
 #### For Docker Configuration Changes
-```bash
-# When Dockerfile or docker-compose.yml changes
-docker-compose down
-docker-compose build --no-cache
-docker-compose up -d
-```
+- **Update Dockerfile/docker-compose.yml** - Configuration changes are automatically applied
+- **No manual rebuild needed** - Container rebuilding is automated
 
-### When to Rebuild vs Restart
+### Development Best Practices
 
-| Scenario | Action Required | Fast? | Command |
-|----------|----------------|-------|---------|
-| **Code changes** (JS, CSS, etc.) | Restart container | ✅ Yes | `docker-compose restart hr-reports-app` |
-| **Dependency changes** (package.json) | Rebuild container | ❌ No | `docker-compose build --no-cache hr-reports-app` |
-| **Docker config changes** (Dockerfile) | Rebuild container | ❌ No | `docker-compose build --no-cache` |
-| **Environment issues** | Recreate container | ✅ Yes | `docker-compose up --force-recreate --no-deps hr-reports-app` |
-
-### Recommended Daily Workflow
-
+**Daily Workflow:**
 1. **Morning**: Check container status with `docker ps`
-2. **Development**: Make code changes and save files (hot reload should work)
-3. **If changes don't appear**: Restart container with `docker-compose restart hr-reports-app`
-4. **If dependencies change**: Rebuild with `docker-compose build --no-cache hr-reports-app`
-5. **End of day**: Leave container running for next session
-
-### Docker Commands Reference
-
-```bash
-# Check container status
-docker ps
-
-# Start services (builds if needed)
-docker-compose up -d
-
-# Restart specific service (fast)
-docker-compose restart hr-reports-app
-
-# Rebuild specific service only
-docker-compose build --no-cache hr-reports-app
-
-# Recreate container without rebuild (medium speed)
-docker-compose up --force-recreate --no-deps hr-reports-app
-
-# Full rebuild (slow - only when necessary)
-docker-compose down && docker-compose build --no-cache && docker-compose up -d
-
-# View container logs
-docker-compose logs -f hr-reports-app
-
-# Stop all containers
-docker-compose down
-
-# Clean up Docker system (weekly maintenance)
-docker system prune -f
-```
-
-### Troubleshooting
-
-**If changes don't appear after restart:**
-1. Check if volumes are properly mounted in docker-compose.yml
-2. Try recreating container: `docker-compose up --force-recreate --no-deps hr-reports-app`
-3. As last resort, rebuild: `docker-compose build --no-cache hr-reports-app`
-
-**If npm server fails to start:**
-1. Check container logs: `docker-compose logs hr-reports-app`
-2. Verify node_modules aren't corrupted (rebuild if needed)
-3. Ensure proper volume mounts in docker-compose.yml
-
-### Cross-Platform Development (Mac/PC)
-
-**Best Practices:**
-- Always work exclusively in Docker for all development
-- Use efficient restart/recreate commands for code changes
-- Only rebuild when dependencies or Docker configs change
-- Use Docker for all testing, demos, and presentations
-- Never use npm start or local development servers
-
-**Optimized Daily Workflow:**
-1. **Morning**: Check container status with `docker ps`, start if needed
 2. **Development**: Work exclusively in Docker (http://localhost:3000)
-3. **Code Changes**: Save files and restart container if needed
+3. **Code Changes**: Save files and continue working
 4. **Testing**: All testing done in Docker environment
 5. **Demos**: Docker is always ready for presentations
-6. **End of day**: Commit changes, leave container running for next session
+6. **End of day**: Commit changes
+
+**Container Management:**
+- Container restart/rebuild is handled automatically
+- Focus on development without worrying about Docker commands
+- Container state is managed by external automation scripts
+- All changes are automatically detected and applied
 
 ## Architecture
 
