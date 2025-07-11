@@ -2,7 +2,6 @@ import React, { useState, useCallback } from 'react';
 import { 
   Database,
   Cloud,
-  ExternalLink,
   Trash2,
   CheckCircle,
   XCircle,
@@ -19,8 +18,8 @@ import { useDataSource } from '../../contexts/DataSourceContext';
 import firebaseService from '../../services/FirebaseService';
 
 const ExcelIntegrationDashboard = () => {
-  const navigate = useNavigate();
   const { state, actions } = useDataSource();
+  const navigate = useNavigate();
   const [firebaseStatus, setFirebaseStatus] = useState(null);
   const [uploadingToFirebase, setUploadingToFirebase] = useState(false);
   const [clearingDatabase, setClearingDatabase] = useState(false);
@@ -217,7 +216,7 @@ const ExcelIntegrationDashboard = () => {
 
   // Navigate to Enhanced Workforce Dashboard
   const navigateToEnhancedWorkforce = () => {
-    navigate('/dashboards/combined-workforce');
+    navigate('/dashboards/enhanced-workforce');
   };
 
   // Navigate to Workforce Data Tester
@@ -364,15 +363,6 @@ const ExcelIntegrationDashboard = () => {
               </span>
             </div>
             
-            {firebaseStatus.status === 'success' && firebaseStatus.dashboardLinks && (
-              <button
-                onClick={navigateToEnhancedWorkforce}
-                className="flex items-center gap-1 px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 text-sm"
-              >
-                <ExternalLink size={14} />
-                View Dashboard
-              </button>
-            )}
           </div>
         </div>
       )}
@@ -412,6 +402,29 @@ const ExcelIntegrationDashboard = () => {
             <strong>Smart Detection:</strong> The system automatically detects your data format and processes it accordingly. 
             Upload individual employee records for detailed analysis or quarterly aggregates for dashboard metrics.
           </p>
+        </div>
+      </div>
+
+      {/* Database Management Section */}
+      <div className="bg-white rounded-lg shadow-sm border p-6 border-red-200">
+        <h3 className="text-lg font-semibold text-red-900 mb-3">Database Management</h3>
+        <div className="bg-red-50 rounded-lg p-4">
+          <div className="flex items-start gap-3">
+            <div className="flex-1">
+              <h4 className="font-medium text-red-800 mb-1">Clear Database</h4>
+              <p className="text-sm text-red-700 mb-3">
+                Remove all uploaded data from Firebase for testing purposes. This action cannot be undone.
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={clearDatabase}
+            disabled={clearingDatabase}
+            className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 transition-colors"
+          >
+            <Trash2 size={16} />
+            {clearingDatabase ? 'Clearing Database...' : 'Clear Database'}
+          </button>
         </div>
       </div>
     </div>
