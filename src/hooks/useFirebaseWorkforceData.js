@@ -3,6 +3,8 @@ import { useDashboard } from '../contexts/DashboardContext';
 import firebaseService from '../services/FirebaseService';
 import { useErrorHandler, handleNetworkError, validateData } from '../utils/errorHandler';
 import { globalCache } from '../utils/cacheUtils';
+import { createEnhancedSummary } from '../services/QuarterComparisonService';
+import { toFirebaseFormat, debugQuarterFormat } from '../utils/quarterFormatUtils';
 
 // Cache configuration for Firebase data
 const CACHE_CONFIG = {
@@ -58,16 +60,19 @@ const useFirebaseWorkforceData = (customFilters = {}) => {
     // Handle multiple period formats and normalize to Firebase format
     if (!reportingPeriod) return '2025-Q1'; // Default current period
     
+    // Use the new quarter format utility for consistent conversion
+    const firebaseFormat = toFirebaseFormat(reportingPeriod);
+    if (firebaseFormat && firebaseFormat !== reportingPeriod) {
+      console.log('🔧 getFirebasePeriod conversion:', { 
+        input: reportingPeriod, 
+        output: firebaseFormat 
+      });
+      return firebaseFormat;
+    }
+    
     // If already in Firebase format (2025-Q1), return as-is
     if (/^\d{4}-Q\d$/.test(reportingPeriod)) {
       return reportingPeriod;
-    }
-    
-    // Convert "Q2-2025" to "2025-Q2" format
-    const quarterMatch = reportingPeriod.match(/Q(\d)-(\d{4})/);
-    if (quarterMatch) {
-      const [, quarter, year] = quarterMatch;
-      return `${year}-Q${quarter}`;
     }
     
     // Handle date-based periods like "2025-03" (convert to quarter)
@@ -77,12 +82,6 @@ const useFirebaseWorkforceData = (customFilters = {}) => {
       const monthNum = parseInt(month, 10);
       const quarter = Math.ceil(monthNum / 3); // 1-3=Q1, 4-6=Q2, 7-9=Q3, 10-12=Q4
       return `${year}-Q${quarter}`;
-    }
-    
-    // Handle direct quarter format like "Q1-2025" (same as above case)
-    if (/^Q\d-\d{4}$/.test(reportingPeriod)) {
-      const [quarter, year] = reportingPeriod.split('-');
-      return `${year}-${quarter}`;
     }
     
     // For any unrecognized format, default to current quarter
@@ -413,12 +412,58 @@ const useFirebaseWorkforceData = (customFilters = {}) => {
     return filteredData;
   }, []);
 
-  // Format data for easy consumption by components (same as original hook)
-  const formatDataForComponents = useCallback((data) => {
+  // Format data for easy consumption by components with dynamic percentage calculations
+  const formatDataForComponents = useCallback(async (data, useFallback = false) => {
     if (!data || !data.currentPeriod) return null;
 
+    // Get dynamic percentage changes using QuarterComparisonService
+    let dynamicSummary = null;
+    
+    if (!useFallback) {
+      try {
+        // Extract current quarter ID from the data
+        const currentQuarter = data.currentPeriod?.quarter || data.metadata?.period;
+        
+        // Debug quarter format before processing
+        debugQuarterFormat(currentQuarter, 'useFirebaseWorkforceData');
+        
+        console.log('🎯 Firebase hook attempting dynamic calculations:', { 
+          currentQuarter, 
+          hasCurrentPeriod: !!data.currentPeriod,
+          hasMetadata: !!data.metadata,
+          totalEmployees: data.currentPeriod?.headcount?.total
+        });
+        
+        if (currentQuarter) {
+          // Create enhanced summary with dynamic calculations
+          // Handle both Firebase structured data and direct data formats
+          const rawQuarterData = {
+            totalEmployees: data.currentPeriod?.headcount?.total || data.totalEmployees || 0,
+            demographics: {
+              faculty: data.currentPeriod?.headcount?.faculty || data.demographics?.faculty || data.faculty || 0,
+              staff: data.currentPeriod?.headcount?.staff || data.demographics?.staff || data.staff || 0,
+              students: data.currentPeriod?.headcount?.students || data.demographics?.students || data.students || 0
+            }
+          };
+          
+          console.log('🔧 Calling createEnhancedSummary with:', { 
+            currentQuarter, 
+            rawQuarterData,
+            originalDataStructure: Object.keys(data)
+          });
+          dynamicSummary = await createEnhancedSummary(currentQuarter, rawQuarterData);
+          console.log('✅ Dynamic summary result:', dynamicSummary);
+        } else {
+          console.log('❌ No currentQuarter found in data');
+        }
+      } catch (error) {
+        console.warn('Error calculating dynamic percentage changes, using fallback:', error);
+        // Continue with null values for percentage changes
+      }
+    }
+
     return {
-      // Summary metrics
+      // Summary metrics with dynamic percentage calculations
       summary: {
         totalEmployees: data.currentPeriod?.headcount?.total || 0,
         totalHeadcount: data.currentPeriod?.headcount?.total || 0,
@@ -428,11 +473,16 @@ const useFirebaseWorkforceData = (customFilters = {}) => {
         totalPositions: data.currentPeriod?.positions?.total || 0,
         vacancies: data.currentPeriod?.positions?.vacant || 0,
         vacancyRate: data.currentPeriod?.positions?.vacancyRate || 0,
-        employeeChange: data.currentPeriod?.headcount?.changeFromPrevious?.percentChange || 0,
-        facultyChange: ((data.currentPeriod?.headcount?.changeFromPrevious?.faculty || 0) / (data.currentPeriod?.headcount?.faculty || 1) * 100) || 0,
-        staffChange: ((data.currentPeriod?.headcount?.changeFromPrevious?.staff || 0) / (data.currentPeriod?.headcount?.staff || 1) * 100) || 0,
+        
+        // Dynamic percentage changes (null if no previous quarter or calculation fails)
+        employeeChange: dynamicSummary?.employeeChange || null,
+        facultyChange: dynamicSummary?.facultyChange || null,
+        staffChange: dynamicSummary?.staffChange || null,
+        studentsChange: dynamicSummary?.studentsChange || null,
+        
+        // Keep existing vacancy rate change logic for now
         vacancyRateChange: data.currentPeriod?.positions?.changeFromPrevious?.vacancyRateChange || 0,
-        growth: data.currentPeriod?.headcount?.changeFromPrevious?.percentChange || 0
+        growth: dynamicSummary?.employeeChange || null
       },
 
       // Chart data
@@ -564,8 +614,27 @@ const useFirebaseWorkforceData = (customFilters = {}) => {
     return filterFirebaseData(firebaseData, activeFilters);
   }, [firebaseData, activeFilters, filterFirebaseData]);
 
-  const formattedData = useMemo(() => {
-    return formatDataForComponents(filteredData);
+  const [formattedData, setFormattedData] = useState(null);
+  
+  // Handle async formatting of data
+  useEffect(() => {
+    const formatData = async () => {
+      if (filteredData) {
+        try {
+          const formatted = await formatDataForComponents(filteredData);
+          setFormattedData(formatted);
+        } catch (error) {
+          console.error('Error formatting data:', error);
+          // Fallback to basic formatting without dynamic calculations
+          const fallbackFormatted = await formatDataForComponents(filteredData, true);
+          setFormattedData(fallbackFormatted);
+        }
+      } else {
+        setFormattedData(null);
+      }
+    };
+    
+    formatData();
   }, [filteredData, formatDataForComponents]);
 
   // Utility functions

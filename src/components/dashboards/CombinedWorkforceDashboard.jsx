@@ -31,10 +31,11 @@ const CombinedWorkforceDashboard = () => {
   
   // State for filters and actions  
   const [filters, setFilters] = useState({
-    reportingPeriod: 'Q1-2025'
+    reportingPeriod: 'Q1-2025'  // Default to Q1-2025 which has data
   });
   
   // Quarter filter state (matches Enhanced Workforce Dashboard)
+  // Default to Q1-2025 which has data according to Admin Dashboard
   const [selectedQuarter, setSelectedQuarter] = useState('Q1-2025');
   
   // Firebase data integration
@@ -44,7 +45,7 @@ const CombinedWorkforceDashboard = () => {
     error: firebaseError,
     isRealTimeActive 
   } = useFirebaseWorkforceData({
-    reportingPeriod: selectedQuarter || 'Q2-2025'
+    reportingPeriod: selectedQuarter || 'Q1-2025'
   });
   
   // Dynamic headcount data state
@@ -279,9 +280,9 @@ const CombinedWorkforceDashboard = () => {
       // Use Firebase data directly for metrics
       console.log('Using Firebase data for metrics');
       const metrics = {
-        total: { value: firebaseData.summary?.totalEmployees || 0, change: firebaseData.summary?.employeeChange || 0, subtitle: "from previous quarter", changeType: "percentage" },
-        faculty: { value: firebaseData.summary?.faculty || 0, change: firebaseData.summary?.facultyChange || 0, subtitle: "change", changeType: "percentage", indicator: "green" },
-        staff: { value: firebaseData.summary?.staff || 0, change: firebaseData.summary?.staffChange || 0, subtitle: "change", changeType: "percentage", indicator: "yellow" },
+        total: { value: firebaseData.summary?.totalEmployees || 0, change: firebaseData.summary?.employeeChange ?? null, subtitle: "from previous quarter", changeType: "percentage" },
+        faculty: { value: firebaseData.summary?.faculty || 0, change: firebaseData.summary?.facultyChange ?? null, subtitle: "change", changeType: "percentage", indicator: "green" },
+        staff: { value: firebaseData.summary?.staff || 0, change: firebaseData.summary?.staffChange ?? null, subtitle: "change", changeType: "percentage", indicator: "yellow" },
         newHires: { value: (firebaseData.metrics?.recentHires?.faculty || 0) + (firebaseData.metrics?.recentHires?.staff || 0), change: null, subtitle: "new hires", changeType: null, indicator: "teal" },
         leavers: { value: Math.floor((firebaseData.summary?.totalEmployees || 0) * 0.05), change: null, subtitle: "departures", changeType: null, indicator: "blue" }
       };

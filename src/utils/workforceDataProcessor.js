@@ -57,6 +57,32 @@ export const mapColumns = (headers) => {
 };
 
 /**
+ * Detect percentage change columns that should not be uploaded
+ */
+export const detectPercentageChangeColumns = (headers) => {
+  const percentageChangePatterns = [
+    'percentage_change', 'percent_change', 'pct_change', 'change_pct',
+    'employee_change', 'faculty_change', 'staff_change', 'headcount_change',
+    'growth_rate', 'change_rate', 'quarterly_growth', 'quarter_change',
+    'total_change', 'workforce_change', 'yoy_change', 'qoq_change'
+  ];
+  
+  const normalizedHeaders = headers.map(h => h.toLowerCase().replace(/[^a-z0-9]/g, '_'));
+  const detectedColumns = [];
+  
+  normalizedHeaders.forEach((header, index) => {
+    for (const pattern of percentageChangePatterns) {
+      if (header.includes(pattern) || pattern.includes(header)) {
+        detectedColumns.push(headers[index]);
+        break;
+      }
+    }
+  });
+  
+  return detectedColumns;
+};
+
+/**
  * Normalize and clean aggregate data
  */
 export const normalizeAggregateData = (rawData, columnMapping) => {
@@ -271,13 +297,24 @@ const generateLocationAnalysisFromAggregate = (aggregateData) => {
 /**
  * Validate and prepare aggregate data for import
  */
-export const validateWorkforceData = (data) => {
+export const validateWorkforceData = (data, originalHeaders = []) => {
   const errors = [];
   const warnings = [];
   
   if (!Array.isArray(data) || data.length === 0) {
     errors.push('No valid data rows found');
     return { isValid: false, errors, warnings };
+  }
+  
+  // Check for percentage change columns that should not be uploaded
+  if (originalHeaders && originalHeaders.length > 0) {
+    const percentageChangeColumns = detectPercentageChangeColumns(originalHeaders);
+    if (percentageChangeColumns.length > 0) {
+      warnings.push(
+        `⚠️ Percentage change columns detected and ignored: ${percentageChangeColumns.join(', ')}. ` +
+        `Percentage changes are calculated automatically based on quarter-to-quarter comparisons.`
+      );
+    }
   }
   
   // Check for required fields
@@ -317,7 +354,8 @@ export const validateWorkforceData = (data) => {
     stats: {
       totalRows: data.length,
       validRows: data.filter(record => record.division && record.location).length,
-      invalidHeadcounts
+      invalidHeadcounts,
+      percentageChangeColumnsDetected: originalHeaders ? detectPercentageChangeColumns(originalHeaders).length : 0
     }
   };
 };
