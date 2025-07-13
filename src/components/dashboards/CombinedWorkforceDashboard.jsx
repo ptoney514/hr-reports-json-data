@@ -4,6 +4,7 @@ import { BarChart3, Users, Building2, UserPlus, UserMinus, MapPin, Download, Che
 import { useNavigate } from 'react-router-dom';
 import SummaryCard from '../ui/SummaryCard';
 import QuarterFilter, { CompactQuarterFilter } from '../ui/QuarterFilter';
+import FilterButton from '../ui/FilterButton';
 import ErrorBoundary from '../ui/ErrorBoundary';
 import HeadcountChart from '../charts/HeadcountChart';
 import StartersLeaversChart from '../charts/StartersLeaversChart';
@@ -31,7 +32,8 @@ const CombinedWorkforceDashboard = () => {
   
   // State for filters and actions  
   const [filters, setFilters] = useState({
-    reportingPeriod: 'Q1-2025'  // Default to Q1-2025 which has data
+    reportingPeriod: 'Q1-2025',  // Default to Q1-2025 which has data
+    employeeType: 'All'  // Default to show all employees
   });
   
   // Quarter filter state (matches Enhanced Workforce Dashboard)
@@ -45,7 +47,8 @@ const CombinedWorkforceDashboard = () => {
     error: firebaseError,
     isRealTimeActive 
   } = useFirebaseWorkforceData({
-    reportingPeriod: selectedQuarter || 'Q1-2025'
+    reportingPeriod: selectedQuarter || 'Q1-2025',
+    employeeTypeFilter: filters.employeeType
   });
   
   // Dynamic headcount data state
@@ -127,9 +130,16 @@ const CombinedWorkforceDashboard = () => {
 
 
   // Handle filter changes
-  const handleFilterChange = (newFilters) => {
-    setFilters(prev => ({ ...prev, ...newFilters }));
-    console.log('Filters updated:', { ...filters, ...newFilters });
+  const handleFilterChange = (filterType, value) => {
+    // FilterButton passes individual filter changes
+    if (typeof filterType === 'string') {
+      setFilters(prev => ({ ...prev, [filterType]: value }));
+      console.log(`Filter ${filterType} updated to:`, value);
+    } else {
+      // Handle bulk filter updates (legacy)
+      setFilters(prev => ({ ...prev, ...filterType }));
+      console.log('Filters updated:', { ...filters, ...filterType });
+    }
   };
   
   // Handle quarter changes (matches Enhanced Workforce Dashboard)
@@ -996,7 +1006,7 @@ const CombinedWorkforceDashboard = () => {
                     <h1 className="text-2xl font-bold text-gray-900">Workforce Analytics</h1>
                     <div className="flex items-center gap-4 mt-1">
                       <p className="text-gray-600 text-sm">
-                        <span className="font-medium">Note:</span> All workforce metrics below represent <strong>Benefit Eligible</strong> employees only.
+                        <span className="font-medium">Note:</span> Currently viewing <strong>{filters.employeeType === 'All' ? 'All Employees' : filters.employeeType}</strong>.
                       </p>
                       <div className="flex items-center gap-2">
                         {dataSource === 'firebase' ? (
@@ -1024,6 +1034,25 @@ const CombinedWorkforceDashboard = () => {
                     selectedQuarter={selectedQuarter}
                     onQuarterChange={handleQuarterChange}
                     availableQuarters={QUARTER_DATES}
+                  />
+                  <FilterButton
+                    filters={filters}
+                    onFilterChange={handleFilterChange}
+                    activeCount={filters.employeeType !== 'All' ? 1 : 0}
+                    availableFilters={{
+                      employeeType: [
+                        { value: 'All', label: 'All Employees' },
+                        { value: 'Benefit Eligible', label: 'Benefit Eligible' },
+                        { value: 'Non-Benefit Eligible', label: 'Non-Benefit Eligible' },
+                        { value: 'Faculty', label: 'All Faculty' },
+                        { value: 'Staff', label: 'All Staff' },
+                        { value: 'Students', label: 'Student Workers' },
+                        { value: 'Benefit Eligible Faculty', label: 'Benefit Eligible Faculty' },
+                        { value: 'Non-Benefit Eligible Faculty', label: 'Non-Benefit Eligible Faculty' },
+                        { value: 'Benefit Eligible Staff', label: 'Benefit Eligible Staff' },
+                        { value: 'Non-Benefit Eligible Staff', label: 'Non-Benefit Eligible Staff' }
+                      ]
+                    }}
                   />
                   
                   {/* Testing Controls */}

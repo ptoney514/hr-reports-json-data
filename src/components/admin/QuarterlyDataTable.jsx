@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { 
   ChevronUp, 
   ChevronDown, 
@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import EditableTableCell from './EditableTableCell';
 import StatusBadge from './StatusBadge';
+import quarterComparisonService from '../../services/QuarterComparisonService';
 
 const QuarterlyDataTable = ({ 
   allQuartersData, 
@@ -23,6 +24,7 @@ const QuarterlyDataTable = ({
 }) => {
   const [sortConfig, setSortConfig] = useState({ key: 'period', direction: 'desc' });
   const [editingCell, setEditingCell] = useState(null);
+  const [processedRows, setProcessedRows] = useState([]);
 
   // Define table columns based on dashboard type
   const getColumns = useCallback(() => {
@@ -35,14 +37,39 @@ const QuarterlyDataTable = ({
       return [
         ...baseColumns,
         { key: 'totalEmployees', label: 'Total Employees', sortable: true, editable: true, format: 'number' },
-        { key: 'faculty', label: 'Faculty', sortable: true, editable: true, format: 'number' },
-        { key: 'staff', label: 'Staff', sortable: true, editable: true, format: 'number' },
-        { key: 'students', label: 'Students', sortable: true, editable: true, format: 'number' },
-        { key: 'omahaCount', label: 'Omaha Campus', sortable: true, editable: true, format: 'number' },
-        { key: 'phoenixCount', label: 'Phoenix Campus', sortable: true, editable: true, format: 'number' },
-        { key: 'newHires', label: 'New Hires', sortable: true, editable: true, format: 'number' },
-        { key: 'departures', label: 'Departures', sortable: true, editable: true, format: 'number' },
-        { key: 'growth', label: 'Growth %', sortable: true, format: 'percentage' },
+        
+        // Faculty breakdown
+        { key: 'beFaculty', label: 'BE Faculty', sortable: true, editable: true, format: 'number', tooltip: 'Benefit Eligible Faculty' },
+        { key: 'nbeFaculty', label: 'NBE Faculty', sortable: true, editable: true, format: 'number', tooltip: 'Non-Benefit Eligible Faculty' },
+        
+        // Staff breakdown
+        { key: 'beStaff', label: 'BE Staff', sortable: true, editable: true, format: 'number', tooltip: 'Benefit Eligible Staff' },
+        { key: 'nbeStaff', label: 'NBE Staff', sortable: true, editable: true, format: 'number', tooltip: 'Non-Benefit Eligible Staff' },
+        
+        // Students (always NBE)
+        { key: 'students', label: 'NBE Students', sortable: true, editable: true, format: 'number', tooltip: 'Student Workers (Non-Benefit Eligible)' },
+        
+        // Omaha Campus breakdown
+        { key: 'omahaFaculty', label: 'Omaha - Faculty', sortable: true, editable: true, format: 'number' },
+        { key: 'omahaStaff', label: 'Omaha - Staff', sortable: true, editable: true, format: 'number' },
+        { key: 'omahaStudents', label: 'Omaha - Students', sortable: true, editable: true, format: 'number' },
+        
+        // Phoenix Campus breakdown
+        { key: 'phoenixFaculty', label: 'Phoenix - Faculty', sortable: true, editable: true, format: 'number' },
+        { key: 'phoenixStaff', label: 'Phoenix - Staff', sortable: true, editable: true, format: 'number' },
+        { key: 'phoenixStudents', label: 'Phoenix - Students', sortable: true, editable: true, format: 'number' },
+        
+        // New Hires breakdown
+        { key: 'newHiresFaculty', label: 'New Hires - Faculty', sortable: true, editable: true, format: 'number' },
+        { key: 'newHiresStaff', label: 'New Hires - Staff', sortable: true, editable: true, format: 'number' },
+        { key: 'newHiresStudents', label: 'New Hires - Students', sortable: true, editable: true, format: 'number' },
+        
+        // Departures breakdown
+        { key: 'departuresFaculty', label: 'Departures - Faculty', sortable: true, editable: true, format: 'number' },
+        { key: 'departuresStaff', label: 'Departures - Staff', sortable: true, editable: true, format: 'number' },
+        { key: 'departuresStudents', label: 'Departures - Students', sortable: true, editable: true, format: 'number' },
+        
+        { key: 'growth', label: 'Growth %', sortable: true, editable: false, format: 'percentage' },
         { key: 'lastUpdated', label: 'Last Updated', sortable: true, format: 'date' },
         { key: 'actions', label: 'Actions', width: '80px' }
       ];
@@ -71,14 +98,64 @@ const QuarterlyDataTable = ({
 
       if (dashboardType === 'workforce') {
         row.totalEmployees = data.totalEmployees || 0;
-        row.faculty = data.demographics?.faculty || 0;
-        row.staff = data.demographics?.staff || 0;
-        row.students = data.demographics?.students || 0;
-        row.omahaCount = data.byLocation?.[Object.keys(data.byLocation || {})[0]] || 0;
-        row.phoenixCount = data.byLocation?.[Object.keys(data.byLocation || {})[1]] || 0;
-        row.newHires = data.trends?.newHires || 0;
-        row.departures = data.trends?.departures || 0;
-        row.growth = data.trends?.quarterlyGrowth || 0;
+        
+        // Extract BE/NBE values if available, otherwise fall back to totals
+        if (data.demographics?.beFaculty !== undefined || data.demographics?.nbeFaculty !== undefined) {
+          // New structure with BE/NBE breakdown
+          row.beFaculty = data.demographics?.beFaculty || 0;
+          row.nbeFaculty = data.demographics?.nbeFaculty || 0;
+          row.beStaff = data.demographics?.beStaff || 0;
+          row.nbeStaff = data.demographics?.nbeStaff || 0;
+          row.students = data.demographics?.nbeStudents || data.demographics?.students || 0;
+        } else if (data.BE_Faculty_Headcount !== undefined || data.NBE_Faculty_Headcount !== undefined) {
+          // Excel import structure
+          row.beFaculty = data.BE_Faculty_Headcount || 0;
+          row.nbeFaculty = data.NBE_Faculty_Headcount || 0;
+          row.beStaff = data.BE_Staff_Headcount || 0;
+          row.nbeStaff = data.NBE_Staff_Headcount || 0;
+          row.students = data.NBE_Student_Worker_Headcount || 0;
+        } else {
+          // Legacy structure - split totals 70/30 for demonstration
+          const faculty = data.demographics?.faculty || 0;
+          const staff = data.demographics?.staff || 0;
+          row.beFaculty = Math.round(faculty * 0.7);
+          row.nbeFaculty = faculty - row.beFaculty;
+          row.beStaff = Math.round(staff * 0.7);
+          row.nbeStaff = staff - row.beStaff;
+          row.students = data.demographics?.students || 0;
+        }
+        
+        // Extract location breakdown data
+        const locations = data.byLocation || {};
+        const omaha = Object.values(locations).find(loc => loc.name?.toLowerCase().includes('omaha')) || 
+                      Object.entries(locations).find(([key]) => key.toLowerCase().includes('omaha'))?.[1] || {};
+        const phoenix = Object.values(locations).find(loc => loc.name?.toLowerCase().includes('phoenix')) || 
+                        Object.entries(locations).find(([key]) => key.toLowerCase().includes('phoenix'))?.[1] || {};
+        
+        // Omaha Campus breakdown
+        row.omahaFaculty = omaha.breakdown?.faculty || 0;
+        row.omahaStaff = omaha.breakdown?.staff || 0;
+        row.omahaStudents = omaha.breakdown?.students || 0;
+        
+        // Phoenix Campus breakdown
+        row.phoenixFaculty = phoenix.breakdown?.faculty || 0;
+        row.phoenixStaff = phoenix.breakdown?.staff || 0;
+        row.phoenixStudents = phoenix.breakdown?.students || 0;
+        
+        // New Hires breakdown
+        const newHires = data.trends?.newHires || {};
+        row.newHiresFaculty = typeof newHires === 'object' ? newHires.faculty || 0 : 0;
+        row.newHiresStaff = typeof newHires === 'object' ? newHires.staff || 0 : 0;
+        row.newHiresStudents = typeof newHires === 'object' ? newHires.students || 0 : 0;
+        
+        // Departures breakdown
+        const departures = data.trends?.departures || {};
+        row.departuresFaculty = typeof departures === 'object' ? departures.faculty || 0 : 0;
+        row.departuresStaff = typeof departures === 'object' ? departures.staff || 0 : 0;
+        row.departuresStudents = typeof departures === 'object' ? departures.students || 0 : 0;
+        
+        // Growth % will be calculated dynamically in a separate effect
+        row.growth = 0; // Placeholder - will be updated by calculateGrowthPercentages
       } else {
         row.totalRecords = Object.keys(data).length;
       }
@@ -101,9 +178,51 @@ const QuarterlyDataTable = ({
     return 'draft';
   }, []);
 
+  // Calculate growth percentages asynchronously for workforce data
+  const calculateGrowthPercentages = useCallback(async (rows) => {
+    if (dashboardType !== 'workforce' || !rows.length) {
+      return rows;
+    }
+
+    const updatedRows = await Promise.all(
+      rows.map(async (row) => {
+        try {
+          const growthData = await quarterComparisonService.calculateWorkforceChanges(
+            row.period,
+            row.rawData
+          );
+          
+          return {
+            ...row,
+            growth: growthData.totalChange || 0
+          };
+        } catch (error) {
+          console.warn(`Failed to calculate growth for ${row.period}:`, error);
+          return {
+            ...row,
+            growth: 0
+          };
+        }
+      })
+    );
+
+    return updatedRows;
+  }, [dashboardType, quarterComparisonService]);
+
+  // Process rows with growth calculations
+  useEffect(() => {
+    const processRows = async () => {
+      const basicRows = transformDataToRows(allQuartersData);
+      const rowsWithGrowth = await calculateGrowthPercentages(basicRows);
+      setProcessedRows(rowsWithGrowth);
+    };
+
+    processRows();
+  }, [allQuartersData, transformDataToRows, calculateGrowthPercentages]);
+
   // Sort table data
   const sortedData = useMemo(() => {
-    const rows = transformDataToRows(allQuartersData);
+    const rows = processedRows.length > 0 ? processedRows : transformDataToRows(allQuartersData);
     
     if (!sortConfig.key) return rows;
 
@@ -125,7 +244,7 @@ const QuarterlyDataTable = ({
       
       return sortConfig.direction === 'asc' ? comparison : -comparison;
     });
-  }, [allQuartersData, sortConfig, transformDataToRows]);
+  }, [allQuartersData, sortConfig, transformDataToRows, processedRows]);
 
   // Handle column sort
   const handleSort = useCallback((columnKey) => {
@@ -145,15 +264,60 @@ const QuarterlyDataTable = ({
     // Update the appropriate field in the data structure
     if (columnKey === 'totalEmployees') {
       updatedData.totalEmployees = newValue;
-    } else if (columnKey === 'faculty') {
+    } else if (columnKey === 'beFaculty') {
       if (!updatedData.demographics) updatedData.demographics = {};
-      updatedData.demographics.faculty = newValue;
-    } else if (columnKey === 'staff') {
+      updatedData.demographics.beFaculty = newValue;
+      // Update total faculty
+      updatedData.demographics.faculty = newValue + (updatedData.demographics.nbeFaculty || 0);
+      // Update total employees
+      updatedData.totalEmployees = (updatedData.demographics.beFaculty || 0) + 
+                                   (updatedData.demographics.nbeFaculty || 0) + 
+                                   (updatedData.demographics.beStaff || 0) + 
+                                   (updatedData.demographics.nbeStaff || 0) + 
+                                   (updatedData.demographics.students || 0);
+    } else if (columnKey === 'nbeFaculty') {
       if (!updatedData.demographics) updatedData.demographics = {};
-      updatedData.demographics.staff = newValue;
+      updatedData.demographics.nbeFaculty = newValue;
+      // Update total faculty
+      updatedData.demographics.faculty = (updatedData.demographics.beFaculty || 0) + newValue;
+      // Update total employees
+      updatedData.totalEmployees = (updatedData.demographics.beFaculty || 0) + 
+                                   (updatedData.demographics.nbeFaculty || 0) + 
+                                   (updatedData.demographics.beStaff || 0) + 
+                                   (updatedData.demographics.nbeStaff || 0) + 
+                                   (updatedData.demographics.students || 0);
+    } else if (columnKey === 'beStaff') {
+      if (!updatedData.demographics) updatedData.demographics = {};
+      updatedData.demographics.beStaff = newValue;
+      // Update total staff
+      updatedData.demographics.staff = newValue + (updatedData.demographics.nbeStaff || 0);
+      // Update total employees
+      updatedData.totalEmployees = (updatedData.demographics.beFaculty || 0) + 
+                                   (updatedData.demographics.nbeFaculty || 0) + 
+                                   (updatedData.demographics.beStaff || 0) + 
+                                   (updatedData.demographics.nbeStaff || 0) + 
+                                   (updatedData.demographics.students || 0);
+    } else if (columnKey === 'nbeStaff') {
+      if (!updatedData.demographics) updatedData.demographics = {};
+      updatedData.demographics.nbeStaff = newValue;
+      // Update total staff
+      updatedData.demographics.staff = (updatedData.demographics.beStaff || 0) + newValue;
+      // Update total employees
+      updatedData.totalEmployees = (updatedData.demographics.beFaculty || 0) + 
+                                   (updatedData.demographics.nbeFaculty || 0) + 
+                                   (updatedData.demographics.beStaff || 0) + 
+                                   (updatedData.demographics.nbeStaff || 0) + 
+                                   (updatedData.demographics.students || 0);
     } else if (columnKey === 'students') {
       if (!updatedData.demographics) updatedData.demographics = {};
       updatedData.demographics.students = newValue;
+      updatedData.demographics.nbeStudents = newValue; // Students are always NBE
+      // Update total employees
+      updatedData.totalEmployees = (updatedData.demographics.beFaculty || 0) + 
+                                   (updatedData.demographics.nbeFaculty || 0) + 
+                                   (updatedData.demographics.beStaff || 0) + 
+                                   (updatedData.demographics.nbeStaff || 0) + 
+                                   (updatedData.demographics.students || 0);
     } else if (columnKey === 'newHires') {
       if (!updatedData.trends) updatedData.trends = {};
       updatedData.trends.newHires = newValue;
@@ -216,7 +380,7 @@ const QuarterlyDataTable = ({
                   style={{ width: column.width }}
                   onClick={() => column.sortable && handleSort(column.key)}
                 >
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-1" title={column.tooltip || ''}>
                     {column.label}
                     {column.sortable && (
                       <div className="flex flex-col">

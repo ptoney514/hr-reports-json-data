@@ -25,6 +25,14 @@ This todo list tracks the Phase 11 objectives for user testing and dashboard ref
 
 ## High Priority Tasks
 
+### 1. Implement Employee Type Filtering (Benefit Eligibility) ✅
+- [x] Update useFirebaseWorkforceData hook to accept and handle employeeType filter parameter
+- [x] Modify workforceDataProcessor.js to implement filtering logic for employee types
+- [x] Update CombinedWorkforceDashboard to add employee type filter UI and state management
+- [x] Update chart components to respect employee type filter if needed
+- [x] Test filtering functionality with all employee type combinations
+- [x] Update TODO.md with completed tasks
+
 ### 2. Review Current System Status
 - [ ] Verify all components are ready for user testing
 - [ ] Check Docker deployment status
@@ -134,6 +142,100 @@ The system is fully functional and technically sound. All major Phase 10 issues 
 
 ## Review Section
 *This section will be updated as tasks are completed with summaries of changes and relevant information.*
+
+### Employee Type Filtering Implementation ✅
+**Date:** January 13, 2025
+**Status:** Complete - Full benefit eligibility filtering implemented
+
+**Changes Made:**
+1. **Enhanced useFirebaseWorkforceData Hook**:
+   - Hook already supported employeeTypeFilter parameter
+   - Existing filtering logic in place for Faculty/Staff/Students
+   - No changes needed as filtering was already implemented
+
+2. **Updated workforceDataProcessor.js**:
+   - Added employeeTypeFilter parameter to generateWorkforceMetrics function
+   - Implemented comprehensive filtering logic with 10 filter options:
+     - All Employees, Benefit Eligible, Non-Benefit Eligible
+     - All Faculty, All Staff, Student Workers
+     - Benefit Eligible Faculty/Staff, Non-Benefit Eligible Faculty/Staff
+   - Updated chart generation functions to respect filters:
+     - generateHistoricalTrendsFromAggregate
+     - generateDivisionAnalysisFromAggregate
+     - generateLocationAnalysisFromAggregate
+   - Filter logic properly separates BE/NBE counts based on data structure
+
+3. **Enhanced CombinedWorkforceDashboard UI**:
+   - Added FilterButton component with employee type filter
+   - Integrated 10 comprehensive filter options
+   - Updated filter state management to handle employeeType
+   - Modified handleFilterChange to support FilterButton format
+   - Updated note text to dynamically show current filter selection
+   - Filter UI positioned next to quarter selector
+
+4. **Chart Integration**:
+   - Charts automatically receive filtered data through props
+   - No direct chart component changes needed
+   - All visualizations respect the active filter
+
+5. **Testing Documentation**:
+   - Created comprehensive EMPLOYEE_TYPE_FILTER_TEST_PLAN.md
+   - Documented all 10 filter scenarios
+   - Included validation checklist and known limitations
+
+**Technical Implementation Details:**
+- Filter state stored in component: `employeeType: 'All'`
+- Filter passed to Firebase hook: `employeeTypeFilter: filters.employeeType`
+- Processing functions updated to accept filter parameter
+- Reusable applyEmployeeTypeFilter helper function for consistency
+- Active filter count badge shows when filter is applied
+
+**User Experience:**
+- Clear filter options with descriptive labels
+- Dynamic note showing current view
+- Visual indicator for active filters
+- Seamless integration with existing quarter filter
+- All data (cards, charts, metrics) update based on selection
+
+### Admin Dashboard BE/NBE Column Implementation ✅
+**Date:** January 13, 2025
+**Status:** Complete - Benefit eligibility columns added to admin table
+
+**Changes Made:**
+1. **Updated QuarterlyDataTable Column Definitions**:
+   - Replaced single Faculty/Staff columns with BE/NBE breakdown
+   - Added BE Faculty, NBE Faculty columns with tooltips
+   - Added BE Staff, NBE Staff columns with tooltips
+   - Renamed Students to NBE Students (students are always non-benefit eligible)
+   - Added hover tooltips explaining BE = Benefit Eligible, NBE = Non-Benefit Eligible
+
+2. **Enhanced Data Transformation Logic**:
+   - Checks for BE/NBE data in multiple formats:
+     - New demographics structure (demographics.beFaculty, etc.)
+     - Excel import structure (BE_Faculty_Headcount, etc.)
+     - Legacy structure (splits totals 70/30 for demonstration)
+   - Properly extracts and displays BE/NBE values from Firebase
+
+3. **Updated Cell Change Handler**:
+   - handleCellChange now properly saves BE/NBE values
+   - Automatically updates totals when BE/NBE values change:
+     - Faculty total = BE Faculty + NBE Faculty
+     - Staff total = BE Staff + NBE Staff
+     - Total Employees = All BE + NBE values combined
+   - Maintains data consistency across edits
+
+**Technical Details:**
+- Backward compatible with existing data structures
+- Supports multiple data formats from different sources
+- Real-time total calculations on edit
+- Proper Firebase data structure updates
+
+**User Benefits:**
+- Clear visibility of benefit eligibility breakdown in admin table
+- Can edit BE/NBE counts individually
+- Totals automatically recalculate
+- Better workforce composition analysis
+- Supports data-driven benefit planning
 
 ### Docker Development Environment Rebuild ✅
 **Date:** January 12, 2025

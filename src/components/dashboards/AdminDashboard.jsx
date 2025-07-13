@@ -16,7 +16,6 @@ import {
 import { getQuarters } from '../../services/QuarterConfigService';
 import firebaseService from '../../services/FirebaseService';
 import QuarterlyDataTable from '../admin/QuarterlyDataTable';
-import SummaryCards from '../admin/SummaryCards';
 import TableFilters from '../admin/TableFilters';
 import DataImportExport from '../admin/DataImportExport';
 
@@ -394,11 +393,6 @@ const AdminDashboard = () => {
         </div>
       )}
 
-      {/* Summary Cards */}
-      <SummaryCards 
-        allQuartersData={allQuartersData}
-        dashboardType={selectedDashboard}
-      />
 
       {/* Table Filters */}
       <TableFilters

@@ -172,7 +172,7 @@ const parseCurrency = (value) => {
 /**
  * Generate workforce dashboard metrics from aggregate data
  */
-export const generateWorkforceMetrics = (aggregateData, selectedQuarter = null) => {
+export const generateWorkforceMetrics = (aggregateData, selectedQuarter = null, employeeTypeFilter = 'All') => {
   // Filter to selected quarter if specified
   const quarterData = selectedQuarter 
     ? aggregateData.filter(record => {
@@ -181,18 +181,137 @@ export const generateWorkforceMetrics = (aggregateData, selectedQuarter = null) 
       })
     : aggregateData;
   
-  // Calculate totals from aggregate data
-  const totalEmployees = quarterData.reduce((sum, record) => sum + (record.totalHeadcount || 0), 0);
-  const faculty = quarterData.reduce((sum, record) => sum + (record.beFacultyHeadcount || 0) + (record.nbeFacultyHeadcount || 0), 0);
-  const staff = quarterData.reduce((sum, record) => sum + (record.beStaffHeadcount || 0) + (record.nbeStaffHeadcount || 0), 0);
-  const students = quarterData.reduce((sum, record) => sum + (record.nbeStudentHeadcount || 0), 0);
-  const newHires = quarterData.reduce((sum, record) => sum + (record.beNewHires || 0) + (record.nbeNewHires || 0), 0);
-  const departures = quarterData.reduce((sum, record) => sum + (record.beDepartures || 0) + (record.nbeDepartures || 0), 0);
+  // Helper function to apply employee type filtering
+  const applyEmployeeTypeFilter = (beFaculty, nbeFaculty, beStaff, nbeStaff, students) => {
+    switch (employeeTypeFilter) {
+      case 'All':
+        return {
+          faculty: (beFaculty || 0) + (nbeFaculty || 0),
+          staff: (beStaff || 0) + (nbeStaff || 0),
+          students: (students || 0),
+          total: (beFaculty || 0) + (nbeFaculty || 0) + (beStaff || 0) + (nbeStaff || 0) + (students || 0)
+        };
+      case 'Benefit Eligible':
+        return {
+          faculty: beFaculty || 0,
+          staff: beStaff || 0,
+          students: 0, // Students are never benefit eligible
+          total: (beFaculty || 0) + (beStaff || 0)
+        };
+      case 'Non-Benefit Eligible':
+        return {
+          faculty: nbeFaculty || 0,
+          staff: nbeStaff || 0,
+          students: students || 0,
+          total: (nbeFaculty || 0) + (nbeStaff || 0) + (students || 0)
+        };
+      case 'Faculty':
+        return {
+          faculty: (beFaculty || 0) + (nbeFaculty || 0),
+          staff: 0,
+          students: 0,
+          total: (beFaculty || 0) + (nbeFaculty || 0)
+        };
+      case 'Staff':
+        return {
+          faculty: 0,
+          staff: (beStaff || 0) + (nbeStaff || 0),
+          students: 0,
+          total: (beStaff || 0) + (nbeStaff || 0)
+        };
+      case 'Students':
+        return {
+          faculty: 0,
+          staff: 0,
+          students: students || 0,
+          total: students || 0
+        };
+      case 'Benefit Eligible Faculty':
+        return {
+          faculty: beFaculty || 0,
+          staff: 0,
+          students: 0,
+          total: beFaculty || 0
+        };
+      case 'Non-Benefit Eligible Faculty':
+        return {
+          faculty: nbeFaculty || 0,
+          staff: 0,
+          students: 0,
+          total: nbeFaculty || 0
+        };
+      case 'Benefit Eligible Staff':
+        return {
+          faculty: 0,
+          staff: beStaff || 0,
+          students: 0,
+          total: beStaff || 0
+        };
+      case 'Non-Benefit Eligible Staff':
+        return {
+          faculty: 0,
+          staff: nbeStaff || 0,
+          students: 0,
+          total: nbeStaff || 0
+        };
+      default:
+        // Default to 'All' for unrecognized filters
+        return {
+          faculty: (beFaculty || 0) + (nbeFaculty || 0),
+          staff: (beStaff || 0) + (nbeStaff || 0),
+          students: (students || 0),
+          total: (beFaculty || 0) + (nbeFaculty || 0) + (beStaff || 0) + (nbeStaff || 0) + (students || 0)
+        };
+    }
+  };
+  
+  // Calculate totals from aggregate data with filtering
+  let totalEmployees = 0;
+  let faculty = 0;
+  let staff = 0;
+  let students = 0;
+  let beNewHires = 0;
+  let nbeNewHires = 0;
+  let beDepartures = 0;
+  let nbeDepartures = 0;
+  
+  quarterData.forEach(record => {
+    const filtered = applyEmployeeTypeFilter(
+      record.beFacultyHeadcount,
+      record.nbeFacultyHeadcount,
+      record.beStaffHeadcount,
+      record.nbeStaffHeadcount,
+      record.nbeStudentHeadcount
+    );
+    
+    totalEmployees += filtered.total;
+    faculty += filtered.faculty;
+    staff += filtered.staff;
+    students += filtered.students;
+    
+    // Filter new hires and departures based on employee type
+    if (employeeTypeFilter === 'All' || employeeTypeFilter === 'Benefit Eligible' || 
+        employeeTypeFilter === 'Faculty' || employeeTypeFilter === 'Staff' ||
+        employeeTypeFilter === 'Benefit Eligible Faculty' || employeeTypeFilter === 'Benefit Eligible Staff') {
+      beNewHires += record.beNewHires || 0;
+      beDepartures += record.beDepartures || 0;
+    }
+    
+    if (employeeTypeFilter === 'All' || employeeTypeFilter === 'Non-Benefit Eligible' || 
+        employeeTypeFilter === 'Faculty' || employeeTypeFilter === 'Staff' || employeeTypeFilter === 'Students' ||
+        employeeTypeFilter === 'Non-Benefit Eligible Faculty' || employeeTypeFilter === 'Non-Benefit Eligible Staff') {
+      nbeNewHires += record.nbeNewHires || 0;
+      nbeDepartures += record.nbeDepartures || 0;
+    }
+  });
+  
+  const newHires = beNewHires + nbeNewHires;
+  const departures = beDepartures + nbeDepartures;
   
   // Generate charts from aggregate data
-  const topDivisions = generateDivisionAnalysisFromAggregate(quarterData);
-  const locationDistribution = generateLocationAnalysisFromAggregate(quarterData);
-  const historicalTrends = generateHistoricalTrendsFromAggregate(aggregateData);
+  const topDivisions = generateDivisionAnalysisFromAggregate(quarterData, employeeTypeFilter);
+  const locationDistribution = generateLocationAnalysisFromAggregate(quarterData, employeeTypeFilter);
+  const historicalTrends = generateHistoricalTrendsFromAggregate(aggregateData, employeeTypeFilter);
   
   return {
     summary: {
@@ -216,8 +335,91 @@ export const generateWorkforceMetrics = (aggregateData, selectedQuarter = null) 
 /**
  * Generate historical trends from aggregate data
  */
-const generateHistoricalTrendsFromAggregate = (aggregateData) => {
+const generateHistoricalTrendsFromAggregate = (aggregateData, employeeTypeFilter = 'All') => {
   const quarterTotals = {};
+  
+  // Helper function to apply employee type filtering (same logic as in main function)
+  const applyEmployeeTypeFilter = (beFaculty, nbeFaculty, beStaff, nbeStaff, students) => {
+    switch (employeeTypeFilter) {
+      case 'All':
+        return {
+          faculty: (beFaculty || 0) + (nbeFaculty || 0),
+          staff: (beStaff || 0) + (nbeStaff || 0),
+          students: (students || 0),
+          total: (beFaculty || 0) + (nbeFaculty || 0) + (beStaff || 0) + (nbeStaff || 0) + (students || 0)
+        };
+      case 'Benefit Eligible':
+        return {
+          faculty: beFaculty || 0,
+          staff: beStaff || 0,
+          students: 0,
+          total: (beFaculty || 0) + (beStaff || 0)
+        };
+      case 'Non-Benefit Eligible':
+        return {
+          faculty: nbeFaculty || 0,
+          staff: nbeStaff || 0,
+          students: students || 0,
+          total: (nbeFaculty || 0) + (nbeStaff || 0) + (students || 0)
+        };
+      case 'Faculty':
+        return {
+          faculty: (beFaculty || 0) + (nbeFaculty || 0),
+          staff: 0,
+          students: 0,
+          total: (beFaculty || 0) + (nbeFaculty || 0)
+        };
+      case 'Staff':
+        return {
+          faculty: 0,
+          staff: (beStaff || 0) + (nbeStaff || 0),
+          students: 0,
+          total: (beStaff || 0) + (nbeStaff || 0)
+        };
+      case 'Students':
+        return {
+          faculty: 0,
+          staff: 0,
+          students: students || 0,
+          total: students || 0
+        };
+      case 'Benefit Eligible Faculty':
+        return {
+          faculty: beFaculty || 0,
+          staff: 0,
+          students: 0,
+          total: beFaculty || 0
+        };
+      case 'Non-Benefit Eligible Faculty':
+        return {
+          faculty: nbeFaculty || 0,
+          staff: 0,
+          students: 0,
+          total: nbeFaculty || 0
+        };
+      case 'Benefit Eligible Staff':
+        return {
+          faculty: 0,
+          staff: beStaff || 0,
+          students: 0,
+          total: beStaff || 0
+        };
+      case 'Non-Benefit Eligible Staff':
+        return {
+          faculty: 0,
+          staff: nbeStaff || 0,
+          students: 0,
+          total: nbeStaff || 0
+        };
+      default:
+        return {
+          faculty: (beFaculty || 0) + (nbeFaculty || 0),
+          staff: (beStaff || 0) + (nbeStaff || 0),
+          students: (students || 0),
+          total: (beFaculty || 0) + (nbeFaculty || 0) + (beStaff || 0) + (nbeStaff || 0) + (students || 0)
+        };
+    }
+  };
   
   aggregateData.forEach(record => {
     const quarterKey = format(record.quarterEndDate, 'yyyy-MM-dd');
@@ -231,10 +433,18 @@ const generateHistoricalTrendsFromAggregate = (aggregateData) => {
       };
     }
     
-    quarterTotals[quarterKey].total += (record.totalHeadcount || 0);
-    quarterTotals[quarterKey].faculty += (record.beFacultyHeadcount || 0) + (record.nbeFacultyHeadcount || 0);
-    quarterTotals[quarterKey].staff += (record.beStaffHeadcount || 0) + (record.nbeStaffHeadcount || 0);
-    quarterTotals[quarterKey].students += (record.nbeStudentHeadcount || 0);
+    const filtered = applyEmployeeTypeFilter(
+      record.beFacultyHeadcount,
+      record.nbeFacultyHeadcount,
+      record.beStaffHeadcount,
+      record.nbeStaffHeadcount,
+      record.nbeStudentHeadcount
+    );
+    
+    quarterTotals[quarterKey].total += filtered.total;
+    quarterTotals[quarterKey].faculty += filtered.faculty;
+    quarterTotals[quarterKey].staff += filtered.staff;
+    quarterTotals[quarterKey].students += filtered.students;
   });
   
   return Object.values(quarterTotals).sort((a, b) => new Date(a.quarter) - new Date(b.quarter));
@@ -244,8 +454,91 @@ const generateHistoricalTrendsFromAggregate = (aggregateData) => {
 /**
  * Generate division analysis from aggregate data
  */
-const generateDivisionAnalysisFromAggregate = (aggregateData) => {
+const generateDivisionAnalysisFromAggregate = (aggregateData, employeeTypeFilter = 'All') => {
   const divisionCounts = {};
+  
+  // Reuse the same filtering logic
+  const applyEmployeeTypeFilter = (beFaculty, nbeFaculty, beStaff, nbeStaff, students) => {
+    switch (employeeTypeFilter) {
+      case 'All':
+        return {
+          faculty: (beFaculty || 0) + (nbeFaculty || 0),
+          staff: (beStaff || 0) + (nbeStaff || 0),
+          students: (students || 0),
+          total: (beFaculty || 0) + (nbeFaculty || 0) + (beStaff || 0) + (nbeStaff || 0) + (students || 0)
+        };
+      case 'Benefit Eligible':
+        return {
+          faculty: beFaculty || 0,
+          staff: beStaff || 0,
+          students: 0,
+          total: (beFaculty || 0) + (beStaff || 0)
+        };
+      case 'Non-Benefit Eligible':
+        return {
+          faculty: nbeFaculty || 0,
+          staff: nbeStaff || 0,
+          students: students || 0,
+          total: (nbeFaculty || 0) + (nbeStaff || 0) + (students || 0)
+        };
+      case 'Faculty':
+        return {
+          faculty: (beFaculty || 0) + (nbeFaculty || 0),
+          staff: 0,
+          students: 0,
+          total: (beFaculty || 0) + (nbeFaculty || 0)
+        };
+      case 'Staff':
+        return {
+          faculty: 0,
+          staff: (beStaff || 0) + (nbeStaff || 0),
+          students: 0,
+          total: (beStaff || 0) + (nbeStaff || 0)
+        };
+      case 'Students':
+        return {
+          faculty: 0,
+          staff: 0,
+          students: students || 0,
+          total: students || 0
+        };
+      case 'Benefit Eligible Faculty':
+        return {
+          faculty: beFaculty || 0,
+          staff: 0,
+          students: 0,
+          total: beFaculty || 0
+        };
+      case 'Non-Benefit Eligible Faculty':
+        return {
+          faculty: nbeFaculty || 0,
+          staff: 0,
+          students: 0,
+          total: nbeFaculty || 0
+        };
+      case 'Benefit Eligible Staff':
+        return {
+          faculty: 0,
+          staff: beStaff || 0,
+          students: 0,
+          total: beStaff || 0
+        };
+      case 'Non-Benefit Eligible Staff':
+        return {
+          faculty: 0,
+          staff: nbeStaff || 0,
+          students: 0,
+          total: nbeStaff || 0
+        };
+      default:
+        return {
+          faculty: (beFaculty || 0) + (nbeFaculty || 0),
+          staff: (beStaff || 0) + (nbeStaff || 0),
+          students: (students || 0),
+          total: (beFaculty || 0) + (nbeFaculty || 0) + (beStaff || 0) + (nbeStaff || 0) + (students || 0)
+        };
+    }
+  };
   
   aggregateData.forEach(record => {
     const division = record.division || 'Unknown Division';
@@ -253,10 +546,18 @@ const generateDivisionAnalysisFromAggregate = (aggregateData) => {
       divisionCounts[division] = { faculty: 0, staff: 0, students: 0, total: 0 };
     }
     
-    divisionCounts[division].faculty += (record.beFacultyHeadcount || 0) + (record.nbeFacultyHeadcount || 0);
-    divisionCounts[division].staff += (record.beStaffHeadcount || 0) + (record.nbeStaffHeadcount || 0);
-    divisionCounts[division].students += (record.nbeStudentHeadcount || 0);
-    divisionCounts[division].total += (record.totalHeadcount || 0);
+    const filtered = applyEmployeeTypeFilter(
+      record.beFacultyHeadcount,
+      record.nbeFacultyHeadcount,
+      record.beStaffHeadcount,
+      record.nbeStaffHeadcount,
+      record.nbeStudentHeadcount
+    );
+    
+    divisionCounts[division].faculty += filtered.faculty;
+    divisionCounts[division].staff += filtered.staff;
+    divisionCounts[division].students += filtered.students;
+    divisionCounts[division].total += filtered.total;
   });
   
   return Object.entries(divisionCounts)
@@ -268,8 +569,91 @@ const generateDivisionAnalysisFromAggregate = (aggregateData) => {
 /**
  * Generate location analysis from aggregate data
  */
-const generateLocationAnalysisFromAggregate = (aggregateData) => {
+const generateLocationAnalysisFromAggregate = (aggregateData, employeeTypeFilter = 'All') => {
   const locationCounts = {};
+  
+  // Reuse the same filtering logic
+  const applyEmployeeTypeFilter = (beFaculty, nbeFaculty, beStaff, nbeStaff, students) => {
+    switch (employeeTypeFilter) {
+      case 'All':
+        return {
+          faculty: (beFaculty || 0) + (nbeFaculty || 0),
+          staff: (beStaff || 0) + (nbeStaff || 0),
+          students: (students || 0),
+          total: (beFaculty || 0) + (nbeFaculty || 0) + (beStaff || 0) + (nbeStaff || 0) + (students || 0)
+        };
+      case 'Benefit Eligible':
+        return {
+          faculty: beFaculty || 0,
+          staff: beStaff || 0,
+          students: 0,
+          total: (beFaculty || 0) + (beStaff || 0)
+        };
+      case 'Non-Benefit Eligible':
+        return {
+          faculty: nbeFaculty || 0,
+          staff: nbeStaff || 0,
+          students: students || 0,
+          total: (nbeFaculty || 0) + (nbeStaff || 0) + (students || 0)
+        };
+      case 'Faculty':
+        return {
+          faculty: (beFaculty || 0) + (nbeFaculty || 0),
+          staff: 0,
+          students: 0,
+          total: (beFaculty || 0) + (nbeFaculty || 0)
+        };
+      case 'Staff':
+        return {
+          faculty: 0,
+          staff: (beStaff || 0) + (nbeStaff || 0),
+          students: 0,
+          total: (beStaff || 0) + (nbeStaff || 0)
+        };
+      case 'Students':
+        return {
+          faculty: 0,
+          staff: 0,
+          students: students || 0,
+          total: students || 0
+        };
+      case 'Benefit Eligible Faculty':
+        return {
+          faculty: beFaculty || 0,
+          staff: 0,
+          students: 0,
+          total: beFaculty || 0
+        };
+      case 'Non-Benefit Eligible Faculty':
+        return {
+          faculty: nbeFaculty || 0,
+          staff: 0,
+          students: 0,
+          total: nbeFaculty || 0
+        };
+      case 'Benefit Eligible Staff':
+        return {
+          faculty: 0,
+          staff: beStaff || 0,
+          students: 0,
+          total: beStaff || 0
+        };
+      case 'Non-Benefit Eligible Staff':
+        return {
+          faculty: 0,
+          staff: nbeStaff || 0,
+          students: 0,
+          total: nbeStaff || 0
+        };
+      default:
+        return {
+          faculty: (beFaculty || 0) + (nbeFaculty || 0),
+          staff: (beStaff || 0) + (nbeStaff || 0),
+          students: (students || 0),
+          total: (beFaculty || 0) + (nbeFaculty || 0) + (beStaff || 0) + (nbeStaff || 0) + (students || 0)
+        };
+    }
+  };
   
   aggregateData.forEach(record => {
     const location = record.location || 'Unknown Location';
@@ -277,10 +661,18 @@ const generateLocationAnalysisFromAggregate = (aggregateData) => {
       locationCounts[location] = { faculty: 0, staff: 0, students: 0, total: 0 };
     }
     
-    locationCounts[location].faculty += (record.beFacultyHeadcount || 0) + (record.nbeFacultyHeadcount || 0);
-    locationCounts[location].staff += (record.beStaffHeadcount || 0) + (record.nbeStaffHeadcount || 0);
-    locationCounts[location].students += (record.nbeStudentHeadcount || 0);
-    locationCounts[location].total += (record.totalHeadcount || 0);
+    const filtered = applyEmployeeTypeFilter(
+      record.beFacultyHeadcount,
+      record.nbeFacultyHeadcount,
+      record.beStaffHeadcount,
+      record.nbeStaffHeadcount,
+      record.nbeStudentHeadcount
+    );
+    
+    locationCounts[location].faculty += filtered.faculty;
+    locationCounts[location].staff += filtered.staff;
+    locationCounts[location].students += filtered.students;
+    locationCounts[location].total += filtered.total;
   });
   
   const totalEmployees = Object.values(locationCounts).reduce((sum, counts) => sum + counts.total, 0);
