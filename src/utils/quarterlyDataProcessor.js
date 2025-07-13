@@ -226,10 +226,14 @@ export function calculateQuarterMetrics(quarterData, previousQuarterData = null)
   let totalChange = null;
   let facultyChange = null;
   let staffChange = null;
+  let newHiresChange = null;
+  let leaversChange = null;
   
   if (previousQuarterData && previousQuarterData.length > 0) {
     const prevBEFaculty = previousQuarterData.reduce((sum, row) => sum + (row.beFacultyHeadcount || 0), 0);
     const prevBEStaff = previousQuarterData.reduce((sum, row) => sum + (row.beStaffHeadcount || 0), 0);
+    const prevTotalStarters = previousQuarterData.reduce((sum, row) => sum + (row.beNewHires || 0), 0);
+    const prevTotalLeavers = previousQuarterData.reduce((sum, row) => sum + (row.beDepartures || 0), 0);
     
     // BE only per dashboard note
     const prevTotalFaculty = prevBEFaculty;
@@ -245,6 +249,12 @@ export function calculateQuarterMetrics(quarterData, previousQuarterData = null)
     }
     if (prevTotalStaff > 0) {
       staffChange = ((totalStaff - prevTotalStaff) / prevTotalStaff * 100);
+    }
+    if (prevTotalStarters > 0) {
+      newHiresChange = ((totalStarters - prevTotalStarters) / prevTotalStarters * 100);
+    }
+    if (prevTotalLeavers > 0) {
+      leaversChange = ((totalLeavers - prevTotalLeavers) / prevTotalLeavers * 100);
     }
   }
   
@@ -271,16 +281,16 @@ export function calculateQuarterMetrics(quarterData, previousQuarterData = null)
     },
     newHires: { 
       value: totalStarters, 
-      change: null, 
+      change: newHiresChange, 
       subtitle: "new hires",
-      changeType: null,
+      changeType: "percentage",
       indicator: "teal" 
     },
     leavers: { 
       value: totalLeavers, 
-      change: null, 
+      change: leaversChange, 
       subtitle: "departures",
-      changeType: null,
+      changeType: "percentage",
       indicator: "blue" 
     }
   };
