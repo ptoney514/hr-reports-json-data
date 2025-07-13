@@ -53,8 +53,8 @@ const CombinedWorkforceDashboard = () => {
     total: { value: 0, change: null, subtitle: "from previous quarter", changeType: "percentage" },
     faculty: { value: 0, change: null, subtitle: "change", changeType: "percentage", indicator: "green" },
     staff: { value: 0, change: null, subtitle: "change", changeType: "percentage", indicator: "yellow" },
-    newHires: { value: 0, change: null, subtitle: "new hires", changeType: null, indicator: "teal" },
-    leavers: { value: 0, change: null, subtitle: "departures", changeType: null, indicator: "blue" }
+    newHires: { value: 0, change: null, subtitle: "change", changeType: "percentage", indicator: "teal" },
+    leavers: { value: 0, change: null, subtitle: "change", changeType: "percentage", indicator: "blue" }
   });
   
   // Data source state
@@ -104,8 +104,8 @@ const CombinedWorkforceDashboard = () => {
       total: { value: 0, change: null, subtitle: "no data available", changeType: "percentage" },
       faculty: { value: 0, change: null, subtitle: "no data available", changeType: "percentage", indicator: "green" },
       staff: { value: 0, change: null, subtitle: "no data available", changeType: "percentage", indicator: "yellow" },
-      newHires: { value: 0, change: null, subtitle: "no data available", changeType: null, indicator: "teal" },
-      leavers: { value: 0, change: null, subtitle: "no data available", changeType: null, indicator: "blue" }
+      newHires: { value: 0, change: null, subtitle: "no data available", changeType: "percentage", indicator: "teal" },
+      leavers: { value: 0, change: null, subtitle: "no data available", changeType: "percentage", indicator: "blue" }
     },
     charts: {
       fiveQuarter: [],
@@ -279,13 +279,20 @@ const CombinedWorkforceDashboard = () => {
     } else if (dataSource === 'firebase' && firebaseData && Object.keys(firebaseData).length > 0) {
       // Use Firebase data directly for metrics
       console.log('Using Firebase data for metrics');
+      console.log('🎯 DEBUG: Firebase summary data:', firebaseData.summary);
+      console.log('🎯 DEBUG: New Hires Change:', firebaseData.summary?.newHiresChange);
+      console.log('🎯 DEBUG: Departures Change:', firebaseData.summary?.deparuresChange);
+      console.log('🎯 DEBUG: Employee Change:', firebaseData.summary?.employeeChange);
+      console.log('🎯 DEBUG: Faculty Change:', firebaseData.summary?.facultyChange);
+      
       const metrics = {
         total: { value: firebaseData.summary?.totalEmployees || 0, change: firebaseData.summary?.employeeChange ?? null, subtitle: "from previous quarter", changeType: "percentage" },
         faculty: { value: firebaseData.summary?.faculty || 0, change: firebaseData.summary?.facultyChange ?? null, subtitle: "change", changeType: "percentage", indicator: "green" },
         staff: { value: firebaseData.summary?.staff || 0, change: firebaseData.summary?.staffChange ?? null, subtitle: "change", changeType: "percentage", indicator: "yellow" },
-        newHires: { value: (firebaseData.metrics?.recentHires?.faculty || 0) + (firebaseData.metrics?.recentHires?.staff || 0), change: null, subtitle: "new hires", changeType: null, indicator: "teal" },
-        leavers: { value: Math.floor((firebaseData.summary?.totalEmployees || 0) * 0.05), change: null, subtitle: "departures", changeType: null, indicator: "blue" }
+        newHires: { value: (firebaseData.metrics?.recentHires?.faculty || 0) + (firebaseData.metrics?.recentHires?.staff || 0), change: firebaseData.summary?.newHiresChange ?? null, subtitle: "change", changeType: "percentage", indicator: "teal" },
+        leavers: { value: Math.floor((firebaseData.summary?.totalEmployees || 0) * 0.05), change: firebaseData.summary?.deparuresChange ?? null, subtitle: "change", changeType: "percentage", indicator: "blue" }
       };
+      console.log('🎯 DEBUG: Generated metrics for cards:', metrics);
       setHeadcountData(metrics);
       
       // Update additional metrics from Firebase data
@@ -1143,6 +1150,8 @@ const CombinedWorkforceDashboard = () => {
             <SummaryCard
               title="New Hires"
               value={(headcountData.newHires?.value || 0).toLocaleString()}
+              change={headcountData.newHires?.change}
+              changeType="percentage"
               subtitle={cardInsights.newHires.subtitle}
               icon={UserPlus}
             />
@@ -1150,6 +1159,8 @@ const CombinedWorkforceDashboard = () => {
             <SummaryCard
               title="Leavers"
               value={(headcountData.leavers?.value || 0).toLocaleString()}
+              change={headcountData.leavers?.change}
+              changeType="percentage"
               subtitle={cardInsights.leavers.subtitle}
               icon={UserMinus}
             />
@@ -1387,4 +1398,4 @@ const CombinedWorkforceDashboard = () => {
   );
 };
 
-export default CombinedWorkforceDashboard; 
+export default CombinedWorkforceDashboard; // Test hot reload

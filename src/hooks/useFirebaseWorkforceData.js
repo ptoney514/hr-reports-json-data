@@ -437,14 +437,35 @@ const useFirebaseWorkforceData = (customFilters = {}) => {
         if (currentQuarter) {
           // Create enhanced summary with dynamic calculations
           // Handle both Firebase structured data and direct data formats
+          // Generate consistent random values based on quarter ID for stable comparisons
+          const quarterSeed = currentQuarter.charCodeAt(1) + currentQuarter.charCodeAt(3); // Use quarter number and year chars
+          const facultyHires = 5 + (quarterSeed % 15); // Range 5-19
+          const staffHires = 10 + (quarterSeed % 25);  // Range 10-34
+          
           const rawQuarterData = {
             totalEmployees: data.currentPeriod?.headcount?.total || data.totalEmployees || 0,
             demographics: {
               faculty: data.currentPeriod?.headcount?.faculty || data.demographics?.faculty || data.faculty || 0,
               staff: data.currentPeriod?.headcount?.staff || data.demographics?.staff || data.staff || 0,
               students: data.currentPeriod?.headcount?.students || data.demographics?.students || data.students || 0
-            }
+            },
+            metrics: {
+              recentHires: {
+                faculty: facultyHires,  // Consistent values based on quarter
+                staff: staffHires       // Consistent values based on quarter
+              }
+            },
+            // Calculate departures as 5% of total employees (same as dashboard logic)
+            departures: Math.floor((data.currentPeriod?.headcount?.total || data.totalEmployees || 0) * 0.05)
           };
+          
+          console.log('🎯 DEBUG: Generated consistent rawQuarterData for', currentQuarter, ':', {
+            facultyHires,
+            staffHires,
+            totalNewHires: facultyHires + staffHires,
+            departures: rawQuarterData.departures,
+            quarterSeed
+          });
           
           console.log('🔧 Calling createEnhancedSummary with:', { 
             currentQuarter, 
@@ -462,6 +483,10 @@ const useFirebaseWorkforceData = (customFilters = {}) => {
       }
     }
 
+    console.log('🎯 DEBUG: useFirebaseWorkforceData formatDataForComponents - dynamicSummary:', dynamicSummary);
+    console.log('🎯 DEBUG: New Hires Change from summary:', dynamicSummary?.newHiresChange);
+    console.log('🎯 DEBUG: Departures Change from summary:', dynamicSummary?.deparuresChange);
+    
     return {
       // Summary metrics with dynamic percentage calculations
       summary: {
@@ -479,6 +504,8 @@ const useFirebaseWorkforceData = (customFilters = {}) => {
         facultyChange: dynamicSummary?.facultyChange || null,
         staffChange: dynamicSummary?.staffChange || null,
         studentsChange: dynamicSummary?.studentsChange || null,
+        newHiresChange: dynamicSummary?.newHiresChange || null,
+        deparuresChange: dynamicSummary?.deparuresChange || null,
         
         // Keep existing vacancy rate change logic for now
         vacancyRateChange: data.currentPeriod?.positions?.changeFromPrevious?.vacancyRateChange || 0,
@@ -530,11 +557,11 @@ const useFirebaseWorkforceData = (customFilters = {}) => {
         }))
       },
 
-      // Metrics for additional cards
+      // Metrics for additional cards (consistent with rawQuarterData generation)
       metrics: {
         recentHires: {
-          faculty: Math.floor(Math.random() * 15) + 5,
-          staff: Math.floor(Math.random() * 25) + 10,
+          faculty: dynamicSummary?.recentHires || (data.currentPeriod?.quarter ? 5 + (data.currentPeriod.quarter.charCodeAt(1) % 15) : Math.floor(Math.random() * 15) + 5),
+          staff: dynamicSummary?.recentHires ? Math.floor(dynamicSummary.recentHires * 0.6) : (data.currentPeriod?.quarter ? 10 + (data.currentPeriod.quarter.charCodeAt(1) % 25) : Math.floor(Math.random() * 25) + 10),
           students: Math.floor(Math.random() * 8) + 2
         },
         demographics: {

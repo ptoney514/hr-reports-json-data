@@ -181,16 +181,20 @@ class QuarterComparisonService {
     const currentFaculty = currentData.demographics?.faculty || currentData.faculty || 0;
     const currentStaff = currentData.demographics?.staff || currentData.staff || 0;
     const currentStudents = currentData.demographics?.students || currentData.students || 0;
+    const currentNewHires = (currentData.metrics?.recentHires?.faculty || 0) + (currentData.metrics?.recentHires?.staff || 0);
+    const currentDepartures = currentData.departures || 0;
 
     // Extract previous values - handle both direct and nested structure  
     const previousTotal = previousData.totalEmployees || 0;
     const previousFaculty = previousData.demographics?.faculty || previousData.faculty || 0;
     const previousStaff = previousData.demographics?.staff || previousData.staff || 0;
     const previousStudents = previousData.demographics?.students || previousData.students || 0;
+    const previousNewHires = (previousData.metrics?.recentHires?.faculty || 0) + (previousData.metrics?.recentHires?.staff || 0);
+    const previousDepartures = previousData.departures || 0;
 
     console.log('🧮 Calculation values:', {
-      current: { currentTotal, currentFaculty, currentStaff, currentStudents },
-      previous: { previousTotal, previousFaculty, previousStaff, previousStudents }
+      current: { currentTotal, currentFaculty, currentStaff, currentStudents, currentNewHires, currentDepartures },
+      previous: { previousTotal, previousFaculty, previousStaff, previousStudents, previousNewHires, previousDepartures }
     });
 
     // Calculate percentage changes
@@ -198,9 +202,11 @@ class QuarterComparisonService {
     const facultyChange = this.calculatePercentageChange(currentFaculty, previousFaculty);
     const staffChange = this.calculatePercentageChange(currentStaff, previousStaff);
     const studentsChange = this.calculatePercentageChange(currentStudents, previousStudents);
+    const newHiresChange = this.calculatePercentageChange(currentNewHires, previousNewHires);
+    const deparuresChange = this.calculatePercentageChange(currentDepartures, previousDepartures);
 
     console.log('📈 Calculated percentage changes:', {
-      totalChange, facultyChange, staffChange, studentsChange
+      totalChange, facultyChange, staffChange, studentsChange, newHiresChange, deparuresChange
     });
 
     return {
@@ -208,6 +214,8 @@ class QuarterComparisonService {
       facultyChange,
       staffChange,
       studentsChange,
+      newHiresChange,
+      deparuresChange,
       
       // Additional metadata for debugging/validation
       metadata: {
@@ -215,8 +223,8 @@ class QuarterComparisonService {
         currentQuarterApp: appFormatQuarterId,
         previousQuarter: previousQuarter.value,
         previousQuarterFirebase: firebaseFormatPrevious,
-        currentValues: { currentTotal, currentFaculty, currentStaff, currentStudents },
-        previousValues: { previousTotal, previousFaculty, previousStaff, previousStudents }
+        currentValues: { currentTotal, currentFaculty, currentStaff, currentStudents, currentNewHires, currentDepartures },
+        previousValues: { previousTotal, previousFaculty, previousStaff, previousStudents, previousNewHires, previousDepartures }
       }
     };
   }
@@ -347,10 +355,12 @@ class QuarterComparisonService {
       facultyChange: changes.facultyChange,
       staffChange: changes.staffChange,
       studentsChange: changes.studentsChange,
+      newHiresChange: changes.newHiresChange,
+      deparuresChange: changes.deparuresChange,
       
-      // Additional metrics for dashboard compatibility
-      recentHires: quarterData.activity?.newHires || 0,
-      departures: quarterData.activity?.departures || 0,
+      // Additional metrics for dashboard compatibility  
+      recentHires: (quarterData.metrics?.recentHires?.faculty || 0) + (quarterData.metrics?.recentHires?.staff || 0),
+      departures: quarterData.departures || 0,
       
       // Metadata for validation and debugging
       _dynamicCalculation: true,

@@ -10,7 +10,7 @@ import './components/dashboards/I9Dashboard.css';
 // Lazy load dashboard components for better performance
 const DashboardIndex = lazy(() => import('./components/dashboards/DashboardIndex'));
 const TurnoverDashboard = lazy(() => import('./components/dashboards/TurnoverDashboard'));
-const I9HealthDashboard = lazy(() => import('./components/dashboards/I9HealthDashboard'));
+const I9HealthDashboard = lazy(() => import('./components/dashboards/I9HealthDashboard.tsx'));
 const TestSuite = lazy(() => import('./components/testing/TestSuite'));
 const ErrorTestComponent = lazy(() => import('./components/testing/ErrorTestComponent'));
 const ExportTestComponent = lazy(() => import('./components/testing/ExportTestComponent'));

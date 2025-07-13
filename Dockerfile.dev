@@ -1,0 +1,20 @@
+# Development Dockerfile with hot reload support
+FROM node:18-alpine
+
+# Set working directory
+WORKDIR /app
+
+# Copy package files first for better caching
+COPY package*.json ./
+
+# Install dependencies without running prepare script
+RUN npm install --ignore-scripts
+
+# Copy public directory (needed for development server)
+COPY public/ ./public/
+
+# Expose port 3000 for dev server
+EXPOSE 3000
+
+# Use react-scripts for hot reload
+CMD ["npm", "start"]

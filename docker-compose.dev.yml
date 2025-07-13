@@ -4,20 +4,26 @@ services:
   hr-reports-dev:
     build:
       context: .
-      dockerfile: Dockerfile
-      target: production
+      dockerfile: Dockerfile.dev
     container_name: hr-reports-dev
     ports:
-      - "3000:80"
+      - "3000:3000"
+    volumes:
+      # Mount entire project directory for hot reload
+      - .:/app
+      # CRITICAL: Prevent node_modules from being overwritten by host
+      - /app/node_modules
     environment:
       - NODE_ENV=development
+      - CHOKIDAR_USEPOLLING=true
+      - WATCHPACK_POLLING=true
+      - WDS_SOCKET_HOST=0.0.0.0
+      - WDS_SOCKET_PORT=0
+      - FAST_REFRESH=true
+      - REACT_APP_ENV=development
+    stdin_open: true
+    tty: true
     restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
     networks:
       - hr-reports-dev-network
 
