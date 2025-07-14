@@ -128,9 +128,22 @@ const QuarterlyDataTable = ({
       if (dashboardType === 'workforce') {
         row.totalEmployees = data.totalEmployees || 0;
         
+        // Debug: Log what data structure we received for this period
+        console.log(`=== QuarterlyDataTable Debug for ${period} ===`);
+        console.log('Raw data received:', {
+          totalEmployees: data.totalEmployees,
+          hasdemographics: !!data.demographics,
+          demographicsKeys: data.demographics ? Object.keys(data.demographics) : [],
+          beFaculty: data.demographics?.beFaculty,
+          beStaff: data.demographics?.beStaff,
+          students: data.demographics?.students,
+          nbeStudents: data.demographics?.nbeStudents
+        });
+        
         // Extract BE/NBE values if available, otherwise fall back to totals
         if (data.demographics?.beFaculty !== undefined || data.demographics?.nbeFaculty !== undefined) {
           // New structure with BE/NBE breakdown
+          console.log('Using NEW demographics structure for', period);
           row.beFaculty = data.demographics?.beFaculty || 0;
           row.nbeFaculty = data.demographics?.nbeFaculty || 0;
           row.beStaff = data.demographics?.beStaff || 0;
@@ -195,6 +208,16 @@ const QuarterlyDataTable = ({
         
         row.turnoverFaculty = turnoverBeFacultyOmaha + turnoverBeFacultyPhoenix;
         row.turnoverStaff = turnoverBeStaffOmaha + turnoverBeStaffPhoenix;
+        
+        // Debug: Log final row values for this period
+        console.log(`Final row values for ${period}:`, {
+          beFaculty: row.beFaculty,
+          beStaff: row.beStaff,
+          students: row.students,
+          totalEmployees: row.totalEmployees,
+          omahaFaculty: row.omahaFaculty,
+          phoenixFaculty: row.phoenixFaculty
+        });
       } else {
         row.totalRecords = Object.keys(data).length;
       }

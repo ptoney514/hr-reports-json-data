@@ -25,6 +25,7 @@ const RecruitingDashboard = lazy(() => import('./components/dashboards/Recruitin
 const ExitSurveyDashboard = lazy(() => import('./components/dashboards/ExitSurveyDashboard'));
 const CombinedWorkforceDashboard = lazy(() => import('./components/dashboards/CombinedWorkforceDashboard'));
 const AdminDashboard = lazy(() => import('./components/dashboards/AdminDashboard'));
+const EmployeeImportDashboard = lazy(() => import('./components/dashboards/EmployeeImportDashboard'));
 
 function App() {
   // Initialize global error handling
@@ -100,6 +101,9 @@ function App() {
               
               {/* Excel Integration Route */}
               <Route path="/excel-integration" element={<ExcelIntegrationDashboard />} />
+              
+              {/* Employee Import Route */}
+              <Route path="/importer" element={<EmployeeImportDashboard />} />
               
               {/* Admin Dashboard Route */}
               <Route path="/admin" element={<AdminDashboard />} />

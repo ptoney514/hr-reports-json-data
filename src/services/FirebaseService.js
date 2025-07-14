@@ -63,6 +63,11 @@ class FirebaseService {
    */
   async setWorkforceMetrics(period, metrics, type = 'quarters') {
     try {
+      console.log('=== setWorkforceMetrics called ===');
+      console.log('Period:', period);
+      console.log('Type:', type);
+      console.log('Metrics keys:', Object.keys(metrics));
+      
       const docRef = doc(db, 'dashboards', 'workforce', type, period);
       const dataWithTimestamp = {
         ...metrics,
@@ -71,13 +76,19 @@ class FirebaseService {
         type: type
       };
       
+      console.log('Attempting to save to Firebase...');
       await setDoc(docRef, dataWithTimestamp);
       this.cache.set(`workforce-${type}-${period}`, dataWithTimestamp);
       
-      console.log(`Workforce metrics saved for ${period}`);
+      console.log(`Workforce metrics saved successfully for ${period}`);
       return true;
     } catch (error) {
       console.error('Error saving workforce metrics:', error);
+      console.error('Error details:', {
+        code: error.code,
+        message: error.message,
+        stack: error.stack
+      });
       throw error;
     }
   }

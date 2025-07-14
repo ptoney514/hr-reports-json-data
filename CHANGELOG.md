@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Employee Data Importer Dashboard** - New comprehensive Excel employee data import system
+  - `src/components/dashboards/EmployeeImportDashboard.jsx` - Main import interface with file upload and filtering
+  - `src/hooks/useFirebaseEmployeeData.js` - Firebase hook for batch employee data operations
+  - `src/components/cards/EmployeeSummaryCards.js` - Employee data summary visualization
+  - `src/components/filters/EmployeeFilterPanel.js` - Advanced filtering for employee data
+  - `src/components/tables/EmployeeDataTable.js` - Sortable, searchable employee data table
+  - `src/components/modals/ImportConfirmationModal.js` - Import confirmation workflow
+  - Route `/importer` added to navigation for employee data import functionality
+  - Batch import processing with progress tracking and error handling
+  - Excel file parsing for individual employee records with validation
+  - Advanced filtering by End Date, Person Type, School, and Assignment Codes
+  - CSV export functionality for filtered employee data
+  - Comprehensive test suite for import functionality
+
 ### Next Phase
 - Continue Firebase dashboard migrations (Recruiting, Exit Survey, Compliance)
 - Production security rules configuration
