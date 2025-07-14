@@ -681,5 +681,112 @@ Users couldn't tell if the import worked because the modal stayed on the same sc
 - Immediate access to view imported data
 - Professional, polished success feedback
 
-### Next Steps
+#### Workforce Analytics Benefit-Eligible Display Update ✅
+**Date:** January 14, 2025
+**Status:** Complete - First three cards now display benefit-eligible data only
+
+**Changes Made:**
+1. **Updated Card Titles**:
+   - "Total Headcount" → "Total Headcount (benefit eligible only)"
+   - "Faculty" → "Faculty - Benefit Eligible"
+   - "Staff" → "Staff - Benefit Eligible"
+
+2. **Modified Data Calculation Logic**:
+   - Added benefit-eligible calculation in CombinedWorkforceDashboard
+   - Extracts beFaculty and beStaff from Firebase data
+   - Calculates total as beFaculty + beStaff
+
+3. **Enhanced Firebase Data Hook**:
+   - Added beFaculty and beStaff fields to summary object
+   - Updated transformFirebaseToComponentFormat to include BE data
+   - Added BE fields to demographics for data accessibility
+
+4. **Data Flow**:
+   - Firebase data: `demographics.beFaculty` and `demographics.beStaff`
+   - Fallback to `summary.beFaculty` and `summary.beStaff` if available
+   - Total calculation: `beTotalEmployees = beFaculty + beStaff`
+
+**Technical Implementation:**
+- Values extracted from: `firebaseData.demographics?.beFaculty` and `firebaseData.demographics?.beStaff`
+- Benefit-eligible total calculated dynamically
+- Percentage changes remain based on overall employee changes
+- Maintains compatibility with existing data structures
+
+**User Experience:**
+- Clear labeling shows cards display benefit-eligible only
+- Accurate representation of BE workforce
+- Consistent with admin table BE/NBE column display
+- Supports benefit planning and analysis
+
+## Next Steps
 *Test the complete import flow including the new success confirmation screen to ensure users have clear feedback when imports complete successfully.*
+
+### HSR (House Staff Residents) Implementation Complete ✅
+**Date:** January 14, 2025
+**Status:** Complete - HSR fields added across the entire application
+
+**Changes Made:**
+1. **EditModal Component**:
+   - Added HSR input fields for both Omaha and Phoenix campuses
+   - Updated form data state initialization to include hsrOmaha and hsrPhoenix
+   - Modified data saving logic to calculate total HSR and include in Firebase structure
+   - Added HSR to summary totals display showing combined count
+
+2. **QuarterlyDataTable Component**:
+   - Added HSR column to simplified admin table view with tooltip
+   - Updated data transformation to extract HSR from demographics
+   - Modified handleCellChange to update HSR values and recalculate totals
+   - Ensured all total employee calculations include HSR
+
+3. **Firebase Data Structure**:
+   - Updated useFirebaseWorkforceData hook to include HSR in headcount
+   - Added hsrOmaha and hsrPhoenix to summary object
+   - Modified transformFirebaseToComponentFormat to include HSR field
+   - Added hsrChange percentage calculation for dashboard display
+
+4. **Data Processing**:
+   - Updated quarterlyDataProcessor.js to normalize HSR_Headcount field
+   - HSR calculation already existed in calculateQuarterMetrics function
+   - Added HSR field to sample data generation with realistic values (20-60 range)
+   - Updated fallback sample data to include HSR_Headcount: 35
+
+5. **Workforce Analytics Dashboard**:
+   - Dashboard already had HSR card display logic in place
+   - HSR data now flows from EditModal → Firebase → Dashboard
+   - HSR totals calculated from hsrOmaha + hsrPhoenix
+   - Percentage changes calculated and displayed correctly
+
+**Technical Details:**
+- HSR treated as a separate employee category (not BE/NBE)
+- Total employees = BE Faculty + BE Staff + NBE Faculty + NBE Staff + HSR + Students
+- HSR typically has lower headcount than faculty/staff
+- All calculations updated to include HSR in totals
+
+**User Benefits:**
+- Can now track House Staff Residents separately from other employee types
+- HSR data visible in both Admin dashboard and Workforce Analytics
+- Proper breakdown by campus (Omaha/Phoenix)
+- Historical tracking and percentage change calculations
+- Complete data flow from entry to visualization
+
+### Exit Survey Data Structure Documentation Complete ✅
+**Date:** 2025-07-14
+**Status:** Complete - Full Firebase data structure documented for Exit Survey Insights dashboard
+
+**Summary:**
+- Analyzed Exit Survey Dashboard component and Firebase data hooks
+- Documented complete JSON structure for Firebase import
+- Identified all required fields: core metrics, exit reasons, satisfaction scores, department data
+- Firebase path: `exitSurvey/{period}` (e.g., `exitSurvey/2025-Q1`)
+
+**Data Structure Includes:**
+- Core metrics (totalExits, totalResponses, recommendationRate, avgTenure, exitInterviewCompletion)
+- Exit reasons breakdown (percentage for each reason category)
+- Satisfaction scores by category (satisfied/neutral/dissatisfied percentages)
+- Department-level exit and response data
+- Automatic response rate calculations
+
+**Technical Notes:**
+- All numeric values must be numbers, not strings
+- Response rates calculated automatically from raw data
+- Key insights and summary text currently hardcoded but could be added to Firebase

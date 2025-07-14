@@ -15,8 +15,25 @@ const EmployeeSummaryCards = ({ stats, selectedQuarter }) => {
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(true);
 
-  // Define all 12 workforce categories based on the requirements
+  // Calculate BE Total Headcount (BE Faculty + BE Staff + HSR for Phoenix and Omaha)
+  const beTotalHeadcount = (stats.beFacultyOmaha || 0) + 
+                           (stats.beFacultyPhoenix || 0) + 
+                           (stats.beStaffOmaha || 0) + 
+                           (stats.beStaffPhoenix || 0) + 
+                           (stats.hsrOmaha || 0) + 
+                           (stats.hsrPhoenix || 0);
+
+  // Define all workforce categories with BE Total Headcount first
   const workforceCategories = [
+    { 
+      key: 'beTotalHeadcount', 
+      title: 'BE Total Headcount', 
+      displayName: 'BE Total Headcount', 
+      icon: Users, 
+      color: 'indigo',
+      isCalculated: true,
+      calculatedValue: beTotalHeadcount
+    },
     { 
       key: 'beFacultyOmaha', 
       title: 'BE Faculty Omaha', 
@@ -188,7 +205,7 @@ const EmployeeSummaryCards = ({ stats, selectedQuarter }) => {
             <WorkforceCategoryCard 
               key={category.key}
               category={category}
-              count={stats[category.key] || 0}
+              count={category.isCalculated ? category.calculatedValue : (stats[category.key] || 0)}
               selectedQuarter={selectedQuarter}
             />
           ))}

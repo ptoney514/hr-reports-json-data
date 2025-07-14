@@ -55,6 +55,7 @@ const QuarterlyDataTable = ({
         ...baseColumns,
         { key: 'beFaculty', label: 'BE Faculty', sortable: true, editable: true, format: 'number' },
         { key: 'beStaff', label: 'BE Staff', sortable: true, editable: true, format: 'number' },
+        { key: 'hsr', label: 'HSR', sortable: true, editable: true, format: 'number', tooltip: 'House Staff Residents (both campuses)' },
         { key: 'students', label: 'Student', sortable: true, editable: true, format: 'number' },
         { key: 'turnoverFaculty', label: 'BE Faculty Turnover', sortable: true, editable: true, format: 'number', tooltip: 'Benefit Eligible Faculty Turnover (both campuses)' },
         { key: 'turnoverStaff', label: 'BE Staff Turnover', sortable: true, editable: true, format: 'number', tooltip: 'Benefit Eligible Staff Turnover (both campuses)' },
@@ -148,6 +149,7 @@ const QuarterlyDataTable = ({
           row.nbeFaculty = data.demographics?.nbeFaculty || 0;
           row.beStaff = data.demographics?.beStaff || 0;
           row.nbeStaff = data.demographics?.nbeStaff || 0;
+          row.hsr = data.demographics?.hsr || 0;
           row.students = data.demographics?.nbeStudents || data.demographics?.students || 0;
         } else if (data.BE_Faculty_Headcount !== undefined || data.NBE_Faculty_Headcount !== undefined) {
           // Excel import structure
@@ -336,6 +338,7 @@ const QuarterlyDataTable = ({
                                    (updatedData.demographics.nbeFaculty || 0) + 
                                    (updatedData.demographics.beStaff || 0) + 
                                    (updatedData.demographics.nbeStaff || 0) + 
+                                   (updatedData.demographics.hsr || 0) +
                                    (updatedData.demographics.students || 0);
     } else if (columnKey === 'nbeFaculty') {
       if (!updatedData.demographics) updatedData.demographics = {};
@@ -347,6 +350,7 @@ const QuarterlyDataTable = ({
                                    (updatedData.demographics.nbeFaculty || 0) + 
                                    (updatedData.demographics.beStaff || 0) + 
                                    (updatedData.demographics.nbeStaff || 0) + 
+                                   (updatedData.demographics.hsr || 0) +
                                    (updatedData.demographics.students || 0);
     } else if (columnKey === 'beStaff') {
       if (!updatedData.demographics) updatedData.demographics = {};
@@ -358,6 +362,7 @@ const QuarterlyDataTable = ({
                                    (updatedData.demographics.nbeFaculty || 0) + 
                                    (updatedData.demographics.beStaff || 0) + 
                                    (updatedData.demographics.nbeStaff || 0) + 
+                                   (updatedData.demographics.hsr || 0) +
                                    (updatedData.demographics.students || 0);
     } else if (columnKey === 'nbeStaff') {
       if (!updatedData.demographics) updatedData.demographics = {};
@@ -369,6 +374,17 @@ const QuarterlyDataTable = ({
                                    (updatedData.demographics.nbeFaculty || 0) + 
                                    (updatedData.demographics.beStaff || 0) + 
                                    (updatedData.demographics.nbeStaff || 0) + 
+                                   (updatedData.demographics.hsr || 0) +
+                                   (updatedData.demographics.students || 0);
+    } else if (columnKey === 'hsr') {
+      if (!updatedData.demographics) updatedData.demographics = {};
+      updatedData.demographics.hsr = newValue;
+      // Update total employees
+      updatedData.totalEmployees = (updatedData.demographics.beFaculty || 0) + 
+                                   (updatedData.demographics.nbeFaculty || 0) + 
+                                   (updatedData.demographics.beStaff || 0) + 
+                                   (updatedData.demographics.nbeStaff || 0) + 
+                                   (updatedData.demographics.hsr || 0) +
                                    (updatedData.demographics.students || 0);
     } else if (columnKey === 'students') {
       if (!updatedData.demographics) updatedData.demographics = {};
@@ -379,6 +395,7 @@ const QuarterlyDataTable = ({
                                    (updatedData.demographics.nbeFaculty || 0) + 
                                    (updatedData.demographics.beStaff || 0) + 
                                    (updatedData.demographics.nbeStaff || 0) + 
+                                   (updatedData.demographics.hsr || 0) +
                                    (updatedData.demographics.students || 0);
     } else if (columnKey === 'newHires') {
       if (!updatedData.trends) updatedData.trends = {};

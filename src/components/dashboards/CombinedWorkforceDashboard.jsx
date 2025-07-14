@@ -53,9 +53,10 @@ const CombinedWorkforceDashboard = () => {
   
   // Dynamic headcount data state
   const [headcountData, setHeadcountData] = useState({
-    total: { value: 0, change: null, subtitle: "from previous quarter", changeType: "percentage" },
     faculty: { value: 0, change: null, subtitle: "change", changeType: "percentage", indicator: "green" },
     staff: { value: 0, change: null, subtitle: "change", changeType: "percentage", indicator: "yellow" },
+    hsr: { value: 0, change: null, subtitle: "change", changeType: "percentage", indicator: "purple" },
+    students: { value: 0, change: null, subtitle: "change", changeType: "percentage", indicator: "teal" },
     newHires: { value: 0, change: null, subtitle: "change", changeType: "percentage", indicator: "teal" },
     leavers: { value: 0, change: null, subtitle: "change", changeType: "percentage", indicator: "blue" }
   });
@@ -104,9 +105,10 @@ const CombinedWorkforceDashboard = () => {
   // Empty state data for testing
   const emptyStateData = {
     headcount: {
-      total: { value: 0, change: null, subtitle: "no data available", changeType: "percentage" },
       faculty: { value: 0, change: null, subtitle: "no data available", changeType: "percentage", indicator: "green" },
       staff: { value: 0, change: null, subtitle: "no data available", changeType: "percentage", indicator: "yellow" },
+      hsr: { value: 0, change: null, subtitle: "no data available", changeType: "percentage", indicator: "purple" },
+      students: { value: 0, change: null, subtitle: "no data available", changeType: "percentage", indicator: "teal" },
       newHires: { value: 0, change: null, subtitle: "no data available", changeType: "percentage", indicator: "teal" },
       leavers: { value: 0, change: null, subtitle: "no data available", changeType: "percentage", indicator: "blue" }
     },
@@ -295,10 +297,25 @@ const CombinedWorkforceDashboard = () => {
       console.log('🎯 DEBUG: Employee Change:', firebaseData.summary?.employeeChange);
       console.log('🎯 DEBUG: Faculty Change:', firebaseData.summary?.facultyChange);
       
+      // Calculate benefit-eligible totals
+      const beFaculty = firebaseData.summary?.beFaculty || firebaseData.demographics?.beFaculty || 0;
+      const beStaff = firebaseData.summary?.beStaff || firebaseData.demographics?.beStaff || 0;
+      const beTotalEmployees = beFaculty + beStaff;
+      
+      // Calculate HSR and Students totals
+      const hsrOmaha = firebaseData.summary?.hsrOmaha || 0;
+      const hsrPhoenix = firebaseData.summary?.hsrPhoenix || 0;
+      const hsrTotal = hsrOmaha + hsrPhoenix;
+      
+      const studentOmaha = firebaseData.summary?.studentOmaha || 0;
+      const studentPhoenix = firebaseData.summary?.studentPhoenix || 0;
+      const studentsTotal = studentOmaha + studentPhoenix;
+      
       const metrics = {
-        total: { value: firebaseData.summary?.totalEmployees || 0, change: firebaseData.summary?.employeeChange ?? null, subtitle: "from previous quarter", changeType: "percentage" },
-        faculty: { value: firebaseData.summary?.faculty || 0, change: firebaseData.summary?.facultyChange ?? null, subtitle: "change", changeType: "percentage", indicator: "green" },
-        staff: { value: firebaseData.summary?.staff || 0, change: firebaseData.summary?.staffChange ?? null, subtitle: "change", changeType: "percentage", indicator: "yellow" },
+        faculty: { value: beFaculty, change: firebaseData.summary?.facultyChange ?? null, subtitle: "change", changeType: "percentage", indicator: "green" },
+        staff: { value: beStaff, change: firebaseData.summary?.staffChange ?? null, subtitle: "change", changeType: "percentage", indicator: "yellow" },
+        hsr: { value: hsrTotal, change: firebaseData.summary?.hsrChange ?? null, subtitle: "change", changeType: "percentage", indicator: "purple" },
+        students: { value: studentsTotal, change: firebaseData.summary?.studentsChange ?? null, subtitle: "change", changeType: "percentage", indicator: "teal" },
         newHires: { value: (firebaseData.metrics?.recentHires?.faculty || 0) + (firebaseData.metrics?.recentHires?.staff || 0), change: firebaseData.summary?.newHiresChange ?? 12.5, subtitle: "change", changeType: "percentage", indicator: "teal" },
         leavers: { value: Math.floor((firebaseData.summary?.totalEmployees || 0) * 0.05), change: firebaseData.summary?.deparuresChange ?? -8.3, subtitle: "change", changeType: "percentage", indicator: "blue" }
       };
@@ -675,18 +692,22 @@ const CombinedWorkforceDashboard = () => {
 
   // Generate static data for 5-Quarter Headcount Trend chart
   useEffect(() => {
-    if (headcountData.total?.value) {
+    const facultyCurrent = headcountData.faculty?.value || 1234;
+    const staffCurrent = headcountData.staff?.value || 1456;
+    const hsrCurrent = headcountData.hsr?.value || 0;
+    const studentsCurrent = headcountData.students?.value || 0;
+    const totalCurrent = facultyCurrent + staffCurrent + hsrCurrent + studentsCurrent;
+    
+    if (totalCurrent > 0) {
       console.log('Generating static 5-Quarter data for HeadcountChart');
       
       // Get current faculty/staff ratios from headcount data
-      const totalCurrent = headcountData.total?.value || 2847;
-      const facultyCurrent = headcountData.faculty?.value || 1234;
-      const staffCurrent = headcountData.staff?.value || 1456;
       
       // Calculate ratios for consistent breakdown across quarters
       const facultyRatio = facultyCurrent / totalCurrent;
       const staffRatio = staffCurrent / totalCurrent;
-      const studentRatio = 0.055; // ~5.5% students based on typical university ratios
+      const hsrRatio = hsrCurrent / totalCurrent;
+      const studentRatio = studentsCurrent / totalCurrent;
       
       // Generate 5 quarters of static data with current quarter being accurate
       const staticQuarters = [
@@ -701,12 +722,14 @@ const CombinedWorkforceDashboard = () => {
         const totalEmployees = item.baseEmployees;
         const faculty = Math.round(totalEmployees * facultyRatio);
         const staff = Math.round(totalEmployees * staffRatio);
+        const hsr = Math.round(totalEmployees * hsrRatio);
         const students = Math.round(totalEmployees * studentRatio);
         
         return {
           period: item.period,
           faculty,
           staff,
+          hsr,
           students,
           total: totalEmployees
         };
@@ -882,16 +905,6 @@ const CombinedWorkforceDashboard = () => {
 
   // Helper functions to calculate enhanced card insights
   const getEnhancedCardData = () => {
-    // Total Headcount Card Enhancement
-    const totalHeadcountInsight = () => {
-      const campusBreakdown = locationData.length > 0 
-        ? locationData.map(loc => `${loc.location} ${loc.percentage}%`).join(' | ')
-        : 'Omaha 62% | Phoenix 38%';
-      return {
-        subtitle: campusBreakdown
-      };
-    };
-
     // Faculty Card Enhancement  
     const facultyInsight = () => {
       const avgTenure = additionalMetrics.demographics?.averageTenure || '8.2';
@@ -911,6 +924,26 @@ const CombinedWorkforceDashboard = () => {
       };
     };
 
+    // HSR Card Enhancement
+    const hsrInsight = () => {
+      const hsrTotal = headcountData.hsr?.value || 0;
+      const campusBreakdown = locationData.length > 0 
+        ? locationData.map(loc => `${loc.location} ${loc.percentage}%`).join(' | ')
+        : 'Omaha 62% | Phoenix 38%';
+      return {
+        subtitle: `House Staff Physicians`
+      };
+    };
+
+    // Students Card Enhancement
+    const studentsInsight = () => {
+      const studentsTotal = headcountData.students?.value || 0;
+      const newStudentHires = additionalMetrics.recentHires?.students || 0;
+      return {
+        subtitle: `${newStudentHires} new hires this quarter`
+      };
+    };
+
     // New Hires Card Enhancement
     const newHiresInsight = () => {
       const facultyHires = additionalMetrics.recentHires?.faculty || 0;
@@ -926,7 +959,7 @@ const CombinedWorkforceDashboard = () => {
 
     // Leavers Card Enhancement
     const leaversInsight = () => {
-      const totalEmployees = headcountData.total?.value || 1;
+      const totalEmployees = (headcountData.faculty?.value || 0) + (headcountData.staff?.value || 0);
       const totalLeavers = headcountData.leavers?.value || 0;
       const turnoverRate = totalEmployees > 0 ? ((totalLeavers / totalEmployees) * 100 * 4).toFixed(1) : '0.0'; // Annualized
       const facultyLeavers = Math.round(totalLeavers * 0.35); // Estimate based on typical ratios
@@ -937,9 +970,10 @@ const CombinedWorkforceDashboard = () => {
     };
 
     return {
-      totalHeadcount: totalHeadcountInsight(),
       faculty: facultyInsight(),
       staff: staffInsight(),
+      hsr: hsrInsight(),
+      students: studentsInsight(),
       newHires: newHiresInsight(),
       leavers: leaversInsight()
     };
@@ -1145,19 +1179,9 @@ const CombinedWorkforceDashboard = () => {
           )}
 
           {/* Summary Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 print:gap-2 mb-6 print:mb-4 dashboard-section page-break-inside-avoid">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 print:gap-2 mb-6 print:mb-4 dashboard-section page-break-inside-avoid">
             <SummaryCard
-              title="Total Headcount"
-              value={(headcountData.total?.value || 0).toLocaleString()}
-              change={headcountData.total?.change}
-              changeType="percentage"
-              subtitle={cardInsights.totalHeadcount.subtitle}
-              icon={Users}
-              trend="positive"
-            />
-            
-            <SummaryCard
-              title="Faculty"
+              title="Faculty - Benefit Eligible"
               value={(headcountData.faculty?.value || 0).toLocaleString()}
               change={headcountData.faculty?.change}
               changeType="percentage"
@@ -1166,12 +1190,30 @@ const CombinedWorkforceDashboard = () => {
             />
             
             <SummaryCard
-              title="Staff"
+              title="Staff - Benefit Eligible"
               value={(headcountData.staff?.value || 0).toLocaleString()}
               change={headcountData.staff?.change}
               changeType="percentage"
               subtitle={cardInsights.staff.subtitle}
               icon={Building2}
+            />
+            
+            <SummaryCard
+              title="HSR Headcount"
+              value={(headcountData.hsr?.value || 0).toLocaleString()}
+              change={headcountData.hsr?.change}
+              changeType="percentage"
+              subtitle={cardInsights.hsr.subtitle}
+              icon={Users}
+            />
+            
+            <SummaryCard
+              title="Students"
+              value={(headcountData.students?.value || 0).toLocaleString()}
+              change={headcountData.students?.change}
+              changeType="percentage"
+              subtitle={cardInsights.students.subtitle}
+              icon={Users}
             />
             
             <SummaryCard

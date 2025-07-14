@@ -19,6 +19,10 @@ const EditModal = ({ isOpen, onClose, quarterData, onSave }) => {
     nbeFacultyPhoenix: 0,
     nbeStaffPhoenix: 0,
     
+    // HSR (House Staff Residents) - Omaha and Phoenix
+    hsrOmaha: 0,
+    hsrPhoenix: 0,
+    
     // Students (always NBE)
     studentOmaha: 0,
     studentPhoenix: 0,
@@ -58,6 +62,10 @@ const EditModal = ({ isOpen, onClose, quarterData, onSave }) => {
         nbeFacultyPhoenix: phoenix.nbeFaculty || Math.round((demographics.nbeFaculty || 0) * 0.1),
         nbeStaffPhoenix: phoenix.nbeStaff || Math.round((demographics.nbeStaff || 0) * 0.1),
         
+        // HSR data
+        hsrOmaha: omaha.hsr || Math.round((demographics.hsr || 0) * 0.9),
+        hsrPhoenix: phoenix.hsr || Math.round((demographics.hsr || 0) * 0.1),
+        
         studentOmaha: omaha.students || Math.round((demographics.students || 0) * 0.9),
         studentPhoenix: phoenix.students || Math.round((demographics.students || 0) * 0.1),
         
@@ -83,12 +91,13 @@ const EditModal = ({ isOpen, onClose, quarterData, onSave }) => {
     const totalBeStaff = formData.beStaffOmaha + formData.beStaffPhoenix;
     const totalNbeFaculty = formData.nbeFacultyOmaha + formData.nbeFacultyPhoenix;
     const totalNbeStaff = formData.nbeStaffOmaha + formData.nbeStaffPhoenix;
+    const totalHsr = formData.hsrOmaha + formData.hsrPhoenix;
     const totalStudents = formData.studentOmaha + formData.studentPhoenix;
     
     // Prepare updated data structure
     const updatedData = {
       ...quarterData.rawData,
-      totalEmployees: totalBeFaculty + totalBeStaff + totalNbeFaculty + totalNbeStaff + totalStudents,
+      totalEmployees: totalBeFaculty + totalBeStaff + totalNbeFaculty + totalNbeStaff + totalHsr + totalStudents,
       demographics: {
         beFaculty: totalBeFaculty,
         beStaff: totalBeStaff,
@@ -96,6 +105,7 @@ const EditModal = ({ isOpen, onClose, quarterData, onSave }) => {
         nbeStaff: totalNbeStaff,
         faculty: totalBeFaculty + totalNbeFaculty,
         staff: totalBeStaff + totalNbeStaff,
+        hsr: totalHsr,
         students: totalStudents,
         nbeStudents: totalStudents,
       },
@@ -106,13 +116,15 @@ const EditModal = ({ isOpen, onClose, quarterData, onSave }) => {
           beStaff: formData.beStaffOmaha,
           nbeFaculty: formData.nbeFacultyOmaha,
           nbeStaff: formData.nbeStaffOmaha,
+          hsr: formData.hsrOmaha,
           students: formData.studentOmaha,
           breakdown: {
             faculty: formData.beFacultyOmaha + formData.nbeFacultyOmaha,
             staff: formData.beStaffOmaha + formData.nbeStaffOmaha,
+            hsr: formData.hsrOmaha,
             students: formData.studentOmaha,
           },
-          total: formData.beFacultyOmaha + formData.beStaffOmaha + formData.nbeFacultyOmaha + formData.nbeStaffOmaha + formData.studentOmaha,
+          total: formData.beFacultyOmaha + formData.beStaffOmaha + formData.nbeFacultyOmaha + formData.nbeStaffOmaha + formData.hsrOmaha + formData.studentOmaha,
         },
         phoenix: {
           name: 'Phoenix',
@@ -120,13 +132,15 @@ const EditModal = ({ isOpen, onClose, quarterData, onSave }) => {
           beStaff: formData.beStaffPhoenix,
           nbeFaculty: formData.nbeFacultyPhoenix,
           nbeStaff: formData.nbeStaffPhoenix,
+          hsr: formData.hsrPhoenix,
           students: formData.studentPhoenix,
           breakdown: {
             faculty: formData.beFacultyPhoenix + formData.nbeFacultyPhoenix,
             staff: formData.beStaffPhoenix + formData.nbeStaffPhoenix,
+            hsr: formData.hsrPhoenix,
             students: formData.studentPhoenix,
           },
-          total: formData.beFacultyPhoenix + formData.beStaffPhoenix + formData.nbeFacultyPhoenix + formData.nbeStaffPhoenix + formData.studentPhoenix,
+          total: formData.beFacultyPhoenix + formData.beStaffPhoenix + formData.nbeFacultyPhoenix + formData.nbeStaffPhoenix + formData.hsrPhoenix + formData.studentPhoenix,
         },
       },
       trends: {
@@ -235,6 +249,22 @@ const EditModal = ({ isOpen, onClose, quarterData, onSave }) => {
               description="Benefit Eligible staff headcount at Phoenix campus"
             />
 
+            {/* HSR Omaha */}
+            <InputField
+              label="HSR Omaha"
+              value={formData.hsrOmaha}
+              field="hsrOmaha"
+              description="House Staff Residents (HSR) headcount at Omaha campus"
+            />
+
+            {/* HSR Phoenix */}
+            <InputField
+              label="HSR Phoenix"
+              value={formData.hsrPhoenix}
+              field="hsrPhoenix"
+              description="House Staff Residents (HSR) headcount at Phoenix campus"
+            />
+
             {/* Student Omaha */}
             <InputField
               label="Student Omaha"
@@ -335,6 +365,12 @@ const EditModal = ({ isOpen, onClose, quarterData, onSave }) => {
                 </span>
               </div>
               <div>
+                <span className="font-medium">Total HSR:</span>{' '}
+                <span className="text-blue-600 font-semibold">
+                  {formData.hsrOmaha + formData.hsrPhoenix}
+                </span>
+              </div>
+              <div>
                 <span className="font-medium">Total Students:</span>{' '}
                 <span className="text-blue-600 font-semibold">
                   {formData.studentOmaha + formData.studentPhoenix}
@@ -347,6 +383,7 @@ const EditModal = ({ isOpen, onClose, quarterData, onSave }) => {
                    formData.beStaffOmaha + formData.beStaffPhoenix +
                    formData.nbeFacultyOmaha + formData.nbeFacultyPhoenix +
                    formData.nbeStaffOmaha + formData.nbeStaffPhoenix +
+                   formData.hsrOmaha + formData.hsrPhoenix +
                    formData.studentOmaha + formData.studentPhoenix}
                 </span>
               </div>

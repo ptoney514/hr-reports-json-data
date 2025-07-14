@@ -214,7 +214,11 @@ const useFirebaseWorkforceData = (customFilters = {}) => {
           total: firebaseData.totalEmployees,
           faculty: firebaseData.demographics?.faculty || 0,
           staff: firebaseData.demographics?.staff || 0,
+          hsr: firebaseData.demographics?.hsr || 0,
           students: firebaseData.demographics?.students || 0,
+          // Include benefit-eligible specific counts
+          beFaculty: firebaseData.demographics?.beFaculty || 0,
+          beStaff: firebaseData.demographics?.beStaff || 0,
           changeFromPrevious: {
             total: firebaseData.headcountChange || 0,
             percentChange: firebaseData.trends?.quarterlyGrowth || 0,
@@ -286,7 +290,12 @@ const useFirebaseWorkforceData = (customFilters = {}) => {
           { range: '3-5 years', count: Math.floor(firebaseData.totalEmployees * 0.25) },
           { range: '6-10 years', count: Math.floor(firebaseData.totalEmployees * 0.25) },
           { range: '10+ years', count: Math.floor(firebaseData.totalEmployees * 0.20) }
-        ]
+        ],
+        // Include benefit-eligible data from Firebase
+        beFaculty: firebaseData.demographics?.beFaculty || 0,
+        beStaff: firebaseData.demographics?.beStaff || 0,
+        nbeFaculty: firebaseData.demographics?.nbeFaculty || 0,
+        nbeStaff: firebaseData.demographics?.nbeStaff || 0
       },
       // Include version and dataSource at root level for test compatibility
       version: firebaseData.version || '2.0',
@@ -494,7 +503,13 @@ const useFirebaseWorkforceData = (customFilters = {}) => {
         totalHeadcount: data.currentPeriod?.headcount?.total || 0,
         faculty: data.currentPeriod?.headcount?.faculty || 0,
         staff: data.currentPeriod?.headcount?.staff || 0,
+        hsr: data.currentPeriod?.headcount?.hsr || 0,
+        hsrOmaha: data.currentPeriod?.headcount?.hsrOmaha || 0,
+        hsrPhoenix: data.currentPeriod?.headcount?.hsrPhoenix || 0,
         students: data.currentPeriod?.headcount?.students || 0,
+        // Add benefit-eligible specific fields
+        beFaculty: data.currentPeriod?.headcount?.beFaculty || data.demographics?.beFaculty || 0,
+        beStaff: data.currentPeriod?.headcount?.beStaff || data.demographics?.beStaff || 0,
         totalPositions: data.currentPeriod?.positions?.total || 0,
         vacancies: data.currentPeriod?.positions?.vacant || 0,
         vacancyRate: data.currentPeriod?.positions?.vacancyRate || 0,
@@ -503,6 +518,7 @@ const useFirebaseWorkforceData = (customFilters = {}) => {
         employeeChange: dynamicSummary?.employeeChange || null,
         facultyChange: dynamicSummary?.facultyChange || null,
         staffChange: dynamicSummary?.staffChange || null,
+        hsrChange: dynamicSummary?.hsrChange || null,
         studentsChange: dynamicSummary?.studentsChange || null,
         newHiresChange: dynamicSummary?.newHiresChange || null,
         deparuresChange: dynamicSummary?.deparuresChange || null,

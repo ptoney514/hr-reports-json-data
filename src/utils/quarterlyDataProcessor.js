@@ -112,6 +112,7 @@ function normalizeAggregateRecord(row) {
   if (row.BE_Staff_Headcount !== undefined) normalized.beStaffHeadcount = parseInt(row.BE_Staff_Headcount, 10) || 0;
   if (row.NBE_Faculty_Headcount !== undefined) normalized.nbeFacultyHeadcount = parseInt(row.NBE_Faculty_Headcount, 10) || 0;
   if (row.NBE_Staff_Headcount !== undefined) normalized.nbeStaffHeadcount = parseInt(row.NBE_Staff_Headcount, 10) || 0;
+  if (row.HSR_Headcount !== undefined) normalized.hsrHeadcount = parseInt(row.HSR_Headcount, 10) || 0;
   if (row.NBE_Student_Worker_Headcount !== undefined) normalized.nbeStudentWorkerHeadcount = parseInt(row.NBE_Student_Worker_Headcount, 10) || 0;
   if (row.Total_Headcount !== undefined) normalized.totalHeadcount = parseInt(row.Total_Headcount, 10) || 0;
   
@@ -193,9 +194,10 @@ export function processQuarterlyData(rawData) {
 export function calculateQuarterMetrics(quarterData, previousQuarterData = null) {
   if (!quarterData || quarterData.length === 0) {
     return {
-      total: { value: 0, change: null, subtitle: "from previous quarter" },
       faculty: { value: 0, change: null, subtitle: "change", indicator: "green" },
       staff: { value: 0, change: null, subtitle: "change", indicator: "yellow" },
+      hsr: { value: 0, change: null, subtitle: "change", indicator: "purple" },
+      students: { value: 0, change: null, subtitle: "change", indicator: "teal" },
       newHires: { value: 0, change: null, subtitle: "new hires", indicator: "teal" },
       leavers: { value: 0, change: null, subtitle: "departures", indicator: "blue" }
     };
@@ -207,6 +209,8 @@ export function calculateQuarterMetrics(quarterData, previousQuarterData = null)
   const totalNBEFaculty = quarterData.reduce((sum, row) => sum + (row.nbeFacultyHeadcount || 0), 0);
   const totalNBEStaff = quarterData.reduce((sum, row) => sum + (row.nbeStaffHeadcount || 0), 0);
   const totalNBEStudentWorker = quarterData.reduce((sum, row) => sum + (row.nbeStudentWorkerHeadcount || 0), 0);
+  const totalHSR = quarterData.reduce((sum, row) => sum + (row.hsrHeadcount || 0), 0);
+  const totalStudents = quarterData.reduce((sum, row) => sum + (row.studentsHeadcount || 0), 0);
   
   // Only count Benefit Eligible (BE) employees per dashboard note
   const totalStarters = quarterData.reduce((sum, row) => 
@@ -220,35 +224,39 @@ export function calculateQuarterMetrics(quarterData, previousQuarterData = null)
   // Calculate totals (BE only per dashboard note)
   const totalFaculty = totalBEFaculty;
   const totalStaff = totalBEStaff;
-  const grandTotal = totalFaculty + totalStaff;
   
   // Calculate changes if previous quarter data is available
-  let totalChange = null;
   let facultyChange = null;
   let staffChange = null;
+  let hsrChange = null;
+  let studentsChange = null;
   let newHiresChange = null;
   let leaversChange = null;
   
   if (previousQuarterData && previousQuarterData.length > 0) {
     const prevBEFaculty = previousQuarterData.reduce((sum, row) => sum + (row.beFacultyHeadcount || 0), 0);
     const prevBEStaff = previousQuarterData.reduce((sum, row) => sum + (row.beStaffHeadcount || 0), 0);
+    const prevHSR = previousQuarterData.reduce((sum, row) => sum + (row.hsrHeadcount || 0), 0);
+    const prevStudents = previousQuarterData.reduce((sum, row) => sum + (row.studentsHeadcount || 0), 0);
     const prevTotalStarters = previousQuarterData.reduce((sum, row) => sum + (row.beNewHires || 0), 0);
     const prevTotalLeavers = previousQuarterData.reduce((sum, row) => sum + (row.beDepartures || 0), 0);
     
-    // BE only per dashboard note
+    // Calculate totals for previous quarter
     const prevTotalFaculty = prevBEFaculty;
     const prevTotalStaff = prevBEStaff;
-    const prevGrandTotal = prevTotalFaculty + prevTotalStaff;
     
     // Calculate percentage changes (return raw numbers, not formatted strings)
-    if (prevGrandTotal > 0) {
-      totalChange = ((grandTotal - prevGrandTotal) / prevGrandTotal * 100);
-    }
     if (prevTotalFaculty > 0) {
       facultyChange = ((totalFaculty - prevTotalFaculty) / prevTotalFaculty * 100);
     }
     if (prevTotalStaff > 0) {
       staffChange = ((totalStaff - prevTotalStaff) / prevTotalStaff * 100);
+    }
+    if (prevHSR > 0) {
+      hsrChange = ((totalHSR - prevHSR) / prevHSR * 100);
+    }
+    if (prevStudents > 0) {
+      studentsChange = ((totalStudents - prevStudents) / prevStudents * 100);
     }
     if (prevTotalStarters > 0) {
       newHiresChange = ((totalStarters - prevTotalStarters) / prevTotalStarters * 100);
@@ -259,12 +267,6 @@ export function calculateQuarterMetrics(quarterData, previousQuarterData = null)
   }
   
   return {
-    total: { 
-      value: grandTotal, 
-      change: totalChange, 
-      subtitle: "from previous quarter",
-      changeType: "percentage" 
-    },
     faculty: { 
       value: totalFaculty, 
       change: facultyChange, 
@@ -278,6 +280,20 @@ export function calculateQuarterMetrics(quarterData, previousQuarterData = null)
       subtitle: "change", 
       changeType: "percentage",
       indicator: "yellow" 
+    },
+    hsr: { 
+      value: totalHSR, 
+      change: hsrChange, 
+      subtitle: "change",
+      changeType: "percentage",
+      indicator: "purple" 
+    },
+    students: { 
+      value: totalStudents, 
+      change: studentsChange, 
+      subtitle: "change", 
+      changeType: "percentage",
+      indicator: "teal" 
     },
     newHires: { 
       value: totalStarters, 
@@ -412,6 +428,7 @@ export function generateSampleData() {
         const beStaffBase = Math.floor(Math.random() * 150) + 75;
         const nbeFacultyBase = Math.floor(Math.random() * 30) + 10;
         const nbeStaffBase = Math.floor(Math.random() * 50) + 20;
+        const hsrBase = Math.floor(Math.random() * 40) + 20; // HSR typically smaller numbers
         const nbeStudentWorkerBase = Math.floor(Math.random() * 80) + 40;
         
         // Add some growth/decline over quarters
@@ -421,6 +438,7 @@ export function generateSampleData() {
         const beStaffHeadcount = Math.floor(beStaffBase * growthFactor);
         const nbeFacultyHeadcount = Math.floor(nbeFacultyBase * growthFactor);
         const nbeStaffHeadcount = Math.floor(nbeStaffBase * growthFactor);
+        const hsrHeadcount = Math.floor(hsrBase * growthFactor);
         const nbeStudentWorkerHeadcount = Math.floor(nbeStudentWorkerBase * growthFactor);
         
         // Generate realistic hire/departure numbers
@@ -437,8 +455,9 @@ export function generateSampleData() {
           BE_Staff_Headcount: beStaffHeadcount,
           NBE_Faculty_Headcount: nbeFacultyHeadcount,
           NBE_Staff_Headcount: nbeStaffHeadcount,
+          HSR_Headcount: hsrHeadcount,
           NBE_Student_Worker_Headcount: nbeStudentWorkerHeadcount,
-          Total_Headcount: beFacultyHeadcount + beStaffHeadcount + nbeFacultyHeadcount + nbeStaffHeadcount + nbeStudentWorkerHeadcount,
+          Total_Headcount: beFacultyHeadcount + beStaffHeadcount + nbeFacultyHeadcount + nbeStaffHeadcount + hsrHeadcount + nbeStudentWorkerHeadcount,
           BE_New_Hires: beNewHires,
           BE_Departures: beDepartures,
           NBE_New_Hires: nbeNewHires,
@@ -463,8 +482,9 @@ export function generateSampleData() {
         BE_Staff_Headcount: 150,
         NBE_Faculty_Headcount: 25,
         NBE_Staff_Headcount: 50,
+        HSR_Headcount: 35,
         NBE_Student_Worker_Headcount: 30,
-        Total_Headcount: 355,
+        Total_Headcount: 390,
         BE_New_Hires: 5,
         BE_Departures: 3,
         NBE_New_Hires: 10,
