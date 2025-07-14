@@ -8,11 +8,14 @@ import {
   CheckCircle,
   AlertCircle,
   Clock,
-  FileText
+  FileText,
+  Trash2
 } from 'lucide-react';
 import EditableTableCell from './EditableTableCell';
 import StatusBadge from './StatusBadge';
+import EditModal from './EditModal';
 import quarterComparisonService from '../../services/QuarterComparisonService';
+import { toDisplayFormat } from '../../utils/quarterFormatUtils';
 
 const QuarterlyDataTable = ({ 
   allQuartersData, 
@@ -20,20 +23,45 @@ const QuarterlyDataTable = ({
   onDataChange, 
   dashboardType, 
   onQuarterSelect,
-  selectedQuarters = []
+  selectedQuarters = [],
+  onDeleteQuarter,
+  showSimplifiedColumns = false
 }) => {
   const [sortConfig, setSortConfig] = useState({ key: 'period', direction: 'desc' });
   const [editingCell, setEditingCell] = useState(null);
   const [processedRows, setProcessedRows] = useState([]);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [selectedQuarterForEdit, setSelectedQuarterForEdit] = useState(null);
+  const [deleteConfirmation, setDeleteConfirmation] = useState(null);
 
   // Define table columns based on dashboard type
   const getColumns = useCallback(() => {
+    // Debug logging
+    console.log('QuarterlyDataTable getColumns called:', {
+      dashboardType,
+      showSimplifiedColumns,
+      condition: dashboardType === 'workforce' && showSimplifiedColumns
+    });
+
     const baseColumns = [
       { key: 'period', label: 'Quarter', sortable: true, width: '120px' },
       { key: 'status', label: 'Status', sortable: true, width: '100px' },
     ];
 
-    if (dashboardType === 'workforce') {
+    if (dashboardType === 'workforce' && showSimplifiedColumns) {
+      // Simplified columns for Workforce Headcount Admin Table
+      console.log('QuarterlyDataTable: Returning SIMPLIFIED columns');
+      return [
+        ...baseColumns,
+        { key: 'beFaculty', label: 'BE Faculty', sortable: true, editable: true, format: 'number' },
+        { key: 'beStaff', label: 'BE Staff', sortable: true, editable: true, format: 'number' },
+        { key: 'students', label: 'Student', sortable: true, editable: true, format: 'number' },
+        { key: 'turnoverFaculty', label: 'BE Faculty Turnover', sortable: true, editable: true, format: 'number', tooltip: 'Benefit Eligible Faculty Turnover (both campuses)' },
+        { key: 'turnoverStaff', label: 'BE Staff Turnover', sortable: true, editable: true, format: 'number', tooltip: 'Benefit Eligible Staff Turnover (both campuses)' },
+        { key: 'actions', label: 'Actions', width: '120px' }
+      ];
+    } else if (dashboardType === 'workforce') {
+      console.log('QuarterlyDataTable: Returning FULL columns for workforce');
       return [
         ...baseColumns,
         { key: 'totalEmployees', label: 'Total Employees', sortable: true, editable: true, format: 'number' },
@@ -76,13 +104,14 @@ const QuarterlyDataTable = ({
     }
 
     // Add more dashboard-specific columns for other types
+    console.log('QuarterlyDataTable: Returning DEFAULT columns for', dashboardType);
     return [
       ...baseColumns,
       { key: 'totalRecords', label: 'Total Records', sortable: true, editable: true, format: 'number' },
       { key: 'lastUpdated', label: 'Last Updated', sortable: true, format: 'date' },
       { key: 'actions', label: 'Actions', width: '80px' }
     ];
-  }, [dashboardType]);
+  }, [dashboardType, showSimplifiedColumns]);
 
   // Transform Firebase data to table rows
   const transformDataToRows = useCallback((quarterData) => {
@@ -156,6 +185,16 @@ const QuarterlyDataTable = ({
         
         // Growth % will be calculated dynamically in a separate effect
         row.growth = 0; // Placeholder - will be updated by calculateGrowthPercentages
+        
+        // Extract turnover totals for simplified view
+        const trends = data.trends || {};
+        const turnoverBeFacultyOmaha = trends.turnoverBeFacultyOmaha || 0;
+        const turnoverBeStaffOmaha = trends.turnoverBeStaffOmaha || 0;
+        const turnoverBeFacultyPhoenix = trends.turnoverBeFacultyPhoenix || 0;
+        const turnoverBeStaffPhoenix = trends.turnoverBeStaffPhoenix || 0;
+        
+        row.turnoverFaculty = turnoverBeFacultyOmaha + turnoverBeFacultyPhoenix;
+        row.turnoverStaff = turnoverBeStaffOmaha + turnoverBeStaffPhoenix;
       } else {
         row.totalRecords = Object.keys(data).length;
       }
@@ -334,7 +373,7 @@ const QuarterlyDataTable = ({
   }, [allQuartersData, onDataChange]);
 
   // Format cell value for display
-  const formatCellValue = useCallback((value, format) => {
+  const formatCellValue = useCallback((value, format, columnKey) => {
     if (value === null || value === undefined) return '-';
     
     switch (format) {
@@ -347,6 +386,10 @@ const QuarterlyDataTable = ({
         if (value instanceof Date) return value.toLocaleDateString();
         return value;
       default:
+        // Format quarter values using display format
+        if (columnKey === 'period') {
+          return toDisplayFormat(value);
+        }
         return value;
     }
   }, []);
@@ -358,7 +401,10 @@ const QuarterlyDataTable = ({
       {/* Table Header */}
       <div className="border-b border-gray-200 p-4">
         <h3 className="text-lg font-semibold text-gray-900">
-          {dashboardType.charAt(0).toUpperCase() + dashboardType.slice(1)} Data by Quarter
+          {showSimplifiedColumns && dashboardType === 'workforce' 
+            ? 'Workforce Headcount Admin Table'
+            : `${dashboardType.charAt(0).toUpperCase() + dashboardType.slice(1)} Data by Quarter`
+          }
         </h3>
         <p className="text-sm text-gray-600 mt-1">
           {sortedData.length} quarters • {isEditMode ? 'Edit mode active' : 'View mode'}
@@ -426,19 +472,44 @@ const QuarterlyDataTable = ({
                       <StatusBadge status={row.status} />
                     ) : column.key === 'actions' ? (
                       <div className="flex items-center gap-1">
-                        <button
-                          onClick={() => onQuarterSelect?.(row.period)}
-                          className="p-1 text-gray-400 hover:text-gray-600 rounded"
-                          title="View details"
-                        >
-                          <Eye size={14} />
-                        </button>
-                        <button
-                          className="p-1 text-gray-400 hover:text-gray-600 rounded"
-                          title="More actions"
-                        >
-                          <MoreHorizontal size={14} />
-                        </button>
+                        {showSimplifiedColumns && (
+                          <>
+                            <button
+                              onClick={() => {
+                                setSelectedQuarterForEdit(row);
+                                setEditModalOpen(true);
+                              }}
+                              className="p-1 text-blue-600 hover:text-blue-800 rounded"
+                              title="Edit all fields"
+                            >
+                              <Edit size={16} />
+                            </button>
+                            <button
+                              onClick={() => setDeleteConfirmation(row.period)}
+                              className="p-1 text-red-600 hover:text-red-800 rounded"
+                              title="Delete quarter"
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          </>
+                        )}
+                        {!showSimplifiedColumns && (
+                          <>
+                            <button
+                              onClick={() => onQuarterSelect?.(row.period)}
+                              className="p-1 text-gray-400 hover:text-gray-600 rounded"
+                              title="View details"
+                            >
+                              <Eye size={14} />
+                            </button>
+                            <button
+                              className="p-1 text-gray-400 hover:text-gray-600 rounded"
+                              title="More actions"
+                            >
+                              <MoreHorizontal size={14} />
+                            </button>
+                          </>
+                        )}
                       </div>
                     ) : column.editable && isEditMode ? (
                       <EditableTableCell
@@ -453,7 +524,7 @@ const QuarterlyDataTable = ({
                       <span className={`${
                         typeof row[column.key] === 'number' ? 'font-mono' : ''
                       }`}>
-                        {formatCellValue(row[column.key], column.format)}
+                        {formatCellValue(row[column.key], column.format, column.key)}
                       </span>
                     )}
                   </td>
@@ -493,6 +564,48 @@ const QuarterlyDataTable = ({
                 <StatusBadge status="outdated" size="sm" />
                 <span>Outdated</span>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Edit Modal */}
+      <EditModal
+        isOpen={editModalOpen}
+        onClose={() => {
+          setEditModalOpen(false);
+          setSelectedQuarterForEdit(null);
+        }}
+        quarterData={selectedQuarterForEdit}
+        onSave={onDataChange}
+      />
+      
+      {/* Delete Confirmation Dialog */}
+      {deleteConfirmation && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl p-6 max-w-md">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              Delete Quarter Data?
+            </h3>
+            <p className="text-gray-600 mb-4">
+              Are you sure you want to delete data for {deleteConfirmation}? This action cannot be undone.
+            </p>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setDeleteConfirmation(null)}
+                className="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  onDeleteQuarter?.(deleteConfirmation);
+                  setDeleteConfirmation(null);
+                }}
+                className="px-4 py-2 text-white bg-red-600 rounded-md hover:bg-red-700"
+              >
+                Delete
+              </button>
             </div>
           </div>
         </div>

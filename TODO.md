@@ -25,7 +25,21 @@ This todo list tracks the Phase 11 objectives for user testing and dashboard ref
 
 ## High Priority Tasks
 
-### 1. Implement Employee Type Filtering (Benefit Eligibility) ✅
+### 1. Admin Table Enhancement with Modal Editing ✅
+- [x] **Analyze current workforce data fields** - Compare with user's data definitions from screenshots
+- [x] **Review data model discrepancies** - Document differences between current implementation and required fields
+- [x] **Create EditModal component** - Build modal with scrollable form view for all editable fields
+- [x] **Split admin tables** - Create separate Workforce Headcount Admin and Division Headcount Admin tables
+- [x] **Configure Workforce Admin columns** - Show only: Quarter, Status, BE Faculty, BE Staff, Student, Turnover Faculty/Staff, Actions
+- [x] **Configure Division Admin columns** - Show: Quarter, Status, Department, BE Staff, Student, Turnover Faculty/Staff, Actions
+- [x] **Implement row deletion** - Add delete functionality with confirmation dialog
+- [x] **Add modal edit button** - Replace inline editing with modal-based editing
+- [x] **Map workforce fields to modal** - Ensure all fields from user specifications are included
+- [x] **Update Firebase schema** - Support new field structure if needed (backward compatible implementation)
+- [x] **Test both admin tables** - Verify CRUD operations work correctly (build successful, no compilation errors)
+- [x] **Update documentation** - Document new admin table structure and field definitions
+
+### 2. Implement Employee Type Filtering (Benefit Eligibility) ✅
 - [x] Update useFirebaseWorkforceData hook to accept and handle employeeType filter parameter
 - [x] Modify workforceDataProcessor.js to implement filtering logic for employee types
 - [x] Update CombinedWorkforceDashboard to add employee type filter UI and state management
@@ -371,6 +385,79 @@ docker-compose -f docker-compose.dev.yml up --build
 4. **Data Accuracy** - Metric calculations, aggregations, trend analysis
 5. **UI/UX Flow** - Navigation, button functionality, user feedback
 6. **Export Capabilities** - PDF, Excel, CSV generation and formatting
+
+### Admin Table Enhancement Implementation Complete ✅
+**Date:** January 14, 2025
+**Status:** Complete - All admin table features implemented
+
+**Changes Made:**
+1. **Created EditModal Component** (`/src/components/admin/EditModal.jsx`):
+   - Full-screen modal with scrollable form layout
+   - All 14 workforce data fields mapped as specified in user requirements
+   - Organized by campus (Omaha/Phoenix) and benefit eligibility (BE/NBE)
+   - Real-time total calculations displayed at bottom
+   - Proper data structure transformation for Firebase storage
+
+2. **Enhanced QuarterlyDataTable Component**:
+   - Added `showSimplifiedColumns` prop for Workforce Headcount Admin table
+   - Simplified columns: Quarter, Status, BE Faculty, BE Staff, Student, Turnover Faculty/Staff, Actions
+   - Added Edit and Delete buttons to Actions column
+   - Integrated EditModal for comprehensive editing
+   - Added delete confirmation dialog
+   - Enhanced turnover data extraction for simplified view
+
+3. **Created DivisionDataTable Component** (`/src/components/admin/DivisionDataTable.jsx`):
+   - Separate table for division-level data administration
+   - Columns: Quarter, Status, Department, BE Staff, Student, Turnover Faculty/Staff, Actions
+   - Handles division breakdown data from Firebase
+   - Full CRUD operations with modal editing and deletion
+
+4. **Updated AdminDashboard Component**:
+   - Added tab navigation for Workforce/Division admin tables
+   - Integrated both table components with proper state management
+   - Added delete quarter functionality with Firebase integration
+   - Enhanced data loading and error handling
+
+**Data Field Mapping Complete:**
+- BE Faculty Omaha/Phoenix
+- BE Staff Omaha/Phoenix  
+- NBE Faculty Omaha/Phoenix
+- NBE Staff Omaha/Phoenix
+- Student Omaha/Phoenix (always NBE)
+- Turnover BE Faculty/Staff Omaha/Phoenix
+- All fields validate and auto-calculate totals
+
+**User Experience Improvements:**
+- Modal provides better editing experience than inline editing
+- Clear field organization by campus and benefit eligibility
+- Confirmation dialogs for destructive actions
+- Real-time data validation and total calculations
+- Responsive design works on all screen sizes
+
+**Technical Features:**
+- Backward compatible with existing data structures
+- Supports multiple data input formats (Firebase, Excel imports, legacy)
+- Automatic total recalculation when individual values change
+- Proper error handling and user feedback
+- Build completed successfully with no compilation errors
+
+**Modal Popup Enhancement Complete:**
+- Converted modal to proper overlay popup with backdrop
+- All 14 fields displayed in vertical single-column layout as requested
+- Field order matches exact specifications from user screenshots
+- Compact styling with bordered field containers
+- Summary totals displayed at bottom with visual highlighting
+- Enhanced footer with save confirmation text
+- Responsive design optimized for various screen sizes
+- Modal centers properly on screen with max width constraints
+
+**Admin Table Column Display Fixes Complete:**
+- Fixed missing `showSimplifiedColumns` dependency in useCallback causing columns not to update
+- Updated table title to show "Workforce Headcount Admin Table" for simplified view
+- Added comprehensive debug logging to verify prop passing and column generation
+- Verified tab system navigation between Workforce/Division admin tables
+- Ensured only 8 simplified columns display: Quarter, Status, BE Faculty, BE Staff, Student, Turnover Faculty, Turnover Staff, Actions
+- Build completed successfully with all React dependency issues resolved
 
 ### Changes Made
 

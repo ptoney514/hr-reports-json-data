@@ -16,6 +16,7 @@ import {
 import { getQuarters } from '../../services/QuarterConfigService';
 import firebaseService from '../../services/FirebaseService';
 import QuarterlyDataTable from '../admin/QuarterlyDataTable';
+import DivisionDataTable from '../admin/DivisionDataTable';
 import TableFilters from '../admin/TableFilters';
 import DataImportExport from '../admin/DataImportExport';
 
@@ -29,6 +30,7 @@ const AdminDashboard = () => {
   const [error, setError] = useState(null);
   const [status, setStatus] = useState(null);
   const [hasChanges, setHasChanges] = useState(false);
+  const [activeTable, setActiveTable] = useState('workforce'); // 'workforce' or 'division'
   
   // Filter states
   const [searchTerm, setSearchTerm] = useState('');
@@ -118,6 +120,35 @@ const AdminDashboard = () => {
     setAllQuartersData(updatedAllData);
     setHasChanges(JSON.stringify(updatedAllData) !== JSON.stringify(originalData));
   }, [allQuartersData, originalData]);
+
+  // Handle quarter deletion
+  const handleDeleteQuarter = useCallback(async (period) => {
+    try {
+      // Remove from Firebase
+      await firebaseService.deleteQuarterData(selectedDashboard, period);
+      
+      // Remove from local state
+      const updatedAllData = { ...allQuartersData };
+      delete updatedAllData[period];
+      setAllQuartersData(updatedAllData);
+      
+      // Update original data too since this is a direct deletion
+      const updatedOriginalData = { ...originalData };
+      delete updatedOriginalData[period];
+      setOriginalData(updatedOriginalData);
+      
+      setStatus({
+        type: 'success',
+        message: `Successfully deleted ${period} data`
+      });
+      
+    } catch (error) {
+      setStatus({
+        type: 'error', 
+        message: `Failed to delete ${period}: ${error.message}`
+      });
+    }
+  }, [allQuartersData, originalData, selectedDashboard]);
 
   // Save changes to Firebase
   const saveChanges = async () => {
@@ -408,6 +439,36 @@ const AdminDashboard = () => {
         quarterCount={Object.keys(allQuartersData).length}
       />
 
+      {/* Table Selection Tabs - Only show for workforce dashboard */}
+      {selectedDashboard === 'workforce' && Object.keys(allQuartersData).length > 0 && (
+        <div className="bg-white rounded-lg shadow-sm border">
+          <div className="border-b border-gray-200">
+            <nav className="flex">
+              <button
+                onClick={() => setActiveTable('workforce')}
+                className={`px-6 py-3 text-sm font-medium border-b-2 ${
+                  activeTable === 'workforce'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                Workforce Headcount Admin Table
+              </button>
+              <button
+                onClick={() => setActiveTable('division')}
+                className={`px-6 py-3 text-sm font-medium border-b-2 ${
+                  activeTable === 'division'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                Division Headcount Admin Table
+              </button>
+            </nav>
+          </div>
+        </div>
+      )}
+
       {/* Data Display */}
       {loading ? (
         <div className="bg-white rounded-lg shadow-sm border p-8">
@@ -417,13 +478,44 @@ const AdminDashboard = () => {
           </div>
         </div>
       ) : Object.keys(allQuartersData).length > 0 ? (
-        <QuarterlyDataTable
-          allQuartersData={allQuartersData}
-          isEditMode={isEditMode}
-          onDataChange={handleQuarterDataChange}
-          dashboardType={selectedDashboard}
-          onQuarterSelect={(period) => console.log('Selected quarter:', period)}
-        />
+        selectedDashboard === 'workforce' ? (
+          activeTable === 'workforce' ? (
+            <>
+              {console.log('AdminDashboard: Rendering QuarterlyDataTable with showSimplifiedColumns=true', {
+                selectedDashboard,
+                activeTable,
+                showSimplifiedColumns: true
+              })}
+              <QuarterlyDataTable
+                allQuartersData={allQuartersData}
+                isEditMode={isEditMode}
+                onDataChange={handleQuarterDataChange}
+                onDeleteQuarter={handleDeleteQuarter}
+                dashboardType={selectedDashboard}
+                showSimplifiedColumns={true}
+                onQuarterSelect={(period) => console.log('Selected quarter:', period)}
+              />
+            </>
+          ) : (
+            <DivisionDataTable
+              allQuartersData={allQuartersData}
+              isEditMode={isEditMode}
+              onDataChange={handleQuarterDataChange}
+              onDeleteQuarter={handleDeleteQuarter}
+              onQuarterSelect={(period) => console.log('Selected quarter:', period)}
+            />
+          )
+        ) : (
+          <QuarterlyDataTable
+            allQuartersData={allQuartersData}
+            isEditMode={isEditMode}
+            onDataChange={handleQuarterDataChange}
+            onDeleteQuarter={handleDeleteQuarter}
+            dashboardType={selectedDashboard}
+            showSimplifiedColumns={false}
+            onQuarterSelect={(period) => console.log('Selected quarter:', period)}
+          />
+        )
       ) : (
         <div className="bg-white rounded-lg shadow-sm border p-8">
           <div className="text-center text-gray-500">
