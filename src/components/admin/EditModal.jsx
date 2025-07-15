@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { X } from 'lucide-react';
+import { toDisplayFormat } from '../../utils/quarterFormatUtils';
 
 const EditModal = ({ isOpen, onClose, quarterData, onSave }) => {
   const [formData, setFormData] = useState({
@@ -35,6 +36,21 @@ const EditModal = ({ isOpen, onClose, quarterData, onSave }) => {
     turnoverBeFacultyPhoenix: 0,
     turnoverBeStaffPhoenix: 0,
   });
+
+  // Prevent body scroll when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      // Store original overflow style
+      const originalStyle = window.getComputedStyle(document.body).overflow;
+      // Prevent body scroll
+      document.body.style.overflow = 'hidden';
+      
+      // Cleanup function to restore scroll
+      return () => {
+        document.body.style.overflow = originalStyle;
+      };
+    }
+  }, [isOpen]);
 
   // Initialize form data when quarter data changes
   useEffect(() => {
@@ -78,21 +94,37 @@ const EditModal = ({ isOpen, onClose, quarterData, onSave }) => {
     }
   }, [quarterData]);
 
-  const handleInputChange = (field, value) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: parseInt(value) || 0
-    }));
-  };
+  const handleInputChange = useCallback((field, value) => {
+    // Allow empty string for better UX while typing
+    if (value === '') {
+      setFormData(prev => ({
+        ...prev,
+        [field]: ''
+      }));
+      return;
+    }
+    
+    // Convert to number, ensuring it's a valid positive integer
+    const numericValue = parseInt(value);
+    if (!isNaN(numericValue) && numericValue >= 0) {
+      setFormData(prev => ({
+        ...prev,
+        [field]: numericValue
+      }));
+    }
+  }, []);
 
   const handleSave = () => {
+    // Convert empty strings to 0 for calculations
+    const getNumericValue = (val) => val === '' ? 0 : parseInt(val) || 0;
+    
     // Calculate totals
-    const totalBeFaculty = formData.beFacultyOmaha + formData.beFacultyPhoenix;
-    const totalBeStaff = formData.beStaffOmaha + formData.beStaffPhoenix;
-    const totalNbeFaculty = formData.nbeFacultyOmaha + formData.nbeFacultyPhoenix;
-    const totalNbeStaff = formData.nbeStaffOmaha + formData.nbeStaffPhoenix;
-    const totalHsr = formData.hsrOmaha + formData.hsrPhoenix;
-    const totalStudents = formData.studentOmaha + formData.studentPhoenix;
+    const totalBeFaculty = getNumericValue(formData.beFacultyOmaha) + getNumericValue(formData.beFacultyPhoenix);
+    const totalBeStaff = getNumericValue(formData.beStaffOmaha) + getNumericValue(formData.beStaffPhoenix);
+    const totalNbeFaculty = getNumericValue(formData.nbeFacultyOmaha) + getNumericValue(formData.nbeFacultyPhoenix);
+    const totalNbeStaff = getNumericValue(formData.nbeStaffOmaha) + getNumericValue(formData.nbeStaffPhoenix);
+    const totalHsr = getNumericValue(formData.hsrOmaha) + getNumericValue(formData.hsrPhoenix);
+    const totalStudents = getNumericValue(formData.studentOmaha) + getNumericValue(formData.studentPhoenix);
     
     // Prepare updated data structure
     const updatedData = {
@@ -112,43 +144,43 @@ const EditModal = ({ isOpen, onClose, quarterData, onSave }) => {
       byLocation: {
         omaha: {
           name: 'Omaha',
-          beFaculty: formData.beFacultyOmaha,
-          beStaff: formData.beStaffOmaha,
-          nbeFaculty: formData.nbeFacultyOmaha,
-          nbeStaff: formData.nbeStaffOmaha,
-          hsr: formData.hsrOmaha,
-          students: formData.studentOmaha,
+          beFaculty: getNumericValue(formData.beFacultyOmaha),
+          beStaff: getNumericValue(formData.beStaffOmaha),
+          nbeFaculty: getNumericValue(formData.nbeFacultyOmaha),
+          nbeStaff: getNumericValue(formData.nbeStaffOmaha),
+          hsr: getNumericValue(formData.hsrOmaha),
+          students: getNumericValue(formData.studentOmaha),
           breakdown: {
-            faculty: formData.beFacultyOmaha + formData.nbeFacultyOmaha,
-            staff: formData.beStaffOmaha + formData.nbeStaffOmaha,
-            hsr: formData.hsrOmaha,
-            students: formData.studentOmaha,
+            faculty: getNumericValue(formData.beFacultyOmaha) + getNumericValue(formData.nbeFacultyOmaha),
+            staff: getNumericValue(formData.beStaffOmaha) + getNumericValue(formData.nbeStaffOmaha),
+            hsr: getNumericValue(formData.hsrOmaha),
+            students: getNumericValue(formData.studentOmaha),
           },
-          total: formData.beFacultyOmaha + formData.beStaffOmaha + formData.nbeFacultyOmaha + formData.nbeStaffOmaha + formData.hsrOmaha + formData.studentOmaha,
+          total: getNumericValue(formData.beFacultyOmaha) + getNumericValue(formData.beStaffOmaha) + getNumericValue(formData.nbeFacultyOmaha) + getNumericValue(formData.nbeStaffOmaha) + getNumericValue(formData.hsrOmaha) + getNumericValue(formData.studentOmaha),
         },
         phoenix: {
           name: 'Phoenix',
-          beFaculty: formData.beFacultyPhoenix,
-          beStaff: formData.beStaffPhoenix,
-          nbeFaculty: formData.nbeFacultyPhoenix,
-          nbeStaff: formData.nbeStaffPhoenix,
-          hsr: formData.hsrPhoenix,
-          students: formData.studentPhoenix,
+          beFaculty: getNumericValue(formData.beFacultyPhoenix),
+          beStaff: getNumericValue(formData.beStaffPhoenix),
+          nbeFaculty: getNumericValue(formData.nbeFacultyPhoenix),
+          nbeStaff: getNumericValue(formData.nbeStaffPhoenix),
+          hsr: getNumericValue(formData.hsrPhoenix),
+          students: getNumericValue(formData.studentPhoenix),
           breakdown: {
-            faculty: formData.beFacultyPhoenix + formData.nbeFacultyPhoenix,
-            staff: formData.beStaffPhoenix + formData.nbeStaffPhoenix,
-            hsr: formData.hsrPhoenix,
-            students: formData.studentPhoenix,
+            faculty: getNumericValue(formData.beFacultyPhoenix) + getNumericValue(formData.nbeFacultyPhoenix),
+            staff: getNumericValue(formData.beStaffPhoenix) + getNumericValue(formData.nbeStaffPhoenix),
+            hsr: getNumericValue(formData.hsrPhoenix),
+            students: getNumericValue(formData.studentPhoenix),
           },
-          total: formData.beFacultyPhoenix + formData.beStaffPhoenix + formData.nbeFacultyPhoenix + formData.nbeStaffPhoenix + formData.hsrPhoenix + formData.studentPhoenix,
+          total: getNumericValue(formData.beFacultyPhoenix) + getNumericValue(formData.beStaffPhoenix) + getNumericValue(formData.nbeFacultyPhoenix) + getNumericValue(formData.nbeStaffPhoenix) + getNumericValue(formData.hsrPhoenix) + getNumericValue(formData.studentPhoenix),
         },
       },
       trends: {
         ...quarterData.rawData.trends,
-        turnoverBeFacultyOmaha: formData.turnoverBeFacultyOmaha,
-        turnoverBeStaffOmaha: formData.turnoverBeStaffOmaha,
-        turnoverBeFacultyPhoenix: formData.turnoverBeFacultyPhoenix,
-        turnoverBeStaffPhoenix: formData.turnoverBeStaffPhoenix,
+        turnoverBeFacultyOmaha: getNumericValue(formData.turnoverBeFacultyOmaha),
+        turnoverBeStaffOmaha: getNumericValue(formData.turnoverBeStaffOmaha),
+        turnoverBeFacultyPhoenix: getNumericValue(formData.turnoverBeFacultyPhoenix),
+        turnoverBeStaffPhoenix: getNumericValue(formData.turnoverBeStaffPhoenix),
       },
       lastUpdated: new Date(),
       lastEditedBy: 'Admin Modal Editor',
@@ -157,6 +189,27 @@ const EditModal = ({ isOpen, onClose, quarterData, onSave }) => {
     onSave(quarterData.period, updatedData);
     onClose();
   };
+
+  // Helper function to safely get numeric value for display
+  const getNumValue = (val) => val === '' ? 0 : parseInt(val) || 0;
+
+  const handleKeyDown = useCallback((e) => {
+    // Prevent form submission on Enter key
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    // Prevent escape from closing modal unintentionally
+    if (e.key === 'Escape') {
+      e.stopPropagation();
+    }
+  }, []);
+
+  const handleInputEvent = useCallback((field, value, e) => {
+    // Prevent event bubbling that could cause scroll issues
+    e.stopPropagation();
+    handleInputChange(field, value);
+  }, [handleInputChange]);
 
   if (!isOpen) return null;
 
@@ -170,11 +223,13 @@ const EditModal = ({ isOpen, onClose, quarterData, onSave }) => {
       )}
       <input
         type="number"
-        value={value}
-        onChange={(e) => handleInputChange(field, e.target.value)}
+        value={value || ''}
+        onChange={(e) => handleInputEvent(field, e.target.value, e)}
+        onKeyDown={handleKeyDown}
         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
         min="0"
-        placeholder="123"
+        step="1"
+        placeholder="0"
       />
     </div>
   );
@@ -189,7 +244,7 @@ const EditModal = ({ isOpen, onClose, quarterData, onSave }) => {
               Edit Workforce Data
             </h2>
             <p className="text-sm text-gray-600 mt-1">
-              Quarter: {quarterData?.period || 'Unknown'}
+              Reporting Period: {toDisplayFormat(quarterData?.period) || 'Unknown'}
             </p>
           </div>
           <button
@@ -203,15 +258,15 @@ const EditModal = ({ isOpen, onClose, quarterData, onSave }) => {
         {/* Scrollable Content - All Fields Vertical */}
         <div className="px-6 py-4 overflow-y-auto" style={{ maxHeight: 'calc(85vh - 140px)' }}>
           <div className="space-y-4">
-            {/* Quarter (Read-only) */}
+            {/* Reporting Period (Read-only) */}
             <div className="mb-4 p-3 bg-gray-50 rounded-md">
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Quarter
+                Reporting Period
               </label>
-              <p className="text-sm text-gray-600">FY quarter and end reporting date</p>
+              <p className="text-sm text-gray-600">Fiscal year reporting period and end date</p>
               <input
                 type="text"
-                value={quarterData?.period || 'Unknown'}
+                value={toDisplayFormat(quarterData?.period) || 'Unknown'}
                 disabled
                 className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 text-gray-600"
               />
@@ -355,36 +410,36 @@ const EditModal = ({ isOpen, onClose, quarterData, onSave }) => {
               <div>
                 <span className="font-medium">Total BE Faculty:</span>{' '}
                 <span className="text-blue-600 font-semibold">
-                  {formData.beFacultyOmaha + formData.beFacultyPhoenix}
+                  {getNumValue(formData.beFacultyOmaha) + getNumValue(formData.beFacultyPhoenix)}
                 </span>
               </div>
               <div>
                 <span className="font-medium">Total BE Staff:</span>{' '}
                 <span className="text-blue-600 font-semibold">
-                  {formData.beStaffOmaha + formData.beStaffPhoenix}
+                  {getNumValue(formData.beStaffOmaha) + getNumValue(formData.beStaffPhoenix)}
                 </span>
               </div>
               <div>
                 <span className="font-medium">Total HSR:</span>{' '}
                 <span className="text-blue-600 font-semibold">
-                  {formData.hsrOmaha + formData.hsrPhoenix}
+                  {getNumValue(formData.hsrOmaha) + getNumValue(formData.hsrPhoenix)}
                 </span>
               </div>
               <div>
                 <span className="font-medium">Total Students:</span>{' '}
                 <span className="text-blue-600 font-semibold">
-                  {formData.studentOmaha + formData.studentPhoenix}
+                  {getNumValue(formData.studentOmaha) + getNumValue(formData.studentPhoenix)}
                 </span>
               </div>
               <div>
                 <span className="font-medium">Total Employees:</span>{' '}
                 <span className="text-blue-600 font-semibold">
-                  {formData.beFacultyOmaha + formData.beFacultyPhoenix +
-                   formData.beStaffOmaha + formData.beStaffPhoenix +
-                   formData.nbeFacultyOmaha + formData.nbeFacultyPhoenix +
-                   formData.nbeStaffOmaha + formData.nbeStaffPhoenix +
-                   formData.hsrOmaha + formData.hsrPhoenix +
-                   formData.studentOmaha + formData.studentPhoenix}
+                  {getNumValue(formData.beFacultyOmaha) + getNumValue(formData.beFacultyPhoenix) +
+                   getNumValue(formData.beStaffOmaha) + getNumValue(formData.beStaffPhoenix) +
+                   getNumValue(formData.nbeFacultyOmaha) + getNumValue(formData.nbeFacultyPhoenix) +
+                   getNumValue(formData.nbeStaffOmaha) + getNumValue(formData.nbeStaffPhoenix) +
+                   getNumValue(formData.hsrOmaha) + getNumValue(formData.hsrPhoenix) +
+                   getNumValue(formData.studentOmaha) + getNumValue(formData.studentPhoenix)}
                 </span>
               </div>
             </div>

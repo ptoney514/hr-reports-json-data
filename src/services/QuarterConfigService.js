@@ -12,6 +12,14 @@ class QuarterConfigService {
     this.quarters = [];
     this.config = null;
     
+    // Cache for expensive operations to prevent infinite re-renders
+    this._cache = {
+      currentReportingPeriod: null,
+      last5Periods: null,
+      quarters: null,
+      cacheTimestamp: null
+    };
+    
     try {
       // Validate imported config
       if (!quarterConfig) {
@@ -21,9 +29,10 @@ class QuarterConfigService {
         return;
       }
 
-      // Validate config structure
-      if (!quarterConfig.quarters || !Array.isArray(quarterConfig.quarters)) {
-        console.error('Invalid quarter config structure, using fallback configuration');
+      // Support both old 'quarters' and new 'periods' structure
+      const periods = quarterConfig.periods || quarterConfig.quarters;
+      if (!periods || !Array.isArray(periods)) {
+        console.error('Invalid config structure, using fallback configuration');
         this.config = this.getDefaultConfig();
         this.quarters = this.config.quarters || [];
         return;
@@ -31,7 +40,7 @@ class QuarterConfigService {
 
       // Config is valid, use it
       this.config = quarterConfig;
-      this.quarters = this.config.quarters || [];
+      this.quarters = periods;
       
       console.log('QuarterConfigService initialized successfully with', this.quarters.length, 'quarters');
     } catch (error) {
@@ -124,26 +133,42 @@ class QuarterConfigService {
   }
 
   /**
-   * Get all active quarters in format compatible with original QUARTER_DATES
+   * Get all active quarters in format compatible with original QUARTER_DATES - MEMOIZED
    * @returns {Array} Array of quarter objects with value, label, quarter, dateValue
    */
   getQuarters() {
+    // Return cached result if valid
+    if (this._isCacheValid() && this._cache.quarters) {
+      return this._cache.quarters;
+    }
+
     if (!this.quarters || !Array.isArray(this.quarters)) {
       console.error('Quarters not available in getQuarters()');
       return [];
     }
     
-    return this.quarters
-      .filter(q => q && q.active)
-      .sort((a, b) => a.display_order - b.display_order)
-      .map(quarter => ({
-        value: quarter.id,
-        label: quarter.label,
-        quarter: quarter.quarter,
-        dateValue: quarter.end_date,
-        startDate: quarter.start_date,
-        fiscalYear: quarter.fiscal_year
-      }));
+    try {
+      const result = this.quarters
+        .filter(q => q && q.active)
+        .sort((a, b) => a.display_order - b.display_order)
+        .map(quarter => ({
+          value: quarter.id,
+          label: quarter.label,
+          quarter: quarter.quarter,
+          dateValue: quarter.end_date,
+          startDate: quarter.start_date,
+          fiscalYear: quarter.fiscal_year
+        }));
+
+      // Cache the result
+      this._cache.quarters = result;
+      this._cache.cacheTimestamp = Date.now();
+      
+      return result;
+    } catch (error) {
+      console.warn('Error getting quarters:', error);
+      return [];
+    }
   }
 
   /**
@@ -192,6 +217,125 @@ class QuarterConfigService {
       fiscalYear: quarter.fiscal_year,
       active: quarter.active
     };
+  }
+
+  /**
+   * Clear cache to force recalculation
+   * @private
+   */
+  _clearCache() {
+    this._cache = {
+      currentReportingPeriod: null,
+      last5Periods: null,
+      quarters: null,
+      cacheTimestamp: null
+    };
+  }
+
+  /**
+   * Check if cache is valid (expires after 5 minutes)
+   * @private
+   */
+  _isCacheValid() {
+    if (!this._cache.cacheTimestamp) return false;
+    const now = Date.now();
+    const fiveMinutes = 5 * 60 * 1000;
+    return (now - this._cache.cacheTimestamp) < fiveMinutes;
+  }
+
+  /**
+   * Get the current reporting date (fixed at 6/30/2025)
+   * @returns {string} Current reporting date
+   */
+  getCurrentReportingDate() {
+    return this.config?.current_reporting_date || '2025-06-30';
+  }
+
+  /**
+   * Get the current reporting period (Q2-2025 for 6/30/2025) - MEMOIZED
+   * @returns {Object|null} Current reporting period object
+   */
+  getCurrentReportingPeriod() {
+    // Return cached result if valid
+    if (this._isCacheValid() && this._cache.currentReportingPeriod) {
+      return this._cache.currentReportingPeriod;
+    }
+
+    try {
+      const reportingDate = this.getCurrentReportingDate();
+      const currentPeriod = this.quarters.find(q => 
+        q.is_current || q.end_date === reportingDate
+      );
+      
+      const result = currentPeriod ? this.getQuarterById(currentPeriod.id) : {
+        value: 'Q2-2025',
+        label: '6/30/2025',
+        quarter: 'Q2-2025',
+        dateValue: '2025-06-30',
+        startDate: '2025-04-01',
+        fiscalYear: 2025,
+        active: true
+      };
+
+      // Cache the result
+      this._cache.currentReportingPeriod = result;
+      this._cache.cacheTimestamp = Date.now();
+      
+      return result;
+    } catch (error) {
+      console.warn('Error getting current reporting period:', error);
+      // Return fallback
+      return {
+        value: 'Q2-2025',
+        label: '6/30/2025',
+        quarter: 'Q2-2025',
+        dateValue: '2025-06-30',
+        startDate: '2025-04-01',
+        fiscalYear: 2025,
+        active: true
+      };
+    }
+  }
+
+  /**
+   * Get the last 5 periods from current reporting date for time-series - MEMOIZED
+   * @returns {Array} Array of 5 periods ending with current reporting period
+   */
+  getLast5Periods() {
+    // Return cached result if valid
+    if (this._isCacheValid() && this._cache.last5Periods) {
+      return this._cache.last5Periods;
+    }
+
+    try {
+      const currentPeriod = this.getCurrentReportingPeriod();
+      if (!currentPeriod) {
+        this._cache.last5Periods = [];
+        return [];
+      }
+
+      const allPeriods = this.getQuarters();
+      const currentIndex = allPeriods.findIndex(q => q.value === currentPeriod.value);
+      
+      if (currentIndex === -1) {
+        this._cache.last5Periods = [];
+        return [];
+      }
+
+      // Get 5 periods including current (so 4 back + current)
+      const startIndex = Math.max(0, currentIndex - 4);
+      const result = allPeriods.slice(startIndex, currentIndex + 1);
+      
+      // Cache the result
+      this._cache.last5Periods = result;
+      this._cache.cacheTimestamp = Date.now();
+      
+      return result;
+    } catch (error) {
+      console.warn('Error getting last 5 periods:', error);
+      this._cache.last5Periods = [];
+      return [];
+    }
   }
 
   /**
@@ -378,6 +522,7 @@ class QuarterConfigService {
       };
 
       this.quarters.push(newQuarter);
+      this._clearCache(); // Clear cache when data changes
       return true;
     } catch (error) {
       console.error('Failed to add quarter:', error);
@@ -404,6 +549,7 @@ class QuarterConfigService {
         ...updates
       };
 
+      this._clearCache(); // Clear cache when data changes
       return true;
     } catch (error) {
       console.error('Failed to update quarter:', error);
@@ -491,6 +637,9 @@ export const getQuarters = () => quarterConfigService.getQuarters();
 export const getQuarterById = (id) => quarterConfigService.getQuarterById(id);
 export const getMostRecentQuarter = () => quarterConfigService.getMostRecentQuarter();
 export const getCurrentQuarter = () => quarterConfigService.getCurrentQuarter();
+export const getCurrentReportingDate = () => quarterConfigService.getCurrentReportingDate();
+export const getCurrentReportingPeriod = () => quarterConfigService.getCurrentReportingPeriod();
+export const getLast5Periods = () => quarterConfigService.getLast5Periods();
 export const getPreviousQuarter = (id) => quarterConfigService.getPreviousQuarter(id);
 export const getNextQuarter = (id) => quarterConfigService.getNextQuarter(id);
 export const isValidQuarterFormat = (id) => quarterConfigService.isValidQuarterFormat(id);

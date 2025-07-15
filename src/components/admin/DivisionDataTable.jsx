@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import StatusBadge from './StatusBadge';
 import EditModal from './EditModal';
+import { toDisplayFormat } from '../../utils/quarterFormatUtils';
 
 const DivisionDataTable = ({ 
   allQuartersData, 
@@ -24,7 +25,7 @@ const DivisionDataTable = ({
   // Define table columns for division admin
   const getColumns = useCallback(() => {
     return [
-      { key: 'period', label: 'Quarter', sortable: true, width: '120px' },
+      { key: 'period', label: 'Reporting Period', sortable: true, width: '150px' },
       { key: 'status', label: 'Status', sortable: true, width: '100px' },
       { key: 'department', label: 'Department', sortable: true, width: '180px' },
       { key: 'beStaff', label: 'BE Staff', sortable: true, editable: true, format: 'number' },
@@ -127,7 +128,7 @@ const DivisionDataTable = ({
   }, []);
 
   // Format cell value for display
-  const formatCellValue = useCallback((value, format) => {
+  const formatCellValue = useCallback((value, format, columnKey) => {
     if (value === null || value === undefined) return '-';
     
     switch (format) {
@@ -140,6 +141,10 @@ const DivisionDataTable = ({
         if (value instanceof Date) return value.toLocaleDateString();
         return value;
       default:
+        // Format quarter values using display format
+        if (columnKey === 'period') {
+          return toDisplayFormat(value);
+        }
         return value;
     }
   }, []);
@@ -218,7 +223,7 @@ const DivisionDataTable = ({
                     {column.key === 'status' ? (
                       <StatusBadge status={row.status} />
                     ) : column.key === 'period' ? (
-                      <span className="font-medium">{row.displayPeriod || row.period}</span>
+                      <span className="font-medium">{formatCellValue(row.period, column.format, column.key)}</span>
                     ) : column.key === 'actions' ? (
                       <div className="flex items-center gap-1">
                         <button
@@ -243,7 +248,7 @@ const DivisionDataTable = ({
                       <span className={`${
                         typeof row[column.key] === 'number' ? 'font-mono' : ''
                       }`}>
-                        {formatCellValue(row[column.key], column.format)}
+                        {formatCellValue(row[column.key], column.format, column.key)}
                       </span>
                     )}
                   </td>

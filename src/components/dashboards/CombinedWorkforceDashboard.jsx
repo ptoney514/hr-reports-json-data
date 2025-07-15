@@ -3,8 +3,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsive
 import { BarChart3, Users, Building2, UserPlus, UserMinus, MapPin, Download, ChevronDown, Database, Cloud, Settings } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import SummaryCard from '../ui/SummaryCard';
-import QuarterFilter, { CompactQuarterFilter } from '../ui/QuarterFilter';
-import FilterButton from '../ui/FilterButton';
+import { getCurrentReportingPeriod, getQuarterById } from '../../services/QuarterConfigService';
 import ErrorBoundary from '../ui/ErrorBoundary';
 import HeadcountChart from '../charts/HeadcountChart';
 import StartersLeaversChart from '../charts/StartersLeaversChart';
@@ -18,6 +17,18 @@ import {
 } from '../../utils/quarterlyDataProcessor';
 import { generateWorkforceMetrics } from '../../utils/workforceDataProcessor';
 import useFirebaseWorkforceData from '../../hooks/useFirebaseWorkforceData';
+import { 
+  formatDateRange, 
+  getDateRangeType, 
+  dateRangeToQuarters,
+  quarterToDateRange 
+} from '../../utils/dateRangeUtils';
+
+// Helper function to convert quarter ID to date label
+const getDateLabelFromQuarter = (quarterId) => {
+  const quarterInfo = getQuarterById(quarterId);
+  return quarterInfo?.label || quarterId;
+};
 
 const CombinedWorkforceDashboard = () => {
   const navigate = useNavigate();
@@ -36,10 +47,13 @@ const CombinedWorkforceDashboard = () => {
     employeeType: 'All'  // Default to show all employees
   });
   
-  // Quarter filter state (matches Enhanced Workforce Dashboard)
-  // Default to Q1-2025 which has data according to Admin Dashboard
-  const [selectedQuarter, setSelectedQuarter] = useState('Q1-2025');
+  // Fixed reporting period - always use current reporting date (6/30/2025)
+  const currentReportingPeriod = getCurrentReportingPeriod();
+  const reportingPeriod = currentReportingPeriod?.value || 'Q2-2025';
   
+  // For backward compatibility with existing code that uses selectedQuarter
+  const selectedQuarter = reportingPeriod;
+
   // Firebase data integration
   const { 
     data: firebaseData, 
@@ -47,12 +61,13 @@ const CombinedWorkforceDashboard = () => {
     error: firebaseError,
     isRealTimeActive 
   } = useFirebaseWorkforceData({
-    reportingPeriod: selectedQuarter || 'Q1-2025',
+    reportingPeriod: reportingPeriod,
     employeeTypeFilter: filters.employeeType
   });
   
   // Dynamic headcount data state
   const [headcountData, setHeadcountData] = useState({
+    beTotal: { value: 0, change: null, subtitle: "change", changeType: "percentage", indicator: "blue" },
     faculty: { value: 0, change: null, subtitle: "change", changeType: "percentage", indicator: "green" },
     staff: { value: 0, change: null, subtitle: "change", changeType: "percentage", indicator: "yellow" },
     hsr: { value: 0, change: null, subtitle: "change", changeType: "percentage", indicator: "purple" },
@@ -105,6 +120,7 @@ const CombinedWorkforceDashboard = () => {
   // Empty state data for testing
   const emptyStateData = {
     headcount: {
+      beTotal: { value: 0, change: null, subtitle: "no data available", changeType: "percentage", indicator: "blue" },
       faculty: { value: 0, change: null, subtitle: "no data available", changeType: "percentage", indicator: "green" },
       staff: { value: 0, change: null, subtitle: "no data available", changeType: "percentage", indicator: "yellow" },
       hsr: { value: 0, change: null, subtitle: "no data available", changeType: "percentage", indicator: "purple" },
@@ -144,12 +160,7 @@ const CombinedWorkforceDashboard = () => {
     }
   };
   
-  // Handle quarter changes (matches Enhanced Workforce Dashboard)
-  const handleQuarterChange = (newQuarter) => {
-    setSelectedQuarter(newQuarter);
-    // Also update the reportingPeriod in filters for consistency
-    setFilters(prev => ({ ...prev, reportingPeriod: newQuarter }));
-  };
+  // Reporting period is now fixed - no handler needed
 
   // Handle testing mode toggle
   const toggleTestingMode = () => {
@@ -300,18 +311,21 @@ const CombinedWorkforceDashboard = () => {
       // Calculate benefit-eligible totals
       const beFaculty = firebaseData.summary?.beFaculty || firebaseData.demographics?.beFaculty || 0;
       const beStaff = firebaseData.summary?.beStaff || firebaseData.demographics?.beStaff || 0;
-      const beTotalEmployees = beFaculty + beStaff;
       
       // Calculate HSR and Students totals
       const hsrOmaha = firebaseData.summary?.hsrOmaha || 0;
       const hsrPhoenix = firebaseData.summary?.hsrPhoenix || 0;
       const hsrTotal = hsrOmaha + hsrPhoenix;
       
+      // BE Total includes Faculty + Staff + HSR (all are benefit eligible)
+      const beTotalEmployees = beFaculty + beStaff + hsrTotal;
+      
       const studentOmaha = firebaseData.summary?.studentOmaha || 0;
       const studentPhoenix = firebaseData.summary?.studentPhoenix || 0;
       const studentsTotal = studentOmaha + studentPhoenix;
       
       const metrics = {
+        beTotal: { value: beTotalEmployees, change: ((firebaseData.summary?.facultyChange ?? 0) + (firebaseData.summary?.staffChange ?? 0) + (firebaseData.summary?.hsrChange ?? 0)) / 3, subtitle: "change", changeType: "percentage", indicator: "blue" },
         faculty: { value: beFaculty, change: firebaseData.summary?.facultyChange ?? null, subtitle: "change", changeType: "percentage", indicator: "green" },
         staff: { value: beStaff, change: firebaseData.summary?.staffChange ?? null, subtitle: "change", changeType: "percentage", indicator: "yellow" },
         hsr: { value: hsrTotal, change: firebaseData.summary?.hsrChange ?? null, subtitle: "change", changeType: "percentage", indicator: "purple" },
@@ -384,9 +398,33 @@ const CombinedWorkforceDashboard = () => {
       setLocationData(emptyStateData.charts.location);
     } else if (dataSource === 'firebase' && firebaseData && Object.keys(firebaseData).length > 0) {
       // Use Firebase data for chart data
+      console.log('Using Firebase data for charts', firebaseData);
       
+      // Check if we have quarter range data
+      if (firebaseData.quarterRangeData && firebaseData.quarterRangeData.length > 0) {
+        console.log('Using quarter range data for charts');
+        
+        // Generate headcount trend data from quarter range
+        const headcountTrendData = firebaseData.quarterRangeData.map(({ quarter, data }) => {
+          if (!data) return null;
+          
+          return {
+            quarterDisplay: getDateLabelFromQuarter(quarter), // Show date instead of quarter
+            period: getDateLabelFromQuarter(quarter), // Show date for x-axis
+            faculty: data.demographics?.faculty || 0,
+            staff: data.demographics?.staff || 0,
+            hsr: data.demographics?.hsr || 0,
+            students: data.demographics?.students || 0,
+            total: data.totalEmployees || 0
+          };
+        }).filter(Boolean);
+        
+        setFiveQuarterData(headcountTrendData);
+      } else {
+        // Use existing single quarter logic - Firebase data without quarter range
+        console.log('Using single quarter Firebase data');
+      }
       
-
       // Generate division breakdown from Firebase data for the selected quarter
       console.log('Generating Firebase division breakdown for quarter:', selectedQuarter);
       
@@ -969,7 +1007,18 @@ const CombinedWorkforceDashboard = () => {
       };
     };
 
+    // BE Total Card Enhancement
+    const beTotalInsight = () => {
+      const beFaculty = headcountData.faculty?.value || 0;
+      const beStaff = headcountData.staff?.value || 0;
+      const hsrTotal = headcountData.hsr?.value || 0;
+      return {
+        subtitle: `Faculty ${beFaculty} | Staff ${beStaff} | HSR ${hsrTotal}`
+      };
+    };
+
     return {
+      beTotal: beTotalInsight(),
       faculty: facultyInsight(),
       staff: staffInsight(),
       hsr: hsrInsight(),
@@ -1040,7 +1089,9 @@ const CombinedWorkforceDashboard = () => {
                     <h1 className="text-2xl font-bold text-gray-900">Workforce Analytics</h1>
                     <div className="flex items-center gap-4 mt-1">
                       <p className="text-gray-600 text-sm">
-                        <span className="font-medium">Note:</span> Currently viewing <strong>{filters.employeeType === 'All' ? 'All Employees' : filters.employeeType}</strong>.
+                        <span className="font-medium">Reporting Date:</span> <strong>{currentReportingPeriod?.label || '6/30/2025'}</strong>
+                        {' • '}
+                        <span className="font-medium">Viewing:</span> <strong>{filters.employeeType === 'All' ? 'All Employees' : filters.employeeType}</strong>
                       </p>
                       <div className="flex items-center gap-2">
                         {dataSource === 'firebase' ? (
@@ -1064,38 +1115,13 @@ const CombinedWorkforceDashboard = () => {
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <CompactQuarterFilter 
-                    selectedQuarter={selectedQuarter}
-                    onQuarterChange={handleQuarterChange}
-                    availableQuarters={QUARTER_DATES}
-                  />
-                  <FilterButton
-                    filters={filters}
-                    onFilterChange={handleFilterChange}
-                    activeCount={filters.employeeType !== 'All' ? 1 : 0}
-                    availableFilters={{
-                      employeeType: [
-                        { value: 'All', label: 'All Employees' },
-                        { value: 'Benefit Eligible', label: 'Benefit Eligible' },
-                        { value: 'Non-Benefit Eligible', label: 'Non-Benefit Eligible' },
-                        { value: 'Faculty', label: 'All Faculty' },
-                        { value: 'Staff', label: 'All Staff' },
-                        { value: 'Students', label: 'Student Workers' },
-                        { value: 'Benefit Eligible Faculty', label: 'Benefit Eligible Faculty' },
-                        { value: 'Non-Benefit Eligible Faculty', label: 'Non-Benefit Eligible Faculty' },
-                        { value: 'Benefit Eligible Staff', label: 'Benefit Eligible Staff' },
-                        { value: 'Non-Benefit Eligible Staff', label: 'Non-Benefit Eligible Staff' }
-                      ]
-                    }}
-                  />
-                  
                   {/* Testing Controls */}
                   <div className="relative">
                     <button 
                       onClick={toggleTestingMode}
-                      className="flex items-center gap-2 bg-gray-600 hover:bg-gray-700 text-white px-3 py-2 rounded-lg font-medium transition-colors duration-200"
+                      className="flex items-center gap-1.5 bg-gray-600 hover:bg-gray-700 text-white px-3 py-1.5 rounded-lg font-medium text-sm transition-colors duration-200"
                     >
-                      <Settings size={16} />
+                      <Settings size={14} />
                       <span>Testing</span>
                     </button>
                     
@@ -1134,11 +1160,11 @@ const CombinedWorkforceDashboard = () => {
                   
                   <button 
                     onClick={() => console.log('Export functionality coming soon')}
-                    className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200"
+                    className="flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg font-medium text-sm transition-colors duration-200"
                   >
-                    <Download size={16} />
+                    <Download size={14} />
                     <span>Export</span>
-                    <ChevronDown size={14} />
+                    <ChevronDown size={12} />
                   </button>
                 </div>
               </div>
@@ -1181,16 +1207,16 @@ const CombinedWorkforceDashboard = () => {
           {/* Summary Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 print:gap-2 mb-6 print:mb-4 dashboard-section page-break-inside-avoid">
             <SummaryCard
-              title="Faculty - Benefit Eligible"
-              value={(headcountData.faculty?.value || 0).toLocaleString()}
-              change={headcountData.faculty?.change}
+              title="BE Total Headcount"
+              value={(headcountData.beTotal?.value || 0).toLocaleString()}
+              change={headcountData.beTotal?.change}
               changeType="percentage"
-              subtitle={cardInsights.faculty.subtitle}
+              subtitle={cardInsights.beTotal?.subtitle || "change"}
               icon={Users}
             />
             
             <SummaryCard
-              title="Staff - Benefit Eligible"
+              title="BE Staff"
               value={(headcountData.staff?.value || 0).toLocaleString()}
               change={headcountData.staff?.change}
               changeType="percentage"
@@ -1199,11 +1225,11 @@ const CombinedWorkforceDashboard = () => {
             />
             
             <SummaryCard
-              title="HSR Headcount"
-              value={(headcountData.hsr?.value || 0).toLocaleString()}
-              change={headcountData.hsr?.change}
+              title="BE Faculty"
+              value={(headcountData.faculty?.value || 0).toLocaleString()}
+              change={headcountData.faculty?.change}
               changeType="percentage"
-              subtitle={cardInsights.hsr.subtitle}
+              subtitle={cardInsights.faculty.subtitle}
               icon={Users}
             />
             
@@ -1239,7 +1265,7 @@ const CombinedWorkforceDashboard = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
             <HeadcountChart
               data={fiveQuarterData}
-              title="5-Quarter Headcount Trend"
+              title="5-Period Headcount Trend"
               height={320}
               showLegend={true}
             />

@@ -60,7 +60,7 @@ export const toFirebaseFormat = (appQuarterId) => {
  * Convert quarter ID to display format with end date
  * @param {string} quarterId - Quarter in any supported format
  * @param {Object} quarterConfig - Optional quarter configuration object
- * @returns {string} Display format (e.g., "Q1 2025 (3/31/2025)")
+ * @returns {string} Display format (e.g., "6/30/25")
  */
 export const toDisplayFormat = (quarterId, quarterConfig = null) => {
   if (!quarterId) return '';
@@ -74,11 +74,16 @@ export const toDisplayFormat = (quarterId, quarterConfig = null) => {
   
   const [, quarter, year] = match;
   
+  // Get 2-digit year
+  const shortYear = year.slice(-2);
+  
   // If quarter config is provided, use the actual end date
   if (quarterConfig && quarterConfig.dateValue) {
     const endDate = new Date(quarterConfig.dateValue);
-    const formattedDate = `${endDate.getMonth() + 1}/${endDate.getDate()}/${endDate.getFullYear()}`;
-    return `Q${quarter} ${year} (${formattedDate})`;
+    const month = endDate.getMonth() + 1;
+    const day = endDate.getDate();
+    const configYear = endDate.getFullYear().toString().slice(-2);
+    return `${month}/${day}/${configYear}`;
   }
   
   // Otherwise, calculate standard quarter end dates
@@ -90,7 +95,7 @@ export const toDisplayFormat = (quarterId, quarterConfig = null) => {
   };
   
   const endDate = endDates[quarter] || '12/31';
-  return `Q${quarter} ${year} (${endDate}/${year})`;
+  return `${endDate}/${shortYear}`;
 };
 
 /**

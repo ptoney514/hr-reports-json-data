@@ -34,6 +34,70 @@ This todo list tracks the Phase 11 objectives for user testing and dashboard ref
 - [x] **Phase 3: Replace Division & Location Data** - Replace topDivisionsData and turnoverReasons with dynamic calculations
 - [x] **Phase 4: Dynamic Executive Summary** - Replace static executive summary with data-driven content
 
+## Current Tasks
+
+### Quarter Range Selection Implementation (In Progress)
+- [x] **Create QuarterRangeSelector component** - Built component with start/end quarter selection
+- [x] **Update CombinedWorkforceDashboard** - Replaced QuarterFilter with QuarterRangeSelector
+- [x] **Modify useFirebaseWorkforceData hook** - Added loadQuarterRangeData function and quarter range support
+- [ ] **Update charts** - Display all quarters in selected range
+- [ ] **Add preset ranges** - Quick selection options
+- [ ] **Test implementation** - Verify functionality
+
+## Completed Tasks (January 15, 2025)
+
+### ✅ Quarter Range Selection Implementation
+**Status:** Mostly Complete - Ready for testing
+
+### ✅ Edit Workforce Data Modal Improvements (January 15, 2025)
+- [x] **Convert Input Fields to Free-form** - Changed number inputs to text inputs with numeric validation
+- [x] **Remove Arrow Spinners** - Added CSS to hide number input spinners for better UX
+- [x] **Improve Input Handling** - Allow empty strings during typing, numeric-only validation
+- [x] **Fix Calculations** - Handle empty string values in calculations with getNumericValue helper
+
+### ✅ Reporting Period Display Format Update (January 15, 2025)
+- [x] **Update EditModal Display** - Changed from "2025-Q2" to "6/30/25" format
+- [x] **Import toDisplayFormat** - Added import for quarterFormatUtils
+- [x] **Apply Format Consistently** - Updated both header and input field displays
+
+**Components Created/Modified:**
+1. **QuarterRangeSelector Component**:
+   - Built comprehensive quarter range selection with dropdown UI
+   - Default end quarter: Q2-2025 (6/30/2025)
+   - Default start quarter: 1 year before end quarter
+   - Preset range options: Last 4 Quarters, Last Year, Last 2 Years, Year to Date
+   - Visual range display with quarter count
+   - Validation to ensure start quarter comes before end quarter
+
+2. **CombinedWorkforceDashboard Updates**:
+   - Replaced QuarterFilter with QuarterRangeSelector
+   - Added quarterRange state management
+   - Updated all references from selectedDateRange to quarterRange
+   - Dynamic chart title based on selected range
+
+3. **useFirebaseWorkforceData Hook Enhancement**:
+   - Added loadQuarterRangeData function to fetch multiple quarters
+   - Modified main data loading to support both single quarter and range modes
+   - Added quarterRangeData to returned data structure for charts
+   - Handles quarter range in activeFilters
+
+4. **Chart Updates**:
+   - HeadcountChart title now shows selected quarter range
+   - Chart data generation supports multiple quarters from Firebase
+   - Backward compatibility maintained for single quarter mode
+
+**Technical Implementation:**
+- Quarter range selector defaults to Q2-2025 as end with 1-year range
+- Firebase data fetched for all quarters in selected range
+- Primary data (for summary cards) uses end quarter of range
+- Chart data includes all quarters in range when available
+- Preset ranges provide quick selection options
+
+**Remaining Tasks:**
+- Update StartersLeaversChart to show aggregated data across quarters
+- Full testing of the implementation with real data
+- Performance optimization for large quarter ranges
+
 ## High Priority Tasks
 
 ### 1. Fix Import Aggregate Data Button Functionality ✅
@@ -65,6 +129,14 @@ This todo list tracks the Phase 11 objectives for user testing and dashboard ref
 - [x] Update chart components to respect employee type filter if needed
 - [x] Test filtering functionality with all employee type combinations
 - [x] Update TODO.md with completed tasks
+
+### 3. Enhanced Date Range Selection Implementation ✅ (January 15, 2025)
+- [x] **Create DateRangeSelector component** - Built comprehensive component with quarter/custom date toggle
+- [x] **Add calendar UI and preset ranges** - Implemented date pickers with preset options (Last 30 days, Quarter, YTD)
+- [x] **Enhance QuarterFilter component** - Added support for date range mode with backward compatibility
+- [x] **Create date range utility functions** - Built utilities for quarter/date conversions and validation
+- [x] **Update CombinedWorkforceDashboard** - Integrated date range support with dynamic period display
+- [x] **Add visual indicators** - Added data availability status icons (complete/partial/empty) with legend
 
 ### 2. Review Current System Status
 - [ ] Verify all components are ready for user testing

@@ -1,28 +1,51 @@
 import React from 'react';
 import { Calendar, ChevronDown } from 'lucide-react';
-import { QUARTER_DATES } from '../../utils/quarterlyDataProcessor';
+import { getQuarters, getCurrentReportingPeriod } from '../../services/QuarterConfigService';
+import DateRangeSelector from './DateRangeSelector';
 
 /**
- * Quarter Filter Component
- * Allows users to select a quarter for filtering dashboard data
+ * Reporting Period Filter Component
+ * Shows reporting dates as primary labels (6/30/2025 instead of quarters)
+ * Fixed to current reporting date with read-only display
  */
 const QuarterFilter = ({ 
   selectedQuarter, 
   onQuarterChange, 
   availableQuarters = null,
   className = "",
-  showIcon = true 
+  showIcon = true,
+  enableDateRange = false,
+  dateRangeMode = 'quarter', // 'quarter' | 'custom' | 'both'
+  minDate = null,
+  maxDate = null,
+  readOnly = false // New prop to make it read-only display
 }) => {
-  // Use provided quarters or default to all quarters
-  const quarters = availableQuarters || QUARTER_DATES;
+  // Use provided quarters or get from service
+  const quarters = availableQuarters || getQuarters();
+  const currentReportingPeriod = getCurrentReportingPeriod();
   
   // If no quarters available, don't render
   if (!quarters || quarters.length === 0) {
     return null;
   }
   
-  // Set default selection if none provided
-  const currentSelection = selectedQuarter || quarters[quarters.length - 1]?.value;
+  // If date range mode is enabled, use DateRangeSelector
+  if (enableDateRange) {
+    return (
+      <DateRangeSelector
+        value={selectedQuarter}
+        onChange={onQuarterChange}
+        availableQuarters={quarters}
+        className={className}
+        mode={dateRangeMode}
+        minDate={minDate}
+        maxDate={maxDate}
+      />
+    );
+  }
+  
+  // Use current reporting period as default, fallback to provided selection
+  const currentSelection = currentReportingPeriod?.value || selectedQuarter || quarters[quarters.length - 1]?.value;
   
   const handleChange = (event) => {
     const newQuarter = event.target.value;
@@ -31,10 +54,39 @@ const QuarterFilter = ({
     }
   };
   
+  // If read-only, show current reporting date as fixed display
+  if (readOnly) {
+    const currentPeriod = quarters.find(q => q.value === currentSelection);
+    return (
+      <div className={`relative ${className}`}>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Reporting Date
+        </label>
+        <div className="relative">
+          {showIcon && (
+            <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-blue-500" />
+          )}
+          <div className={`
+            block w-full 
+            ${showIcon ? 'pl-10' : 'pl-3'} pr-3 py-2
+            border border-blue-200
+            bg-blue-50 
+            rounded-md 
+            text-sm
+            text-blue-800
+            font-medium
+          `}>
+            {currentPeriod?.label || '6/30/2025'}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className={`relative ${className}`}>
       <label className="block text-sm font-medium text-gray-700 mb-1">
-        Quarter End Date
+        Reporting Date
       </label>
       <div className="relative">
         {showIcon && (
@@ -60,7 +112,7 @@ const QuarterFilter = ({
             hover:border-gray-400
             transition-colors
           `}
-          aria-label="Select quarter end date"
+          aria-label="Select reporting date"
         >
           {quarters.map((quarter) => (
             <option key={quarter.value} value={quarter.value}>
@@ -75,15 +127,16 @@ const QuarterFilter = ({
 };
 
 /**
- * Compact Quarter Filter (for inline use)
+ * Compact Reporting Date Filter (for inline use)
  */
 export const CompactQuarterFilter = ({ 
   selectedQuarter, 
   onQuarterChange, 
   availableQuarters = null 
 }) => {
-  const quarters = availableQuarters || QUARTER_DATES;
-  const currentSelection = selectedQuarter || quarters[quarters.length - 1]?.value;
+  const quarters = availableQuarters || getQuarters();
+  const currentReportingPeriod = getCurrentReportingPeriod();
+  const currentSelection = currentReportingPeriod?.value || selectedQuarter || quarters[quarters.length - 1]?.value;
   
   if (!quarters || quarters.length === 0) {
     return null;
@@ -140,8 +193,9 @@ export const BadgeQuarterFilter = ({
   onQuarterChange, 
   availableQuarters = null 
 }) => {
-  const quarters = availableQuarters || QUARTER_DATES;
-  const currentSelection = selectedQuarter || quarters[quarters.length - 1]?.value;
+  const quarters = availableQuarters || getQuarters();
+  const currentReportingPeriod = getCurrentReportingPeriod();
+  const currentSelection = currentReportingPeriod?.value || selectedQuarter || quarters[quarters.length - 1]?.value;
   
   if (!quarters || quarters.length === 0) {
     return null;
@@ -171,15 +225,16 @@ export const BadgeQuarterFilter = ({
 };
 
 /**
- * Helper function to get quarter display info
+ * Helper function to get reporting period display info
  */
 export const getQuarterInfo = (quarterValue) => {
-  const quarter = QUARTER_DATES.find(q => q.value === quarterValue);
+  const quarters = getQuarters();
+  const quarter = quarters.find(q => q.value === quarterValue);
   return quarter || null;
 };
 
 /**
- * Helper function to format quarter for display
+ * Helper function to format reporting period for display (now shows dates first)
  */
 export const formatQuarterDisplay = (quarterValue) => {
   const quarter = getQuarterInfo(quarterValue);

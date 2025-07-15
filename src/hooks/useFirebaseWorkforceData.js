@@ -5,6 +5,7 @@ import { useErrorHandler, handleNetworkError, validateData } from '../utils/erro
 import { globalCache } from '../utils/cacheUtils';
 import { createEnhancedSummary } from '../services/QuarterComparisonService';
 import { toFirebaseFormat, debugQuarterFormat } from '../utils/quarterFormatUtils';
+import { getLast5Periods } from '../services/QuarterConfigService';
 
 // Cache configuration for Firebase data
 const CACHE_CONFIG = {
@@ -39,7 +40,8 @@ const useFirebaseWorkforceData = (customFilters = {}) => {
     divisionFilter: customFilters.divisionFilter || state.divisionFilter || 'All',
     departmentFilter: customFilters.departmentFilter || state.departmentFilter || 'All',
     employeeTypeFilter: customFilters.employeeTypeFilter || state.employeeTypeFilter || 'All',
-    dateRange: customFilters.dateRange || state.dateRange || null
+    dateRange: customFilters.dateRange || state.dateRange || null,
+    quarterRange: customFilters.quarterRange || null
   }), [
     customFilters.reportingPeriod,
     customFilters.locationFilter, 
@@ -47,6 +49,7 @@ const useFirebaseWorkforceData = (customFilters = {}) => {
     customFilters.departmentFilter,
     customFilters.employeeTypeFilter,
     customFilters.dateRange,
+    customFilters.quarterRange,
     state.reportingPeriod,
     state.locationFilter,
     state.divisionFilter,
@@ -200,6 +203,85 @@ const useFirebaseWorkforceData = (customFilters = {}) => {
       actions.setLoading('workforce', false);
     }
   }, [activeFilters, getFirebasePeriod, getCacheKey, actions, handleError, workforceDataSchema]);
+
+  // Load data for a range of quarters
+  const loadQuarterRangeData = useCallback(async (quarterRange) => {
+    if (!quarterRange || !quarterRange.startQuarter || !quarterRange.endQuarter) {
+      return null;
+    }
+
+    setLocalLoading(true);
+    actions.setLoading('workforce', true);
+    actions.clearError('workforce');
+    setLocalError(null);
+
+    try {
+      console.log(`Loading workforce data for quarter range: ${quarterRange.startQuarter} to ${quarterRange.endQuarter}`);
+      
+      // Get all quarters in the range
+      const { getQuarters } = await import('../services/QuarterConfigService');
+      const allQuarters = getQuarters();
+      
+      // Find the indices of start and end quarters
+      const startIndex = allQuarters.findIndex(q => q.value === quarterRange.startQuarter);
+      const endIndex = allQuarters.findIndex(q => q.value === quarterRange.endQuarter);
+      
+      if (startIndex === -1 || endIndex === -1 || startIndex > endIndex) {
+        throw new Error('Invalid quarter range');
+      }
+      
+      // Get quarters in the range
+      const quartersInRange = allQuarters.slice(startIndex, endIndex + 1);
+      
+      // Load data for each quarter
+      const quarterDataPromises = quartersInRange.map(async (quarter) => {
+        const period = getFirebasePeriod(quarter.value);
+        try {
+          const data = await firebaseService.getWorkforceMetrics(period);
+          return { quarter: quarter.value, data };
+        } catch (error) {
+          console.warn(`Failed to load data for ${quarter.value}:`, error);
+          return { quarter: quarter.value, data: null };
+        }
+      });
+      
+      const quarterResults = await Promise.all(quarterDataPromises);
+      
+      // Filter out quarters with no data
+      const validQuarterData = quarterResults.filter(result => result.data);
+      
+      if (validQuarterData.length === 0) {
+        throw new Error('No data available for the selected quarter range');
+      }
+      
+      // Transform the range data
+      const rangeData = {
+        quarterRange: {
+          start: quarterRange.startQuarter,
+          end: quarterRange.endQuarter,
+          quartersCount: quartersInRange.length
+        },
+        quarterData: validQuarterData,
+        // Use the end quarter as the primary period for summary data
+        primaryData: validQuarterData[validQuarterData.length - 1]?.data
+      };
+      
+      return rangeData;
+      
+    } catch (error) {
+      handleError(error, {
+        operation: 'loadQuarterRangeData',
+        quarterRange: quarterRange
+      });
+      
+      setLocalError(error.message);
+      actions.setError('workforce', error.message);
+      return null;
+    } finally {
+      setLocalLoading(false);
+      actions.setLoading('workforce', false);
+    }
+  }, [getFirebasePeriod, actions, handleError]);
 
   // Transform Firebase aggregate data to component-expected format
   const transformFirebaseToComponentFormat = useCallback((firebaseData) => {
@@ -625,18 +707,78 @@ const useFirebaseWorkforceData = (customFilters = {}) => {
 
     const fetchData = async () => {
       try {
-        // Load initial data
-        const data = await loadFirebaseData();
-        if (isMounted) {
+        // Add global timeout protection for the entire fetch operation
+        const globalTimeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Global data fetch timeout')), 30000)
+        );
+
+        const dataFetchPromise = async () => {
+          let data;
+        
+        // Check if we have a quarter range
+        if (activeFilters.quarterRange && activeFilters.quarterRange.startQuarter && activeFilters.quarterRange.endQuarter) {
+          // Load data for the quarter range
+          const rangeData = await loadQuarterRangeData(activeFilters.quarterRange);
+          if (rangeData && rangeData.primaryData) {
+            // Transform the primary data for display
+            data = transformFirebaseToComponentFormat(rangeData.primaryData);
+            // Store the quarter range data for charts
+            data.quarterRangeData = rangeData.quarterData;
+          }
+        } else {
+          // Load single quarter data and automatically load last 5 periods for charts
+          data = await loadFirebaseData();
+          
+          // Automatically load last 5 periods for time-series charts with timeout protection
+          try {
+            const timeoutPromise = new Promise((_, reject) => 
+              setTimeout(() => reject(new Error('Last 5 periods loading timeout')), 10000)
+            );
+            
+            const loadLast5Periods = async () => {
+              console.log('Loading last 5 periods for time-series charts');
+              const last5Periods = getLast5Periods();
+              if (last5Periods && last5Periods.length > 0) {
+                const startQuarter = last5Periods[0].value;
+                const endQuarter = last5Periods[last5Periods.length - 1].value;
+                const rangeData = await loadQuarterRangeData({ startQuarter, endQuarter });
+                
+                if (rangeData && rangeData.quarterData && rangeData.quarterData.length > 0) {
+                  console.log('Setting last 5 periods data for charts');
+                  data.quarterRangeData = rangeData.quarterData;
+                }
+              }
+            };
+            
+            await Promise.race([loadLast5Periods(), timeoutPromise]);
+          } catch (error) {
+            console.warn('Failed to load last 5 periods for time-series charts:', error);
+            // Continue without the range data
+          }
+        }
+        
+        if (isMounted && data) {
           setFirebaseData(data);
           actions.updateDataTimestamp();
           
-          // Set up real-time subscription
-          unsubscribeRealTime = setupRealTimeSubscription();
+          // Set up real-time subscription (only for single quarter mode)
+          if (!activeFilters.quarterRange) {
+            unsubscribeRealTime = setupRealTimeSubscription();
+          }
         }
+        };
+
+        // Execute with timeout protection
+        await Promise.race([dataFetchPromise(), globalTimeoutPromise]);
       } catch (error) {
-        console.error('Firebase workforce data fetch failed:', error);
-        // Error is already handled in loadFirebaseData
+        if (error.message.includes('timeout')) {
+          console.error('Firebase workforce data fetch timed out:', error);
+          setLocalError('Data loading timed out. Please try again.');
+          actions.setError('workforce', 'Data loading timed out. Please try again.');
+        } else {
+          console.error('Firebase workforce data fetch failed:', error);
+          // Error is already handled in loadFirebaseData/loadQuarterRangeData
+        }
       }
     };
 
@@ -649,7 +791,17 @@ const useFirebaseWorkforceData = (customFilters = {}) => {
         setIsRealTimeActive(false);
       }
     };
-  }, [activeFilters]); // Removed actions dependency to prevent infinite loop
+  }, [
+    // Only include primitive values that actually change
+    activeFilters.reportingPeriod,
+    activeFilters.locationFilter,
+    activeFilters.divisionFilter,
+    activeFilters.departmentFilter,
+    activeFilters.employeeTypeFilter,
+    activeFilters.quarterRange?.startQuarter,
+    activeFilters.quarterRange?.endQuarter
+    // Removed function dependencies that cause re-renders
+  ]);
 
   // Compute filtered and formatted data
   const filteredData = useMemo(() => {
@@ -659,18 +811,35 @@ const useFirebaseWorkforceData = (customFilters = {}) => {
 
   const [formattedData, setFormattedData] = useState(null);
   
-  // Handle async formatting of data
+  // Handle async formatting of data with timeout protection
   useEffect(() => {
     const formatData = async () => {
       if (filteredData) {
         try {
-          const formatted = await formatDataForComponents(filteredData);
+          // Add timeout protection for data formatting
+          const formatTimeoutPromise = new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('Data formatting timeout')), 5000)
+          );
+
+          const formatPromise = formatDataForComponents(filteredData);
+          const formatted = await Promise.race([formatPromise, formatTimeoutPromise]);
           setFormattedData(formatted);
         } catch (error) {
           console.error('Error formatting data:', error);
-          // Fallback to basic formatting without dynamic calculations
-          const fallbackFormatted = await formatDataForComponents(filteredData, true);
-          setFormattedData(fallbackFormatted);
+          try {
+            // Fallback to basic formatting without dynamic calculations
+            const fallbackFormatted = await formatDataForComponents(filteredData, true);
+            setFormattedData(fallbackFormatted);
+          } catch (fallbackError) {
+            console.error('Even fallback formatting failed:', fallbackError);
+            // Ultimate fallback - return minimal data structure
+            setFormattedData({
+              summary: { totalEmployees: 0, faculty: 0, staff: 0, students: 0 },
+              charts: { historicalTrends: [], startersLeavers: [], topDivisions: [], locationDistribution: [] },
+              metrics: { recentHires: { faculty: 0, staff: 0 } },
+              firebase: { lastSyncTime: null, isRealTime: false }
+            });
+          }
         }
       } else {
         setFormattedData(null);

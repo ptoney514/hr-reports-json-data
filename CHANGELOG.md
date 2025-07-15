@@ -8,6 +8,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Enhanced Date Range Selection** (January 15, 2025)
+  - `src/components/ui/DateRangeSelector.jsx` - Comprehensive date range selector with quarter/custom modes
+  - `src/utils/dateRangeUtils.js` - Utility functions for date range operations and conversions
+  - Quarter selection mode with data availability indicators (complete/partial/empty)
+  - Custom date range selection with calendar UI and validation
+  - Preset date ranges (Last 30 days, Last 90 days, This Quarter, Year to Date)
+  - Visual indicators for data availability status with informative legend
+  - Enhanced QuarterFilter component with backward-compatible date range support
+  - Updated CombinedWorkforceDashboard with dynamic period display
+
 - **Employee Data Importer Dashboard** - New comprehensive Excel employee data import system
   - `src/components/dashboards/EmployeeImportDashboard.jsx` - Main import interface with file upload and filtering
   - `src/hooks/useFirebaseEmployeeData.js` - Firebase hook for batch employee data operations

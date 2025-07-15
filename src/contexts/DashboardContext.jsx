@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import { format, subMonths, startOfMonth, endOfMonth } from 'date-fns';
+import { getCurrentReportingPeriod, getCurrentReportingDate } from '../services/QuarterConfigService';
 
 // Action types
 const actionTypes = {
@@ -18,20 +19,32 @@ const actionTypes = {
   UPDATE_DATA_TIMESTAMP: 'UPDATE_DATA_TIMESTAMP'
 };
 
-// Default state
-const defaultState = {
-  // Filter states
-  reportingPeriod: 'Q2-2025',
-  locationFilter: 'All',
-  divisionFilter: 'All',
-  departmentFilter: 'All',
-  employeeTypeFilter: 'All',
-  dateRange: {
-    type: 'quarter', // 'quarter', 'month', 'custom'
-    startDate: new Date('2025-01-01'),
-    endDate: new Date('2025-03-31'),
-    label: 'Q2 2025'
-  },
+// Get current reporting period for default state (lazy evaluation)
+const getCurrentReportingPeriodSafe = () => {
+  try {
+    return getCurrentReportingPeriod();
+  } catch (error) {
+    console.warn('Could not get current reporting period, using fallback');
+    return { value: 'Q2-2025', label: '6/30/2025' };
+  }
+};
+
+// Create default state function to avoid calling service during module load
+const createDefaultState = () => {
+  const currentPeriod = getCurrentReportingPeriodSafe();
+  return {
+    // Filter states - now uses fixed current reporting period
+    reportingPeriod: currentPeriod?.value || 'Q2-2025',
+    locationFilter: 'All',
+    divisionFilter: 'All',
+    departmentFilter: 'All',
+    employeeTypeFilter: 'All',
+    dateRange: {
+      type: 'fixed', // 'fixed' instead of quarter since it's now fixed
+      startDate: new Date('2025-04-01'),
+      endDate: new Date('2025-06-30'),
+      label: currentPeriod?.label || '6/30/2025'
+    },
   
   // UI states
   loading: {
@@ -66,6 +79,33 @@ const defaultState = {
       'Library Services',
       'Athletics'
     ],
+    employeeTypes: ['All', 'Faculty', 'Staff', 'Students'],
+    fiscalYears: ['FY2020', 'FY2021', 'FY2022', 'FY2023', 'FY2024']
+  }
+  };
+};
+
+// Static fallback state for when createDefaultState fails
+const staticDefaultState = {
+  reportingPeriod: 'Q2-2025',
+  locationFilter: 'All',
+  divisionFilter: 'All',
+  departmentFilter: 'All',
+  employeeTypeFilter: 'All',
+  dateRange: {
+    type: 'fixed',
+    startDate: new Date('2025-04-01'),
+    endDate: new Date('2025-06-30'),
+    label: '6/30/2025'
+  },
+  loading: { workforce: false, turnover: false, general: false },
+  error: { workforce: null, turnover: null, general: null },
+  currentDashboard: 'workforce',
+  dataLastUpdated: null,
+  availableOptions: {
+    reportingPeriods: ['Q2-2024', 'Q3-2024', 'Q4-2024', 'Q1-2025', 'Q2-2025'],
+    locations: ['All', 'Omaha Campus', 'Phoenix Campus'],
+    divisions: ['All', 'Academic Affairs', 'Student Affairs', 'Research & Innovation', 'Information Technology', 'Finance & Administration', 'Human Resources', 'Facilities Management', 'Marketing & Communications', 'Library Services', 'Athletics'],
     employeeTypes: ['All', 'Faculty', 'Staff', 'Students'],
     fiscalYears: ['FY2020', 'FY2021', 'FY2022', 'FY2023', 'FY2024']
   }
@@ -175,15 +215,29 @@ const dashboardReducer = (state, action) => {
       };
 
     case actionTypes.RESET_FILTERS:
-      return {
-        ...defaultState,
-        // Preserve UI states and current dashboard
-        loading: state.loading,
-        error: state.error,
-        currentDashboard: state.currentDashboard,
-        dataLastUpdated: state.dataLastUpdated,
-        availableOptions: state.availableOptions
-      };
+      try {
+        const freshState = createDefaultState();
+        return {
+          ...freshState,
+          // Preserve UI states and current dashboard
+          loading: state.loading,
+          error: state.error,
+          currentDashboard: state.currentDashboard,
+          dataLastUpdated: state.dataLastUpdated,
+          availableOptions: state.availableOptions
+        };
+      } catch (error) {
+        console.warn('Failed to reset to default state, using static fallback:', error);
+        return {
+          ...staticDefaultState,
+          // Preserve UI states and current dashboard
+          loading: state.loading,
+          error: state.error,
+          currentDashboard: state.currentDashboard,
+          dataLastUpdated: state.dataLastUpdated,
+          availableOptions: state.availableOptions
+        };
+      }
 
     default:
       return state;
@@ -225,7 +279,15 @@ const DashboardContext = createContext();
 
 // Provider component
 export const DashboardProvider = ({ children }) => {
-  const [state, dispatch] = useReducer(dashboardReducer, defaultState);
+  // Use lazy initialization to prevent calling services during module load
+  const [state, dispatch] = useReducer(dashboardReducer, undefined, () => {
+    try {
+      return createDefaultState();
+    } catch (error) {
+      console.warn('Failed to create default state, using static fallback:', error);
+      return staticDefaultState;
+    }
+  });
 
   // Action creators
   const actions = {
@@ -344,7 +406,8 @@ export const DashboardProvider = ({ children }) => {
     applyPresetFilter: (preset) => {
       switch (preset) {
         case 'current-quarter':
-          actions.setReportingPeriod('Q2-2025');
+          const currentPeriod = getCurrentReportingPeriodSafe();
+          actions.setReportingPeriod(currentPeriod?.value || 'Q2-2025');
           actions.setLocationFilter('All');
           actions.setDivisionFilter('All');
           actions.setEmployeeTypeFilter('All');
