@@ -17,7 +17,6 @@ import { getQuarters } from '../../services/QuarterConfigService';
 import firebaseService from '../../services/FirebaseService';
 import QuarterlyDataTable from '../admin/QuarterlyDataTable';
 import DivisionDataTable from '../admin/DivisionDataTable';
-import TableFilters from '../admin/TableFilters';
 import DataImportExport from '../admin/DataImportExport';
 
 const AdminDashboard = () => {
@@ -31,11 +30,6 @@ const AdminDashboard = () => {
   const [status, setStatus] = useState(null);
   const [hasChanges, setHasChanges] = useState(false);
   const [activeTable, setActiveTable] = useState('workforce'); // 'workforce' or 'division'
-  
-  // Filter states
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [dateRange, setDateRange] = useState({ start: '', end: '' });
 
   // Available dashboard types
   const dashboardTypes = [
@@ -91,11 +85,11 @@ const AdminDashboard = () => {
       const quarterCount = Object.keys(allData).length;
       setStatus({
         type: 'success',
-        message: `Successfully loaded ${selectedDashboard} data for ${quarterCount} quarters`
+        message: `Successfully loaded ${selectedDashboard} data for ${quarterCount} reporting periods`
       });
       
     } catch (err) {
-      console.error('Error loading quarters data:', err);
+      console.error('Error loading reporting periods data:', err);
       setError(`Failed to load ${selectedDashboard} data: ${err.message}`);
       setStatus({
         type: 'error',
@@ -212,12 +206,12 @@ const AdminDashboard = () => {
       if (errors.length > 0) {
         setStatus({
           type: 'warning',
-          message: `Saved ${savedCount} quarters, but ${errors.length} failed: ${errors.join(', ')}`
+          message: `Saved ${savedCount} reporting periods, but ${errors.length} failed: ${errors.join(', ')}`
         });
       } else {
         setStatus({
           type: 'success',
-          message: `Successfully saved ${savedCount} quarters of ${selectedDashboard} data`
+          message: `Successfully saved ${savedCount} reporting periods of ${selectedDashboard} data`
         });
       }
 
@@ -244,70 +238,6 @@ const AdminDashboard = () => {
     });
   };
 
-  // Handle filter functions
-  const handleBulkExport = useCallback(() => {
-    const exportData = {
-      dashboardType: selectedDashboard,
-      exportDate: new Date().toISOString(),
-      quarters: allQuartersData
-    };
-
-    const dataStr = JSON.stringify(exportData, null, 2);
-    const dataBlob = new Blob([dataStr], { type: 'application/json' });
-    const url = URL.createObjectURL(dataBlob);
-    
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `${selectedDashboard}-all-quarters-export.json`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-
-    setStatus({
-      type: 'success',
-      message: `Exported ${Object.keys(allQuartersData).length} quarters of ${selectedDashboard} data`
-    });
-  }, [allQuartersData, selectedDashboard]);
-
-  const handleBulkImport = useCallback(() => {
-    // Create hidden file input
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = '.json';
-    input.onchange = (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        try {
-          const importedData = JSON.parse(event.target.result);
-          if (importedData.quarters) {
-            setAllQuartersData(importedData.quarters);
-            setHasChanges(true);
-            setStatus({
-              type: 'info',
-              message: `Imported ${Object.keys(importedData.quarters).length} quarters. Remember to save changes.`
-            });
-          }
-        } catch (error) {
-          setStatus({
-            type: 'error',
-            message: `Failed to import data: ${error.message}`
-          });
-        }
-      };
-      reader.readAsText(file);
-    };
-    input.click();
-  }, []);
-
-  const resetFilters = useCallback(() => {
-    setSearchTerm('');
-    setStatusFilter('all');
-    setDateRange({ start: '', end: '' });
-  }, []);
 
   return (
     <div className="max-w-7xl mx-auto p-6 space-y-6">
@@ -318,7 +248,7 @@ const AdminDashboard = () => {
           <h1 className="text-2xl font-bold text-gray-900">Firebase Admin Dashboard</h1>
         </div>
         <p className="text-gray-600">
-          View and edit quarterly HR data stored in Firebase. Make quick corrections without needing to re-upload entire datasets.
+          View and edit reporting period HR data stored in Firebase. Make quick corrections without needing to re-upload entire datasets.
         </p>
       </div>
 
@@ -340,7 +270,7 @@ const AdminDashboard = () => {
             </select>
             
             <span className="text-sm text-gray-600">
-              {Object.keys(allQuartersData).length} quarters loaded
+              {Object.keys(allQuartersData).length} reporting periods loaded
             </span>
           </div>
 
@@ -425,19 +355,6 @@ const AdminDashboard = () => {
       )}
 
 
-      {/* Table Filters */}
-      <TableFilters
-        searchTerm={searchTerm}
-        onSearchChange={setSearchTerm}
-        statusFilter={statusFilter}
-        onStatusFilterChange={setStatusFilter}
-        dateRange={dateRange}
-        onDateRangeChange={setDateRange}
-        onReset={resetFilters}
-        onBulkExport={handleBulkExport}
-        onBulkImport={handleBulkImport}
-        quarterCount={Object.keys(allQuartersData).length}
-      />
 
       {/* Table Selection Tabs - Only show for workforce dashboard */}
       {selectedDashboard === 'workforce' && Object.keys(allQuartersData).length > 0 && (
@@ -474,7 +391,7 @@ const AdminDashboard = () => {
         <div className="bg-white rounded-lg shadow-sm border p-8">
           <div className="flex items-center justify-center">
             <RefreshCw className="animate-spin text-blue-500" size={24} />
-            <span className="ml-2 text-gray-600">Loading quarters data...</span>
+            <span className="ml-2 text-gray-600">Loading reporting periods data...</span>
           </div>
         </div>
       ) : Object.keys(allQuartersData).length > 0 ? (
@@ -494,6 +411,7 @@ const AdminDashboard = () => {
                 dashboardType={selectedDashboard}
                 showSimplifiedColumns={true}
                 onQuarterSelect={(period) => console.log('Selected quarter:', period)}
+                onEnableEditMode={() => setIsEditMode(true)}
               />
             </>
           ) : (
@@ -514,6 +432,7 @@ const AdminDashboard = () => {
             dashboardType={selectedDashboard}
             showSimplifiedColumns={false}
             onQuarterSelect={(period) => console.log('Selected quarter:', period)}
+            onEnableEditMode={() => setIsEditMode(true)}
           />
         )
       ) : (
@@ -521,7 +440,7 @@ const AdminDashboard = () => {
           <div className="text-center text-gray-500">
             <Database size={48} className="mx-auto mb-4 text-gray-400" />
             <h3 className="text-lg font-medium mb-2">No Data Found</h3>
-            <p>No {selectedDashboard} data available across any quarters</p>
+            <p>No {selectedDashboard} data available across any reporting periods</p>
             <p className="text-sm mt-2">Upload data through the Excel Integration Dashboard first.</p>
           </div>
         </div>

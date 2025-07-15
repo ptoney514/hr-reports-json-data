@@ -13,7 +13,6 @@ import {
 } from 'lucide-react';
 import EditableTableCell from './EditableTableCell';
 import StatusBadge from './StatusBadge';
-import EditModal from './EditModal';
 import quarterComparisonService from '../../services/QuarterComparisonService';
 import { toDisplayFormat } from '../../utils/quarterFormatUtils';
 
@@ -25,13 +24,12 @@ const QuarterlyDataTable = ({
   onQuarterSelect,
   selectedQuarters = [],
   onDeleteQuarter,
-  showSimplifiedColumns = false
+  showSimplifiedColumns = false,
+  onEnableEditMode
 }) => {
   const [sortConfig, setSortConfig] = useState({ key: 'period', direction: 'desc' });
   const [editingCell, setEditingCell] = useState(null);
   const [processedRows, setProcessedRows] = useState([]);
-  const [editModalOpen, setEditModalOpen] = useState(false);
-  const [selectedQuarterForEdit, setSelectedQuarterForEdit] = useState(null);
   const [deleteConfirmation, setDeleteConfirmation] = useState(null);
 
   // Define table columns based on dashboard type
@@ -44,7 +42,7 @@ const QuarterlyDataTable = ({
     });
 
     const baseColumns = [
-      { key: 'period', label: 'Quarter', sortable: true, width: '120px' },
+      { key: 'period', label: 'Reporting Period', sortable: true, width: '150px' },
       { key: 'status', label: 'Status', sortable: true, width: '100px' },
     ];
 
@@ -443,11 +441,11 @@ const QuarterlyDataTable = ({
         <h3 className="text-lg font-semibold text-gray-900">
           {showSimplifiedColumns && dashboardType === 'workforce' 
             ? 'Workforce Headcount Admin Table'
-            : `${dashboardType.charAt(0).toUpperCase() + dashboardType.slice(1)} Data by Quarter`
+            : `${dashboardType.charAt(0).toUpperCase() + dashboardType.slice(1)} Data by Reporting Period`
           }
         </h3>
         <p className="text-sm text-gray-600 mt-1">
-          {sortedData.length} quarters • {isEditMode ? 'Edit mode active' : 'View mode'}
+          {sortedData.length} reporting periods • {isEditMode ? 'Edit mode active' : 'View mode'}
         </p>
       </div>
 
@@ -514,20 +512,23 @@ const QuarterlyDataTable = ({
                       <div className="flex items-center gap-1">
                         {showSimplifiedColumns && (
                           <>
-                            <button
-                              onClick={() => {
-                                setSelectedQuarterForEdit(row);
-                                setEditModalOpen(true);
-                              }}
-                              className="p-1 text-blue-600 hover:text-blue-800 rounded"
-                              title="Edit all fields"
-                            >
-                              <Edit size={16} />
-                            </button>
+                            {!isEditMode && (
+                              <button
+                                onClick={() => {
+                                  if (onEnableEditMode) {
+                                    onEnableEditMode();
+                                  }
+                                }}
+                                className="p-1 text-blue-600 hover:text-blue-800 rounded"
+                                title="Enable edit mode"
+                              >
+                                <Edit size={16} />
+                              </button>
+                            )}
                             <button
                               onClick={() => setDeleteConfirmation(row.period)}
                               className="p-1 text-red-600 hover:text-red-800 rounded"
-                              title="Delete quarter"
+                              title="Delete reporting period"
                             >
                               <Trash2 size={16} />
                             </button>
@@ -579,7 +580,7 @@ const QuarterlyDataTable = ({
           <div className="text-center py-12">
             <FileText size={48} className="mx-auto text-gray-400 mb-4" />
             <h3 className="text-lg font-medium text-gray-900 mb-2">No Data Available</h3>
-            <p className="text-gray-600">No quarterly data found for {dashboardType} dashboard.</p>
+            <p className="text-gray-600">No reporting period data found for {dashboardType} dashboard.</p>
           </div>
         )}
       </div>
@@ -589,7 +590,7 @@ const QuarterlyDataTable = ({
         <div className="border-t border-gray-200 px-4 py-3 bg-gray-50">
           <div className="flex items-center justify-between text-sm text-gray-600">
             <div>
-              Showing {sortedData.length} quarters
+              Showing {sortedData.length} reporting periods
             </div>
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
@@ -609,23 +610,13 @@ const QuarterlyDataTable = ({
         </div>
       )}
       
-      {/* Edit Modal */}
-      <EditModal
-        isOpen={editModalOpen}
-        onClose={() => {
-          setEditModalOpen(false);
-          setSelectedQuarterForEdit(null);
-        }}
-        quarterData={selectedQuarterForEdit}
-        onSave={onDataChange}
-      />
       
       {/* Delete Confirmation Dialog */}
       {deleteConfirmation && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-xl p-6 max-w-md">
             <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              Delete Quarter Data?
+              Delete Reporting Period Data?
             </h3>
             <p className="text-gray-600 mb-4">
               Are you sure you want to delete data for {deleteConfirmation}? This action cannot be undone.
