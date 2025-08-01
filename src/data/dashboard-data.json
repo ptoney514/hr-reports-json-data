@@ -1,0 +1,630 @@
+{
+  "reportingPeriods": {
+    "6-30-2025": { 
+      "label": "Q2 2025", 
+      "quarter": "Q2-2025",
+      "startDate": "2025-04-01",
+      "endDate": "2025-06-30"
+    },
+    "3-31-2025": { 
+      "label": "Q1 2025", 
+      "quarter": "Q1-2025",
+      "startDate": "2025-01-01",
+      "endDate": "2025-03-31"
+    },
+    "12-31-2024": { 
+      "label": "Q4 2024", 
+      "quarter": "Q4-2024",
+      "startDate": "2024-10-01",
+      "endDate": "2024-12-31"
+    },
+    "9-30-2024": { 
+      "label": "Q3 2024", 
+      "quarter": "Q3-2024",
+      "startDate": "2024-07-01",
+      "endDate": "2024-09-30"
+    }
+  },
+  
+  "workforce": {
+    "6-30-2025": {
+      "period": "6-30-2025",
+      "totalEmployees": 2342,
+      "demographics": {
+        "faculty": 798,
+        "staff": 1234,
+        "students": 310,
+        "hsr": 145,
+        "hsrOmaha": 100,
+        "hsrPhoenix": 45,
+        "beFaculty": 650,
+        "beStaff": 1100,
+        "nbeFaculty": 148,
+        "nbeStaff": 134
+      },
+      "byLocation": {
+        "Omaha Campus": 1800,
+        "Phoenix Campus": 542
+      },
+      "byDepartment": {
+        "School of Medicine": 450,
+        "College of Arts & Sciences": 380,
+        "School of Business": 290,
+        "School of Law": 180,
+        "School of Dentistry": 220,
+        "School of Pharmacy": 195,
+        "College of Nursing": 275,
+        "Graduate School": 165,
+        "School of Social Work": 95,
+        "Athletics": 92
+      },
+      "trends": {
+        "quarterlyGrowth": 2.1,
+        "yearOverYearGrowth": 5.3
+      },
+      "headcountChange": 48,
+      "lastUpdated": "2025-06-30T12:00:00Z"
+    },
+    
+    "3-31-2025": {
+      "period": "3-31-2025",
+      "totalEmployees": 2294,
+      "demographics": {
+        "faculty": 785,
+        "staff": 1205,
+        "students": 304,
+        "hsr": 142,
+        "hsrOmaha": 98,
+        "hsrPhoenix": 44,
+        "beFaculty": 640,
+        "beStaff": 1080,
+        "nbeFaculty": 145,
+        "nbeStaff": 125
+      },
+      "byLocation": {
+        "Omaha Campus": 1765,
+        "Phoenix Campus": 529
+      },
+      "byDepartment": {
+        "School of Medicine": 445,
+        "College of Arts & Sciences": 375,
+        "School of Business": 285,
+        "School of Law": 178,
+        "School of Dentistry": 215,
+        "School of Pharmacy": 190,
+        "College of Nursing": 270,
+        "Graduate School": 162,
+        "School of Social Work": 92,
+        "Athletics": 82
+      },
+      "trends": {
+        "quarterlyGrowth": 1.8,
+        "yearOverYearGrowth": 4.9
+      },
+      "headcountChange": 41,
+      "lastUpdated": "2025-03-31T12:00:00Z"
+    },
+    
+    "12-31-2024": {
+      "period": "12-31-2024",
+      "totalEmployees": 2253,
+      "demographics": {
+        "faculty": 772,
+        "staff": 1183,
+        "students": 298,
+        "hsr": 140,
+        "hsrOmaha": 96,
+        "hsrPhoenix": 44,
+        "beFaculty": 630,
+        "beStaff": 1060,
+        "nbeFaculty": 142,
+        "nbeStaff": 123
+      },
+      "byLocation": {
+        "Omaha Campus": 1735,
+        "Phoenix Campus": 518
+      },
+      "byDepartment": {
+        "School of Medicine": 438,
+        "College of Arts & Sciences": 370,
+        "School of Business": 280,
+        "School of Law": 175,
+        "School of Dentistry": 210,
+        "School of Pharmacy": 188,
+        "College of Nursing": 265,
+        "Graduate School": 158,
+        "School of Social Work": 90,
+        "Athletics": 79
+      },
+      "trends": {
+        "quarterlyGrowth": 1.5,
+        "yearOverYearGrowth": 4.2
+      },
+      "headcountChange": 33,
+      "lastUpdated": "2024-12-31T12:00:00Z"
+    },
+    
+    "9-30-2024": {
+      "period": "9-30-2024",
+      "totalEmployees": 2220,
+      "demographics": {
+        "faculty": 760,
+        "staff": 1165,
+        "students": 295,
+        "hsr": 138,
+        "hsrOmaha": 94,
+        "hsrPhoenix": 44,
+        "beFaculty": 620,
+        "beStaff": 1045,
+        "nbeFaculty": 140,
+        "nbeStaff": 120
+      },
+      "byLocation": {
+        "Omaha Campus": 1710,
+        "Phoenix Campus": 510
+      },
+      "byDepartment": {
+        "School of Medicine": 430,
+        "College of Arts & Sciences": 365,
+        "School of Business": 275,
+        "School of Law": 172,
+        "School of Dentistry": 208,
+        "School of Pharmacy": 185,
+        "College of Nursing": 260,
+        "Graduate School": 155,
+        "School of Social Work": 88,
+        "Athletics": 82
+      },
+      "trends": {
+        "quarterlyGrowth": 1.2,
+        "yearOverYearGrowth": 3.8
+      },
+      "headcountChange": 26,
+      "lastUpdated": "2024-09-30T12:00:00Z"
+    }
+  },
+  
+  "turnover": {
+    "6-30-2025": {
+      "period": "6-30-2025",
+      "overallTurnoverRate": 11.8,
+      "totalDepartures": 276,
+      "turnoverRateChange": -0.7,
+      "facultyTurnoverRate": 8.5,
+      "facultyDepartures": 68,
+      "facultyTurnoverChange": -0.3,
+      "staffTurnoverRate": 14.5,
+      "staffDepartures": 179,
+      "staffTurnoverChange": -0.8,
+      "totalCostImpact": 6500000,
+      "avgCostPerDeparture": 23550,
+      "costImpactChange": -4.5,
+      "voluntaryReasons": {
+        "Career Advancement": 105,
+        "Compensation": 58,
+        "Work-Life Balance": 46,
+        "Retirement": 35,
+        "Relocation": 20,
+        "Other": 12
+      },
+      "tenureAnalysis": {
+        "< 1 Year": 97,
+        "1-3 Years": 78,
+        "3-5 Years": 48,
+        "5-10 Years": 30,
+        "10+ Years": 23
+      },
+      "lastUpdated": "2025-06-30T12:00:00Z"
+    },
+    
+    "3-31-2025": {
+      "period": "3-31-2025",
+      "overallTurnoverRate": 12.5,
+      "totalDepartures": 287,
+      "turnoverRateChange": -1.8,
+      "facultyTurnoverRate": 8.8,
+      "facultyDepartures": 89,
+      "facultyTurnoverChange": -0.9,
+      "staffTurnoverRate": 15.3,
+      "staffDepartures": 178,
+      "staffTurnoverChange": -2.1,
+      "totalCostImpact": 6780000,
+      "avgCostPerDeparture": 23623,
+      "costImpactChange": -5.2,
+      "voluntaryReasons": {
+        "Career Advancement": 109,
+        "Compensation": 60,
+        "Work-Life Balance": 49,
+        "Retirement": 34,
+        "Relocation": 23,
+        "Other": 11
+      },
+      "tenureAnalysis": {
+        "< 1 Year": 100,
+        "1-3 Years": 83,
+        "3-5 Years": 52,
+        "5-10 Years": 29,
+        "10+ Years": 23
+      },
+      "lastUpdated": "2025-03-31T12:00:00Z"
+    },
+    
+    "12-31-2024": {
+      "period": "12-31-2024",
+      "overallTurnoverRate": 13.2,
+      "totalDepartures": 297,
+      "turnoverRateChange": -2.5,
+      "facultyTurnoverRate": 9.1,
+      "facultyDepartures": 70,
+      "facultyTurnoverChange": -1.2,
+      "staffTurnoverRate": 16.1,
+      "staffDepartures": 190,
+      "staffTurnoverChange": -2.8,
+      "totalCostImpact": 7100000,
+      "avgCostPerDeparture": 23905,
+      "costImpactChange": -6.8,
+      "voluntaryReasons": {
+        "Career Advancement": 115,
+        "Compensation": 65,
+        "Work-Life Balance": 52,
+        "Retirement": 30,
+        "Relocation": 25,
+        "Other": 10
+      },
+      "tenureAnalysis": {
+        "< 1 Year": 108,
+        "1-3 Years": 87,
+        "3-5 Years": 55,
+        "5-10 Years": 27,
+        "10+ Years": 20
+      },
+      "lastUpdated": "2024-12-31T12:00:00Z"
+    },
+    
+    "9-30-2024": {
+      "period": "9-30-2024",
+      "overallTurnoverRate": 14.3,
+      "totalDepartures": 317,
+      "turnoverRateChange": -0.2,
+      "facultyTurnoverRate": 9.7,
+      "facultyDepartures": 74,
+      "facultyTurnoverChange": 0.3,
+      "staffTurnoverRate": 17.4,
+      "staffDepartures": 203,
+      "staffTurnoverChange": -0.5,
+      "totalCostImpact": 7600000,
+      "avgCostPerDeparture": 23974,
+      "costImpactChange": 2.1,
+      "voluntaryReasons": {
+        "Career Advancement": 122,
+        "Compensation": 72,
+        "Work-Life Balance": 58,
+        "Retirement": 28,
+        "Relocation": 27,
+        "Other": 10
+      },
+      "tenureAnalysis": {
+        "< 1 Year": 115,
+        "1-3 Years": 95,
+        "3-5 Years": 60,
+        "5-10 Years": 28,
+        "10+ Years": 19
+      },
+      "lastUpdated": "2024-09-30T12:00:00Z"
+    }
+  },
+  
+  "i9Compliance": {
+    "6-30-2025": {
+      "period": "6-30-2025",
+      "overallComplianceRate": 94.2,
+      "totalActive": 2342,
+      "compliant": 2206,
+      "nonCompliant": 136,
+      "expiringSoon": 87,
+      "overdue": 49,
+      "highRiskDepartments": [
+        { "name": "School of Medicine", "complianceRate": 91.5, "issues": 38 },
+        { "name": "Athletics", "complianceRate": 89.3, "issues": 10 },
+        { "name": "School of Business", "complianceRate": 92.8, "issues": 21 }
+      ],
+      "riskCategories": {
+        "expired": 49,
+        "expiring30Days": 87,
+        "missingDocuments": 28,
+        "pendingReverification": 15
+      },
+      "lastUpdated": "2025-06-30T12:00:00Z"
+    },
+    
+    "3-31-2025": {
+      "period": "3-31-2025",
+      "overallComplianceRate": 93.8,
+      "totalActive": 2294,
+      "compliant": 2152,
+      "nonCompliant": 142,
+      "expiringSoon": 92,
+      "overdue": 50,
+      "highRiskDepartments": [
+        { "name": "School of Medicine", "complianceRate": 90.8, "issues": 41 },
+        { "name": "Athletics", "complianceRate": 88.5, "issues": 9 },
+        { "name": "School of Business", "complianceRate": 92.1, "issues": 22 }
+      ],
+      "riskCategories": {
+        "expired": 50,
+        "expiring30Days": 92,
+        "missingDocuments": 30,
+        "pendingReverification": 18
+      },
+      "lastUpdated": "2025-03-31T12:00:00Z"
+    },
+    
+    "12-31-2024": {
+      "period": "12-31-2024",
+      "overallComplianceRate": 92.5,
+      "totalActive": 2253,
+      "compliant": 2084,
+      "nonCompliant": 169,
+      "expiringSoon": 105,
+      "overdue": 64,
+      "highRiskDepartments": [
+        { "name": "School of Medicine", "complianceRate": 89.2, "issues": 47 },
+        { "name": "Athletics", "complianceRate": 87.1, "issues": 10 },
+        { "name": "School of Business", "complianceRate": 90.8, "issues": 26 }
+      ],
+      "riskCategories": {
+        "expired": 64,
+        "expiring30Days": 105,
+        "missingDocuments": 35,
+        "pendingReverification": 22
+      },
+      "lastUpdated": "2024-12-31T12:00:00Z"
+    },
+    
+    "9-30-2024": {
+      "period": "9-30-2024",
+      "overallComplianceRate": 91.2,
+      "totalActive": 2220,
+      "compliant": 2025,
+      "nonCompliant": 195,
+      "expiringSoon": 118,
+      "overdue": 77,
+      "highRiskDepartments": [
+        { "name": "School of Medicine", "complianceRate": 88.1, "issues": 51 },
+        { "name": "Athletics", "complianceRate": 85.4, "issues": 12 },
+        { "name": "School of Business", "complianceRate": 89.5, "issues": 29 }
+      ],
+      "riskCategories": {
+        "expired": 77,
+        "expiring30Days": 118,
+        "missingDocuments": 42,
+        "pendingReverification": 28
+      },
+      "lastUpdated": "2024-09-30T12:00:00Z"
+    }
+  },
+  
+  "recruiting": {
+    "6-30-2025": {
+      "period": "6-30-2025",
+      "openPositions": 187,
+      "newHires": 92,
+      "timeToFill": 42,
+      "acceptanceRate": 78.5,
+      "candidatesInPipeline": 543,
+      "offersPending": 23,
+      "interviewsScheduled": 67,
+      "byDepartment": {
+        "School of Medicine": 35,
+        "College of Arts & Sciences": 28,
+        "School of Business": 22,
+        "School of Law": 15,
+        "Other": 87
+      },
+      "sourceEffectiveness": {
+        "Employee Referral": 28,
+        "Job Boards": 24,
+        "LinkedIn": 18,
+        "University Website": 15,
+        "Recruitment Agencies": 7
+      },
+      "lastUpdated": "2025-06-30T12:00:00Z"
+    },
+    
+    "3-31-2025": {
+      "period": "3-31-2025",
+      "openPositions": 195,
+      "newHires": 87,
+      "timeToFill": 45,
+      "acceptanceRate": 76.2,
+      "candidatesInPipeline": 512,
+      "offersPending": 21,
+      "interviewsScheduled": 72,
+      "byDepartment": {
+        "School of Medicine": 38,
+        "College of Arts & Sciences": 30,
+        "School of Business": 24,
+        "School of Law": 16,
+        "Other": 87
+      },
+      "sourceEffectiveness": {
+        "Employee Referral": 26,
+        "Job Boards": 22,
+        "LinkedIn": 17,
+        "University Website": 14,
+        "Recruitment Agencies": 8
+      },
+      "lastUpdated": "2025-03-31T12:00:00Z"
+    },
+    
+    "12-31-2024": {
+      "period": "12-31-2024",
+      "openPositions": 208,
+      "newHires": 78,
+      "timeToFill": 48,
+      "acceptanceRate": 74.8,
+      "candidatesInPipeline": 487,
+      "offersPending": 19,
+      "interviewsScheduled": 81,
+      "byDepartment": {
+        "School of Medicine": 42,
+        "College of Arts & Sciences": 32,
+        "School of Business": 26,
+        "School of Law": 18,
+        "Other": 90
+      },
+      "sourceEffectiveness": {
+        "Employee Referral": 23,
+        "Job Boards": 20,
+        "LinkedIn": 15,
+        "University Website": 12,
+        "Recruitment Agencies": 8
+      },
+      "lastUpdated": "2024-12-31T12:00:00Z"
+    },
+    
+    "9-30-2024": {
+      "period": "9-30-2024",
+      "openPositions": 225,
+      "newHires": 72,
+      "timeToFill": 52,
+      "acceptanceRate": 72.3,
+      "candidatesInPipeline": 468,
+      "offersPending": 17,
+      "interviewsScheduled": 89,
+      "byDepartment": {
+        "School of Medicine": 45,
+        "College of Arts & Sciences": 35,
+        "School of Business": 28,
+        "School of Law": 20,
+        "Other": 97
+      },
+      "sourceEffectiveness": {
+        "Employee Referral": 21,
+        "Job Boards": 18,
+        "LinkedIn": 14,
+        "University Website": 11,
+        "Recruitment Agencies": 8
+      },
+      "lastUpdated": "2024-09-30T12:00:00Z"
+    }
+  },
+  
+  "exitSurvey": {
+    "6-30-2025": {
+      "period": "6-30-2025",
+      "responseRate": 87.3,
+      "totalResponses": 241,
+      "overallSatisfaction": 3.8,
+      "wouldRecommend": 72.5,
+      "primaryReasons": {
+        "Career Growth": 95,
+        "Compensation": 52,
+        "Work-Life Balance": 41,
+        "Management": 28,
+        "Culture Fit": 15,
+        "Other": 10
+      },
+      "satisfactionScores": {
+        "compensation": 3.2,
+        "benefits": 4.1,
+        "workLifeBalance": 3.5,
+        "careerDevelopment": 3.4,
+        "management": 3.6,
+        "culture": 3.9
+      },
+      "themes": {
+        "positive": ["Collegial environment", "Mission-driven work", "Benefits package"],
+        "negative": ["Limited advancement", "Salary competitiveness", "Workload"]
+      },
+      "lastUpdated": "2025-06-30T12:00:00Z"
+    },
+    
+    "3-31-2025": {
+      "period": "3-31-2025",
+      "responseRate": 85.7,
+      "totalResponses": 246,
+      "overallSatisfaction": 3.7,
+      "wouldRecommend": 70.8,
+      "primaryReasons": {
+        "Career Growth": 98,
+        "Compensation": 55,
+        "Work-Life Balance": 44,
+        "Management": 30,
+        "Culture Fit": 12,
+        "Other": 7
+      },
+      "satisfactionScores": {
+        "compensation": 3.1,
+        "benefits": 4.0,
+        "workLifeBalance": 3.4,
+        "careerDevelopment": 3.3,
+        "management": 3.5,
+        "culture": 3.8
+      },
+      "themes": {
+        "positive": ["Strong mission", "Supportive colleagues", "Good benefits"],
+        "negative": ["Pay below market", "Limited promotion paths", "Heavy workload"]
+      },
+      "lastUpdated": "2025-03-31T12:00:00Z"
+    },
+    
+    "12-31-2024": {
+      "period": "12-31-2024",
+      "responseRate": 83.2,
+      "totalResponses": 247,
+      "overallSatisfaction": 3.6,
+      "wouldRecommend": 68.5,
+      "primaryReasons": {
+        "Career Growth": 102,
+        "Compensation": 58,
+        "Work-Life Balance": 46,
+        "Management": 33,
+        "Culture Fit": 8,
+        "Other": 0
+      },
+      "satisfactionScores": {
+        "compensation": 3.0,
+        "benefits": 4.0,
+        "workLifeBalance": 3.3,
+        "careerDevelopment": 3.2,
+        "management": 3.4,
+        "culture": 3.7
+      },
+      "themes": {
+        "positive": ["Mission alignment", "Team collaboration", "Benefits"],
+        "negative": ["Compensation gaps", "Career plateaus", "Work-life challenges"]
+      },
+      "lastUpdated": "2024-12-31T12:00:00Z"
+    },
+    
+    "9-30-2024": {
+      "period": "9-30-2024",
+      "responseRate": 81.5,
+      "totalResponses": 258,
+      "overallSatisfaction": 3.5,
+      "wouldRecommend": 66.2,
+      "primaryReasons": {
+        "Career Growth": 108,
+        "Compensation": 63,
+        "Work-Life Balance": 48,
+        "Management": 35,
+        "Culture Fit": 4,
+        "Other": 0
+      },
+      "satisfactionScores": {
+        "compensation": 2.9,
+        "benefits": 3.9,
+        "workLifeBalance": 3.2,
+        "careerDevelopment": 3.1,
+        "management": 3.3,
+        "culture": 3.6
+      },
+      "themes": {
+        "positive": ["Purpose-driven work", "Collaborative teams", "Healthcare benefits"],
+        "negative": ["Below-market pay", "Few advancement opportunities", "High workload"]
+      },
+      "lastUpdated": "2024-09-30T12:00:00Z"
+    }
+  }
+}

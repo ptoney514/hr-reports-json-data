@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useDashboard } from '../contexts/DashboardContext';
-import firebaseService from '../services/FirebaseService';
+import firebaseService from '../services/DataService';
 import { useErrorHandler, handleNetworkError, validateData } from '../utils/errorHandler';
 import { globalCache } from '../utils/cacheUtils';
 import { createEnhancedSummary } from '../services/QuarterComparisonService';

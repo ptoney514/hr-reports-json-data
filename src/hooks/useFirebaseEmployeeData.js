@@ -1,11 +1,5 @@
 import { useState, useCallback } from 'react';
-import { 
-  collection, 
-  getDocs,
-  deleteDoc
-} from 'firebase/firestore';
-import { db } from '../config/firebase';
-import firebaseService from '../services/FirebaseService';
+import firebaseService from '../services/DataService';
 import { 
   transformToFirebaseWorkforceData, 
   endDateToQuarterPeriod, 
@@ -25,21 +19,9 @@ export const useFirebaseEmployeeData = () => {
     setError(null);
     
     try {
-      // Check if the 'employees' collection exists and clear it
-      const employeesCollection = collection(db, 'employees');
-      const snapshot = await getDocs(employeesCollection);
-      
-      if (snapshot.size > 0) {
-        console.log(`Found ${snapshot.size} individual employee records to delete for privacy compliance`);
-        const deletePromises = snapshot.docs.map(doc => deleteDoc(doc.ref));
-        await Promise.all(deletePromises);
-        console.log(`Successfully deleted ${snapshot.size} individual employee records`);
-        
-        return { success: true, count: snapshot.size, message: `Deleted ${snapshot.size} individual employee records for privacy compliance` };
-      } else {
-        console.log('No individual employee records found - database is already privacy compliant');
-        return { success: true, count: 0, message: 'No individual employee records found' };
-      }
+      // In JSON mode, there are no individual employee records to clear
+      console.log('JSON mode: No individual employee records stored - privacy compliant by design');
+      return { success: true, count: 0, message: 'JSON mode: No individual employee records stored' };
     } catch (err) {
       console.error('Error clearing individual employee data:', err);
       setError(err.message);

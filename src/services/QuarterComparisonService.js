@@ -5,7 +5,7 @@
  */
 
 import quarterConfigService, { getPreviousQuarter } from './QuarterConfigService.js';
-import firebaseService from './FirebaseService.js';
+import firebaseService from './DataService.js';
 import { toAppFormat, toFirebaseFormat, debugQuarterFormat } from '../utils/quarterFormatUtils.js';
 
 class QuarterComparisonService {

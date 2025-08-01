@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
-import firebaseService from '../services/FirebaseService';
+import firebaseService from '../services/DataService';
 
 // Initial state
 const initialState = {

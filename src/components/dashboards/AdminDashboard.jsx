@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { 
   Database, 
   Eye, 
@@ -11,13 +11,23 @@ import {
   AlertCircle,
   CheckCircle,
   Calendar,
-  BarChart3
+  BarChart3,
+  FileJson,
+  FileDown,
+  FileUp
 } from 'lucide-react';
 import { getQuarters } from '../../services/QuarterConfigService';
-import firebaseService from '../../services/FirebaseService';
+import firebaseService from '../../services/DataService';
 import QuarterlyDataTable from '../admin/QuarterlyDataTable';
 import DivisionDataTable from '../admin/DivisionDataTable';
 import DataImportExport from '../admin/DataImportExport';
+import { 
+  downloadCurrentData, 
+  downloadSampleTemplate, 
+  parseJSONFile, 
+  validateJSONStructure,
+  mergeUploadedData 
+} from '../../utils/jsonDataUtils';
 
 const AdminDashboard = () => {
   // State management
@@ -30,6 +40,7 @@ const AdminDashboard = () => {
   const [status, setStatus] = useState(null);
   const [hasChanges, setHasChanges] = useState(false);
   const [activeTable, setActiveTable] = useState('workforce'); // 'workforce' or 'division'
+  const fileInputRef = useRef(null);
 
   // Available dashboard types
   const dashboardTypes = [
@@ -237,6 +248,87 @@ const AdminDashboard = () => {
       message: 'Changes cancelled - data reverted to original values'
     });
   };
+  
+  // Handle JSON file upload
+  const handleJSONUpload = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    setLoading(true);
+    setError(null);
+    
+    try {
+      // Parse the uploaded JSON file
+      const uploadedData = await parseJSONFile(file);
+      
+      // Validate the structure
+      const validation = validateJSONStructure(uploadedData);
+      if (!validation.isValid) {
+        throw new Error(`Invalid JSON structure: ${validation.errors.join(', ')}`);
+      }
+      
+      // Merge with existing data
+      const mergedData = mergeUploadedData(uploadedData);
+      
+      // Update the data store
+      firebaseService.updateDataStore(mergedData);
+      
+      // Reload the current dashboard data
+      await loadAllQuartersData();
+      
+      setStatus({
+        type: 'success',
+        message: `Successfully imported data from ${file.name}`
+      });
+      
+    } catch (err) {
+      console.error('Error uploading JSON:', err);
+      setError(`Failed to upload JSON: ${err.message}`);
+      setStatus({
+        type: 'error',
+        message: `Failed to upload JSON: ${err.message}`
+      });
+    } finally {
+      setLoading(false);
+      // Reset file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+  
+  // Download current data as JSON
+  const handleDownloadData = () => {
+    try {
+      downloadCurrentData();
+      setStatus({
+        type: 'success',
+        message: 'Data downloaded successfully'
+      });
+    } catch (err) {
+      setStatus({
+        type: 'error',
+        message: `Failed to download data: ${err.message}`
+      });
+    }
+  };
+  
+  // Download sample template
+  const handleDownloadTemplate = () => {
+    try {
+      const currentQuarter = 'Q2-2025'; // You can make this dynamic
+      downloadSampleTemplate(currentQuarter);
+      setStatus({
+        type: 'success',
+        message: 'Sample template downloaded successfully'
+      });
+    } catch (err) {
+      setStatus({
+        type: 'error',
+        message: `Failed to download template: ${err.message}`
+      });
+    }
+  };
 
 
   return (
@@ -244,12 +336,30 @@ const AdminDashboard = () => {
       {/* Header */}
       <div className="bg-white rounded-lg shadow-sm border p-6">
         <div className="flex items-center gap-3 mb-4">
-          <Database className="text-blue-600" size={24} />
-          <h1 className="text-2xl font-bold text-gray-900">Firebase Admin Dashboard</h1>
+          <FileJson className="text-blue-600" size={24} />
+          <h1 className="text-2xl font-bold text-gray-900">JSON Data Admin Dashboard</h1>
         </div>
         <p className="text-gray-600">
-          View and edit reporting period HR data stored in Firebase. Make quick corrections without needing to re-upload entire datasets.
+          View and edit HR data stored in JSON format. Make quick corrections, upload new data, or download templates for easy data management.
         </p>
+      </div>
+
+      {/* JSON Mode Notice */}
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <div className="flex items-start gap-3">
+          <FileJson className="text-blue-600 mt-0.5" size={20} />
+          <div className="flex-1">
+            <h3 className="font-medium text-blue-900 mb-1">JSON Data Mode</h3>
+            <p className="text-sm text-blue-700">
+              Data is stored in memory during your session. To persist changes:
+            </p>
+            <ul className="text-sm text-blue-700 mt-1 ml-4 list-disc">
+              <li>Use "Export JSON" to download the current data</li>
+              <li>Use "Import JSON" to load previously saved data</li>
+              <li>Changes are saved locally but not to the server</li>
+            </ul>
+          </div>
+        </div>
       </div>
 
       {/* Controls */}
@@ -275,46 +385,86 @@ const AdminDashboard = () => {
           </div>
 
           {/* Action Buttons */}
-          <div className="flex gap-2">
-            <button
-              onClick={loadAllQuartersData}
-              disabled={loading}
-              className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:border-gray-400 disabled:opacity-50"
-            >
-              <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
-              Refresh
-            </button>
-
-            {Object.keys(allQuartersData).length > 0 && !isEditMode && (
+          <div className="flex gap-2 flex-wrap">
+            {/* JSON Operations */}
+            <div className="flex gap-2">
               <button
-                onClick={() => setIsEditMode(true)}
-                className="flex items-center gap-2 px-3 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                onClick={handleDownloadTemplate}
+                className="flex items-center gap-2 px-3 py-2 text-sm text-blue-600 hover:text-blue-800 border border-blue-300 rounded-lg hover:border-blue-400"
+                title="Download a sample JSON template"
               >
-                <Edit size={14} />
-                Edit Mode
+                <FileDown size={14} />
+                Template
               </button>
-            )}
+              
+              <button
+                onClick={handleDownloadData}
+                className="flex items-center gap-2 px-3 py-2 text-sm text-green-600 hover:text-green-800 border border-green-300 rounded-lg hover:border-green-400"
+                title="Download all current data as JSON"
+              >
+                <Download size={14} />
+                Export JSON
+              </button>
+              
+              <label className="flex items-center gap-2 px-3 py-2 text-sm text-purple-600 hover:text-purple-800 border border-purple-300 rounded-lg hover:border-purple-400 cursor-pointer"
+                     title="Upload JSON data file">
+                <FileUp size={14} />
+                Import JSON
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".json"
+                  onChange={handleJSONUpload}
+                  className="hidden"
+                />
+              </label>
+            </div>
+            
+            {/* Divider */}
+            <div className="border-l border-gray-300 mx-2" />
+            
+            {/* Data Operations */}
+            <div className="flex gap-2">
+              <button
+                onClick={loadAllQuartersData}
+                disabled={loading}
+                className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:border-gray-400 disabled:opacity-50"
+              >
+                <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
+                Refresh
+              </button>
 
-            {isEditMode && (
-              <>
+              {Object.keys(allQuartersData).length > 0 && !isEditMode && (
                 <button
-                  onClick={cancelEdit}
-                  className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:border-gray-400"
+                  onClick={() => setIsEditMode(true)}
+                  className="flex items-center gap-2 px-3 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                 >
-                  <X size={14} />
-                  Cancel
+                  <Edit size={14} />
+                  Edit Mode
                 </button>
-                <button
-                  onClick={saveChanges}
-                  disabled={!hasChanges || loading}
-                  className="flex items-center gap-2 px-3 py-2 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50"
-                >
-                  <Save size={14} />
-                  Save Changes
-                  {hasChanges && <span className="text-xs">(Modified)</span>}
-                </button>
-              </>
-            )}
+              )}
+
+              {isEditMode && (
+                <>
+                  <button
+                    onClick={cancelEdit}
+                    className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:border-gray-400"
+                  >
+                    <X size={14} />
+                    Cancel
+                  </button>
+                  <button
+                    onClick={saveChanges}
+                    disabled={!hasChanges || loading}
+                    className="flex items-center gap-2 px-3 py-2 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50"
+                  >
+                    <Save size={14} />
+                    Save Changes
+                    {hasChanges && <span className="text-xs">(Modified)</span>}
+                  </button>
+                </>
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -438,10 +588,32 @@ const AdminDashboard = () => {
       ) : (
         <div className="bg-white rounded-lg shadow-sm border p-8">
           <div className="text-center text-gray-500">
-            <Database size={48} className="mx-auto mb-4 text-gray-400" />
+            <FileJson size={48} className="mx-auto mb-4 text-gray-400" />
             <h3 className="text-lg font-medium mb-2">No Data Found</h3>
             <p>No {selectedDashboard} data available across any reporting periods</p>
-            <p className="text-sm mt-2">Upload data through the Excel Integration Dashboard first.</p>
+            <div className="mt-4 space-y-2">
+              <p className="text-sm">Get started by:</p>
+              <div className="flex justify-center gap-4 mt-3">
+                <button
+                  onClick={handleDownloadTemplate}
+                  className="flex items-center gap-2 px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                >
+                  <FileDown size={16} />
+                  Download Template
+                </button>
+                <label className="flex items-center gap-2 px-4 py-2 text-sm bg-purple-600 text-white rounded-lg hover:bg-purple-700 cursor-pointer">
+                  <FileUp size={16} />
+                  Import JSON
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept=".json"
+                    onChange={handleJSONUpload}
+                    className="hidden"
+                  />
+                </label>
+              </div>
+            </div>
           </div>
         </div>
       )}

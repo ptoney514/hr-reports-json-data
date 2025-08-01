@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import firebaseService from '../services/FirebaseService';
+import firebaseService from '../services/DataService';
 
 /**
  * Simple Firebase hook for I9 Compliance data

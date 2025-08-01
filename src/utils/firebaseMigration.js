@@ -1,5 +1,5 @@
 import DataMigrationService from '../services/DataMigrationService';
-import firebaseService from '../services/FirebaseService';
+import firebaseService from '../services/DataService';
 
 /**
  * Firebase Migration Utilities

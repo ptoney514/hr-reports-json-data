@@ -7,7 +7,7 @@ import {
 } from '../../utils/firebaseMigration';
 import { testBasicFirebaseConnection } from '../../utils/simpleFirebaseTest';
 import { runFirebaseDiagnostic, checkFirebaseConfig } from '../../utils/firebaseDiagnostic';
-import firebaseService from '../../services/FirebaseService';
+import firebaseService from '../../services/DataService';
 
 /**
  * Firebase Test Component

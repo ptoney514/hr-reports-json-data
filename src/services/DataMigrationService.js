@@ -1,4 +1,4 @@
-import firebaseService from './FirebaseService';
+import firebaseService from './DataService';
 import HRDatabase from '../database/HRDatabase';
 
 /**

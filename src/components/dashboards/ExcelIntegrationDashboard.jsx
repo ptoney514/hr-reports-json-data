@@ -16,7 +16,7 @@ import { useNavigate } from 'react-router-dom';
 import FileUploader from '../ui/FileUploader';
 import DataSourceManager from '../ui/DataSourceManager';
 import { useDataSource } from '../../contexts/DataSourceContext';
-import firebaseService from '../../services/FirebaseService';
+import firebaseService from '../../services/DataService';
 import { downloadCombinedWorkforceTemplate } from '../../utils/excelTemplateGenerator';
 
 const ExcelIntegrationDashboard = () => {
