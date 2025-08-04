@@ -11,6 +11,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 5. Please every step of the way just give me a high level explanation of what changes you made
 6. Make every task and code change you do as simple as possible. We want to avoid making any massive or complex changes. Every change should impact as little code as possible. Everything is about simplicity.
 7. Finally, add a review section to the todo.md file with a summary of the changes you made and any other relevant information.
+8. DO NOT BE LAZY. NEVER BE LAZY. IF THERE IS A BUG FIND THE ROOT CAUSE AND FIX IT. NO TEMPORARY FIXES. YOU ARE A SENIOR DEVELOPER. NEVER BE LAZY
+9. MAKE ALL FIXES AND CODE CHANGES AS SIMPLE AS HUMANLY POSSIBLE. THEY SHOULD ONLY IMPACT NECESSARY CODE RELEVANT TO THE TASK AND NOTHING ELSE. IT SHOULD IMPACT AS LITTLE CODE AS POSSIBLE. YOUR GOAL IS TO NOT INTRODUCE ANY BUGS. IT'S ALL ABOUT SIMPLICITY
 
 ## TODO List Management (CRITICAL)
 
@@ -46,6 +48,106 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Update TODO.md immediately** after any TodoWrite operation
 
 This ensures consistent task tracking, demonstrates progress to users, and prevents missing critical steps in complex implementations.
+
+## Specialized Subagents
+
+The HR Reports application includes custom Claude Code subagents for enhanced development efficiency and code quality. These specialized agents handle specific domain tasks with expert-level knowledge.
+
+### Available Subagents
+
+#### 1. **json-master** - JSON Data Management Specialist
+- **Purpose**: Handle all JSON data operations, validation, and transformations
+- **Use Cases**: 
+  - JSON data structure design and optimization
+  - Firebase to JSON migration tasks
+  - Data validation and schema management
+  - Local file-based data operations
+- **Auto-triggered**: JSON file operations, data migrations, data validation
+
+#### 2. **firebase-remover** - Firebase Removal Specialist  
+- **Purpose**: Systematically remove Firebase dependencies and replace with JSON alternatives
+- **Use Cases**:
+  - Remove Firebase imports and configurations
+  - Convert Firebase operations to JSON-based alternatives
+  - Migrate Firebase data structures to JSON files
+  - Update hooks and services to use JSON data
+- **Auto-triggered**: Firebase-related code modifications, data source migrations
+
+#### 3. **test-runner** - Testing & Quality Assurance Specialist
+- **Purpose**: Automated testing, quality checks, and build verification
+- **Use Cases**:
+  - Run comprehensive test suites (unit, integration, accessibility)
+  - Fix failing tests while preserving test intent
+  - Execute builds and verify code quality
+  - Generate test coverage reports
+- **Auto-triggered**: Code changes, before commits, quality gate checks
+
+#### 4. **react-optimizer** - React Performance Specialist
+- **Purpose**: Optimize React components and fix performance issues
+- **Use Cases**:
+  - Fix React Hook dependency warnings
+  - Implement proper memoization strategies
+  - Clean up unused imports and variables
+  - Optimize component re-render patterns
+- **Auto-triggered**: React Hook warnings, performance issues, build optimization
+
+#### 5. **chart-debugger** - Chart & Visualization Specialist
+- **Purpose**: Debug and optimize Recharts visualizations
+- **Use Cases**:
+  - Fix chart rendering and synchronization issues
+  - Debug chart data flow and updates
+  - Optimize chart performance and responsiveness
+  - Handle chart animation and interaction problems
+- **Auto-triggered**: Chart rendering issues, data visualization problems
+
+#### 6. **data-transformer** - Data Processing Specialist
+- **Purpose**: Handle complex data transformations and processing
+- **Use Cases**:
+  - Process Excel/CSV file imports
+  - Transform data between different formats
+  - Aggregate quarterly and periodic data
+  - Calculate complex metrics and KPIs
+- **Auto-triggered**: Data import/export, format conversions, metric calculations
+
+#### 7. **accessibility-guardian** - Accessibility Compliance Specialist
+- **Purpose**: Ensure WCAG 2.1 AA accessibility compliance
+- **Use Cases**:
+  - Run accessibility tests and fix violations
+  - Implement proper ARIA attributes and semantics
+  - Ensure keyboard navigation and focus management
+  - Validate color contrast and visual accessibility
+- **Auto-triggered**: Accessibility violations, compliance testing, WCAG validation
+
+### Using Subagents Effectively
+
+#### Automatic Delegation
+Claude Code will automatically delegate tasks to appropriate subagents based on:
+- Task context and requirements
+- Code patterns and file types being modified
+- Build warnings and error types
+- Quality gate requirements
+
+#### Explicit Invocation
+You can specifically request subagent assistance:
+```
+> Use the json-master agent to design the JSON data structure
+> Have the test-runner agent fix failing tests
+> Ask the accessibility-guardian to check WCAG compliance
+```
+
+#### Subagent Integration
+Subagents work together on complex tasks:
+- **firebase-remover** + **json-master**: Complete Firebase to JSON migration
+- **test-runner** + **react-optimizer**: Fix performance while maintaining quality
+- **chart-debugger** + **accessibility-guardian**: Accessible chart implementations
+
+### Benefits
+
+- **Specialized Expertise**: Each agent has deep domain knowledge
+- **Context Preservation**: Agents work in isolated contexts to prevent pollution
+- **Consistent Quality**: Standardized approaches to common tasks
+- **Faster Development**: Automated handling of routine but complex tasks
+- **Knowledge Retention**: Best practices encoded in each agent
 
 
 ## Git Workflow and Branching Strategy
