@@ -24,7 +24,7 @@ const useComplianceData = () => {
   };
 
   useEffect(() => {
-    const loadComplianceData = async () => {
+    const loadComplianceData = async (retryCount = 0) => {
       setLoading(true);
       setError(null);
 
@@ -33,13 +33,21 @@ const useComplianceData = () => {
         const response = await fetch(`/data/compliance/${reportingDate}.json`);
         
         if (!response.ok) {
-          throw new Error(`Failed to load compliance data: ${response.status}`);
+          throw new Error(`Failed to load compliance data: ${response.status} for ${reportingDate}`);
         }
 
         const jsonData = await response.json();
         setData(jsonData);
       } catch (err) {
         console.error('Error loading compliance data:', err);
+        
+        // Retry once after a short delay if it's a 404 error
+        if (err.message.includes('404') && retryCount < 1) {
+          console.log('Retrying compliance data load after 500ms...');
+          setTimeout(() => loadComplianceData(retryCount + 1), 500);
+          return;
+        }
+        
         setError(err.message);
       } finally {
         setLoading(false);

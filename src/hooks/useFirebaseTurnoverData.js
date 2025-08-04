@@ -1,135 +1,181 @@
 import { useState, useEffect } from 'react';
-import firebaseService from '../services/DataService';
+
+// Map quarter format to JSON file dates
+const QUARTER_TO_DATE_MAP = {
+  'Q2-2025': '2025-06-30',
+  'Q1-2025': '2025-03-31',
+  'Q4-2024': '2024-12-31',
+  'Q3-2024': '2024-09-30',
+  'Q2-2024': '2024-06-30',
+  // Firebase format
+  '2025-Q2': '2025-06-30',
+  '2025-Q1': '2025-03-31',
+  '2024-Q4': '2024-12-31',
+  '2024-Q3': '2024-09-30',
+  '2024-Q2': '2024-06-30'
+};
 
 /**
- * Simple Firebase hook for Turnover data
+ * Simple JSON hook for Turnover data
  */
-const useFirebaseTurnoverData = (period = '2025-Q1') => {
+const useFirebaseTurnoverData = (period = 'Q2-2025') => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [isRealTime, setIsRealTime] = useState(false);
+  const [isRealTime] = useState(false); // No real-time for JSON
   const [lastSyncTime, setLastSyncTime] = useState(null);
+  
+  // Convert period to JSON file date
+  const getJsonFileDate = (reportingPeriod) => {
+    if (!reportingPeriod) return '2025-06-30';
+    if (/^\d{4}-\d{2}-\d{2}$/.test(reportingPeriod)) {
+      return reportingPeriod;
+    }
+    return QUARTER_TO_DATE_MAP[reportingPeriod] || '2025-06-30';
+  };
 
   useEffect(() => {
-    let unsubscribe;
-
     const loadData = async () => {
       try {
         setLoading(true);
         setError(null);
 
-        // Get initial data
-        const firebaseData = await firebaseService.getTurnoverMetrics(period);
+        // Get JSON file date from period
+        const jsonDate = getJsonFileDate(period);
+        console.log(`Loading turnover data from JSON for date: ${jsonDate}`);
         
-        if (firebaseData) {
-          setData(transformData(firebaseData));
-          setLastSyncTime(new Date());
-          
-          // Set up real-time subscription
-          unsubscribe = firebaseService.subscribeToMetrics('turnover', period, (updatedData) => {
-            if (updatedData) {
-              setData(transformData(updatedData));
-              setLastSyncTime(new Date());
-              setIsRealTime(true);
-            }
-          });
+        // Load data from JSON file
+        const response = await fetch(`/data/turnover/${jsonDate}.json`);
+        
+        if (!response.ok) {
+          throw new Error(`No turnover data found for ${period} (${jsonDate})`);
+        }
+        
+        const jsonData = await response.json();
+        
+        if (jsonData) {
+          setData(transformData(jsonData));
+          setLastSyncTime(new Date(jsonData.lastUpdated || Date.now()));
         }
       } catch (err) {
+        console.error('Error loading turnover data:', err);
         setError(err.message);
+        // Set default data on error
+        setData(getDefaultData());
       } finally {
         setLoading(false);
       }
     };
 
     loadData();
-
-    return () => {
-      if (unsubscribe) {
-        unsubscribe();
-        setIsRealTime(false);
-      }
-    };
   }, [period]);
 
   return { data, loading, error, isRealTime, lastSyncTime };
 };
 
-// Transform Firebase data to component format
-const transformData = (firebaseData) => {
-  if (!firebaseData) return null;
+// Get default data structure
+const getDefaultData = () => ({
+  summary: {
+    overallTurnoverRate: 0,
+    totalDepartures: 0,
+    turnoverRateChange: 0,
+    facultyTurnoverRate: 0,
+    facultyDepartures: 0,
+    facultyTurnoverChange: 0,
+    staffTurnoverRate: 0,
+    staffDepartures: 0,
+    staffTurnoverChange: 0,
+    totalCostImpact: 0,
+    avgCostPerDeparture: 0,
+    costImpactChange: 0
+  },
+  charts: {
+    voluntaryReasons: [],
+    tenureAnalysis: [],
+    byReason: [],
+    byDepartment: [],
+    trends: []
+  },
+  metadata: {
+    source: 'json',
+    period: '',
+    lastUpdated: new Date().toISOString()
+  }
+});
+
+// Transform JSON data to component format
+const transformData = (jsonData) => {
+  if (!jsonData) return getDefaultData();
 
   return {
     summary: {
-      overallTurnoverRate: parseFloat(firebaseData.turnoverRate) || 0,
-      totalDepartures: firebaseData.totalSeparations || 0,
-      turnoverRateChange: parseFloat(firebaseData.trends?.quarterlyChange) || 0,
-      facultyTurnoverRate: parseFloat(firebaseData.byDepartment?.['Academic Affairs']) || 0,
-      facultyDepartures: Math.floor(firebaseData.totalSeparations * 0.3) || 0,
-      facultyTurnoverChange: -0.9,
-      staffTurnoverRate: parseFloat(firebaseData.byDepartment?.['Administration']) || 0,
-      staffDepartures: Math.floor(firebaseData.totalSeparations * 0.7) || 0,
-      staffTurnoverChange: parseFloat(firebaseData.trends?.quarterlyChange) || 0,
-      totalCostImpact: firebaseData.costOfTurnover || 0,
-      avgCostPerDeparture: Math.floor((firebaseData.costOfTurnover || 0) / (firebaseData.totalSeparations || 1)),
-      costImpactChange: -5.2
+      overallTurnoverRate: jsonData.metrics?.overallRate || jsonData.turnoverRate || 0,
+      totalDepartures: jsonData.metrics?.totalDepartures || jsonData.totalSeparations || 0,
+      turnoverRateChange: jsonData.metrics?.turnoverRateChange || jsonData.trends?.quarterlyChange || 0,
+      facultyTurnoverRate: jsonData.metrics?.facultyRate || 0,
+      facultyDepartures: jsonData.metrics?.facultyDepartures || Math.floor((jsonData.metrics?.totalDepartures || 0) * 0.3),
+      facultyTurnoverChange: jsonData.metrics?.facultyChange || -0.9,
+      staffTurnoverRate: jsonData.metrics?.staffRate || 0,
+      staffDepartures: jsonData.metrics?.staffDepartures || Math.floor((jsonData.metrics?.totalDepartures || 0) * 0.7),
+      staffTurnoverChange: jsonData.metrics?.staffChange || 0,
+      totalCostImpact: jsonData.metrics?.costImpact || jsonData.costOfTurnover || 0,
+      avgCostPerDeparture: jsonData.metrics?.avgCostPerDeparture || Math.floor((jsonData.metrics?.costImpact || 0) / Math.max(1, jsonData.metrics?.totalDepartures || 1)),
+      costImpactChange: jsonData.metrics?.costImpactChange || -5.2,
+      voluntaryRate: jsonData.metrics?.voluntaryRate || 0,
+      involuntaryRate: jsonData.metrics?.involuntaryRate || 0
     },
     charts: {
       // Transform voluntary turnover reasons for pie chart
-      voluntaryReasons: firebaseData.voluntaryTurnoverReasons 
-        ? Object.entries(firebaseData.voluntaryTurnoverReasons).map(([reason, data]) => ({
-            name: reason,
-            value: data.count || 0,
-            percentage: data.percentage || 0
-          }))
-        : [
-            { name: 'Career Advancement', value: 109, percentage: 38 },
-            { name: 'Compensation', value: 60, percentage: 21 },
-            { name: 'Work-Life Balance', value: 49, percentage: 17 },
-            { name: 'Retirement', value: 34, percentage: 12 },
-            { name: 'Relocation', value: 23, percentage: 8 },
-            { name: 'Other', value: 11, percentage: 4 }
-          ],
+      voluntaryReasons: (jsonData.byReason || jsonData.voluntaryTurnoverReasons || [
+        { reason: 'Career Advancement', count: 109, percentage: 38 },
+        { reason: 'Compensation', count: 60, percentage: 21 },
+        { reason: 'Work-Life Balance', count: 49, percentage: 17 },
+        { reason: 'Retirement', count: 34, percentage: 12 },
+        { reason: 'Relocation', count: 23, percentage: 8 },
+        { reason: 'Other', count: 11, percentage: 4 }
+      ]).map(item => ({
+        name: item.reason || item.name,
+        value: item.count || item.value || 0,
+        percentage: item.percentage || ((item.count / Math.max(1, jsonData.metrics?.totalDepartures || 1)) * 100).toFixed(1)
+      })),
       
       // Transform departures by tenure for pie chart
-      tenureAnalysis: firebaseData.departuresByTenure
-        ? Object.entries(firebaseData.departuresByTenure).map(([tenure, data]) => ({
-            name: tenure,
-            value: data.count || 0,
-            percentage: data.percentage || 0
-          }))
-        : [
-            { name: '< 1 Year', value: 100, percentage: 35 },
-            { name: '1-3 Years', value: 83, percentage: 29 },
-            { name: '3-5 Years', value: 52, percentage: 18 },
-            { name: '5-10 Years', value: 29, percentage: 10 },
-            { name: '10+ Years', value: 23, percentage: 8 }
-          ],
+      tenureAnalysis: (jsonData.byTenure || jsonData.departuresByTenure || [
+        { range: '< 1 Year', count: 100, percentage: 35 },
+        { range: '1-3 Years', count: 83, percentage: 29 },
+        { range: '3-5 Years', count: 52, percentage: 18 },
+        { range: '5-10 Years', count: 29, percentage: 10 },
+        { range: '10+ Years', count: 23, percentage: 8 }
+      ]).map(item => ({
+        name: item.range || item.name || item.tenure,
+        value: item.count || item.value || 0,
+        percentage: item.percentage || item.rate || 0
+      })),
 
-      // Legacy data for backward compatibility
-      byReason: Object.entries(firebaseData.byReason || {}).map(([reason, count]) => ({
-        reason,
-        count: parseInt(count),
-        percentage: ((count / firebaseData.totalSeparations) * 100).toFixed(1)
+      // Transform data for backward compatibility
+      byReason: (jsonData.byReason || []).map(item => ({
+        reason: item.reason || item.name,
+        count: item.count || 0,
+        percentage: item.percentage || ((item.count / Math.max(1, jsonData.metrics?.totalDepartures || 1)) * 100).toFixed(1)
       })),
-      byDepartment: Object.entries(firebaseData.byDepartment || {}).map(([dept, rate]) => ({
-        department: dept,
-        rate: parseFloat(rate),
-        departures: Math.floor(parseFloat(rate) * 10) // Estimate
+      byDepartment: (jsonData.byDivision || jsonData.byDepartment || []).map(item => ({
+        department: item.name || item.division || item.department,
+        rate: item.rate || item.turnoverRate || 0,
+        departures: item.departures || item.count || 0
       })),
-      trends: [
+      trends: jsonData.monthlyTrend || jsonData.trends || [
         {
-          quarter: firebaseData.period,
-          overall: parseFloat(firebaseData.turnoverRate),
-          voluntary: parseFloat(firebaseData.voluntaryRate),
-          involuntary: parseFloat(firebaseData.involuntaryRate)
+          quarter: jsonData.quarter || jsonData.period,
+          overall: jsonData.metrics?.overallRate || 0,
+          voluntary: jsonData.metrics?.voluntaryRate || 0,
+          involuntary: jsonData.metrics?.involuntaryRate || 0
         }
       ]
     },
     metadata: {
-      source: 'firebase',
-      period: firebaseData.period,
-      lastUpdated: firebaseData.lastUpdated
+      source: 'json',
+      period: jsonData.quarter || jsonData.period,
+      lastUpdated: jsonData.lastUpdated || new Date().toISOString()
     }
   };
 };

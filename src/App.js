@@ -22,6 +22,7 @@ const FirebaseTestComponent = lazy(() => import('./components/testing/FirebaseTe
 const WorkforceDataTester = lazy(() => import('./components/testing/WorkforceDataTester'));
 const ExcelUploadTester = lazy(() => import('./components/testing/ExcelUploadTester'));
 const JsonDataTester = lazy(() => import('./components/testing/JsonDataTester'));
+const HooksTestComponent = lazy(() => import('./components/testing/HooksTestComponentWrapper'));
 const ExcelIntegrationDashboard = lazy(() => import('./components/dashboards/ExcelIntegrationDashboard'));
 const RecruitingDashboard = lazy(() => import('./components/dashboards/RecruitingDashboard'));
 const ExitSurveyDashboard = lazy(() => import('./components/dashboards/ExitSurveyDashboard'));
@@ -102,6 +103,7 @@ function App() {
               <Route path="/test/workforce-data" element={<WorkforceDataTester />} />
               <Route path="/test/excel-upload" element={<ExcelUploadTester />} />
               <Route path="/test/json-data" element={<JsonDataTester />} />
+              <Route path="/test/json-hooks" element={<HooksTestComponent />} />
               
               {/* Excel Integration Route */}
               <Route path="/excel-integration" element={<ExcelIntegrationDashboard />} />

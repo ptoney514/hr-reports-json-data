@@ -1,28 +1,42 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useDashboard } from '../contexts/DashboardContext';
-import firebaseService from '../services/DataService';
 import { useErrorHandler, handleNetworkError, validateData } from '../utils/errorHandler';
 import { globalCache } from '../utils/cacheUtils';
 import { createEnhancedSummary } from '../services/QuarterComparisonService';
 import { toFirebaseFormat, debugQuarterFormat } from '../utils/quarterFormatUtils';
 import { getLast5Periods } from '../services/QuarterConfigService';
 
-// Cache configuration for Firebase data
+// Cache configuration for JSON data
 const CACHE_CONFIG = {
-  TTL: 10 * 60 * 1000, // 10 minutes (longer for Firebase since data is more static)
-  KEY_PREFIX: 'firebase_workforce_data',
-  VERSION: '2.0'
+  TTL: 10 * 60 * 1000, // 10 minutes cache for JSON data
+  KEY_PREFIX: 'json_workforce_data',
+  VERSION: '3.0'
+};
+
+// Map quarter format to JSON file dates
+const QUARTER_TO_DATE_MAP = {
+  'Q2-2025': '2025-06-30',
+  'Q1-2025': '2025-03-31',
+  'Q4-2024': '2024-12-31',
+  'Q3-2024': '2024-09-30',
+  'Q2-2024': '2024-06-30',
+  // Firebase format
+  '2025-Q2': '2025-06-30',
+  '2025-Q1': '2025-03-31',
+  '2024-Q4': '2024-12-31',
+  '2024-Q3': '2024-09-30',
+  '2024-Q2': '2024-06-30'
 };
 
 /**
- * Enhanced useWorkforceData hook with Firebase support
+ * Enhanced useWorkforceData hook with JSON data support
  * 
  * Features:
- * - Real-time Firebase data synchronization
- * - Fallback to LowDB when needed
- * - Optimized for aggregate data
+ * - JSON file-based data loading
  * - Intelligent caching
- * - Real-time updates
+ * - Quarter-based data management
+ * - Automatic data transformation
+ * - Error handling with fallbacks
  */
 const useFirebaseWorkforceData = (customFilters = {}) => {
   const { state, actions } = useDashboard();
@@ -58,38 +72,29 @@ const useFirebaseWorkforceData = (customFilters = {}) => {
     state.dateRange
   ]);
 
-  // Convert reporting period to Firebase period format
-  const getFirebasePeriod = useCallback((reportingPeriod) => {
-    // Handle multiple period formats and normalize to Firebase format
-    if (!reportingPeriod) return '2025-Q1'; // Default current period
+  // Convert reporting period to JSON file date
+  const getJsonFileDate = useCallback((reportingPeriod) => {
+    if (!reportingPeriod) return '2025-06-30'; // Default to Q2 2025
     
-    // Use the new quarter format utility for consistent conversion
-    const firebaseFormat = toFirebaseFormat(reportingPeriod);
-    if (firebaseFormat && firebaseFormat !== reportingPeriod) {
-      console.log('🔧 getFirebasePeriod conversion:', { 
-        input: reportingPeriod, 
-        output: firebaseFormat 
-      });
-      return firebaseFormat;
-    }
-    
-    // If already in Firebase format (2025-Q1), return as-is
-    if (/^\d{4}-Q\d$/.test(reportingPeriod)) {
+    // Check if it's already a date format
+    if (/^\d{4}-\d{2}-\d{2}$/.test(reportingPeriod)) {
       return reportingPeriod;
     }
     
-    // Handle date-based periods like "2025-03" (convert to quarter)
-    const monthMatch = reportingPeriod.match(/(\d{4})-(\d{2})/);
-    if (monthMatch) {
-      const [, year, month] = monthMatch;
-      const monthNum = parseInt(month, 10);
-      const quarter = Math.ceil(monthNum / 3); // 1-3=Q1, 4-6=Q2, 7-9=Q3, 10-12=Q4
-      return `${year}-Q${quarter}`;
+    // Try to map from quarter format
+    if (QUARTER_TO_DATE_MAP[reportingPeriod]) {
+      return QUARTER_TO_DATE_MAP[reportingPeriod];
     }
     
-    // For any unrecognized format, default to current quarter
-    console.warn(`Unrecognized period format: ${reportingPeriod}, defaulting to 2025-Q1`);
-    return '2025-Q1';
+    // Use the quarter format utility for conversion
+    const firebaseFormat = toFirebaseFormat(reportingPeriod);
+    if (firebaseFormat && QUARTER_TO_DATE_MAP[firebaseFormat]) {
+      return QUARTER_TO_DATE_MAP[firebaseFormat];
+    }
+    
+    // Default to latest available date
+    console.warn(`Unable to map period ${reportingPeriod} to JSON file date, using default`);
+    return '2025-06-30';
   }, []);
 
   // Data validation schema for Firebase aggregate data
@@ -107,93 +112,100 @@ const useFirebaseWorkforceData = (customFilters = {}) => {
 
   // Generate cache key based on filters
   const getCacheKey = useCallback((filters) => {
-    const period = getFirebasePeriod(filters.reportingPeriod);
-    return `${CACHE_CONFIG.KEY_PREFIX}_${period}_${JSON.stringify(filters)}`;
-  }, [getFirebasePeriod]);
+    const date = getJsonFileDate(filters.reportingPeriod);
+    return `${CACHE_CONFIG.KEY_PREFIX}_${date}_${JSON.stringify(filters)}`;
+  }, [getJsonFileDate]);
 
-  // Load data from Firebase with caching
-  const loadFirebaseData = useCallback(async () => {
-    const period = getFirebasePeriod(activeFilters.reportingPeriod);
+  // Load data from JSON files with caching
+  const loadJsonData = useCallback(async () => {
+    const jsonDate = getJsonFileDate(activeFilters.reportingPeriod);
     const cacheKey = getCacheKey(activeFilters);
     
     // Check cache first
     try {
       const cachedResult = await globalCache.get(cacheKey, {
-        params: { period, ...activeFilters }
+        params: { date: jsonDate, ...activeFilters }
       });
       
       if (cachedResult) {
-        console.log(`Firebase workforce cache hit for ${period}`);
+        console.log(`JSON workforce cache hit for ${jsonDate}`);
         setLastSyncTime(new Date(cachedResult.metadata?.timestamp || Date.now()));
         return cachedResult.data;
       }
     } catch (cacheError) {
-      console.warn('Firebase cache read error:', cacheError);
+      console.warn('JSON cache read error:', cacheError);
     }
 
-    // Fetch from Firebase
+    // Fetch from JSON file
     setLocalLoading(true);
     actions.setLoading('workforce', true);
     actions.clearError('workforce');
     setLocalError(null);
 
     try {
-      console.log(`Loading workforce data from Firebase for period: ${period}`);
+      console.log(`Loading workforce data from JSON for date: ${jsonDate}`);
       
-      const firebaseData = await firebaseService.getWorkforceMetrics(period);
+      // Load JSON data from public folder
+      const response = await fetch(`/data/workforce/${jsonDate}.json`);
       
-      if (!firebaseData) {
-        throw new Error(`No workforce data found for period ${period}`);
+      if (!response.ok) {
+        throw new Error(`No workforce data found for date ${jsonDate}`);
+      }
+      
+      const jsonData = await response.json();
+      
+      if (!jsonData) {
+        throw new Error(`Invalid workforce data for date ${jsonDate}`);
       }
 
-      // Validate Firebase data
-      const validation = validateData(firebaseData, workforceDataSchema, 'useFirebaseWorkforceData');
+      // Validate JSON data
+      const validation = validateData(jsonData, workforceDataSchema, 'useFirebaseWorkforceData');
       if (!validation.valid) {
-        console.warn('Firebase workforce data validation failed:', validation.errors);
+        console.warn('JSON workforce data validation failed:', validation.errors);
         // Continue anyway - don't block the app
       }
 
-      // Transform Firebase aggregate data to component format
-      const transformedData = transformFirebaseToComponentFormat(firebaseData);
+      // Transform JSON data to component format
+      const transformedData = transformJsonToComponentFormat(jsonData);
 
       // Cache the transformed data
       try {
         await globalCache.set(cacheKey, transformedData, {
           ttl: CACHE_CONFIG.TTL,
-          params: { period, ...activeFilters },
+          params: { date: jsonDate, ...activeFilters },
           metadata: {
             version: CACHE_CONFIG.VERSION,
             timestamp: Date.now(),
-            firebaseTimestamp: firebaseData.lastUpdated?.toDate?.() || new Date(),
-            period: period,
-            source: 'firebase'
+            jsonDate: jsonDate,
+            period: jsonData.quarter || activeFilters.reportingPeriod,
+            source: 'json'
           }
         });
-        console.log('Firebase workforce data cached successfully');
+        console.log('JSON workforce data cached successfully');
       } catch (cacheError) {
-        console.warn('Failed to cache Firebase workforce data:', cacheError);
+        console.warn('Failed to cache JSON workforce data:', cacheError);
       }
 
-      setLastSyncTime(firebaseData.lastUpdated?.toDate?.() || new Date());
+      setLastSyncTime(new Date(jsonData.lastUpdated || Date.now()));
       return transformedData;
 
     } catch (error) {
       handleError(error, {
-        operation: 'loadFirebaseWorkforceData',
-        period: period,
+        operation: 'loadJsonData',
+        date: jsonDate,
         filters: activeFilters
       });
 
       // If it's just missing data, don't treat it as a hard error
       if (error.message.includes('No workforce data found')) {
-        console.warn(`No Firebase data available for ${period}, will use fallback data`);
+        console.warn(`No JSON data available for ${jsonDate}, will use fallback data`);
         setLocalError(null); // Clear error so fallback data can be used
         actions.clearError('workforce');
         return null; // Return null so dashboard can use fallback data
       }
 
-      // For actual Firebase connection errors, set error but don't throw
-      const errorMessage = `Failed to load workforce data from Firebase: ${error.message}`;
+      // For actual fetch errors, set error but don't throw
+      const errorMessage = `Failed to load workforce data: ${error.message}`;
       setLocalError(errorMessage);
       actions.setError('workforce', errorMessage);
       
@@ -202,7 +214,7 @@ const useFirebaseWorkforceData = (customFilters = {}) => {
       setLocalLoading(false);
       actions.setLoading('workforce', false);
     }
-  }, [activeFilters, getFirebasePeriod, getCacheKey, actions, handleError, workforceDataSchema]);
+  }, [activeFilters, getJsonFileDate, getCacheKey, actions, handleError, workforceDataSchema]);
 
   // Load data for a range of quarters
   const loadQuarterRangeData = useCallback(async (quarterRange) => {
@@ -233,11 +245,16 @@ const useFirebaseWorkforceData = (customFilters = {}) => {
       // Get quarters in the range
       const quartersInRange = allQuarters.slice(startIndex, endIndex + 1);
       
-      // Load data for each quarter
+      // Load data for each quarter from JSON files
       const quarterDataPromises = quartersInRange.map(async (quarter) => {
-        const period = getFirebasePeriod(quarter.value);
+        const jsonDate = getJsonFileDate(quarter.value);
         try {
-          const data = await firebaseService.getWorkforceMetrics(period);
+          const response = await fetch(`/data/workforce/${jsonDate}.json`);
+          if (!response.ok) {
+            console.warn(`No data file for ${quarter.value} (${jsonDate})`);
+            return { quarter: quarter.value, data: null };
+          }
+          const data = await response.json();
           return { quarter: quarter.value, data };
         } catch (error) {
           console.warn(`Failed to load data for ${quarter.value}:`, error);
@@ -281,155 +298,159 @@ const useFirebaseWorkforceData = (customFilters = {}) => {
       setLocalLoading(false);
       actions.setLoading('workforce', false);
     }
-  }, [getFirebasePeriod, actions, handleError]);
+  }, [getJsonFileDate, actions, handleError]);
 
-  // Transform Firebase aggregate data to component-expected format
-  const transformFirebaseToComponentFormat = useCallback((firebaseData) => {
-    if (!firebaseData) return null;
+  // Transform JSON data to component-expected format
+  const transformJsonToComponentFormat = useCallback((jsonData) => {
+    if (!jsonData) return null;
 
-    // Firebase data is already in aggregate format, so we transform it to match
-    // the existing component expectations
+    // Transform JSON data to match component expectations
     return {
       currentPeriod: {
-        quarter: firebaseData.period,
+        quarter: jsonData.quarter || jsonData.period,
         headcount: {
-          total: firebaseData.totalEmployees,
-          faculty: firebaseData.demographics?.faculty || 0,
-          staff: firebaseData.demographics?.staff || 0,
-          hsr: firebaseData.demographics?.hsr || 0,
-          students: firebaseData.demographics?.students || 0,
+          total: jsonData.metrics?.totalEmployees || jsonData.totalEmployees || 0,
+          faculty: jsonData.metrics?.faculty || jsonData.demographics?.faculty || 0,
+          staff: jsonData.metrics?.staff || jsonData.demographics?.staff || 0,
+          hsr: jsonData.metrics?.hsr || jsonData.demographics?.hsr || 0,
+          students: jsonData.metrics?.students || jsonData.demographics?.students || 0,
           // Include benefit-eligible specific counts
-          beFaculty: firebaseData.demographics?.beFaculty || 0,
-          beStaff: firebaseData.demographics?.beStaff || 0,
+          beFaculty: jsonData.demographics?.beFaculty || 0,
+          beStaff: jsonData.demographics?.beStaff || 0,
           changeFromPrevious: {
-            total: firebaseData.headcountChange || 0,
-            percentChange: firebaseData.trends?.quarterlyGrowth || 0,
-            faculty: Math.floor((firebaseData.demographics?.faculty || 0) * 0.02), // Estimated
-            staff: Math.floor((firebaseData.demographics?.staff || 0) * 0.015) // Estimated
+            total: jsonData.headcountChange || 0,
+            percentChange: jsonData.trends?.quarterlyGrowth || 0,
+            faculty: Math.floor((jsonData.metrics?.faculty || 0) * 0.02), // Estimated
+            staff: Math.floor((jsonData.metrics?.staff || 0) * 0.015) // Estimated
           }
         },
         positions: {
-          total: firebaseData.totalEmployees + Math.floor(firebaseData.totalEmployees * 0.08), // Estimated total positions
-          vacant: Math.floor(firebaseData.totalEmployees * 0.08), // Estimated vacancies
-          vacancyRate: 8.0, // Estimated
+          total: jsonData.metrics?.totalPositions || (jsonData.metrics?.totalEmployees || 0) + Math.floor((jsonData.metrics?.totalEmployees || 0) * 0.08),
+          vacant: jsonData.metrics?.vacancies || Math.floor((jsonData.metrics?.totalEmployees || 0) * 0.08),
+          vacancyRate: jsonData.metrics?.vacancyRate || 8.0,
           changeFromPrevious: {
             vacancyRateChange: -0.5 // Estimated improvement
           }
         },
-        locations: Object.entries(firebaseData.byLocation || {}).map(([name, count]) => ({
-          name: name,
-          total: count,
-          percentOfTotal: ((count / firebaseData.totalEmployees) * 100).toFixed(1),
+        locations: (jsonData.byLocation || []).map(loc => ({
+          name: loc.name || loc.location,
+          total: loc.count || loc.total || 0,
+          percentOfTotal: loc.percentage || ((loc.count / (jsonData.metrics?.totalEmployees || 1)) * 100).toFixed(1),
           breakdown: {
-            faculty: Math.floor(count * 0.4), // Estimated breakdown
-            staff: Math.floor(count * 0.5),
-            students: Math.floor(count * 0.1)
+            faculty: loc.faculty || Math.floor((loc.count || 0) * 0.4),
+            staff: loc.staff || Math.floor((loc.count || 0) * 0.5),
+            students: loc.students || Math.floor((loc.count || 0) * 0.1)
           }
         })),
-        topDivisions: Object.entries(firebaseData.byDepartment || {}).map(([name, count]) => ({
-          name: name,
-          headcount: count,
-          faculty: Math.floor(count * 0.45), // Estimated breakdown
-          staff: Math.floor(count * 0.55),
-          vacancies: Math.floor(count * 0.08),
-          vacancyRate: 8.0,
-          changeFromPrevious: Math.floor(Math.random() * 20 - 10) // Estimated change
+        topDivisions: (jsonData.byDivision || jsonData.byDepartment || []).map(div => ({
+          name: div.name || div.division,
+          headcount: div.count || div.headcount || 0,
+          faculty: div.faculty || Math.floor((div.count || 0) * 0.45),
+          staff: div.staff || Math.floor((div.count || 0) * 0.55),
+          vacancies: div.vacancies || Math.floor((div.count || 0) * 0.08),
+          vacancyRate: div.vacancyRate || 8.0,
+          changeFromPrevious: div.change || Math.floor(Math.random() * 20 - 10)
         }))
       },
-      historicalTrends: [
-        // Generate some historical trend data based on current data
+      historicalTrends: jsonData.historicalTrends || [
+        // Use provided historical data or generate based on current data
         {
-          quarter: firebaseData.period,
+          quarter: jsonData.quarter || jsonData.period,
           headcount: {
-            total: firebaseData.totalEmployees,
-            faculty: firebaseData.demographics?.faculty || 0,
-            staff: firebaseData.demographics?.staff || 0,
-            students: firebaseData.demographics?.students || 0
+            total: jsonData.metrics?.totalEmployees || 0,
+            faculty: jsonData.metrics?.faculty || 0,
+            staff: jsonData.metrics?.staff || 0,
+            students: jsonData.metrics?.students || 0
           },
           positions: {
-            vacancyRate: 8.0
+            vacancyRate: jsonData.metrics?.vacancyRate || 8.0
           }
         }
-        // In a real implementation, you'd fetch historical data separately
       ],
       startersLeaversDetail: {
-        monthlyData: [
-          // Generate estimated monthly data
+        monthlyData: jsonData.monthlyTrends || jsonData.startersLeavers || [
+          // Use provided data or generate defaults
           { month: 'Jan', starters: 45, leavers: 32, netChange: 13, categories: { starters: { faculty: 15, staff: 30 }, leavers: { faculty: 12, staff: 20 } } },
           { month: 'Feb', starters: 38, leavers: 28, netChange: 10, categories: { starters: { faculty: 12, staff: 26 }, leavers: { faculty: 10, staff: 18 } } },
           { month: 'Mar', starters: 52, leavers: 35, netChange: 17, categories: { starters: { faculty: 18, staff: 34 }, leavers: { faculty: 14, staff: 21 } } }
         ]
       },
-      demographics: {
+      demographics: jsonData.demographics || {
         ageGroups: [
-          { range: '22-30', count: Math.floor(firebaseData.totalEmployees * 0.25) },
-          { range: '31-40', count: Math.floor(firebaseData.totalEmployees * 0.30) },
-          { range: '41-50', count: Math.floor(firebaseData.totalEmployees * 0.25) },
-          { range: '51-65', count: Math.floor(firebaseData.totalEmployees * 0.20) }
+          { range: '22-30', count: Math.floor((jsonData.metrics?.totalEmployees || 0) * 0.25) },
+          { range: '31-40', count: Math.floor((jsonData.metrics?.totalEmployees || 0) * 0.30) },
+          { range: '41-50', count: Math.floor((jsonData.metrics?.totalEmployees || 0) * 0.25) },
+          { range: '51-65', count: Math.floor((jsonData.metrics?.totalEmployees || 0) * 0.20) }
         ],
         tenure: [
-          { range: '0-2 years', count: Math.floor(firebaseData.totalEmployees * 0.30) },
-          { range: '3-5 years', count: Math.floor(firebaseData.totalEmployees * 0.25) },
-          { range: '6-10 years', count: Math.floor(firebaseData.totalEmployees * 0.25) },
-          { range: '10+ years', count: Math.floor(firebaseData.totalEmployees * 0.20) }
+          { range: '0-2 years', count: Math.floor((jsonData.metrics?.totalEmployees || 0) * 0.30) },
+          { range: '3-5 years', count: Math.floor((jsonData.metrics?.totalEmployees || 0) * 0.25) },
+          { range: '6-10 years', count: Math.floor((jsonData.metrics?.totalEmployees || 0) * 0.25) },
+          { range: '10+ years', count: Math.floor((jsonData.metrics?.totalEmployees || 0) * 0.20) }
         ],
-        // Include benefit-eligible data from Firebase
-        beFaculty: firebaseData.demographics?.beFaculty || 0,
-        beStaff: firebaseData.demographics?.beStaff || 0,
-        nbeFaculty: firebaseData.demographics?.nbeFaculty || 0,
-        nbeStaff: firebaseData.demographics?.nbeStaff || 0
+        // Include benefit-eligible data
+        beFaculty: jsonData.demographics?.beFaculty || 0,
+        beStaff: jsonData.demographics?.beStaff || 0,
+        nbeFaculty: jsonData.demographics?.nbeFaculty || 0,
+        nbeStaff: jsonData.demographics?.nbeStaff || 0
       },
       // Include version and dataSource at root level for test compatibility
-      version: firebaseData.version || '2.0',
-      dataSource: firebaseData.dataSource || 'firebase',
+      version: jsonData.version || '3.0',
+      dataSource: 'json',
       metadata: {
-        source: 'firebase',
-        lastUpdated: firebaseData.lastUpdated,
-        period: firebaseData.period,
-        version: firebaseData.version || '2.0',
-        dataSource: firebaseData.dataSource || 'firebase'
+        source: 'json',
+        lastUpdated: jsonData.lastUpdated || new Date().toISOString(),
+        period: jsonData.quarter || jsonData.period,
+        version: jsonData.version || '3.0',
+        dataSource: 'json'
       }
     };
   }, []);
 
-  // Set up real-time subscription
-  const setupRealTimeSubscription = useCallback(() => {
-    const period = getFirebasePeriod(activeFilters.reportingPeriod);
-    
-    console.log(`Setting up real-time subscription for workforce data: ${period}`);
-    
-    const unsubscribe = firebaseService.subscribeToMetrics(
-      'workforce',
-      period,
-      (data) => {
-        if (data) {
-          console.log('Real-time workforce data update received');
-          const transformedData = transformFirebaseToComponentFormat(data);
-          setFirebaseData(transformedData);
-          setLastSyncTime(data.lastUpdated?.toDate?.() || new Date());
-          
-          // Update cache with real-time data
-          const cacheKey = getCacheKey(activeFilters);
-          globalCache.set(cacheKey, transformedData, {
-            ttl: CACHE_CONFIG.TTL,
-            params: { period, ...activeFilters },
-            metadata: {
-              version: CACHE_CONFIG.VERSION,
-              timestamp: Date.now(),
-              source: 'firebase-realtime',
-              period: period
-            }
-          });
+  // Simulate real-time updates with periodic polling (optional)
+  const setupPolling = useCallback(() => {
+    // For JSON files, we can poll periodically to check for updates
+    // This is optional and can be removed if not needed
+    const pollInterval = setInterval(async () => {
+      const jsonDate = getJsonFileDate(activeFilters.reportingPeriod);
+      try {
+        const response = await fetch(`/data/workforce/${jsonDate}.json`);
+        if (response.ok) {
+          const data = await response.json();
+          if (data && data.lastUpdated !== lastSyncTime?.toISOString()) {
+            console.log('JSON workforce data update detected');
+            const transformedData = transformJsonToComponentFormat(data);
+            setFirebaseData(transformedData);
+            setLastSyncTime(new Date(data.lastUpdated || Date.now()));
+            
+            // Update cache with new data
+            const cacheKey = getCacheKey(activeFilters);
+            globalCache.set(cacheKey, transformedData, {
+              ttl: CACHE_CONFIG.TTL,
+              params: { date: jsonDate, ...activeFilters },
+              metadata: {
+                version: CACHE_CONFIG.VERSION,
+                timestamp: Date.now(),
+                source: 'json-poll',
+                period: data.quarter || activeFilters.reportingPeriod
+              }
+            });
+          }
         }
+      } catch (error) {
+        console.warn('Polling error:', error);
       }
-    );
+    }, 60000); // Poll every minute
 
     setIsRealTimeActive(true);
-    return unsubscribe;
-  }, [activeFilters, getFirebasePeriod, getCacheKey, transformFirebaseToComponentFormat]);
+    return () => {
+      clearInterval(pollInterval);
+      setIsRealTimeActive(false);
+    };
+  }, [activeFilters, getJsonFileDate, getCacheKey, transformJsonToComponentFormat, lastSyncTime]);
 
-  // Filter data based on active filters (applied to Firebase data)
-  const filterFirebaseData = useCallback((data, filters) => {
+  // Filter data based on active filters
+  const filterJsonData = useCallback((data, filters) => {
     if (!data || !data.currentPeriod) return data;
 
     let filteredData = { ...data };
@@ -689,11 +710,11 @@ const useFirebaseWorkforceData = (customFilters = {}) => {
       version: data?.version || '2.0',
       dataSource: data?.dataSource || 'firebase',
 
-      // Firebase-specific metadata
+      // JSON data metadata
       firebase: {
         lastSyncTime: lastSyncTime,
-        isRealTime: isRealTimeActive,
-        source: data.metadata?.source || 'firebase'
+        isRealTime: false, // No real-time for JSON files
+        source: data.metadata?.source || 'json'
       },
 
       raw: data
@@ -721,13 +742,13 @@ const useFirebaseWorkforceData = (customFilters = {}) => {
           const rangeData = await loadQuarterRangeData(activeFilters.quarterRange);
           if (rangeData && rangeData.primaryData) {
             // Transform the primary data for display
-            data = transformFirebaseToComponentFormat(rangeData.primaryData);
+            data = transformJsonToComponentFormat(rangeData.primaryData);
             // Store the quarter range data for charts
             data.quarterRangeData = rangeData.quarterData;
           }
         } else {
           // Load single quarter data and automatically load last 5 periods for charts
-          data = await loadFirebaseData();
+          data = await loadJsonData();
           
           // Automatically load last 5 periods for time-series charts with timeout protection
           try {
@@ -761,9 +782,10 @@ const useFirebaseWorkforceData = (customFilters = {}) => {
           setFirebaseData(data);
           actions.updateDataTimestamp();
           
-          // Set up real-time subscription (only for single quarter mode)
+          // Set up polling for updates (optional, only for single quarter mode)
           if (!activeFilters.quarterRange) {
-            unsubscribeRealTime = setupRealTimeSubscription();
+            // Commenting out polling for now - can be enabled if needed
+            // unsubscribeRealTime = setupPolling();
           }
         }
         };
@@ -806,8 +828,8 @@ const useFirebaseWorkforceData = (customFilters = {}) => {
   // Compute filtered and formatted data
   const filteredData = useMemo(() => {
     if (!firebaseData) return null;
-    return filterFirebaseData(firebaseData, activeFilters);
-  }, [firebaseData, activeFilters, filterFirebaseData]);
+    return filterJsonData(firebaseData, activeFilters);
+  }, [firebaseData, activeFilters, filterJsonData]);
 
   const [formattedData, setFormattedData] = useState(null);
   
@@ -854,8 +876,8 @@ const useFirebaseWorkforceData = (customFilters = {}) => {
     const cacheKey = getCacheKey(activeFilters);
     await globalCache.delete(cacheKey, { params: activeFilters });
     setFirebaseData(null);
-    await loadFirebaseData();
-  }, [loadFirebaseData, getCacheKey, activeFilters]);
+    await loadJsonData();
+  }, [loadJsonData, getCacheKey, activeFilters]);
 
   const isStale = useCallback(() => {
     const cacheKey = getCacheKey(activeFilters);
