@@ -1,0 +1,75 @@
+{
+  "reportingDate": "2024-12-31",
+  "quarter": "Q4-2024",
+  "lastUpdated": "2025-01-01T08:00:00Z",
+  "metrics": {
+    "totalI9s": 867,
+    "section2OnTime": 756,
+    "section2Late": 111,
+    "section2Compliance": 87.2,
+    "overallCompliance": 88.5,
+    "reverifications": 28,
+    "auditReady": 82.4,
+    "pendingI9s": 44,
+    "expiringSoon": 22
+  },
+  "byEmployeeType": [
+    { "type": "Full-Time Faculty", "total": 333, "onTime": 321, "late": 12, "rate": 96.4 },
+    { "type": "Full-Time Staff", "total": 282, "onTime": 267, "late": 15, "rate": 94.7 },
+    { "type": "Part-Time Faculty", "total": 141, "onTime": 123, "late": 18, "rate": 87.2 },
+    { "type": "Part-Time Staff", "total": 96, "onTime": 82, "late": 14, "rate": 85.4 },
+    { "type": "Student Workers", "total": 208, "onTime": 175, "late": 33, "rate": 84.1 }
+  ],
+  "byLocation": [
+    { "location": "Omaha", "total": 626, "compliant": 554, "rate": 88.5 },
+    { "location": "Phoenix", "total": 241, "compliant": 213, "rate": 88.4 }
+  ],
+  "riskIndicators": [
+    { 
+      "category": "High Risk - Late Section 2",
+      "count": 111,
+      "severity": "high",
+      "description": "I-9s with Section 2 completed after 3-day deadline",
+      "trend": "decreasing"
+    },
+    {
+      "category": "Medium Risk - Missing Documents",
+      "count": 44,
+      "severity": "medium",
+      "description": "I-9s with incomplete or expired documentation",
+      "trend": "decreasing"
+    },
+    {
+      "category": "Low Risk - Reverifications Pending",
+      "count": 22,
+      "severity": "low",
+      "description": "Work authorizations expiring within 90 days",
+      "trend": "decreasing"
+    },
+    {
+      "category": "Critical - No Section 2",
+      "count": 7,
+      "severity": "critical",
+      "description": "Active employees with no Section 2 on file",
+      "trend": "decreasing"
+    }
+  ],
+  "quarterlyTrend": [
+    { "quarter": "Q1-2024", "compliance": 90.1, "processed": 742 },
+    { "quarter": "Q2-2024", "compliance": 87.8, "processed": 834 },
+    { "quarter": "Q3-2024", "compliance": 88.1, "processed": 856 },
+    { "quarter": "Q4-2024", "compliance": 88.5, "processed": 867 }
+  ],
+  "monthlyActivity": [
+    { "month": "October", "newI9s": 78, "reverifications": 9, "corrections": 12 },
+    { "month": "November", "newI9s": 80, "reverifications": 10, "corrections": 14 },
+    { "month": "December", "newI9s": 75, "reverifications": 9, "corrections": 9 }
+  ],
+  "auditFindings": {
+    "lastAuditDate": "2024-11-15",
+    "totalFindings": 11,
+    "criticalFindings": 2,
+    "resolvedFindings": 8,
+    "pendingFindings": 3
+  }
+}

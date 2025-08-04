@@ -1,0 +1,73 @@
+{
+  "quarter": "Q4-2024",
+  "reportingDate": "2024-12-31",
+  "lastUpdated": "2024-12-31T00:00:00Z",
+  "metrics": {
+    "totalExits": 92,
+    "totalResponses": 16,
+    "recommendationRate": 50,
+    "avgTenure": 2.2,
+    "exitInterviewCompletion": 17.4
+  },
+  "exitReasons": {
+    "Career Advancement": 32,
+    "Supervisor Issues": 28,
+    "Compensation": 16,
+    "Work-Life Balance": 10,
+    "Retirement": 8,
+    "Other": 6
+  },
+  "satisfaction": {
+    "Overall Experience": {
+      "satisfied": 38,
+      "neutral": 37,
+      "dissatisfied": 25
+    },
+    "Career Development": {
+      "satisfied": 25,
+      "neutral": 32,
+      "dissatisfied": 43
+    },
+    "Leadership": {
+      "satisfied": 42,
+      "neutral": 33,
+      "dissatisfied": 25
+    },
+    "Compensation": {
+      "satisfied": 32,
+      "neutral": 38,
+      "dissatisfied": 30
+    },
+    "Work Environment": {
+      "satisfied": 62,
+      "neutral": 23,
+      "dissatisfied": 15
+    }
+  },
+  "byDepartment": {
+    "School of Dentistry": {
+      "exits": 11,
+      "responses": 2
+    },
+    "Student Services": {
+      "exits": 14,
+      "responses": 2
+    },
+    "School of Medicine": {
+      "exits": 17,
+      "responses": 3
+    },
+    "Information Technology": {
+      "exits": 9,
+      "responses": 2
+    },
+    "Administration": {
+      "exits": 21,
+      "responses": 4
+    },
+    "Other Departments": {
+      "exits": 20,
+      "responses": 3
+    }
+  }
+}

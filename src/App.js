@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Navigation from './components/ui/Navigation';
 import ErrorBoundary from './components/ui/ErrorBoundary';
 import { DataSourceProvider } from './contexts/DataSourceContext';
+import { DashboardProvider } from './contexts/DashboardContext';
 import { setupGlobalErrorHandling } from './utils/errorHandler';
 import { DashboardSkeleton } from './components/ui/LoadingSkeleton';
 import './components/dashboards/I9Dashboard.css';
@@ -20,6 +21,7 @@ const DatabaseTestComponent = lazy(() => import('./components/testing/DatabaseTe
 const FirebaseTestComponent = lazy(() => import('./components/testing/FirebaseTestComponent'));
 const WorkforceDataTester = lazy(() => import('./components/testing/WorkforceDataTester'));
 const ExcelUploadTester = lazy(() => import('./components/testing/ExcelUploadTester'));
+const JsonDataTester = lazy(() => import('./components/testing/JsonDataTester'));
 const ExcelIntegrationDashboard = lazy(() => import('./components/dashboards/ExcelIntegrationDashboard'));
 const RecruitingDashboard = lazy(() => import('./components/dashboards/RecruitingDashboard'));
 const ExitSurveyDashboard = lazy(() => import('./components/dashboards/ExitSurveyDashboard'));
@@ -55,15 +57,16 @@ function App() {
 
   return (
     <DataSourceProvider>
-      <ErrorBoundary
-        onError={handleAppError}
-        onRetry={handleAppRetry}
-        showHomeButton={false}
-      >
-        <Router>
-          <div className="App flex h-screen bg-gray-50">
-            {/* Sidebar Navigation Component */}
-            <Navigation />
+      <DashboardProvider>
+        <ErrorBoundary
+          onError={handleAppError}
+          onRetry={handleAppRetry}
+          showHomeButton={false}
+        >
+          <Router>
+            <div className="App flex h-screen bg-gray-50">
+              {/* Sidebar Navigation Component */}
+              <Navigation />
             
             {/* Main Content Area */}
             <main className="flex-1 overflow-y-auto">
@@ -98,6 +101,7 @@ function App() {
               <Route path="/test/firebase" element={<FirebaseTestComponent />} />
               <Route path="/test/workforce-data" element={<WorkforceDataTester />} />
               <Route path="/test/excel-upload" element={<ExcelUploadTester />} />
+              <Route path="/test/json-data" element={<JsonDataTester />} />
               
               {/* Excel Integration Route */}
               <Route path="/excel-integration" element={<ExcelIntegrationDashboard />} />
@@ -122,6 +126,7 @@ function App() {
           </div>
         </Router>
       </ErrorBoundary>
+    </DashboardProvider>
     </DataSourceProvider>
   );
 }

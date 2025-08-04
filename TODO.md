@@ -36,6 +36,11 @@ This todo list tracks the Phase 11 objectives for user testing and dashboard ref
 
 ## Current Tasks
 
+### Exit Survey JSON Test Fix (Completed - August 4, 2025)
+- [x] **Fix JsonDataTester path issue** - Changed from camelCase 'exitSurvey' to kebab-case 'exit-survey' to match directory structure
+- [x] **Update useExitSurveyData hook** - Modified to fetch from JSON files instead of using hardcoded sample data
+- [x] **Transform data structure** - Updated data transformation logic to match actual JSON file structure
+
 ### Quarter Range Selection Implementation (In Progress)
 - [x] **Create QuarterRangeSelector component** - Built component with start/end quarter selection
 - [x] **Update CombinedWorkforceDashboard** - Replaced QuarterFilter with QuarterRangeSelector
@@ -45,6 +50,16 @@ This todo list tracks the Phase 11 objectives for user testing and dashboard ref
 - [ ] **Test implementation** - Verify functionality
 
 ## Completed Tasks (January 15, 2025)
+
+### ✅ Phase 1: JSON Data Setup - COMPLETED
+- [x] **Create useComplianceData.js hook** - Simple JSON data loading hook for compliance data
+- [x] **Create useRecruitingData.js hook** - Simple JSON data loading hook for recruiting data  
+- [x] **Create useExitSurveyData.js hook** - Simple JSON data loading hook for exit survey data
+- [x] **Create useSimpleWorkforceData.js** - Simple hook for loading from /public/data/workforce/
+- [x] **Create useSimpleTurnoverData.js** - Simple hook for quarterly turnover data structure
+- [x] **Create JsonDataTester.jsx** - Comprehensive test component for JSON data loading
+- [x] **Update WorkforceDataTester** - Added JSON/Firebase toggle for testing both data sources
+- [x] **Add JSON test route** - Added /test/json-data route to App.js for testing
 
 ### ✅ Quarter Range Selection Implementation
 **Status:** Mostly Complete - Ready for testing

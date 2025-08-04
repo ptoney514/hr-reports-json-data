@@ -1,0 +1,50 @@
+{
+  "reportingDate": "2024-09-30",
+  "quarter": "Q3-2024",
+  "lastUpdated": "2024-10-01T08:00:00Z",
+  "metrics": {
+    "overallRate": 8.1,
+    "voluntaryRate": 5.4,
+    "involuntaryRate": 2.7,
+    "totalDepartures": 193,
+    "retirements": 22,
+    "resignations": 138,
+    "terminations": 33,
+    "averageTenure": 5.3
+  },
+  "byReason": [
+    { "reason": "Better Opportunity", "count": 49, "percentage": 25.4 },
+    { "reason": "Career Change", "count": 33, "percentage": 17.1 },
+    { "reason": "Relocation", "count": 29, "percentage": 15.0 },
+    { "reason": "Retirement", "count": 22, "percentage": 11.4 },
+    { "reason": "Work-Life Balance", "count": 22, "percentage": 11.4 },
+    { "reason": "Compensation", "count": 19, "percentage": 9.8 },
+    { "reason": "Management", "count": 13, "percentage": 6.7 },
+    { "reason": "Other", "count": 6, "percentage": 3.1 }
+  ],
+  "byDivision": [
+    { "name": "Academic Affairs", "rate": 6.9, "departures": 46, "voluntary": 39, "involuntary": 7 },
+    { "name": "Health Sciences", "rate": 8.4, "departures": 39, "voluntary": 31, "involuntary": 8 },
+    { "name": "Student Affairs", "rate": 9.0, "departures": 33, "voluntary": 26, "involuntary": 7 },
+    { "name": "Finance & Admin", "rate": 7.7, "departures": 22, "voluntary": 18, "involuntary": 4 },
+    { "name": "Information Technology", "rate": 10.6, "departures": 29, "voluntary": 24, "involuntary": 5 }
+  ],
+  "byTenure": [
+    { "range": "0-1 year", "count": 69, "percentage": 35.8, "rate": 18.8 },
+    { "range": "1-2 years", "count": 43, "percentage": 22.3, "rate": 12.3 },
+    { "range": "2-5 years", "count": 39, "percentage": 20.2, "rate": 7.9 },
+    { "range": "5-10 years", "count": 27, "percentage": 14.0, "rate": 4.3 },
+    { "range": "10+ years", "count": 15, "percentage": 7.8, "rate": 2.2 }
+  ],
+  "monthlyTrend": [
+    { "month": "July", "departures": 64, "rate": 7.7 },
+    { "month": "August", "departures": 66, "rate": 8.0 },
+    { "month": "September", "departures": 63, "rate": 8.6 }
+  ],
+  "exitSurveyMetrics": {
+    "responseRate": 81.3,
+    "recommendEmployer": 67.1,
+    "satisfactionScore": 3.7,
+    "wouldRehire": 69.9
+  }
+}

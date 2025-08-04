@@ -330,6 +330,28 @@ const TestSuite = () => {
                 <div className="text-sm text-gray-600">Test compliance tracking</div>
               </div>
             </Link>
+            
+            <Link
+              to="/test/json-data"
+              className="flex items-center gap-3 p-4 border rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              <Database className="text-indigo-600" size={20} />
+              <div>
+                <div className="font-medium text-gray-900">JSON Data Tester</div>
+                <div className="text-sm text-gray-600">Test JSON data loading</div>
+              </div>
+            </Link>
+            
+            <Link
+              to="/test/workforce-data"
+              className="flex items-center gap-3 p-4 border rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              <BarChart3 className="text-teal-600" size={20} />
+              <div>
+                <div className="font-medium text-gray-900">Workforce Data Tester</div>
+                <div className="text-sm text-gray-600">Test workforce data accuracy</div>
+              </div>
+            </Link>
           </div>
         </div>
       </div>

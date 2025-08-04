@@ -8,20 +8,25 @@ import {
   Database,
   Eye,
   Download,
-  RefreshCw
+  RefreshCw,
+  ToggleLeft,
+  ToggleRight
 } from 'lucide-react';
 import { QUARTER_DATES } from '../../utils/quarterlyDataProcessor';
 import useFirebaseWorkforceData from '../../hooks/useFirebaseWorkforceData';
+import useSimpleWorkforceData from '../../hooks/useSimpleWorkforceData';
 
 /**
  * Comprehensive testing framework for Workforce Analytics dashboard
  * Validates data accuracy, calculations, and consistency
+ * Now supports both Firebase and JSON data sources
  */
 const WorkforceDataTester = () => {
   const [selectedQuarter, setSelectedQuarter] = useState('Q1-2025');
   const [testResults, setTestResults] = useState({});
   const [isRunningTests, setIsRunningTests] = useState(false);
   const [testMode, setTestMode] = useState('all'); // 'all', 'calculations', 'consistency', 'charts'
+  const [dataSource, setDataSource] = useState('firebase'); // 'firebase' or 'json'
 
   // Get Firebase data for testing
   const { 
@@ -29,6 +34,18 @@ const WorkforceDataTester = () => {
     loading: firebaseLoading, 
     error: firebaseError 
   } = useFirebaseWorkforceData({ reportingPeriod: selectedQuarter });
+
+  // Get JSON data for testing
+  const {
+    data: jsonData,
+    loading: jsonLoading,
+    error: jsonError
+  } = useSimpleWorkforceData();
+
+  // Select data based on source
+  const currentData = dataSource === 'firebase' ? firebaseData : jsonData;
+  const currentLoading = dataSource === 'firebase' ? firebaseLoading : jsonLoading;
+  const currentError = dataSource === 'firebase' ? firebaseError : jsonError;
 
   // Test categories
   const testCategories = {
@@ -87,8 +104,8 @@ const WorkforceDataTester = () => {
   const testSummaryCalculations = async () => {
     const tests = [];
     
-    if (firebaseData && firebaseData.summary) {
-      const summary = firebaseData.summary;
+    if (currentData && currentData.summary) {
+      const summary = currentData.summary;
       
       // Test 1: Total headcount should equal faculty + staff + students
       const calculatedTotal = (summary.faculty || 0) + (summary.staff || 0) + (summary.students || 0);
@@ -106,7 +123,7 @@ const WorkforceDataTester = () => {
       });
 
       // Test 2: Recent hires should be positive number
-      const recentHires = firebaseData.metrics?.recentHires;
+      const recentHires = currentData.metrics?.recentHires;
       if (recentHires) {
         const totalHires = (recentHires.faculty || 0) + (recentHires.staff || 0) + (recentHires.students || 0);
         tests.push({
@@ -136,12 +153,12 @@ const WorkforceDataTester = () => {
       });
     } else {
       tests.push({
-        name: 'Firebase Data Availability',
-        description: 'Firebase data should be available for testing',
-        expected: 'Firebase data object',
-        actual: firebaseData ? 'Available' : 'Not available',
-        status: firebaseData ? 'pass' : 'fail',
-        details: firebaseError || 'No Firebase data found'
+        name: `${dataSource === 'firebase' ? 'Firebase' : 'JSON'} Data Availability`,
+        description: `${dataSource === 'firebase' ? 'Firebase' : 'JSON'} data should be available for testing`,
+        expected: 'Data object',
+        actual: currentData ? 'Available' : 'Not available',
+        status: currentData ? 'pass' : 'fail',
+        details: currentError || 'No data found'
       });
     }
 
@@ -170,13 +187,13 @@ const WorkforceDataTester = () => {
     });
 
     // Test: Data source consistency
-    if (firebaseData) {
-      const dataSourceTest = firebaseData.version && firebaseData.dataSource;
+    if (currentData) {
+      const dataSourceTest = currentData.version && currentData.dataSource;
       tests.push({
         name: 'Data Source Consistency',
         description: 'Data should have consistent source and version information',
         expected: 'Version and source metadata',
-        actual: `Version: ${firebaseData.version || 'Unknown'}, Source: ${firebaseData.dataSource || 'Unknown'}`,
+        actual: `Version: ${currentData.version || 'Unknown'}, Source: ${currentData.dataSource || 'Unknown'}`,
         status: dataSourceTest ? 'pass' : 'warning',
         details: 'Helps track data lineage and versions'
       });
@@ -210,13 +227,13 @@ const WorkforceDataTester = () => {
     });
 
     // Test: Chart data should exist for visualization
-    if (firebaseData && firebaseData.breakdowns) {
-      const hasDivisions = firebaseData.breakdowns.divisions && firebaseData.breakdowns.divisions.length > 0;
+    if (currentData && currentData.breakdowns) {
+      const hasDivisions = currentData.breakdowns.divisions && currentData.breakdowns.divisions.length > 0;
       tests.push({
         name: 'Division Chart Data',
         description: 'Division breakdown data should be available for charts',
         expected: 'Array of division data',
-        actual: hasDivisions ? `${firebaseData.breakdowns.divisions.length} divisions` : 'No division data',
+        actual: hasDivisions ? `${currentData.breakdowns.divisions.length} divisions` : 'No division data',
         status: hasDivisions ? 'pass' : 'warning',
         details: 'Needed for Top Divisions chart'
       });
@@ -247,13 +264,13 @@ const WorkforceDataTester = () => {
     });
 
     // Test: Data structure validation
-    if (firebaseData) {
-      const hasRequiredFields = firebaseData.summary && firebaseData.metrics;
+    if (currentData) {
+      const hasRequiredFields = currentData.summary && currentData.metrics;
       tests.push({
         name: 'Data Structure Validation',
         description: 'Firebase data should have required summary and metrics fields',
         expected: 'Summary and metrics objects',
-        actual: `Summary: ${!!firebaseData.summary}, Metrics: ${!!firebaseData.metrics}`,
+        actual: `Summary: ${!!currentData.summary}, Metrics: ${!!currentData.metrics}`,
         status: hasRequiredFields ? 'pass' : 'fail',
         details: 'Required for dashboard functionality'
       });
@@ -351,6 +368,26 @@ const WorkforceDataTester = () => {
               <option value="consistency">Consistency Only</option>
               <option value="charts">Charts Only</option>
             </select>
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Data Source</label>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setDataSource(dataSource === 'firebase' ? 'json' : 'firebase')}
+                className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
+              >
+                {dataSource === 'firebase' ? <ToggleLeft size={20} /> : <ToggleRight size={20} />}
+                <span className="text-sm font-medium">
+                  {dataSource === 'firebase' ? 'Firebase' : 'JSON Files'}
+                </span>
+              </button>
+              <span className={`text-xs px-2 py-1 rounded ${
+                dataSource === 'firebase' ? 'bg-orange-100 text-orange-700' : 'bg-blue-100 text-blue-700'
+              }`}>
+                {dataSource === 'firebase' ? 'Live Firebase' : 'Local JSON'}
+              </span>
+            </div>
           </div>
           
           <div className="flex gap-2 mt-6">

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { ArrowUpCircle, Wifi, WifiOff, UserPlus, Filter, Download } from 'lucide-react';
-import useFirebaseRecruitingData from '../../hooks/useFirebaseRecruitingData';
+import useSimpleRecruitingData from '../../hooks/useSimpleRecruitingData';
 import QuarterFilter from '../ui/QuarterFilter';
 
 // Fallback data to ensure the dashboard always works
@@ -40,16 +40,16 @@ const FALLBACK_DATA = {
 const RecruitingDashboard = () => {
   const [selectedQuarter, setSelectedQuarter] = useState('2025-Q2');
   
-  // Use Firebase data with fallback
+  // Use JSON data with fallback
   const { 
-    data: firebaseData, 
+    data: jsonData, 
     loading, 
     isRealTime, 
     lastSyncTime 
-  } = useFirebaseRecruitingData(selectedQuarter);
+  } = useSimpleRecruitingData(selectedQuarter);
 
-  // Use Firebase data if available, otherwise fallback
-  const data = firebaseData || FALLBACK_DATA;
+  // Use JSON data if available, otherwise fallback
+  const data = jsonData || FALLBACK_DATA;
   const { recruitingData, openPositionsByDept, hireSourceData, timeToFillData } = data;
 
   const handleQuarterChange = (quarter) => {
@@ -98,7 +98,7 @@ const RecruitingDashboard = () => {
                   </p>
                   <div className="flex items-center gap-2 text-sm text-gray-600 print:hidden">
                     <span className={isRealTime ? 'text-green-600' : 'text-gray-400'}>
-                      {isRealTime ? '🔴 Live' : '📊 Cached'} (Firebase)
+                      {isRealTime ? '🔴 Live' : '📊 Cached'} (JSON)
                     </span>
                     {isRealTime && <Wifi size={14} className="text-green-500" />}
                     {!isRealTime && <WifiOff size={14} className="text-gray-400" />}

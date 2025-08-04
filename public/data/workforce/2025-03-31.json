@@ -1,0 +1,57 @@
+{
+  "reportingDate": "2025-03-31",
+  "quarter": "Q1-2025",
+  "lastUpdated": "2025-04-01T08:00:00Z",
+  "metrics": {
+    "totalEmployees": 7189,
+    "faculty": 3212,
+    "staff": 2445,
+    "students": 1532,
+    "hsr": 428,
+    "hsrOmaha": 286,
+    "hsrPhoenix": 142,
+    "beFaculty": 2871,
+    "beStaff": 2089,
+    "nbeFaculty": 341,
+    "nbeStaff": 356,
+    "studentOmaha": 1114,
+    "studentPhoenix": 418,
+    "vacancyRate": 8.5,
+    "vacancies": 611,
+    "totalPositions": 7800,
+    "newHires": 218,
+    "departures": 201,
+    "netChange": 17,
+    "turnoverRate": 8.1
+  },
+  "byLocation": {
+    "Omaha": 5198,
+    "Phoenix": 1991
+  },
+  "byDivision": [
+    { "name": "Academic Affairs", "count": 2328, "faculty": 1862, "staff": 466, "vacancyRate": 7.5 },
+    { "name": "Health Sciences", "count": 1862, "faculty": 980, "staff": 882, "vacancyRate": 9.3 },
+    { "name": "Student Affairs", "count": 1425, "faculty": 232, "staff": 1193, "vacancyRate": 7.0 },
+    { "name": "Finance & Admin", "count": 886, "faculty": 44, "staff": 842, "vacancyRate": 8.7 },
+    { "name": "Information Technology", "count": 688, "faculty": 94, "staff": 594, "vacancyRate": 10.5 }
+  ],
+  "monthlyTrends": [
+    { "month": "January", "starters": 72, "leavers": 68, "netChange": 4 },
+    { "month": "February", "starters": 71, "leavers": 67, "netChange": 4 },
+    { "month": "March", "starters": 75, "leavers": 66, "netChange": 9 }
+  ],
+  "demographics": {
+    "ageGroups": [
+      { "range": "22-30", "count": 1797, "percentage": 25 },
+      { "range": "31-40", "count": 2157, "percentage": 30 },
+      { "range": "41-50", "count": 1797, "percentage": 25 },
+      { "range": "51-65", "count": 1438, "percentage": 20 }
+    ],
+    "tenure": [
+      { "range": "0-2 years", "count": 2157, "percentage": 30 },
+      { "range": "3-5 years", "count": 1797, "percentage": 25 },
+      { "range": "6-10 years", "count": 1797, "percentage": 25 },
+      { "range": "10+ years", "count": 1438, "percentage": 20 }
+    ]
+  }
+}

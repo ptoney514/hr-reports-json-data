@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { ArrowDownCircle, Wifi, WifiOff, Filter, Download, LogOut } from 'lucide-react';
-import useFirebaseExitSurveyData from '../../hooks/useFirebaseExitSurveyData';
+import useSimpleExitSurveyData from '../../hooks/useSimpleExitSurveyData';
+import QuarterFilter from '../ui/QuarterFilter';
 
 // Enhanced fallback data matching the screenshot for better visual testing
 const FALLBACK_DATA = {
@@ -60,17 +61,19 @@ const FALLBACK_DATA = {
 };
 
 const ExitSurveyDashboard = () => {
-  // Use Firebase data with fallback
+  const [selectedQuarter, setSelectedQuarter] = useState('2025-Q2');
+
+  // Use JSON data with fallback
   const { 
-    data: firebaseData, 
+    data: jsonData, 
     loading, 
     error, 
     isRealTime, 
     lastSyncTime 
-  } = useFirebaseExitSurveyData('2025-Q1');
+  } = useSimpleExitSurveyData(selectedQuarter);
 
-  // Use Firebase data if available, otherwise fallback
-  const data = firebaseData || FALLBACK_DATA;
+  // Use JSON data if available, otherwise fallback
+  const data = jsonData || FALLBACK_DATA;
   const { 
     exitSurveyData = FALLBACK_DATA.exitSurveyData, 
     exitReasons = FALLBACK_DATA.exitReasons, 
@@ -80,7 +83,7 @@ const ExitSurveyDashboard = () => {
     summaryText = FALLBACK_DATA.summaryText 
   } = data;
 
-  // Show loading state only if Firebase is actively loading AND no fallback data available
+  // Show loading state only if JSON data is actively loading AND no fallback data available
   if (loading && !data) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -96,13 +99,17 @@ const ExitSurveyDashboard = () => {
 
   // Debug logging to check data
   console.log('Exit Survey Data Debug:', {
-    firebaseData,
+    jsonData,
     fallbackData: FALLBACK_DATA,
     finalData: data,
     exitReasons,
     satisfactionData,
     exitSurveyData
   });
+
+  const handleQuarterChange = (quarter) => {
+    setSelectedQuarter(quarter);
+  };
 
   const handleFilterClick = () => {
     console.log('Filter clicked');
@@ -115,21 +122,68 @@ const ExitSurveyDashboard = () => {
   return (
     <div className="min-h-screen bg-gray-50 py-8 dashboard-container print:bg-white print:py-0">
       <div className="max-w-7xl mx-auto px-4 print:max-w-none print:px-0 print:mx-0">
-        {/* Header - Match Turnover dashboard layout exactly */}
-        <div className="mb-6 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <LogOut className="text-blue-600" size={24} />
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Exit Survey Insights</h1>
-              <p className="text-gray-600 text-sm mt-1">
-                FY 2025 | {isRealTime ? '🔴 Live' : '📊 Cached'} ({firebaseData ? 'Firebase' : 'Local'})
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3 no-print">
-            <div className="flex items-center gap-2 text-sm text-gray-600">
-              <span className="px-2 py-1 bg-blue-100 rounded">FY25 Q3</span>
-              <span className="px-2 py-1 bg-blue-100 rounded">{exitSurveyData.totalResponses} Responses</span>
+        {/* Professional Header Card */}
+        <div className="bg-white rounded-lg shadow-sm border mb-6 print:mb-4 print:shadow-none">
+          <div className="p-6 print:p-4">
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+              {/* Title Section */}
+              <div className="flex items-center gap-3">
+                <div className="flex-shrink-0">
+                  <LogOut className="w-8 h-8 text-blue-600 print:text-black" />
+                </div>
+                <div>
+                  <h1 className="text-2xl print:text-xl font-bold text-gray-900 print:text-black">
+                    Exit Survey Insights Dashboard
+                  </h1>
+                  <div className="flex items-center gap-4 mt-1">
+                    <p className="text-sm print:text-xs text-gray-600 print:text-black">
+                      Generated: {new Date().toLocaleDateString()} | University-wide
+                    </p>
+                    <div className="flex items-center gap-2 text-sm text-gray-600 print:hidden">
+                      <span className={isRealTime ? 'text-green-600' : 'text-gray-400'}>
+                        {isRealTime ? '🔴 Live' : '📊 Cached'} (JSON)
+                      </span>
+                      {isRealTime && <Wifi size={14} className="text-green-500" />}
+                      {!isRealTime && <WifiOff size={14} className="text-gray-400" />}
+                      {lastSyncTime && (
+                        <span className="text-xs">
+                          | Last sync: {lastSyncTime.toLocaleTimeString()}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Controls Section */}
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 print:hidden">
+                <div className="flex items-center gap-3">
+                  <QuarterFilter
+                    selectedQuarter={selectedQuarter}
+                    onQuarterChange={handleQuarterChange}
+                    className="min-w-[200px]"
+                    showIcon={false}
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <button 
+                    className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+                    onClick={handleFilterClick}
+                    aria-label="Open filters"
+                  >
+                    <Filter size={16} className="text-gray-600" />
+                    <span className="text-sm font-medium text-gray-700">Filters</span>
+                  </button>
+                  <button 
+                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+                    onClick={handleExportClick}
+                    aria-label="Export dashboard as PDF"
+                  >
+                    <Download size={16} />
+                    <span className="text-sm font-medium">Export</span>
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>

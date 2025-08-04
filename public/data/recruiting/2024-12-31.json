@@ -1,0 +1,64 @@
+{
+  "quarter": "Q4-2024",
+  "reportingDate": "2024-12-31",
+  "lastUpdated": "2024-12-31T00:00:00Z",
+  "metrics": {
+    "totalOpenPositions": 134,
+    "postedPositions": 91,
+    "notPostedPositions": 43,
+    "newHiresYTD": 205,
+    "costPerHire": 4500
+  },
+  "byDepartment": {
+    "Academic Affairs": {
+      "open": 30,
+      "posted": 21,
+      "notPosted": 9,
+      "filled": 31
+    },
+    "Student Services": {
+      "open": 24,
+      "posted": 17,
+      "notPosted": 7,
+      "filled": 25
+    },
+    "Administration": {
+      "open": 21,
+      "posted": 16,
+      "notPosted": 5,
+      "filled": 29
+    },
+    "Research": {
+      "open": 18,
+      "posted": 13,
+      "notPosted": 5,
+      "filled": 22
+    },
+    "Health Sciences": {
+      "open": 26,
+      "posted": 17,
+      "notPosted": 9,
+      "filled": 37
+    },
+    "Other": {
+      "open": 15,
+      "posted": 7,
+      "notPosted": 8,
+      "filled": 61
+    }
+  },
+  "hireSources": {
+    "Employee Referral": 62,
+    "University Career Page": 47,
+    "LinkedIn": 31,
+    "Higher Ed Jobs": 26,
+    "Indeed": 23,
+    "Other": 16
+  },
+  "timeToFill": [
+    { "quarter": "Q1-24", "avgDays": 58, "target": 45 },
+    { "quarter": "Q2-24", "avgDays": 55, "target": 45 },
+    { "quarter": "Q3-24", "avgDays": 52, "target": 45 },
+    { "quarter": "Q4-24", "avgDays": 48, "target": 45 }
+  ]
+}
