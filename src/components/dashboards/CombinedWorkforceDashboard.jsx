@@ -16,7 +16,7 @@ import {
   calculateLocationBreakdown
 } from '../../utils/quarterlyDataProcessor';
 import { generateWorkforceMetrics } from '../../utils/workforceDataProcessor';
-import useFirebaseWorkforceData from '../../hooks/useFirebaseWorkforceData';
+import useWorkforceData from '../../hooks/useWorkforceData';
 import { 
   formatDateRange, 
   getDateRangeType, 
@@ -54,13 +54,13 @@ const CombinedWorkforceDashboard = () => {
   // For backward compatibility with existing code that uses selectedQuarter
   const selectedQuarter = reportingPeriod;
 
-  // Firebase data integration
+  // JSON data integration
   const { 
-    data: firebaseData, 
-    loading: firebaseLoading, 
-    error: firebaseError,
+    data: jsonData, 
+    loading: jsonLoading, 
+    error: jsonError,
     isRealTimeActive 
-  } = useFirebaseWorkforceData({
+  } = useWorkforceData({
     reportingPeriod: reportingPeriod,
     employeeTypeFilter: filters.employeeType
   });
@@ -77,7 +77,7 @@ const CombinedWorkforceDashboard = () => {
   });
   
   // Data source state
-  const [dataSource, setDataSource] = useState('sample'); // 'sample', 'firebase', 'empty'
+  const [dataSource, setDataSource] = useState('sample'); // 'sample', 'json', 'empty'
   const [quarterlyData, setQuarterlyData] = useState(null);
   const [quarterConfigLoading, setQuarterConfigLoading] = useState(true);
   const [quarterConfigError, setQuarterConfigError] = useState(null);
@@ -170,45 +170,45 @@ const CombinedWorkforceDashboard = () => {
   // Handle data source manual switch (for testing)
   const handleDataSourceSwitch = (newSource) => {
     if (newSource === 'empty') {
-      localStorage.setItem('firebase_data_cleared', Date.now().toString());
+      localStorage.setItem('data_store_cleared', Date.now().toString());
     } else {
-      localStorage.removeItem('firebase_data_cleared');
+      localStorage.removeItem('data_store_cleared');
     }
     setDataSource(newSource);
   };
 
-  // Handle Firebase data integration with empty state detection
+  // Handle JSON data integration with empty state detection
   useEffect(() => {
     if (testingMode && dataSource === 'empty') {
       // In testing mode, keep empty state if manually set
       return;
     }
     
-    if (firebaseData && Object.keys(firebaseData).length > 0) {
-      console.log('Firebase data loaded:', firebaseData);
-      setDataSource('firebase');
+    if (jsonData && Object.keys(jsonData).length > 0) {
+      console.log('JSON data loaded:', jsonData);
+      setDataSource('json');
     } else {
-      // Check if we just cleared Firebase data (for testing)
+      // Check if we just cleared JSON data (for testing)
       // If we recently cleared data, show empty state instead of sample
-      const recentlyClearedData = localStorage.getItem('firebase_data_cleared');
+      const recentlyClearedData = localStorage.getItem('data_store_cleared');
       if (recentlyClearedData) {
         const clearedTime = parseInt(recentlyClearedData);
         const now = Date.now();
         // If cleared within last 5 minutes, show empty state
         if (now - clearedTime < 5 * 60 * 1000) {
-          console.log('Recently cleared Firebase data, showing empty state');
+          console.log('Recently cleared JSON data, showing empty state');
           setDataSource('empty');
           return;
         } else {
           // Clear the flag after 5 minutes
-          localStorage.removeItem('firebase_data_cleared');
+          localStorage.removeItem('data_store_cleared');
         }
       }
       
-      console.log('No Firebase data found, using sample data');
+      console.log('No JSON data found, using sample data');
       setDataSource('sample');
     }
-  }, [firebaseData, testingMode, dataSource]);
+  }, [jsonData, testingMode, dataSource]);
 
   // Initialize quarter config and handle any loading issues
   useEffect(() => {
@@ -234,7 +234,7 @@ const CombinedWorkforceDashboard = () => {
     initializeQuarterConfig();
   }, []);
 
-  // Initialize with sample data only if no Firebase data
+  // Initialize with sample data only if no JSON data
   useEffect(() => {
     // Don't initialize data if quarter config is still loading or has errors
     if (quarterConfigLoading || quarterConfigError) {
@@ -242,8 +242,8 @@ const CombinedWorkforceDashboard = () => {
       return;
     }
     
-    if (!firebaseData || Object.keys(firebaseData).length === 0) {
-      console.log('No Firebase data found, using sample data');
+    if (!jsonData || Object.keys(jsonData).length === 0) {
+      console.log('No JSON data found, using sample data');
       
       try {
         // Generate sample data for demonstration
@@ -284,7 +284,7 @@ const CombinedWorkforceDashboard = () => {
         setDataSource('empty');
       }
     }
-  }, [firebaseData, quarterConfigLoading, quarterConfigError]);
+  }, [jsonData, quarterConfigLoading, quarterConfigError]);
 
   // Update metrics when quarter or data changes
   useEffect(() => {
@@ -299,69 +299,69 @@ const CombinedWorkforceDashboard = () => {
       console.log('Using empty state data for metrics');
       setHeadcountData(emptyStateData.headcount);
       setAdditionalMetrics(emptyStateData.additionalMetrics);
-    } else if (dataSource === 'firebase' && firebaseData && Object.keys(firebaseData).length > 0) {
-      // Use Firebase data directly for metrics
-      console.log('Using Firebase data for metrics');
-      console.log('🎯 DEBUG: Firebase summary data:', firebaseData.summary);
-      console.log('🎯 DEBUG: New Hires Change:', firebaseData.summary?.newHiresChange);
-      console.log('🎯 DEBUG: Departures Change:', firebaseData.summary?.deparuresChange);
-      console.log('🎯 DEBUG: Employee Change:', firebaseData.summary?.employeeChange);
-      console.log('🎯 DEBUG: Faculty Change:', firebaseData.summary?.facultyChange);
+    } else if (dataSource === 'json' && jsonData && Object.keys(jsonData).length > 0) {
+      // Use JSON data directly for metrics
+      console.log('Using JSON data for metrics');
+      console.log('🎯 DEBUG: JSON summary data:', jsonData.summary);
+      console.log('🎯 DEBUG: New Hires Change:', jsonData.summary?.newHiresChange);
+      console.log('🎯 DEBUG: Departures Change:', jsonData.summary?.deparuresChange);
+      console.log('🎯 DEBUG: Employee Change:', jsonData.summary?.employeeChange);
+      console.log('🎯 DEBUG: Faculty Change:', jsonData.summary?.facultyChange);
       
       // Calculate benefit-eligible totals
-      const beFaculty = firebaseData.summary?.beFaculty || firebaseData.demographics?.beFaculty || 0;
-      const beStaff = firebaseData.summary?.beStaff || firebaseData.demographics?.beStaff || 0;
+      const beFaculty = jsonData.summary?.beFaculty || jsonData.demographics?.beFaculty || 0;
+      const beStaff = jsonData.summary?.beStaff || jsonData.demographics?.beStaff || 0;
       
       // Calculate HSR and Students totals
-      const hsrOmaha = firebaseData.summary?.hsrOmaha || 0;
-      const hsrPhoenix = firebaseData.summary?.hsrPhoenix || 0;
+      const hsrOmaha = jsonData.summary?.hsrOmaha || 0;
+      const hsrPhoenix = jsonData.summary?.hsrPhoenix || 0;
       const hsrTotal = hsrOmaha + hsrPhoenix;
       
       // BE Total includes Faculty + Staff + HSR (all are benefit eligible)
       const beTotalEmployees = beFaculty + beStaff + hsrTotal;
       
-      const studentOmaha = firebaseData.summary?.studentOmaha || 0;
-      const studentPhoenix = firebaseData.summary?.studentPhoenix || 0;
+      const studentOmaha = jsonData.summary?.studentOmaha || 0;
+      const studentPhoenix = jsonData.summary?.studentPhoenix || 0;
       const studentsTotal = studentOmaha + studentPhoenix;
       
       const metrics = {
-        beTotal: { value: beTotalEmployees, change: ((firebaseData.summary?.facultyChange ?? 0) + (firebaseData.summary?.staffChange ?? 0) + (firebaseData.summary?.hsrChange ?? 0)) / 3, subtitle: "change", changeType: "percentage", indicator: "blue" },
-        faculty: { value: beFaculty, change: firebaseData.summary?.facultyChange ?? null, subtitle: "change", changeType: "percentage", indicator: "green" },
-        staff: { value: beStaff, change: firebaseData.summary?.staffChange ?? null, subtitle: "change", changeType: "percentage", indicator: "yellow" },
-        hsr: { value: hsrTotal, change: firebaseData.summary?.hsrChange ?? null, subtitle: "change", changeType: "percentage", indicator: "purple" },
-        students: { value: studentsTotal, change: firebaseData.summary?.studentsChange ?? null, subtitle: "change", changeType: "percentage", indicator: "teal" },
-        newHires: { value: (firebaseData.metrics?.recentHires?.faculty || 0) + (firebaseData.metrics?.recentHires?.staff || 0), change: firebaseData.summary?.newHiresChange ?? 12.5, subtitle: "change", changeType: "percentage", indicator: "teal" },
-        leavers: { value: Math.floor((firebaseData.summary?.totalEmployees || 0) * 0.05), change: firebaseData.summary?.deparuresChange ?? -8.3, subtitle: "change", changeType: "percentage", indicator: "blue" }
+        beTotal: { value: beTotalEmployees, change: ((jsonData.summary?.facultyChange ?? 0) + (jsonData.summary?.staffChange ?? 0) + (jsonData.summary?.hsrChange ?? 0)) / 3, subtitle: "change", changeType: "percentage", indicator: "blue" },
+        faculty: { value: beFaculty, change: jsonData.summary?.facultyChange ?? null, subtitle: "change", changeType: "percentage", indicator: "green" },
+        staff: { value: beStaff, change: jsonData.summary?.staffChange ?? null, subtitle: "change", changeType: "percentage", indicator: "yellow" },
+        hsr: { value: hsrTotal, change: jsonData.summary?.hsrChange ?? null, subtitle: "change", changeType: "percentage", indicator: "purple" },
+        students: { value: studentsTotal, change: jsonData.summary?.studentsChange ?? null, subtitle: "change", changeType: "percentage", indicator: "teal" },
+        newHires: { value: (jsonData.metrics?.recentHires?.faculty || 0) + (jsonData.metrics?.recentHires?.staff || 0), change: jsonData.summary?.newHiresChange ?? 12.5, subtitle: "change", changeType: "percentage", indicator: "teal" },
+        leavers: { value: Math.floor((jsonData.summary?.totalEmployees || 0) * 0.05), change: jsonData.summary?.deparuresChange ?? -8.3, subtitle: "change", changeType: "percentage", indicator: "blue" }
       };
       console.log('🎯 DEBUG: Generated metrics for cards:', metrics);
       console.log('🎯 DEBUG: NewHires change value specifically:', metrics.newHires.change);
       console.log('🎯 DEBUG: Leavers change value specifically:', metrics.leavers.change);
       setHeadcountData(metrics);
       
-      // Update additional metrics from Firebase data
-      if (firebaseData.metrics) {
+      // Update additional metrics from JSON data
+      if (jsonData.metrics) {
         setAdditionalMetrics({
           recentHires: {
-            faculty: firebaseData.metrics.recentHires?.faculty || 23,
-            staff: firebaseData.metrics.recentHires?.staff || 34,
-            students: firebaseData.metrics.recentHires?.students || 12
+            faculty: jsonData.metrics.recentHires?.faculty || 23,
+            staff: jsonData.metrics.recentHires?.staff || 34,
+            students: jsonData.metrics.recentHires?.students || 12
           },
           demographics: {
-            averageTenure: firebaseData.metrics.demographics?.averageTenure || '8.2',
-            averageAge: firebaseData.metrics.demographics?.averageAge || '42',
-            genderRatio: firebaseData.metrics.demographics?.genderRatio || '52/48',
-            diversityIndex: firebaseData.metrics.demographics?.diversityIndex || '34'
+            averageTenure: jsonData.metrics.demographics?.averageTenure || '8.2',
+            averageAge: jsonData.metrics.demographics?.averageAge || '42',
+            genderRatio: jsonData.metrics.demographics?.genderRatio || '52/48',
+            diversityIndex: jsonData.metrics.demographics?.diversityIndex || '34'
           },
           campuses: {
             omaha: {
-              percentage: firebaseData.metrics.campuses?.omaha?.percentage || 94.4,
-              employees: firebaseData.metrics.campuses?.omaha?.employees || 2687
+              percentage: jsonData.metrics.campuses?.omaha?.percentage || 94.4,
+              employees: jsonData.metrics.campuses?.omaha?.employees || 2687
             },
             phoenix: {
-              percentage: firebaseData.metrics.campuses?.phoenix?.percentage || 5.6,
-              employees: firebaseData.metrics.campuses?.phoenix?.employees || 160
+              percentage: jsonData.metrics.campuses?.phoenix?.percentage || 5.6,
+              employees: jsonData.metrics.campuses?.phoenix?.employees || 160
             },
-            growthRate: firebaseData.metrics.campuses?.growthRate || 2.1
+            growthRate: jsonData.metrics.campuses?.growthRate || 2.1
           }
         });
       }
@@ -378,7 +378,7 @@ const CombinedWorkforceDashboard = () => {
       const metrics = calculateQuarterMetrics(currentQuarterData, previousQuarterData);
       setHeadcountData(metrics);
     }
-  }, [quarterlyData, selectedQuarter, dataSource, firebaseData, quarterConfigLoading, quarterConfigError]);
+  }, [quarterlyData, selectedQuarter, dataSource, jsonData, quarterConfigLoading, quarterConfigError]);
 
   // Update chart data when data source changes
   useEffect(() => {
@@ -396,16 +396,16 @@ const CombinedWorkforceDashboard = () => {
       setTopDivisionsData(emptyStateData.charts.topDivisions);
       setTurnoverReasons(emptyStateData.charts.turnoverReasons);
       setLocationData(emptyStateData.charts.location);
-    } else if (dataSource === 'firebase' && firebaseData && Object.keys(firebaseData).length > 0) {
-      // Use Firebase data for chart data
-      console.log('Using Firebase data for charts', firebaseData);
+    } else if (dataSource === 'json' && jsonData && Object.keys(jsonData).length > 0) {
+      // Use JSON data for chart data
+      console.log('Using JSON data for charts', jsonData);
       
       // Check if we have quarter range data
-      if (firebaseData.quarterRangeData && firebaseData.quarterRangeData.length > 0) {
+      if (jsonData.quarterRangeData && jsonData.quarterRangeData.length > 0) {
         console.log('Using quarter range data for charts');
         
         // Generate headcount trend data from quarter range
-        const headcountTrendData = firebaseData.quarterRangeData.map(({ quarter, data }) => {
+        const headcountTrendData = jsonData.quarterRangeData.map(({ quarter, data }) => {
           if (!data) return null;
           
           return {
@@ -421,15 +421,15 @@ const CombinedWorkforceDashboard = () => {
         
         setFiveQuarterData(headcountTrendData);
       } else {
-        // Use existing single quarter logic - Firebase data without quarter range
-        console.log('Using single quarter Firebase data');
+        // Use existing single quarter logic - JSON data without quarter range
+        console.log('Using single quarter JSON data');
       }
       
-      // Generate division breakdown from Firebase data for the selected quarter
-      console.log('Generating Firebase division breakdown for quarter:', selectedQuarter);
+      // Generate division breakdown from JSON data for the selected quarter
+      console.log('Generating JSON division breakdown for quarter:', selectedQuarter);
       
-      // Apply quarter variations to Firebase data too
-      const firebaseQuarterVariation = selectedQuarter === 'Q1-2025' ? 1.0 : 
+      // Apply quarter variations to JSON data too
+      const jsonQuarterVariation = selectedQuarter === 'Q1-2025' ? 1.0 : 
                                       selectedQuarter === 'Q4-2024' ? 0.85 : 
                                       selectedQuarter === 'Q3-2024' ? 0.92 : 
                                       selectedQuarter === 'Q2-2024' ? 1.15 : 
@@ -438,7 +438,7 @@ const CombinedWorkforceDashboard = () => {
                                       selectedQuarter === 'Q2-2025' ? 0.95 : 0.90;
       
       
-      const baseDivisionsData = firebaseData.breakdowns?.divisions || [
+      const baseDivisionsData = jsonData.breakdowns?.divisions || [
         { name: 'School of Medicine', faculty: 106, staff: 177, total: 283 },
         { name: 'Arts & Sciences', faculty: 227, staff: 37, total: 264 },
         { name: 'Medicine', faculty: 96, staff: 168, total: 264 },
@@ -446,22 +446,22 @@ const CombinedWorkforceDashboard = () => {
         { name: 'Dentistry', faculty: 70, staff: 79, total: 149 }
       ];
       
-      // Apply quarter variation to Firebase data
+      // Apply quarter variation to JSON data
       const divisionsBreakdown = baseDivisionsData.map(division => ({
         ...division,
-        faculty: Math.round(division.faculty * firebaseQuarterVariation),
-        staff: Math.round(division.staff * firebaseQuarterVariation),
-        total: Math.round(division.total * firebaseQuarterVariation)
+        faculty: Math.round(division.faculty * jsonQuarterVariation),
+        staff: Math.round(division.staff * jsonQuarterVariation),
+        total: Math.round(division.total * jsonQuarterVariation)
       }));
       
-      // Note: Firebase division data is currently static but responsive to quarter changes
-      // In a full implementation, this would query Firebase for quarter-specific division data
+      // Note: JSON division data is currently static but responsive to quarter changes
+      // In a full implementation, this would query JSON data for quarter-specific division data
       setTopDivisionsData(divisionsBreakdown);
       
-      // Generate turnover reasons from Firebase data for the selected quarter
-      console.log('Generating Firebase turnover reasons for quarter:', selectedQuarter);
+      // Generate turnover reasons from JSON data for the selected quarter
+      console.log('Generating JSON turnover reasons for quarter:', selectedQuarter);
       
-      // Firebase might have quarter-specific turnover data, fall back to baseline if not
+      // JSON data might have quarter-specific turnover data, fall back to baseline if not
       const baseTurnoverReasons = [
         { name: 'Career Advancement', value: 38 },
         { name: 'Compensation', value: 21 },
@@ -472,22 +472,22 @@ const CombinedWorkforceDashboard = () => {
       ];
       
       // Check for quarter-specific data, or apply slight variations to show responsiveness
-      const turnoverReasonsData = firebaseData.analysis?.turnoverReasons?.[selectedQuarter] || 
-                                  firebaseData.analysis?.turnoverReasons || 
+      const turnoverReasonsData = jsonData.analysis?.turnoverReasons?.[selectedQuarter] || 
+                                  jsonData.analysis?.turnoverReasons || 
                                   generateQuarterVariedTurnoverReasons(baseTurnoverReasons, selectedQuarter);
       
-      console.log('Firebase turnover reasons for quarter', selectedQuarter, ':', turnoverReasonsData);
+      console.log('JSON turnover reasons for quarter', selectedQuarter, ':', turnoverReasonsData);
       setTurnoverReasons(turnoverReasonsData);
       
-      // Generate dynamic executive summary from Firebase data
-      const summary = generateExecutiveSummary(firebaseData, turnoverReasonsData);
+      // Generate dynamic executive summary from JSON data
+      const summary = generateExecutiveSummary(jsonData, turnoverReasonsData);
       setExecutiveSummary(summary);
       
-      // Generate location breakdown from Firebase data for the selected quarter
-      console.log('Generating Firebase location breakdown for quarter:', selectedQuarter);
+      // Generate location breakdown from JSON data for the selected quarter
+      console.log('Generating JSON location breakdown for quarter:', selectedQuarter);
       
-      // Apply quarter variations to Firebase data for locations
-      const firebaseLocationVariation = selectedQuarter === 'Q1-2025' ? 1.0 : 
+      // Apply quarter variations to JSON data for locations
+      const jsonLocationVariation = selectedQuarter === 'Q1-2025' ? 1.0 : 
                                         selectedQuarter === 'Q4-2024' ? 0.85 : 
                                         selectedQuarter === 'Q3-2024' ? 0.92 : 
                                         selectedQuarter === 'Q2-2024' ? 1.15 : 
@@ -496,8 +496,8 @@ const CombinedWorkforceDashboard = () => {
                                         selectedQuarter === 'Q2-2025' ? 0.95 : 0.90;
       
       const baseLocationData = [
-        { location: 'Omaha', count: Math.round(2650 * firebaseLocationVariation) },
-        { location: 'Phoenix', count: Math.round(1599 * firebaseLocationVariation) }
+        { location: 'Omaha', count: Math.round(2650 * jsonLocationVariation) },
+        { location: 'Phoenix', count: Math.round(1599 * jsonLocationVariation) }
       ];
       
       const totalCount = baseLocationData.reduce((sum, item) => sum + item.count, 0);
@@ -508,29 +508,29 @@ const CombinedWorkforceDashboard = () => {
       
       setLocationData(locationBreakdown);
       
-      // Update additional metrics with quarter variations for Firebase data
+      // Update additional metrics with quarter variations for JSON data
       setAdditionalMetrics({
         recentHires: {
-          faculty: Math.round((firebaseData.metrics?.recentHires?.faculty || 23) * firebaseQuarterVariation),
-          staff: Math.round((firebaseData.metrics?.recentHires?.staff || 34) * firebaseQuarterVariation),
-          students: Math.round((firebaseData.metrics?.recentHires?.students || 12) * firebaseQuarterVariation)
+          faculty: Math.round((jsonData.metrics?.recentHires?.faculty || 23) * jsonQuarterVariation),
+          staff: Math.round((jsonData.metrics?.recentHires?.staff || 34) * jsonQuarterVariation),
+          students: Math.round((jsonData.metrics?.recentHires?.students || 12) * jsonQuarterVariation)
         },
         demographics: {
-          averageTenure: firebaseData.metrics?.demographics?.averageTenure || '8.2',
-          averageAge: firebaseData.metrics?.demographics?.averageAge || '42',
-          genderRatio: firebaseData.metrics?.demographics?.genderRatio || '52/48',
-          diversityIndex: firebaseData.metrics?.demographics?.diversityIndex || '34'
+          averageTenure: jsonData.metrics?.demographics?.averageTenure || '8.2',
+          averageAge: jsonData.metrics?.demographics?.averageAge || '42',
+          genderRatio: jsonData.metrics?.demographics?.genderRatio || '52/48',
+          diversityIndex: jsonData.metrics?.demographics?.diversityIndex || '34'
         },
         campuses: {
           omaha: {
-            percentage: firebaseData.metrics?.campuses?.omaha?.percentage || 94.4,
-            employees: Math.round((firebaseData.metrics?.campuses?.omaha?.employees || 2687) * firebaseQuarterVariation)
+            percentage: jsonData.metrics?.campuses?.omaha?.percentage || 94.4,
+            employees: Math.round((jsonData.metrics?.campuses?.omaha?.employees || 2687) * jsonQuarterVariation)
           },
           phoenix: {
-            percentage: firebaseData.metrics?.campuses?.phoenix?.percentage || 5.6,
-            employees: Math.round((firebaseData.metrics?.campuses?.phoenix?.employees || 160) * firebaseQuarterVariation)
+            percentage: jsonData.metrics?.campuses?.phoenix?.percentage || 5.6,
+            employees: Math.round((jsonData.metrics?.campuses?.phoenix?.employees || 160) * jsonQuarterVariation)
           },
-          growthRate: firebaseData.metrics?.campuses?.growthRate || 2.1
+          growthRate: jsonData.metrics?.campuses?.growthRate || 2.1
         }
       });
       
@@ -726,7 +726,7 @@ const CombinedWorkforceDashboard = () => {
     }
     
     
-  }, [dataSource, firebaseData, quarterlyData, selectedQuarter, quarterConfigLoading, quarterConfigError]);
+  }, [dataSource, jsonData, quarterlyData, selectedQuarter, quarterConfigLoading, quarterConfigError]);
 
   // Generate static data for 5-Quarter Headcount Trend chart
   useEffect(() => {
@@ -902,7 +902,7 @@ const CombinedWorkforceDashboard = () => {
   // Generate dynamic executive summary based on data
   const generateExecutiveSummary = (data, turnoverData) => {
     if (data && data.summary) {
-      // Firebase data summary
+      // JSON data summary
       const total = data.summary.totalEmployees || 0;
       const change = data.summary.employeeChange || 0;
       const faculty = data.summary.faculty || 0;
@@ -1094,10 +1094,10 @@ const CombinedWorkforceDashboard = () => {
                         <span className="font-medium">Viewing:</span> <strong>{filters.employeeType === 'All' ? 'All Employees' : filters.employeeType}</strong>
                       </p>
                       <div className="flex items-center gap-2">
-                        {dataSource === 'firebase' ? (
+                        {dataSource === 'json' ? (
                           <div className="flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs">
                             <Cloud size={12} />
-                            <span>Firebase Data</span>
+                            <span>JSON Data</span>
                           </div>
                         ) : dataSource === 'empty' ? (
                           <div className="flex items-center gap-1 px-2 py-1 bg-red-100 text-red-700 rounded-full text-xs">
@@ -1130,12 +1130,12 @@ const CombinedWorkforceDashboard = () => {
                         <div className="text-sm font-medium text-gray-700 mb-2">Data Source Override</div>
                         <div className="space-y-1">
                           <button
-                            onClick={() => handleDataSourceSwitch('firebase')}
+                            onClick={() => handleDataSourceSwitch('json')}
                             className={`block w-full text-left px-3 py-2 rounded text-sm ${
-                              dataSource === 'firebase' ? 'bg-green-100 text-green-700' : 'hover:bg-gray-100'
+                              dataSource === 'json' ? 'bg-green-100 text-green-700' : 'hover:bg-gray-100'
                             }`}
                           >
-                            Firebase Data
+                            JSON Data
                           </button>
                           <button
                             onClick={() => handleDataSourceSwitch('sample')}
@@ -1179,7 +1179,7 @@ const CombinedWorkforceDashboard = () => {
                   <span className="text-white text-xs">!</span>
                 </div>
                 <div>
-                  <h3 className="font-medium text-yellow-800">No Firebase Data Found</h3>
+                  <h3 className="font-medium text-yellow-800">No JSON Data Found</h3>
                   <p className="text-yellow-700 text-sm mt-1">
                     Currently showing sample data. Upload data via the Excel Integration Dashboard to see real metrics.
                   </p>
@@ -1197,7 +1197,7 @@ const CombinedWorkforceDashboard = () => {
                 <div>
                   <h3 className="font-medium text-red-800">No Data Available</h3>
                   <p className="text-red-700 text-sm mt-1">
-                    Firebase database is empty. All metrics show zero values. Upload data via the Excel Integration Dashboard to see real metrics.
+                    JSON data store is empty. All metrics show zero values. Upload data via the Excel Integration Dashboard to see real metrics.
                   </p>
                 </div>
               </div>

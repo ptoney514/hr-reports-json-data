@@ -68,20 +68,6 @@ const Navigation = () => {
       isActive: isActive('/dashboards/exit-survey')
     },
     {
-      id: 'excel-integration',
-      label: 'Excel Integration',
-      path: '/excel-integration',
-      icon: Settings,
-      isActive: isActive('/excel-integration')
-    },
-    {
-      id: 'importer',
-      label: 'Employee Importer',
-      path: '/importer',
-      icon: FileUp,
-      isActive: isActive('/importer')
-    },
-    {
       id: 'admin',
       label: 'Admin Dashboard',
       path: '/admin',

@@ -4,7 +4,7 @@ import TurnoverPieChart from '../charts/TurnoverPieChart';
 import PieBarCombinationChart from '../charts/PieBarCombinationChart';
 import QuarterFilter from '../ui/QuarterFilter';
 import ErrorBoundary from '../ui/ErrorBoundary';
-import useFirebaseTurnoverData from '../../hooks/useFirebaseTurnoverData';
+import useTurnoverData from '../../hooks/useTurnoverData';
 import { 
   TrendingDown, 
   DollarSign, 
@@ -105,17 +105,17 @@ const TurnoverDashboard = () => {
     setSelectedQuarter(newQuarter);
   };
 
-  // Use Firebase data with fallback
+  // Use JSON data with fallback
   const { 
-    data: firebaseData, 
+    data: jsonData, 
     loading, 
     error, 
     isRealTime, 
     lastSyncTime 
-  } = useFirebaseTurnoverData(selectedQuarter);
+  } = useTurnoverData(selectedQuarter);
 
-  // Use Firebase data if available, otherwise fallback
-  const data = firebaseData || FALLBACK_DATA;
+  // Use JSON data if available, otherwise fallback
+  const data = jsonData || FALLBACK_DATA;
   const filters = { fiscalYear: selectedQuarter.split('-')[1] || '2024' };
 
 
@@ -133,7 +133,7 @@ const TurnoverDashboard = () => {
 
   // Enhanced subtitle with real-time status
   const realtimeStatus = isRealTime ? '🔴 Live' : '📊 Cached';
-  const dataSource = firebaseData ? 'Firebase' : 'Local';
+  const dataSource = jsonData ? 'JSON Data' : 'Local';
   const syncInfo = lastSyncTime ? ` | Last sync: ${lastSyncTime.toLocaleTimeString()}` : '';
   const subtitle = `FY ${filters.fiscalYear || '2024'} | ${realtimeStatus} (${dataSource})${syncInfo}`;
 

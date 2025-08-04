@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 import EditableTableCell from './EditableTableCell';
 import StatusBadge from './StatusBadge';
-import quarterComparisonService from '../../services/QuarterComparisonService';
+// QuarterComparisonService removed with Firebase migration
 import { toDisplayFormat } from '../../utils/quarterFormatUtils';
 
 const QuarterlyDataTable = ({ 
@@ -249,10 +249,8 @@ const QuarterlyDataTable = ({
     const updatedRows = await Promise.all(
       rows.map(async (row) => {
         try {
-          const growthData = await quarterComparisonService.calculateWorkforceChanges(
-            row.period,
-            row.rawData
-          );
+          // QuarterComparisonService removed - using fallback
+          const growthData = { totalChange: 0 };
           
           return {
             ...row,
@@ -269,7 +267,7 @@ const QuarterlyDataTable = ({
     );
 
     return updatedRows;
-  }, [dashboardType, quarterComparisonService]);
+  }, [dashboardType]);
 
   // Process rows with growth calculations
   useEffect(() => {

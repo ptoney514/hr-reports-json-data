@@ -17,7 +17,7 @@ import {
   FileUp
 } from 'lucide-react';
 import { getQuarters } from '../../services/QuarterConfigService';
-import firebaseService from '../../services/DataService';
+import dataService from '../../services/DataService';
 import QuarterlyDataTable from '../admin/QuarterlyDataTable';
 import DivisionDataTable from '../admin/DivisionDataTable';
 import DataImportExport from '../admin/DataImportExport';
@@ -63,19 +63,19 @@ const AdminDashboard = () => {
       const quarters = getQuarters().slice(-8);
       const quarterPromises = quarters.map(async (quarter) => {
         try {
-          // Convert quarter format to Firebase format
-          let firebasePeriod = quarter.quarter;
+          // Convert quarter format to standard format
+          let period = quarter.quarter;
           if (quarter.quarter.match(/^Q\d-\d{4}$/)) {
-            firebasePeriod = quarter.quarter.replace(/^Q(\d)-(\d{4})$/, '$2-Q$1');
+            period = quarter.quarter.replace(/^Q(\d)-(\d{4})$/, '$2-Q$1');
           }
           
-          const data = await firebaseService.getMetricsByDashboard(
+          const data = await dataService.getMetricsByDashboard(
             selectedDashboard, 
-            firebasePeriod, 
+            period, 
             'quarters'
           );
           
-          return data ? { [firebasePeriod]: data } : null;
+          return data ? { [period]: data } : null;
         } catch (error) {
           console.warn(`Failed to load data for ${quarter.quarter}:`, error);
           return null;
@@ -129,8 +129,8 @@ const AdminDashboard = () => {
   // Handle quarter deletion
   const handleDeleteQuarter = useCallback(async (period) => {
     try {
-      // Remove from Firebase
-      await firebaseService.deleteQuarterData(selectedDashboard, period);
+      // Remove from data store
+      await dataService.deleteQuarterData(selectedDashboard, period);
       
       // Remove from local state
       const updatedAllData = { ...allQuartersData };
@@ -181,22 +181,22 @@ const AdminDashboard = () => {
               version: data.version || '2.0'
             };
 
-            // Save to Firebase using the appropriate method
+            // Save to data store using the appropriate method
             switch (selectedDashboard) {
               case 'workforce':
-                await firebaseService.setWorkforceMetrics(period, dataToSave);
+                await dataService.setWorkforceMetrics(period, dataToSave);
                 break;
               case 'turnover':
-                await firebaseService.setTurnoverMetrics(period, dataToSave);
+                await dataService.setTurnoverMetrics(period, dataToSave);
                 break;
               case 'compliance':
-                await firebaseService.setComplianceMetrics(period, dataToSave);
+                await dataService.setComplianceMetrics(period, dataToSave);
                 break;
               case 'recruiting':
-                await firebaseService.setRecruitingMetrics(period, dataToSave);
+                await dataService.setRecruitingMetrics(period, dataToSave);
                 break;
               case 'exitSurvey':
-                await firebaseService.setExitSurveyMetrics(period, dataToSave);
+                await dataService.setExitSurveyMetrics(period, dataToSave);
                 break;
               default:
                 throw new Error(`Unknown dashboard type: ${selectedDashboard}`);
@@ -271,7 +271,7 @@ const AdminDashboard = () => {
       const mergedData = mergeUploadedData(uploadedData);
       
       // Update the data store
-      firebaseService.updateDataStore(mergedData);
+      dataService.updateDataStore(mergedData);
       
       // Reload the current dashboard data
       await loadAllQuartersData();

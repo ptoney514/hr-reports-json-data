@@ -3,9 +3,9 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import EmployeeImportDashboard from '../EmployeeImportDashboard';
 
-// Mock Firebase hook (updated for privacy compliance - no individual records)
-jest.mock('../../../hooks/useFirebaseEmployeeData', () => ({
-  useFirebaseEmployeeData: () => ({
+// Mock Employee Data hook (updated for privacy compliance - no individual records)
+jest.mock('../../../hooks/useEmployeeData', () => ({
+  useEmployeeData: () => ({
     importAggregateWorkforceData: jest.fn(),
     getAggregateWorkforceData: jest.fn(),
     clearAllIndividualEmployeeData: jest.fn(),

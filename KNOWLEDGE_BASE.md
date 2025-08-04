@@ -49,7 +49,7 @@ The application follows a modern React architecture with clear separation of con
 
 ### Data Management & Processing
 
-- **Firebase 11.2.0**: Primary cloud database with real-time synchronization capabilities
+- **JSON Data Architecture**: Local file-based data management with efficient caching
 - **LowDB 7.0.1**: Lightweight JSON database for local fallback and offline support
 - **Date-fns 3.6.0**: Modern date utility library for date manipulation
 - **Lodash 4.17.21**: Utility library for data processing and manipulation
@@ -57,12 +57,10 @@ The application follows a modern React architecture with clear separation of con
 
 ### Export & File Handling
 
-- **XLSX 0.18.5**: Excel file generation and processing
 - **jsPDF 3.0.1**: PDF generation for reports
 - **html2canvas 1.4.1**: HTML to canvas rendering for visual exports
 - **File-saver 2.0.5**: Client-side file downloading
 - **React-to-print 3.1.0**: Print functionality for React components
-- **React-dropzone 14.3.8**: Drag-and-drop file upload interface
 
 ### Testing & Quality Assurance
 
@@ -264,58 +262,66 @@ UI Updates with New Data
 
 ### Custom Hooks for Data Management
 
-#### Firebase Integration (Phase 9)
+#### JSON Data Integration (Current)
 
-The application now uses Firebase/Firestore as the primary database with real-time synchronization capabilities:
+The application uses a JSON-based data architecture for local file management and efficient data operations:
 
 ```jsx
-// useFirebaseWorkforceData.js - Enhanced hook with real-time capabilities
-const useFirebaseWorkforceData = (customFilters = {}) => {
-  const [firebaseData, setFirebaseData] = useState(null);
-  const [isRealTimeActive, setIsRealTimeActive] = useState(false);
-  const [lastSyncTime, setLastSyncTime] = useState(null);
+// useWorkforceData.js - JSON-based data hook with efficient caching
+const useWorkforceData = (customFilters = {}) => {
+  const [jsonData, setJsonData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   
-  // Real-time subscription setup
-  const setupRealTimeSubscription = useCallback(() => {
-    const unsubscribe = firebaseService.subscribeToMetrics(
-      'workforce',
-      period,
-      (data) => {
-        if (data) {
-          const transformedData = transformFirebaseToComponentFormat(data);
-          setFirebaseData(transformedData);
-          setLastSyncTime(data.lastUpdated?.toDate?.() || new Date());
-        }
-      }
-    );
-    setIsRealTimeActive(true);
-    return unsubscribe;
+  // Fetch JSON data from local files
+  const fetchJsonData = useCallback(async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(`/data/workforce/${period}.json`);
+      if (!response.ok) throw new Error('Data not found');
+      
+      const data = await response.json();
+      const transformedData = transformJsonToComponentFormat(data);
+      setJsonData(transformedData);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   }, [period]);
   
   return { 
-    data: formattedData, 
+    data: jsonData, 
     loading, 
     error, 
-    isRealTime, 
-    lastSyncTime, 
-    refetch 
+    refetch: fetchJsonData 
   };
 };
 ```
 
-#### Firebase Service Layer
+#### JSON Data Service Layer
 
-The FirebaseService provides comprehensive CRUD operations for all HR metrics:
+The DataService provides comprehensive operations for JSON-based HR metrics management:
 
 ```javascript
-// FirebaseService.js - Core service for Firebase operations
-class FirebaseService {
+// DataService.js - Core service for JSON data operations
+class DataService {
   // Workforce metrics operations
-  async setWorkforceMetrics(period, data) { /* ... */ }
-  async getWorkforceMetrics(period) { /* ... */ }
+  async setWorkforceMetrics(period, data) {
+    // Save to local JSON file
+    const filePath = `/data/workforce/${period}.json`;
+    await this.saveJsonFile(filePath, data);
+  }
   
-  // Real-time subscriptions
-  subscribeToMetrics(type, period, callback) { /* ... */ }
+  async getWorkforceMetrics(period) {
+    // Load from local JSON file
+    const filePath = `/data/workforce/${period}.json`;
+    return await this.loadJsonFile(filePath);
+  }
+  
+  // JSON file operations
+  async loadJsonFile(filePath) { /* ... */ }
+  async saveJsonFile(filePath, data) { /* ... */ }
   
   // Data validation and transformation
   validateMetricsData(data, type) { /* ... */ }
@@ -669,7 +675,6 @@ Architecture supports:
 - Real-time data streams
 
 #### Export Integrations
-- Microsoft Excel integration
 - PDF report generation
 - Email delivery systems
 - File storage services (AWS S3, Google Drive)

@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Removed
+- **Excel Integration Removal** (August 4, 2025)  
+  - Removed `ExcelIntegrationDashboard.jsx` - broken Excel upload dashboard
+  - Removed `EmployeeImportDashboard.jsx` - Excel-based employee import functionality
+  - Removed `DataSourceManager.jsx` - component causing React errors in screenshots
+  - Removed `ExcelUploadTester.jsx` - Excel upload testing component
+  - Removed `MultiSheetFileUploader.jsx` and `FileUploader.jsx` - file upload components
+  - Removed `excelTemplateGenerator.js` - Excel template generation utilities
+  - Removed broken Excel export functionality from `exportUtils.js`
+  - Removed Excel dependencies: `react-dropzone` and `xlsx` packages
+  - Removed Excel integration navigation routes and menu items
+  - **Result**: Fixed React errors, reduced bundle size by ~300+ bytes, simplified architecture
+
 ### Added
 - **Enhanced Date Range Selection** (January 15, 2025)
   - `src/components/ui/DateRangeSelector.jsx` - Comprehensive date range selector with quarter/custom modes

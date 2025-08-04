@@ -18,17 +18,13 @@ const ExportTestComponent = lazy(() => import('./components/testing/ExportTestCo
 const PrintTestComponent = lazy(() => import('./components/testing/PrintTestComponent'));
 const AccessibilityTestComponent = lazy(() => import('./components/testing/AccessibilityTestComponent'));
 const DatabaseTestComponent = lazy(() => import('./components/testing/DatabaseTestComponent'));
-const FirebaseTestComponent = lazy(() => import('./components/testing/FirebaseTestComponent'));
 const WorkforceDataTester = lazy(() => import('./components/testing/WorkforceDataTester'));
-const ExcelUploadTester = lazy(() => import('./components/testing/ExcelUploadTester'));
 const JsonDataTester = lazy(() => import('./components/testing/JsonDataTester'));
 const HooksTestComponent = lazy(() => import('./components/testing/HooksTestComponentWrapper'));
-const ExcelIntegrationDashboard = lazy(() => import('./components/dashboards/ExcelIntegrationDashboard'));
 const RecruitingDashboard = lazy(() => import('./components/dashboards/RecruitingDashboard'));
 const ExitSurveyDashboard = lazy(() => import('./components/dashboards/ExitSurveyDashboard'));
 const CombinedWorkforceDashboard = lazy(() => import('./components/dashboards/CombinedWorkforceDashboard'));
 const AdminDashboard = lazy(() => import('./components/dashboards/AdminDashboard'));
-const EmployeeImportDashboard = lazy(() => import('./components/dashboards/EmployeeImportDashboard'));
 
 function App() {
   // Initialize global error handling
@@ -99,17 +95,10 @@ function App() {
               <Route path="/test/print" element={<PrintTestComponent />} />
               <Route path="/test/accessibility" element={<AccessibilityTestComponent />} />
               <Route path="/test/database" element={<DatabaseTestComponent />} />
-              <Route path="/test/firebase" element={<FirebaseTestComponent />} />
               <Route path="/test/workforce-data" element={<WorkforceDataTester />} />
-              <Route path="/test/excel-upload" element={<ExcelUploadTester />} />
               <Route path="/test/json-data" element={<JsonDataTester />} />
               <Route path="/test/json-hooks" element={<HooksTestComponent />} />
               
-              {/* Excel Integration Route */}
-              <Route path="/excel-integration" element={<ExcelIntegrationDashboard />} />
-              
-              {/* Employee Import Route */}
-              <Route path="/importer" element={<EmployeeImportDashboard />} />
               
               {/* Admin Dashboard Route */}
               <Route path="/admin" element={<AdminDashboard />} />

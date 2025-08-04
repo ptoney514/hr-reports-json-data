@@ -13,7 +13,7 @@ import {
   ToggleRight
 } from 'lucide-react';
 import { QUARTER_DATES } from '../../utils/quarterlyDataProcessor';
-import useFirebaseWorkforceData from '../../hooks/useFirebaseWorkforceData';
+import useWorkforceData from '../../hooks/useWorkforceData';
 import useSimpleWorkforceData from '../../hooks/useSimpleWorkforceData';
 
 /**
@@ -33,7 +33,7 @@ const WorkforceDataTester = () => {
     data: firebaseData, 
     loading: firebaseLoading, 
     error: firebaseError 
-  } = useFirebaseWorkforceData({ reportingPeriod: selectedQuarter });
+  } = useWorkforceData({ reportingPeriod: selectedQuarter });
 
   // Get JSON data for testing
   const {

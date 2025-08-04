@@ -5,7 +5,7 @@ import RiskAssessmentCard from './components/RiskAssessmentCard';
 import TrendChart from './components/TrendChart';
 import ComplianceTable from './components/ComplianceTable';
 import ExecutiveSummary from './components/ExecutiveSummary';
-import useFirebaseComplianceData from '../../hooks/useFirebaseComplianceData';
+import useComplianceData from '../../hooks/useComplianceData';
 import { 
   I9Metrics, 
   PreviousMetrics, 
@@ -30,22 +30,24 @@ const I9HealthDashboard: React.FC<I9HealthDashboardProps> = ({
   className = '',
   ...ariaProps
 }) => {
-  // Use Firebase data when props are not provided
+  // Use JSON data when props are not provided
   const { 
-    data: firebaseData, 
-    loading: firebaseLoading, 
-    error: firebaseError, 
-    isRealTime, 
-    lastSyncTime 
-  } = useFirebaseComplianceData('2025-Q1');
+    data: jsonData, 
+    loading: jsonLoading, 
+    error: jsonError
+  } = useComplianceData();
+  
+  // JSON data doesn't have real-time features
+  const isRealTime = false;
+  const lastSyncTime = null;
 
-  // Determine if we should use Firebase data or props
-  const shouldUseFirebase = !currentMetrics && !previousMetrics && !complianceByType;
-  const loading = shouldUseFirebase ? firebaseLoading : propLoading;
-  const error = shouldUseFirebase ? firebaseError : propError;
-  // Use Firebase data or props with fallbacks (type assertions for Firebase data)
+  // Determine if we should use JSON data or props
+  const shouldUseJSON = !currentMetrics && !previousMetrics && !complianceByType;
+  const loading = shouldUseJSON ? jsonLoading : propLoading;
+  const error = shouldUseJSON ? jsonError : propError;
+  // Use JSON data or props with fallbacks (type assertions for JSON data)
   const defaultCurrentMetrics: I9Metrics = currentMetrics || 
-    ((firebaseData as any)?.currentMetrics) || 
+    ((jsonData as any)?.currentMetrics) || 
     {
       totalI9s: 847,
       section2OnTime: 732,
@@ -57,7 +59,7 @@ const I9HealthDashboard: React.FC<I9HealthDashboardProps> = ({
     };
 
   const defaultPreviousMetrics: PreviousMetrics = previousMetrics || 
-    ((firebaseData as any)?.previousMetrics) || 
+    ((jsonData as any)?.previousMetrics) || 
     {
       totalI9s: 798,
       section2Compliance: 89,
@@ -71,10 +73,10 @@ const I9HealthDashboard: React.FC<I9HealthDashboardProps> = ({
       return complianceByType;
     }
     
-    // Second priority: Firebase data (only if not empty)
-    const firebaseComplianceData = (firebaseData as any)?.complianceByType;
-    if (firebaseComplianceData && firebaseComplianceData.length > 0) {
-      return firebaseComplianceData;
+    // Second priority: JSON data (only if not empty)
+    const jsonComplianceData = (jsonData as any)?.complianceByType;
+    if (jsonComplianceData && jsonComplianceData.length > 0) {
+      return jsonComplianceData;
     }
     
     // Third priority: comprehensive mock data
@@ -110,7 +112,7 @@ const I9HealthDashboard: React.FC<I9HealthDashboardProps> = ({
   const defaultComplianceByType: ComplianceByType[] = getComplianceData();
 
   const defaultTrendData: TrendData[] = trendData || 
-    ((firebaseData as any)?.trendData) || 
+    ((jsonData as any)?.trendData) || 
     [
       { quarter: 'Q1-24', compliance: 92, processed: 723 },
       { quarter: 'Q2-24', compliance: 89, processed: 798 },
@@ -198,10 +200,10 @@ const I9HealthDashboard: React.FC<I9HealthDashboardProps> = ({
                     <p className="text-gray-600 text-sm">
                       Quarter: Q2 2025 | Generated: {new Date().toLocaleDateString()}
                     </p>
-                    {shouldUseFirebase && (
+                    {shouldUseJSON && (
                       <div className="flex items-center gap-2 text-sm text-gray-600">
                         <span className={isRealTime ? 'text-green-600' : 'text-gray-400'}>
-                          {isRealTime ? '🔴 Live' : '📊 Cached'} (Firebase)
+                          {isRealTime ? '🔴 Live' : '📊 Cached'} (JSON Data)
                         </span>
                         {isRealTime && <Wifi size={14} className="text-green-500" />}
                         {!isRealTime && <WifiOff size={14} className="text-gray-400" />}

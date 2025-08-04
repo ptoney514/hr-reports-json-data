@@ -1,11 +1,12 @@
 /**
  * Export Utilities for Dashboard Reports
- * Handles PDF generation, Excel/CSV exports, and report formatting
+ * Handles PDF generation, JSON exports, and report formatting
+ * Note: Excel functionality disabled - use JSON export instead
  */
 
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
-import * as XLSX from 'xlsx';
+// import * as XLSX from 'xlsx'; // Disabled - Excel functionality removed
 import { saveAs } from 'file-saver';
 import { formatDate, formatDateShort, getCurrentQuarter } from './dateHelpers';
 import { formatNumber, formatPercentage, formatCurrency } from './dataFormatters';
@@ -408,7 +409,7 @@ export class PDFExporter {
 }
 
 /**
- * Excel/CSV Export Class
+ * JSON/CSV Export Class (Excel functionality disabled)
  */
 export class DataExporter {
   constructor(options = {}) {
@@ -424,24 +425,8 @@ export class DataExporter {
    * Export data to Excel format
    */
   exportToExcel(data, filename, additionalSheets = {}) {
-    const workbook = XLSX.utils.book_new();
-    
-    // Main data sheet
-    const mainSheet = this.createWorksheet(data);
-    XLSX.utils.book_append_sheet(workbook, mainSheet, this.options.sheetName);
-    
-    // Additional sheets
-    Object.entries(additionalSheets).forEach(([sheetName, sheetData]) => {
-      const sheet = this.createWorksheet(sheetData);
-      XLSX.utils.book_append_sheet(workbook, sheet, sheetName);
-    });
-    
-    // Generate and save file
-    const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-    const blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-    
-    const finalFilename = filename || `dashboard-data-${formatDate(new Date(), 'YYYY-MM-DD')}.xlsx`;
-    saveAs(blob, finalFilename);
+    console.warn('Excel export disabled - use JSON export instead');
+    return { success: false, message: 'Excel export disabled - use JSON export instead' };
   }
 
   /**
@@ -466,24 +451,17 @@ export class DataExporter {
    * Create worksheet with metadata and branding
    */
   createWorksheet(data) {
-    if (!data || data.length === 0) {
-      return XLSX.utils.aoa_to_sheet([['No data available']]);
-    }
-
-    const worksheet = XLSX.utils.json_to_sheet(data);
-    
-    // Add metadata if enabled
-    if (this.options.includeMetadata) {
-      this.addWorksheetMetadata(worksheet);
-    }
-    
-    return worksheet;
+    console.warn('Excel worksheet creation disabled');
+    return null;
   }
 
   /**
    * Add metadata and branding to worksheet
    */
   addWorksheetMetadata(worksheet) {
+    console.warn('Excel worksheet metadata disabled');
+    return;
+    /*
     // Insert company branding at the top
     const brandingRows = [
       [COMPANY_BRANDING.name],
@@ -520,6 +498,7 @@ export class DataExporter {
     });
 
     worksheet['!ref'] = XLSX.utils.encode_range(newRange);
+    */
   }
 
   /**
@@ -622,6 +601,9 @@ export class ExportManager {
    * Export dashboard data to Excel
    */
   async exportDashboardExcel(options = {}) {
+    console.warn('Excel export disabled - use JSON export instead');
+    return { success: false, message: 'Excel export disabled - use JSON export instead' };
+    /*
     const {
       filename = null,
       includeCharts = false // Charts as images in Excel require additional processing
@@ -638,6 +620,7 @@ export class ExportManager {
       console.error('Excel export error:', error);
       return { success: false, error: error.message };
     }
+    */
   }
 
   /**
@@ -814,8 +797,8 @@ export const exportUtils = {
    * Quick Excel export of current dashboard
    */
   quickExcelExport: async () => {
-    const manager = new ExportManager();
-    return await manager.exportDashboardExcel();
+    console.warn('Excel export disabled - use JSON export instead');
+    return { success: false, message: 'Excel export disabled - use JSON export instead' };
   },
 
   /**

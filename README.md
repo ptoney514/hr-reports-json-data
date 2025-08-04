@@ -1,6 +1,6 @@
 # HR Reports Project
 
-A comprehensive React-based dashboard application for I-9 compliance health monitoring and HR analytics. Features multiple dashboards, comprehensive testing infrastructure, WCAG 2.1 AA accessibility compliance, database integration, and enterprise-level performance optimization.
+A comprehensive React-based dashboard application for I-9 compliance health monitoring and HR analytics. Features multiple dashboards, comprehensive testing infrastructure, WCAG 2.1 AA accessibility compliance, JSON-based data architecture, and enterprise-level performance optimization.
 
 ## 🚀 Quick Start (Docker - Recommended)
 
@@ -119,7 +119,7 @@ src/
 ├── contexts/            # React Context providers
 ├── data/               # Data files and API layer
 ├── hooks/              # Custom React hooks
-├── services/           # Service layer (Firebase, etc.)
+├── services/           # Service layer (JSON data management)
 ├── styles/             # CSS files
 └── utils/              # Utility functions
 ```
@@ -138,10 +138,30 @@ src/
 - **React 19.1.0** - Frontend framework
 - **Tailwind CSS 3.4.17** - Styling
 - **Recharts 3.0.0** - Data visualization
-- **Firebase 11.2.0** - Cloud database
+- **JSON Data Architecture** - Local file-based data management
 - **Docker** - Containerization
 - **React Router DOM** - Navigation
 - **Jest & React Testing Library** - Testing
+
+## 📁 Data Architecture
+
+**JSON-Based Data Management:**
+- **Local JSON Files** - All data stored in `/public/data/` directory
+- **File Organization** - Organized by data type (workforce, compliance, turnover, etc.)
+- **Quarter-Based Structure** - Data organized by reporting periods (e.g., `2024-06-30.json`)
+- **No External Dependencies** - Self-contained, no cloud database required
+- **Easy Data Management** - JSON file-based data operations with validation
+- **Version Control Friendly** - JSON files can be tracked and versioned with Git
+
+**Data Location:**
+```
+public/data/
+├── workforce/     # Workforce analytics data
+├── compliance/    # I-9 compliance data  
+├── turnover/      # Employee turnover data
+├── recruiting/    # Recruitment metrics
+└── exit-survey/   # Exit interview data
+```
 
 ## 🤝 Contributing
 
