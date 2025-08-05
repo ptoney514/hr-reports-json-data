@@ -67,7 +67,7 @@ describe('EmployeeImportDashboard', () => {
     renderComponent();
     
     expect(screen.getByText('Employee Data Importer')).toBeInTheDocument();
-    expect(screen.getByText('Upload employee data, filter as needed, and import aggregate workforce metrics to Firebase')).toBeInTheDocument();
+    expect(screen.getByText('Upload employee data, filter as needed, and import aggregate workforce metrics to JSON data')).toBeInTheDocument();
   });
 
   test('shows supported file formats', () => {
@@ -191,7 +191,7 @@ describe('EmployeeImportDashboard', () => {
 });
 
 describe('EmployeeImportDashboard Integration', () => {
-  test('integrates with Firebase hook correctly', () => {
+  test('integrates with data hook correctly', () => {
     const mockImportAggregateWorkforceData = jest.fn();
     const mockGetAggregateWorkforceData = jest.fn();
     const mockClearAllIndividualEmployeeData = jest.fn();
@@ -211,7 +211,7 @@ describe('EmployeeImportDashboard Integration', () => {
     expect(screen.getByText('Employee Data Importer')).toBeInTheDocument();
   });
 
-  test('handles loading state from Firebase hook', () => {
+  test('handles loading state from data hook', () => {
     require('../../../hooks/useFirebaseEmployeeData').useFirebaseEmployeeData.mockReturnValue({
       importAggregateWorkforceData: jest.fn(),
       getAggregateWorkforceData: jest.fn(),
@@ -226,8 +226,8 @@ describe('EmployeeImportDashboard Integration', () => {
     expect(screen.getByText('Employee Data Importer')).toBeInTheDocument();
   });
 
-  test('handles error state from Firebase hook', () => {
-    const errorMessage = 'Firebase connection failed';
+  test('handles error state from data hook', () => {
+    const errorMessage = 'Data connection failed';
     require('../../../hooks/useFirebaseEmployeeData').useFirebaseEmployeeData.mockReturnValue({
       importAggregateWorkforceData: jest.fn(),
       getAggregateWorkforceData: jest.fn(),

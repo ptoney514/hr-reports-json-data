@@ -6,13 +6,13 @@
  */
 
 /**
- * Transform Employee Import Dashboard categories to Firebase workforce structure
+ * Transform Employee Import Dashboard categories to JSON workforce structure
  * @param {Object} summaryStats - Summary statistics from Employee Import Dashboard
  * @param {string} period - Quarter period (e.g., "Q1-2025" or "2025-Q1")
  * @param {string} endDate - The end date for the reporting period
- * @returns {Object} Firebase-compatible workforce metrics
+ * @returns {Object} JSON-compatible workforce metrics
  */
-export const transformToFirebaseWorkforceData = (summaryStats, period, endDate) => {
+export const transformToJsonWorkforceData = (summaryStats, period, endDate) => {
   // Extract the 12 workforce categories
   const {
     beFacultyOmaha = 0,
@@ -85,11 +85,11 @@ export const transformToFirebaseWorkforceData = (summaryStats, period, endDate) 
   const omahaPercentage = totalEmployees > 0 ? (omahaTotal / totalEmployees) * 100 : 0;
   const phoenixPercentage = totalEmployees > 0 ? (phoenixTotal / totalEmployees) * 100 : 0;
 
-  // Normalize period format to Firebase standard (2025-Q1)
+  // Normalize period format to JSON standard (2025-Q1)
   const normalizedPeriod = normalizePeriodFormat(period);
 
-  // Create the Firebase-compatible data structure
-  const firebaseData = {
+  // Create the JSON-compatible data structure
+  const jsonData = {
     // Core metrics
     totalEmployees,
     period: normalizedPeriod,
@@ -215,31 +215,31 @@ export const transformToFirebaseWorkforceData = (summaryStats, period, endDate) 
     }
   };
 
-  // Debug: Log the final Firebase data structure
-  console.log('=== Final Firebase Data Structure ===');
-  console.log('Period:', firebaseData.period);
-  console.log('Total Employees:', firebaseData.totalEmployees);
+  // Debug: Log the final JSON data structure
+  console.log('=== Final JSON Data Structure ===');
+  console.log('Period:', jsonData.period);
+  console.log('Total Employees:', jsonData.totalEmployees);
   console.log('Demographics:', {
-    beFaculty: firebaseData.demographics.beFaculty,
-    beStaff: firebaseData.demographics.beStaff,
-    students: firebaseData.demographics.students,
-    nbeFaculty: firebaseData.demographics.nbeFaculty,
-    nbeStaff: firebaseData.demographics.nbeStaff
+    beFaculty: jsonData.demographics.beFaculty,
+    beStaff: jsonData.demographics.beStaff,
+    students: jsonData.demographics.students,
+    nbeFaculty: jsonData.demographics.nbeFaculty,
+    nbeStaff: jsonData.demographics.nbeStaff
   });
   console.log('Direct fields for QuarterlyDataTable:', {
-    omahaFaculty: firebaseData.omahaFaculty,
-    omahaStaff: firebaseData.omahaStaff,
-    omahaStudents: firebaseData.omahaStudents,
-    phoenixFaculty: firebaseData.phoenixFaculty,
-    phoenixStaff: firebaseData.phoenixStaff,
-    phoenixStudents: firebaseData.phoenixStudents
+    omahaFaculty: jsonData.omahaFaculty,
+    omahaStaff: jsonData.omahaStaff,
+    omahaStudents: jsonData.omahaStudents,
+    phoenixFaculty: jsonData.phoenixFaculty,
+    phoenixStaff: jsonData.phoenixStaff,
+    phoenixStudents: jsonData.phoenixStudents
   });
 
-  return firebaseData;
+  return jsonData;
 };
 
 /**
- * Normalize period format to Firebase standard
+ * Normalize period format to JSON standard
  * @param {string} period - Period in various formats
  * @returns {string} Normalized period (2025-Q1 format)
  */
@@ -407,7 +407,7 @@ export const validateWorkforceData = (data) => {
 };
 
 export default {
-  transformToFirebaseWorkforceData,
+  transformToJsonWorkforceData,
   normalizePeriodFormat,
   endDateToQuarterPeriod,
   validateWorkforceData
