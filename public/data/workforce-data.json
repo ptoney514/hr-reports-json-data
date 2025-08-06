@@ -165,6 +165,225 @@
         "vacancyRate": 5.2,
         "changeFromPrevious": 6
       }
+    ],
+
+    "departmentalBreakdown": [
+      {
+        "name": "School of Medicine",
+        "faculty": 117,
+        "staff": 474,
+        "total": 591,
+        "benefitEligibleOnly": true,
+        "type": "mixed"
+      },
+      {
+        "name": "Phoenix Campus",
+        "faculty": 0,
+        "staff": 372,
+        "total": 372,
+        "benefitEligibleOnly": true,
+        "type": "staff-only"
+      },
+      {
+        "name": "Pharmacy & Health Professions",
+        "faculty": 120,
+        "staff": 214,
+        "total": 334,
+        "benefitEligibleOnly": true,
+        "type": "mixed"
+      },
+      {
+        "name": "Arts & Sciences",
+        "faculty": 253,
+        "staff": 67,
+        "total": 320,
+        "benefitEligibleOnly": true,
+        "type": "mixed"
+      },
+      {
+        "name": "Dentistry",
+        "faculty": 76,
+        "staff": 76,
+        "total": 152,
+        "benefitEligibleOnly": true,
+        "type": "mixed"
+      },
+      {
+        "name": "Facilities",
+        "faculty": 0,
+        "staff": 152,
+        "total": 152,
+        "benefitEligibleOnly": true,
+        "type": "staff-only"
+      },
+      {
+        "name": "Nursing",
+        "faculty": 94,
+        "staff": 52,
+        "total": 146,
+        "benefitEligibleOnly": true,
+        "type": "mixed"
+      },
+      {
+        "name": "Provost",
+        "faculty": 2,
+        "staff": 121,
+        "total": 123,
+        "benefitEligibleOnly": true,
+        "type": "mixed"
+      },
+      {
+        "name": "VPSL",
+        "faculty": 0,
+        "staff": 109,
+        "total": 109,
+        "benefitEligibleOnly": true,
+        "type": "staff-only"
+      },
+      {
+        "name": "Athletics",
+        "faculty": 0,
+        "staff": 89,
+        "total": 89,
+        "benefitEligibleOnly": true,
+        "type": "staff-only"
+      },
+      {
+        "name": "Heider College of Business",
+        "faculty": 67,
+        "staff": 19,
+        "total": 86,
+        "benefitEligibleOnly": true,
+        "type": "mixed"
+      },
+      {
+        "name": "VPIT",
+        "faculty": 0,
+        "staff": 85,
+        "total": 85,
+        "benefitEligibleOnly": true,
+        "type": "staff-only"
+      },
+      {
+        "name": "VPEM",
+        "faculty": 0,
+        "staff": 79,
+        "total": 79,
+        "benefitEligibleOnly": true,
+        "type": "staff-only"
+      },
+      {
+        "name": "VPUR",
+        "faculty": 0,
+        "staff": 77,
+        "total": 77,
+        "benefitEligibleOnly": true,
+        "type": "staff-only"
+      },
+      {
+        "name": "SueSucs",
+        "faculty": 0,
+        "staff": 72,
+        "total": 72,
+        "benefitEligibleOnly": true,
+        "type": "staff-only"
+      },
+      {
+        "name": "VPFN",
+        "faculty": 0,
+        "staff": 54,
+        "total": 54,
+        "benefitEligibleOnly": true,
+        "type": "staff-only"
+      },
+      {
+        "name": "Law School",
+        "faculty": 28,
+        "staff": 26,
+        "total": 54,
+        "benefitEligibleOnly": true,
+        "type": "mixed"
+      },
+      {
+        "name": "Public Safety",
+        "faculty": 0,
+        "staff": 52,
+        "total": 52,
+        "benefitEligibleOnly": true,
+        "type": "staff-only"
+      },
+      {
+        "name": "CollProCE",
+        "faculty": 26,
+        "staff": 14,
+        "total": 40,
+        "benefitEligibleOnly": true,
+        "type": "mixed"
+      },
+      {
+        "name": "UCOM",
+        "faculty": 0,
+        "staff": 35,
+        "total": 35,
+        "benefitEligibleOnly": true,
+        "type": "staff-only"
+      },
+      {
+        "name": "VPLS",
+        "faculty": 0,
+        "staff": 33,
+        "total": 33,
+        "benefitEligibleOnly": true,
+        "type": "staff-only"
+      },
+      {
+        "name": "Research",
+        "faculty": 0,
+        "staff": 27,
+        "total": 27,
+        "benefitEligibleOnly": true,
+        "type": "staff-only"
+      },
+      {
+        "name": "HR",
+        "faculty": 0,
+        "staff": 24,
+        "total": 24,
+        "benefitEligibleOnly": true,
+        "type": "staff-only"
+      },
+      {
+        "name": "VPGE",
+        "faculty": 1,
+        "staff": 21,
+        "total": 22,
+        "benefitEligibleOnly": true,
+        "type": "mixed"
+      },
+      {
+        "name": "VPMM",
+        "faculty": 0,
+        "staff": 20,
+        "total": 20,
+        "benefitEligibleOnly": true,
+        "type": "staff-only"
+      },
+      {
+        "name": "CFE",
+        "faculty": 0,
+        "staff": 18,
+        "total": 18,
+        "benefitEligibleOnly": true,
+        "type": "staff-only"
+      },
+      {
+        "name": "GENC",
+        "faculty": 0,
+        "staff": 9,
+        "total": 9,
+        "benefitEligibleOnly": true,
+        "type": "staff-only"
+      }
     ]
   },
   

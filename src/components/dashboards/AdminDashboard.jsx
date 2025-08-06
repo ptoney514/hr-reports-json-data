@@ -49,8 +49,9 @@ export const AdminDashboard = () => {
 
   const collections = [
     { id: 'workforce', name: 'Workforce Metrics', path: 'dashboards/workforce' },
-    { id: 'compliance', name: 'Compliance Metrics', path: 'metrics/compliance' },
-    { id: 'turnover', name: 'Turnover Metrics', path: 'metrics/turnover' }
+    { id: 'turnover', name: 'Turnover Metrics', path: 'metrics/turnover' },
+    { id: 'exit-survey', name: 'Exit Survey Data', path: 'metrics/exit-survey' },
+    { id: 'recruiting', name: 'Recruiting Metrics', path: 'metrics/recruiting' }
   ];
 
   const tabs = [

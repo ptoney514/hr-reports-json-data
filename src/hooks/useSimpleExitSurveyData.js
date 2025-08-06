@@ -12,7 +12,8 @@ const useSimpleExitSurveyData = (period = '2025-Q1') => {
   // Convert quarter format to date format for filename
   const getDateFromQuarter = (quarter) => {
     const quarterMap = {
-      '2025-Q2': '2025-06-30',
+      '2025-Q4': '2025-06-30',
+      '2025-Q2': '2025-06-30', 
       '2025-Q1': '2025-03-31',
       '2024-Q4': '2024-12-31',
       '2024-Q3': '2024-09-30',
@@ -53,15 +54,15 @@ const useSimpleExitSurveyData = (period = '2025-Q1') => {
 
     return {
       exitSurveyData: {
-        totalExits: data.metrics?.totalExits || 98,
-        totalResponses: data.metrics?.totalResponses || 20,
-        recommendationRate: data.metrics?.recommendationRate || 55,
-        avgTenure: data.metrics?.avgTenure || 2.4,
-        exitInterviewCompletion: data.metrics?.exitInterviewCompletion || 20.4
+        totalExits: data.metrics?.totalExits || 372,
+        totalResponses: data.metrics?.totalResponses || 11,
+        recommendationRate: data.metrics?.recommendationRate || 72.7,
+        avgTenure: data.metrics?.avgTenure || "TBD",
+        exitInterviewCompletion: data.metrics?.exitInterviewCompletion || 2.96
       },
       exitReasons: Object.entries(data.exitReasons || {}).map(([name, value]) => ({
         name,
-        value: parseInt(value)
+        value: parseFloat(value)
       })),
       satisfactionData: Object.entries(data.satisfaction || {}).map(([category, scores]) => ({
         category,
@@ -69,12 +70,25 @@ const useSimpleExitSurveyData = (period = '2025-Q1') => {
         neutral: scores.neutral || 0,
         dissatisfied: scores.dissatisfied || 0
       })),
-      departmentExits: Object.entries(data.byDepartment || {}).map(([dept, data]) => ({
+      departmentExits: Object.entries(data.byDepartment || {}).map(([dept, deptData]) => ({
         department: dept,
-        exits: data.exits || 0,
-        responses: data.responses || 0,
-        responseRate: data.responses ? Math.round((data.responses / data.exits) * 100) : 0
+        exits: deptData.exits || "N/A",
+        responses: deptData.responses || 0,
+        responseRate: (deptData.exits && deptData.responses) ? 
+          ((deptData.responses / deptData.exits) * 100).toFixed(1) + "%" : 
+          deptData.responses ? "N/A" : "0%"
       })),
+      salaryComparison: data.salaryComparison ? Object.entries(data.salaryComparison).map(([label, percentage]) => ({
+        label,
+        count: Math.round((percentage * 11) / 100), // Calculate count from percentage
+        percentage: parseFloat(percentage)
+      })) : [],
+      keyInsights: data.keyInsights || {
+        areasOfConcern: [],
+        positiveFeedback: [],
+        actionItems: []
+      },
+      summaryText: data.summaryText || "",
       metadata: {
         source: 'json',
         period: data.quarter,

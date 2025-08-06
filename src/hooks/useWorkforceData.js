@@ -17,6 +17,21 @@ const useWorkforceData = (customFilters = {}) => {
   const [localError, setLocalError] = useState(null);
   const [cachedData, setCachedData] = useState(null);
   const { handleError } = useErrorHandler('useWorkforceData');
+  
+  // Store action refs to prevent infinite loops
+  const handleErrorRef = useRef(handleError);
+  const updateDataTimestampRef = useRef(actions.updateDataTimestamp);
+  const setLoadingRef = useRef(actions.setLoading);
+  const setErrorRef = useRef(actions.setError);
+  const clearErrorRef = useRef(actions.clearError);
+  
+  useEffect(() => {
+    handleErrorRef.current = handleError;
+    updateDataTimestampRef.current = actions.updateDataTimestamp;
+    setLoadingRef.current = actions.setLoading;
+    setErrorRef.current = actions.setError;
+    clearErrorRef.current = actions.clearError;
+  }, []); // Remove dependencies to prevent circular updates
 
   // Stabilize activeFilters to prevent unnecessary re-renders
   const activeFiltersRef = useRef();
@@ -99,8 +114,8 @@ const useWorkforceData = (customFilters = {}) => {
     const fetchData = async () => {
       if (!skipStateUpdates) {
         setLocalLoading(true);
-        actions.setLoading('workforce', true);
-        actions.clearError('workforce');
+        if (setLoadingRef.current) setLoadingRef.current('workforce', true);
+        if (clearErrorRef.current) clearErrorRef.current('workforce');
         setLocalError(null);
       }
 
@@ -141,21 +156,21 @@ const useWorkforceData = (customFilters = {}) => {
         return data;
       } catch (error) {
         if (!skipStateUpdates) {
-          handleError(error, {
+          handleErrorRef.current(error, {
             operation: 'loadWorkforceData',
             filters: filters
           });
 
           const errorMessage = `Failed to load workforce data: ${error.message}`;
           setLocalError(errorMessage);
-          actions.setError('workforce', errorMessage);
+          if (setErrorRef.current) setErrorRef.current('workforce', errorMessage);
         }
         
         throw error;
       } finally {
         if (!skipStateUpdates) {
           setLocalLoading(false);
-          actions.setLoading('workforce', false);
+          if (setLoadingRef.current) setLoadingRef.current('workforce', false);
         }
       }
     };
@@ -166,7 +181,7 @@ const useWorkforceData = (customFilters = {}) => {
       fetchData,
       3 // maxRetries
     );
-  }, [handleError, getCacheKey, workforceDataSchema, actions]);
+  }, [getCacheKey, workforceDataSchema]); // Removed handleError to prevent re-creation
 
   // Filter workforce data based on active filters
   const filterData = useCallback((data, filters) => {
@@ -263,6 +278,10 @@ const useWorkforceData = (customFilters = {}) => {
         };
       }
     }
+
+    // Always preserve departmentalBreakdown and other important data structures
+    filteredData.currentPeriod.departmentalBreakdown = data.currentPeriod?.departmentalBreakdown || [];
+    filteredData.currentPeriod.topDivisions = data.currentPeriod?.topDivisions || [];
 
     return filteredData;
   }, []);
@@ -402,23 +421,34 @@ const useWorkforceData = (customFilters = {}) => {
     return () => {
       isMounted = false;
     };
-  }, [activeFilters, getCacheKey, workforceDataSchema, handleError]);
+  }, [activeFilters, loadData]); // Only depend on activeFilters and loadData
 
   // Separate effect for updating timestamp - prevents circular dependency
   useEffect(() => {
-    if (cachedData) {
-      actions.updateDataTimestamp();
+    if (cachedData && updateDataTimestampRef.current) {
+      updateDataTimestampRef.current();
     }
-  }, [cachedData, actions]);
+  }, [cachedData]); // Use ref to prevent infinite loop
 
   // Compute filtered and formatted data
   const filteredData = useMemo(() => {
-    if (!cachedData) return null;
-    return filterData(cachedData, activeFilters);
+    console.log('🔍 useWorkforceData - cachedData:', cachedData);
+    console.log('🔍 useWorkforceData - activeFilters:', activeFilters);
+    if (!cachedData) {
+      console.log('🚫 useWorkforceData - No cachedData, returning null');
+      return null;
+    }
+    const filtered = filterData(cachedData, activeFilters);
+    console.log('🔍 useWorkforceData - filteredData result:', filtered);
+    console.log('🔍 useWorkforceData - filteredData departmentalBreakdown:', filtered?.currentPeriod?.departmentalBreakdown);
+    return filtered;
   }, [cachedData, activeFilters, filterData]);
 
   const formattedData = useMemo(() => {
-    return formatDataForComponents(filteredData);
+    console.log('🔍 useWorkforceData - filteredData for formatting:', filteredData);
+    const formatted = formatDataForComponents(filteredData);
+    console.log('🔍 useWorkforceData - formattedData result:', formatted);
+    return formatted;
   }, [filteredData, formatDataForComponents]);
 
   // Utility functions
@@ -443,6 +473,12 @@ const useWorkforceData = (customFilters = {}) => {
   // Error state (combines context and local errors)
   const error = localError || state.error.workforce;
 
+  console.log('🔍 useWorkforceData - RETURNING:', {
+    formattedData,
+    filteredData,
+    rawDataHasDepartmental: filteredData?.currentPeriod?.departmentalBreakdown?.length
+  });
+
   return {
     // Data
     data: formattedData,
@@ -460,7 +496,7 @@ const useWorkforceData = (customFilters = {}) => {
     // Actions
     refetch,
     clearError: () => {
-      actions.clearError('workforce');
+      if (clearErrorRef.current) clearErrorRef.current('workforce');
       setLocalError(null);
     },
     

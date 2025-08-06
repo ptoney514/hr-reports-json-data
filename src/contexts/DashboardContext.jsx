@@ -59,7 +59,7 @@ const createDefaultState = () => {
   },
   
   // Dashboard state
-  currentDashboard: 'workforce', // 'workforce', 'turnover', 'i9'
+  currentDashboard: 'workforce', // 'workforce', 'turnover', 'recruiting', 'exit-survey'
   dataLastUpdated: null,
   
   // Available filter options (populated from data)

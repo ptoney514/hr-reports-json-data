@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useDashboard } from '../contexts/DashboardContext';
 import turnoverDataJson from '../data/turnover-data.json';
 
@@ -11,6 +11,20 @@ const useTurnoverData = (customFilters = {}) => {
   const { state, actions } = useDashboard();
   const [localLoading, setLocalLoading] = useState(false);
   const [localError, setLocalError] = useState(null);
+
+  // Create refs for action functions to prevent infinite loops
+  const updateDataTimestampRef = useRef(actions.updateDataTimestamp);
+  const setLoadingRef = useRef(actions.setLoading);
+  const clearErrorRef = useRef(actions.clearError);
+  const setErrorRef = useRef(actions.setError);
+
+  // Update refs when actions change
+  useEffect(() => {
+    updateDataTimestampRef.current = actions.updateDataTimestamp;
+    setLoadingRef.current = actions.setLoading;
+    clearErrorRef.current = actions.clearError;
+    setErrorRef.current = actions.setError;
+  }, [actions]);
 
   // Merge context filters with custom filters
   const activeFilters = useMemo(() => ({
@@ -34,8 +48,8 @@ const useTurnoverData = (customFilters = {}) => {
 
     try {
       setLocalLoading(true);
-      actions.setLoading('turnover', true);
-      actions.clearError('turnover');
+      setLoadingRef.current('turnover', true);
+      clearErrorRef.current('turnover');
       setLocalError(null);
 
       // Simulate network delay
@@ -55,13 +69,13 @@ const useTurnoverData = (customFilters = {}) => {
     } catch (error) {
       const errorMessage = `Failed to load turnover data: ${error.message}`;
       setLocalError(errorMessage);
-      actions.setError('turnover', errorMessage);
+      setErrorRef.current('turnover', errorMessage);
       throw error;
     } finally {
       setLocalLoading(false);
-      actions.setLoading('turnover', false);
+      setLoadingRef.current('turnover', false);
     }
-  }, [actions]);
+  }, []);
 
   // Filter turnover data based on active filters
   const filterData = useCallback((data, filters) => {
@@ -270,7 +284,7 @@ const useTurnoverData = (customFilters = {}) => {
       try {
         await loadData();
         if (isMounted) {
-          actions.updateDataTimestamp();
+          updateDataTimestampRef.current();
         }
       } catch (error) {
         // Error is already handled in loadData
@@ -283,7 +297,7 @@ const useTurnoverData = (customFilters = {}) => {
     return () => {
       isMounted = false;
     };
-  }, [loadData, actions]);
+  }, [loadData]);
 
   // Compute filtered and formatted data
   const filteredData = useMemo(() => {
@@ -331,7 +345,7 @@ const useTurnoverData = (customFilters = {}) => {
     // Actions
     refetch,
     clearError: () => {
-      actions.clearError('turnover');
+      clearErrorRef.current('turnover');
       setLocalError(null);
     },
     

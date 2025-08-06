@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import useSimpleWorkforceData from '../../hooks/useSimpleWorkforceData';
 import useSimpleTurnoverData from '../../hooks/useSimpleTurnoverData';
-import useComplianceData from '../../hooks/useComplianceData';
 import useRecruitingData from '../../hooks/useRecruitingData';
 import useExitSurveyData from '../../hooks/useExitSurveyData';
 
@@ -15,7 +14,6 @@ const JsonDataTester = () => {
   // Use all the hooks
   const workforceHook = useSimpleWorkforceData();
   const turnoverHook = useSimpleTurnoverData();
-  const complianceHook = useComplianceData();
   const recruitingHook = useRecruitingData();
   const exitSurveyHook = useExitSurveyData();
 
@@ -23,7 +21,6 @@ const JsonDataTester = () => {
   const hooks = {
     workforce: workforceHook,
     turnover: turnoverHook,
-    compliance: complianceHook,
     recruiting: recruitingHook,
     'exit-survey': exitSurveyHook
   };
@@ -84,7 +81,6 @@ const JsonDataTester = () => {
             >
               <option value="workforce">Workforce</option>
               <option value="turnover">Turnover</option>
-              <option value="compliance">Compliance</option>
               <option value="recruiting">Recruiting</option>
               <option value="exit-survey">Exit Survey</option>
             </select>
@@ -244,34 +240,6 @@ const JsonDataTester = () => {
               </>
             )}
 
-            {selectedDataType === 'compliance' && (
-              <>
-                <div className="bg-green-50 p-3 rounded">
-                  <p className="text-sm text-gray-600">Overall Compliance</p>
-                  <p className="text-2xl font-bold text-green-600">
-                    {currentHook.data.metrics?.overallCompliance || 0}%
-                  </p>
-                </div>
-                <div className="bg-blue-50 p-3 rounded">
-                  <p className="text-sm text-gray-600">I-9 Compliance</p>
-                  <p className="text-2xl font-bold text-blue-600">
-                    {currentHook.data.metrics?.i9Compliance || 0}%
-                  </p>
-                </div>
-                <div className="bg-yellow-50 p-3 rounded">
-                  <p className="text-sm text-gray-600">Pending Reviews</p>
-                  <p className="text-2xl font-bold text-yellow-600">
-                    {currentHook.data.metrics?.pendingReviews || 0}
-                  </p>
-                </div>
-                <div className="bg-red-50 p-3 rounded">
-                  <p className="text-sm text-gray-600">High Risk</p>
-                  <p className="text-2xl font-bold text-red-600">
-                    {currentHook.data.riskIndicators?.highRisk || 0}
-                  </p>
-                </div>
-              </>
-            )}
           </div>
         </div>
       )}

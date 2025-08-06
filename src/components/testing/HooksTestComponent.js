@@ -3,15 +3,12 @@ import { ChevronDown, ChevronRight, CheckCircle, XCircle, AlertCircle, RefreshCw
 import { useDashboard } from '../../contexts/DashboardContext';
 import useWorkforceData from '../../hooks/useWorkforceData';
 import useTurnoverData from '../../hooks/useTurnoverData';
-import useComplianceData from '../../hooks/useComplianceData';
-import useTestComplianceData from '../../hooks/test/useTestComplianceData';
 
 const HooksTestComponent = () => {
   const { state, actions } = useDashboard();
   const [expandedSections, setExpandedSections] = useState({
     workforce: true,
-    turnover: true,
-    compliance: true
+    turnover: true
   });
 
   const [selectedQuarter, setSelectedQuarter] = useState('Q3-2024');
@@ -30,7 +27,6 @@ const HooksTestComponent = () => {
   // useTurnoverData accepts customFilters parameter  
   const turnoverHook = useTurnoverData({ fiscalYear: 'FY2024' });
   // Use test version that accepts quarter parameter directly
-  const complianceHook = useTestComplianceData(selectedQuarter);
 
   const toggleSection = (section) => {
     setExpandedSections(prev => ({
@@ -229,35 +225,6 @@ const HooksTestComponent = () => {
                 </div>
               )}
 
-              {name === 'Compliance' && data && (
-                <div className="bg-green-50 rounded-lg p-3">
-                  <div className="text-sm font-medium text-green-900 mb-2">Compliance Data Details</div>
-                  <div className="grid grid-cols-2 gap-2 text-xs">
-                    <div>
-                      <span className="text-green-700">Risk Categories:</span>{' '}
-                      <span className="font-medium">
-                        {data.riskCategories ? data.riskCategories.length : 0}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="text-green-700">Trends Data:</span>{' '}
-                      <span className="font-medium">
-                        {data.trends ? data.trends.length : 0} points
-                      </span>
-                    </div>
-                    <div>
-                      <span className="text-green-700">Has Summary:</span>{' '}
-                      <span className="font-medium">
-                        {data.summary ? 'Yes' : 'No'}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="text-green-700">Quarter:</span>{' '}
-                      <span className="font-medium">{selectedQuarter}</span>
-                    </div>
-                  </div>
-                </div>
-              )}
             </div>
           </div>
         )}
@@ -274,7 +241,7 @@ const HooksTestComponent = () => {
             <div>
               <h1 className="text-2xl font-bold text-gray-900">JSON Data Hooks Test Component (Hot Reload Working!)</h1>
               <p className="text-gray-600 mt-2">
-                Comprehensive testing interface for useWorkforceData, useTurnoverData, and useComplianceData hooks
+                Comprehensive testing interface for useWorkforceData and useTurnoverData hooks
               </p>
             </div>
             <div className="flex items-center space-x-3">
@@ -324,7 +291,7 @@ const HooksTestComponent = () => {
                 <div>
                   <div className="text-sm text-gray-600">Status</div>
                   <div className="text-2xl font-bold text-green-600">
-                    {workforceHook.loading || turnoverHook.loading || complianceHook.loading 
+                    {workforceHook.loading || turnoverHook.loading 
                       ? 'Loading' 
                       : 'Ready'}
                   </div>
@@ -339,7 +306,6 @@ const HooksTestComponent = () => {
         <div className="space-y-4">
           {renderHookStatus(workforceHook, 'Workforce')}
           {renderHookStatus(turnoverHook, 'Turnover')}
-          {renderHookStatus(complianceHook, 'Compliance')}
         </div>
 
         {/* Debug Information */}
@@ -364,7 +330,7 @@ const HooksTestComponent = () => {
             </div>
             <div>
               <span className="text-gray-600">Hook Types:</span>{' '}
-              <span className="text-gray-900">workforce, turnover, compliance</span>
+              <span className="text-gray-900">workforce, turnover</span>
             </div>
           </div>
         </div>

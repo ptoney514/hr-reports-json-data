@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import SummaryCard from '../ui/SummaryCard';
 import ErrorBoundary from '../ui/ErrorBoundary';
 import useWorkforceData from '../../hooks/useWorkforceData';
+import DepartmentHeadcountDisplay from '../charts/DepartmentHeadcountDisplay';
+import LocationDistributionChart from '../charts/LocationDistributionChart';
 import { 
   Users, 
   TrendingUp, 
@@ -221,14 +223,32 @@ const WorkforceDashboard = () => {
             />
           </div>
 
-          {/* Placeholder content area */}
-          <div className="bg-white rounded-lg shadow-sm border p-6">
-            <div className="text-center py-16">
-              <Users className="mx-auto h-16 w-16 text-gray-300" />
-              <h2 className="mt-4 text-xl font-semibold text-gray-600">Workforce Dashboard Content</h2>
-              <p className="mt-2 text-gray-500">
-                Charts, analytics, and detailed workforce insights will be implemented here.
-              </p>
+          {/* Workforce Analytics Charts */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 print:gap-4">
+            {/* Department Headcount Display */}
+            <div className="lg:col-span-1">
+              {(() => {
+                const deptData = rawData?.currentPeriod?.departmentalBreakdown || [];
+                console.log('🔍 WorkforceDashboard - Departmental data being passed:', deptData);
+                console.log('🔍 WorkforceDashboard - Data length:', deptData.length);
+                console.log('🔍 WorkforceDashboard - Raw data structure:', rawData);
+                return (
+                  <DepartmentHeadcountDisplay 
+                    data={deptData}
+                    maxItems={10}
+                    title="Top 10 Benefit Eligible Headcount by Department"
+                    className="print:h-80 min-h-[420px]"
+                  />
+                );
+              })()}
+            </div>
+            
+            {/* Location Distribution Chart */}
+            <div className="lg:col-span-1">
+              <LocationDistributionChart 
+                data={rawData?.currentPeriod?.locations || []}
+                className="print:h-80 min-h-[420px]"
+              />
             </div>
           </div>
         </div>

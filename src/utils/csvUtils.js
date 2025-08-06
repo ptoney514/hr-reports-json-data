@@ -760,3 +760,137 @@ const validateWorkforceAggregateData = (csvData, errors, warnings, headers) => {
     warnings
   };
 };
+
+/**
+ * Parse departmental breakdown CSV data
+ * Expected format: Row Labels, FACULTY, STAFF, Grand Total
+ * @param {string} csvString - Raw CSV string
+ * @returns {object} Parsed departmental breakdown data
+ */
+export const parseDepartmentalBreakdown = (csvString) => {
+  try {
+    const { data, errors } = parseCSV(csvString, {
+      hasHeaders: true,
+      parseNumbers: true
+    });
+
+    if (errors.length > 0) {
+      return { success: false, errors, data: [] };
+    }
+
+    // Map CSV columns to our expected format
+    const departments = data
+      .filter(row => {
+        // Skip empty rows and summary rows
+        const rowLabel = (row['Row Labels'] || row['Division'] || row['Department'] || '').trim();
+        return rowLabel && 
+               rowLabel !== '' && 
+               !rowLabel.toLowerCase().includes('grand total') &&
+               !rowLabel.toLowerCase().includes('count of empl num');
+      })
+      .map(row => {
+        const name = (row['Row Labels'] || row['Division'] || row['Department'] || '').trim();
+        const faculty = parseInt(row['FACULTY'] || row['Faculty'] || 0) || 0;
+        const staff = parseInt(row['STAFF'] || row['Staff'] || 0) || 0;
+        const total = parseInt(row['Grand Total'] || row['Total'] || (faculty + staff)) || (faculty + staff);
+        
+        return {
+          name: name,
+          faculty: faculty,
+          staff: staff,
+          total: total,
+          benefitEligibleOnly: true,
+          type: faculty > 0 ? 'mixed' : 'staff-only'
+        };
+      })
+      .filter(dept => dept.name); // Remove any departments without names
+
+    // Validation
+    const validationErrors = [];
+    departments.forEach((dept, index) => {
+      if (!dept.name || dept.name.trim() === '') {
+        validationErrors.push(`Row ${index + 1}: Department name is required`);
+      }
+      
+      if (dept.faculty < 0 || dept.staff < 0) {
+        validationErrors.push(`Row ${index + 1} (${dept.name}): Faculty and staff counts cannot be negative`);
+      }
+      
+      if (dept.total !== (dept.faculty + dept.staff)) {
+        validationErrors.push(`Row ${index + 1} (${dept.name}): Total (${dept.total}) does not match Faculty + Staff (${dept.faculty + dept.staff})`);
+      }
+    });
+
+    if (validationErrors.length > 0) {
+      return { 
+        success: false, 
+        errors: validationErrors, 
+        data: departments,
+        summary: {
+          totalDepartments: departments.length,
+          totalFaculty: departments.reduce((sum, d) => sum + d.faculty, 0),
+          totalStaff: departments.reduce((sum, d) => sum + d.staff, 0),
+          totalEmployees: departments.reduce((sum, d) => sum + d.total, 0)
+        }
+      };
+    }
+
+    return { 
+      success: true, 
+      data: departments,
+      summary: {
+        totalDepartments: departments.length,
+        totalFaculty: departments.reduce((sum, d) => sum + d.faculty, 0),
+        totalStaff: departments.reduce((sum, d) => sum + d.staff, 0),
+        totalEmployees: departments.reduce((sum, d) => sum + d.total, 0)
+      }
+    };
+
+  } catch (error) {
+    return { 
+      success: false, 
+      errors: [`CSV parsing error: ${error.message}`], 
+      data: [] 
+    };
+  }
+};
+
+/**
+ * Generate CSV template for departmental breakdown
+ * @returns {string} CSV template string
+ */
+export const generateDepartmentalBreakdownTemplate = () => {
+  const headers = ['Row Labels', 'FACULTY', 'STAFF', 'Grand Total'];
+  const sampleData = [
+    ['School of Medicine', '117', '474', '591'],
+    ['Phoenix Campus', '0', '372', '372'],
+    ['Pharmacy & Health Professions', '120', '214', '334'],
+    ['Arts & Sciences', '253', '67', '320'],
+    ['Dentistry', '76', '76', '152'],
+    ['Facilities', '0', '152', '152'],
+    ['Nursing', '94', '52', '146']
+  ];
+
+  return [headers, ...sampleData]
+    .map(row => row.map(cell => `"${cell}"`).join(','))
+    .join('\n');
+};
+
+/**
+ * Convert departmental breakdown data to CSV
+ * @param {Array} departments - Array of department objects
+ * @returns {string} CSV string
+ */
+export const departmentalBreakdownToCSV = (departments) => {
+  const headers = ['Row Labels', 'FACULTY', 'STAFF', 'Grand Total'];
+  const rows = departments.map(dept => [
+    dept.name || '',
+    (dept.faculty || 0).toString(),
+    (dept.staff || 0).toString(),
+    (dept.total || 0).toString()
+  ]);
+
+  return [headers, ...rows]
+    .map(row => row.map(cell => `"${cell}"`).join(','))
+    .join('\n');
+};

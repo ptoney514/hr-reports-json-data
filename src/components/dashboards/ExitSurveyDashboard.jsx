@@ -61,9 +61,9 @@ const FALLBACK_DATA = {
 };
 
 const ExitSurveyDashboard = () => {
-  // Fixed reporting period - June 30, 2025
+  // Fixed reporting period - June 30, 2025 (Q4 2025)
   const REPORTING_DATE = '6/30/2025';
-  const REPORTING_QUARTER = '2025-Q2';
+  const REPORTING_QUARTER = '2025-Q4';
 
   // Use JSON data with fallback
   const { 
@@ -82,7 +82,8 @@ const ExitSurveyDashboard = () => {
     satisfactionData = FALLBACK_DATA.satisfactionData, 
     departmentExits = FALLBACK_DATA.departmentExits, 
     keyInsights = FALLBACK_DATA.keyInsights, 
-    summaryText = FALLBACK_DATA.summaryText 
+    summaryText = FALLBACK_DATA.summaryText,
+    salaryComparison = [] 
   } = data;
 
   // Show loading state only if JSON data is actively loading AND no fallback data available
@@ -171,6 +172,22 @@ const ExitSurveyDashboard = () => {
           </div>
         </div>
 
+        {/* Response Rate Warning Banner */}
+        <div className="bg-yellow-50 border border-yellow-200 print:border-gray p-3 rounded-lg mb-4 print:mb-2">
+          <div className="flex items-center gap-2">
+            <div className="w-4 h-4 bg-yellow-500 rounded-full flex-shrink-0"></div>
+            <div>
+              <p className="text-sm font-medium text-yellow-800 print:text-black">
+                Low Response Rate Alert: Statistical Significance Limited
+              </p>
+              <p className="text-xs text-yellow-700 print:text-black mt-1">
+                With only 2.96% response rate (11 of 372 exits), these insights should be interpreted with caution. 
+                Improving participation rates is recommended for more reliable data.
+              </p>
+            </div>
+          </div>
+        </div>
+
         {/* Exit Survey Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 print:gap-2 mb-6 print:mb-4">
           <div className="bg-white print:bg-white p-4 print:p-2 rounded-lg shadow-sm border print:border-gray">
@@ -187,24 +204,24 @@ const ExitSurveyDashboard = () => {
             <h2 className="text-xs font-medium text-blue-700 mb-1">Would Recommend</h2>
             <div className="flex items-end gap-1">
               <span className="text-2xl font-bold">{exitSurveyData.recommendationRate}%</span>
-              <span className="text-yellow-500 text-xs">
-                <ArrowDownCircle size={12} className="text-yellow-500 inline" />
+              <span className="text-green-500 text-xs">
+                <ArrowDownCircle size={12} className="text-green-500 inline transform rotate-180" />
               </span>
             </div>
-            <p className="text-gray-500 text-xs">11 of 20 respondents</p>
+            <p className="text-gray-500 text-xs">8 of 11 respondents</p>
           </div>
           <div className="bg-white print:bg-white p-4 print:p-2 rounded-lg shadow-sm border print:border-gray">
             <h2 className="text-xs font-medium text-blue-700 mb-1">Avg Tenure at Exit</h2>
             <div className="flex items-end gap-1">
               <span className="text-2xl font-bold">{exitSurveyData.avgTenure}</span>
-              <span className="text-xs">years</span>
+              {exitSurveyData.avgTenure !== "TBD" && <span className="text-xs">years</span>}
             </div>
-            <p className="text-gray-500 text-xs">64% left in first 3 years</p>
+            <p className="text-gray-500 text-xs">Pending calculation</p>
           </div>
           <div className="bg-white print:bg-white p-4 print:p-2 rounded-lg shadow-sm border print:border-gray">
             <h2 className="text-xs font-medium text-blue-700 mb-1">Top Exit Reason</h2>
-            <div className="text-lg font-bold">Career Growth</div>
-            <p className="text-gray-500 text-xs">30% of responses</p>
+            <div className="text-lg font-bold">Family/Personal</div>
+            <p className="text-gray-500 text-xs">36.4% of responses</p>
           </div>
         </div>
 
@@ -274,6 +291,55 @@ const ExitSurveyDashboard = () => {
           </div>
         </div>
 
+        {/* Salary Comparison and Areas of Concern Row */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 print:gap-2 mb-6 print:mb-4">
+          {/* Salary Comparison Widget */}
+          <div className="bg-white print:bg-white p-6 print:p-4 rounded-lg shadow-sm border print:border-gray">
+            <h2 className="text-sm font-medium text-blue-700 mb-4">Salary Impact on Exit Decision</h2>
+            <div className="space-y-3">
+              {salaryComparison && salaryComparison.length > 0 ? salaryComparison.map((item, index) => (
+                <div key={index} className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-blue-500"></div>
+                    <span className="text-xs font-medium text-gray-700">{item.label}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-bold text-gray-800">{item.count}</span>
+                    <span className="text-xs text-gray-500">({item.percentage}%)</span>
+                  </div>
+                </div>
+              )) : (
+                <p className="text-xs text-gray-500">No salary comparison data available</p>
+              )}
+            </div>
+          </div>
+
+          {/* Areas of Concern Alert Box */}
+          <div className="bg-red-50 print:bg-white border border-red-200 print:border-gray p-6 print:p-4 rounded-lg shadow-sm">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+              <h2 className="text-sm font-bold text-red-800 print:text-black">Areas Requiring Immediate Attention</h2>
+            </div>
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <span className="bg-red-600 text-white text-xs font-bold px-2 py-1 rounded">30%</span>
+                <span className="text-xs text-red-800 print:text-black">reported witnessing improper conduct</span>
+                <span className="bg-red-100 text-red-800 text-xs px-2 py-1 rounded ml-auto print:hidden">CRITICAL</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="bg-orange-600 text-white text-xs font-bold px-2 py-1 rounded">2</span>
+                <span className="text-xs text-red-800 print:text-black">employees cited racial inequality concerns</span>
+                <span className="bg-orange-100 text-orange-800 text-xs px-2 py-1 rounded ml-auto print:hidden">URGENT</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="bg-yellow-600 text-white text-xs font-bold px-2 py-1 rounded">18%</span>
+                <span className="text-xs text-red-800 print:text-black">cited supervisor relationship issues</span>
+                <span className="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded ml-auto print:hidden">WARNING</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Exit Survey Key Insights */}
         <div className="bg-white print:bg-white p-6 print:p-4 rounded-lg shadow-sm border print:border-gray mb-6 print:mb-4">
           <h2 className="text-sm font-medium text-blue-700 mb-2">Exit Survey Key Insights</h2>
@@ -308,13 +374,34 @@ const ExitSurveyDashboard = () => {
               <h3 className="font-medium text-gray-800 mb-1">🎯 Action Items</h3>
               <ul className="space-y-1 text-gray-600">
                 {keyInsights?.actionItems?.map((item, index) => (
-                  <li key={index}>• {item}</li>
+                  <li key={index} className="flex items-start gap-2">
+                    <span className={`flex-shrink-0 w-2 h-2 rounded-full mt-1 ${
+                      item.priority === 'critical' ? 'bg-red-500' :
+                      item.priority === 'warning' ? 'bg-orange-500' : 'bg-blue-500'
+                    }`}></span>
+                    <span>{item.text}</span>
+                  </li>
                 )) || [
-                  <li key="1">• Improve exit survey response rates (currently 20%)</li>,
-                  <li key="2">• Management training for supervisors</li>,
-                  <li key="3">• Enhanced career development programs</li>,
-                  <li key="4">• Improved onboarding for retention</li>,
-                  <li key="5">• Regular check-ins for new hires</li>
+                  <li key="1" className="flex items-start gap-2">
+                    <span className="flex-shrink-0 w-2 h-2 rounded-full mt-1 bg-red-500"></span>
+                    <span>Investigate reported improper conduct (3 of 11 respondents)</span>
+                  </li>,
+                  <li key="2" className="flex items-start gap-2">
+                    <span className="flex-shrink-0 w-2 h-2 rounded-full mt-1 bg-orange-500"></span>
+                    <span>Implement supervisor training program - cited by 18% as exit reason</span>
+                  </li>,
+                  <li key="3" className="flex items-start gap-2">
+                    <span className="flex-shrink-0 w-2 h-2 rounded-full mt-1 bg-orange-500"></span>
+                    <span>Address retention in Medicine (82 exits) and Phoenix (92 exits)</span>
+                  </li>,
+                  <li key="4" className="flex items-start gap-2">
+                    <span className="flex-shrink-0 w-2 h-2 rounded-full mt-1 bg-blue-500"></span>
+                    <span>Enhance career development programs - limited advancement cited</span>
+                  </li>,
+                  <li key="5" className="flex items-start gap-2">
+                    <span className="flex-shrink-0 w-2 h-2 rounded-full mt-1 bg-blue-500"></span>
+                    <span>Improve exit survey response rate (currently 2.96%)</span>
+                  </li>
                 ]}
               </ul>
             </div>
@@ -342,11 +429,12 @@ const ExitSurveyDashboard = () => {
                       <td className="p-2 text-center">{dept.exits}</td>
                       <td className="p-2 text-center">{dept.responses}</td>
                       <td className={`p-2 text-center ${
-                        dept.responseRate >= 30 ? 'text-green-600' : 
-                        dept.responseRate >= 20 ? 'text-yellow-600' : 
+                        dept.responseRate === 'N/A' ? 'text-gray-500' :
+                        parseFloat(dept.responseRate) >= 30 ? 'text-green-600' : 
+                        parseFloat(dept.responseRate) >= 20 ? 'text-yellow-600' : 
                         'text-red-600'
                       }`}>
-                        {dept.responseRate}%
+                        {dept.responseRate}
                       </td>
                     </tr>
                   ))}
@@ -354,7 +442,7 @@ const ExitSurveyDashboard = () => {
               </table>
             </div>
             <div className="bg-blue-50 p-3 rounded">
-              <h3 className="font-medium text-blue-800 mb-2">Q3 Exit Survey Summary</h3>
+              <h3 className="font-medium text-blue-800 mb-2">Q4 2025 Exit Survey Summary</h3>
               <div className="text-xs text-blue-700">
                 {summaryText ? summaryText.split('\n\n').map((paragraph, index) => (
                   <p key={index} className={index > 0 ? "mt-2" : ""}>

@@ -210,8 +210,120 @@ export const DataEditor = ({ collection, period }) => {
     ).join(' ');
   };
 
+  // Specialized array field renderer for departmental breakdown
+  const renderArrayField = (key, value, path) => {
+    if (key === 'departmentalBreakdown') {
+      return (
+        <div key={path} className="border border-gray-200 rounded-lg p-4 mb-6">
+          <div className="mb-4">
+            <h4 className="font-medium text-gray-900">Departmental Breakdown</h4>
+            <p className="text-xs text-gray-500 mt-0.5">
+              Manage benefit-eligible headcount by department ({value.length} departments)
+            </p>
+          </div>
+          
+          <div className="bg-gray-50 p-4 rounded-lg max-h-96 overflow-y-auto">
+            <div className="grid gap-4">
+              <div className="grid grid-cols-4 gap-2 text-xs font-medium text-gray-700 border-b border-gray-300 pb-2">
+                <div>Department Name</div>
+                <div>Faculty (BE)</div>
+                <div>Staff (BE)</div>
+                <div>Total</div>
+              </div>
+              
+              {value.map((dept, index) => (
+                <div key={index} className="grid grid-cols-4 gap-2 items-center py-2 border-b border-gray-200 last:border-b-0">
+                  <input
+                    type="text"
+                    value={dept.name || ''}
+                    onChange={(e) => handleFieldChange(`${path}.${index}.name`, e.target.value)}
+                    className="px-2 py-1 text-sm border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="Department name"
+                  />
+                  <input
+                    type="number"
+                    value={dept.faculty || 0}
+                    onChange={(e) => {
+                      const facultyValue = parseInt(e.target.value) || 0;
+                      handleFieldChange(`${path}.${index}.faculty`, facultyValue);
+                      // Auto-calculate total
+                      const staffValue = dept.staff || 0;
+                      handleFieldChange(`${path}.${index}.total`, facultyValue + staffValue);
+                      // Update type based on faculty count
+                      const newType = facultyValue > 0 ? 'mixed' : 'staff-only';
+                      handleFieldChange(`${path}.${index}.type`, newType);
+                    }}
+                    className="px-2 py-1 text-sm border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
+                    min="0"
+                  />
+                  <input
+                    type="number"
+                    value={dept.staff || 0}
+                    onChange={(e) => {
+                      const staffValue = parseInt(e.target.value) || 0;
+                      handleFieldChange(`${path}.${index}.staff`, staffValue);
+                      // Auto-calculate total
+                      const facultyValue = dept.faculty || 0;
+                      handleFieldChange(`${path}.${index}.total`, facultyValue + staffValue);
+                    }}
+                    className="px-2 py-1 text-sm border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
+                    min="0"
+                  />
+                  <input
+                    type="number"
+                    value={dept.total || 0}
+                    readOnly
+                    className="px-2 py-1 text-sm border border-gray-300 rounded bg-gray-100 text-gray-600"
+                  />
+                </div>
+              ))}
+            </div>
+            
+            <div className="mt-4 text-xs text-gray-600">
+              <p><strong>Note:</strong> Total is automatically calculated from Faculty + Staff.</p>
+              <p>Type is automatically set based on faculty count (mixed/staff-only).</p>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // Default array handling for other arrays
+    return (
+      <div key={path} className="border border-gray-200 rounded-lg p-4 mb-4">
+        <div className="mb-3">
+          <h4 className="font-medium text-gray-900">{getFieldLabel(key)} ({value.length} items)</h4>
+          <p className="text-xs text-gray-500 mt-0.5">{key}</p>
+        </div>
+        {value.map((item, index) => (
+          <div key={index} className="mb-3 p-3 bg-gray-50 rounded-lg">
+            <h5 className="text-sm font-medium text-gray-700 mb-2">Item {index + 1}</h5>
+            {typeof item === 'object' && item !== null 
+              ? Object.entries(item).map(([subKey, subValue]) => 
+                  renderFormField(subKey, subValue, `${path}.${index}.${subKey}`)
+                )
+              : (
+                <input
+                  type={typeof item === 'number' ? 'number' : 'text'}
+                  value={item ?? ''}
+                  onChange={(e) => handleFieldChange(`${path}.${index}`, e.target.value)}
+                  className="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm"
+                />
+              )
+            }
+          </div>
+        ))}
+      </div>
+    );
+  };
+
   const renderFormField = (key, value, path = key) => {
-    if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+    // Handle arrays (like departmentalBreakdown)
+    if (Array.isArray(value)) {
+      return renderArrayField(key, value, path);
+    }
+    
+    if (typeof value === 'object' && value !== null) {
       return (
         <div key={path} className="border border-gray-200 rounded-lg p-4 mb-4">
           <div className="mb-3">

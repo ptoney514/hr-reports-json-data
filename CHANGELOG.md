@@ -8,6 +8,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **useWorkforceData Hook Infinite Loop Resolution** (January 6, 2025)
+  - Fixed "Maximum update depth exceeded" error in useWorkforceData.js causing app-wide crashes
+  - Root cause: Unstable function references (handleError, action functions) in useEffect dependencies
+  - Created handleErrorRef to stabilize the error handler reference
+  - Removed action function dependencies from ref update useEffect
+  - Updated loadData to use handleErrorRef.current instead of direct handleError
+  - Removed unstable dependencies from main data fetching useEffect
+  - **Result**: Eliminated infinite re-render loops, stabilized hook performance
+
+### Fixed
+- **React Hooks Infinite Loop Fix** (August 6, 2025)
+  - Fixed critical infinite render loop in `useWorkforceData` hook causing "Maximum update depth exceeded" errors
+  - Root cause: `actions` object in useEffect dependencies triggering constant re-renders
+  - Implemented stable refs pattern using `useRef` for all action functions
+  - Updated `useWorkforceData.js`: Created refs for `updateDataTimestamp`, `setLoading`, `setError`, `clearError`
+  - Fixed `useTurnoverData.js` with same ref pattern to prevent similar issues
+  - Removed `actions` from all useEffect dependency arrays
+  - **Result**: Eliminated infinite loops, stabilized component rendering, improved performance
+
+### Fixed
 - **Workforce Analytics Dashboard Infinite Loop** (August 5, 2025)
   - Fixed critical "Maximum update depth exceeded" error specific to Workforce Analytics dashboard
   - Root cause: Complex circular dependency chain between dataSource state and multiple useEffect hooks

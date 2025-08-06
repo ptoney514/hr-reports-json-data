@@ -74,24 +74,6 @@ const DashboardIndex = () => {
         { label: 'Cost Impact', value: '$6.8M', trend: 'down', change: '-$0.4M' },
         { label: 'vs Industry', value: '-12%', trend: 'up', change: 'Better' }
       ]
-    },
-    {
-      id: 'i9-compliance',
-      title: 'I-9 Compliance',
-      description: 'Immigration compliance tracking and audit readiness metrics',
-      path: '/dashboards/i9',
-      icon: FileBarChart,
-      color: 'bg-green-500',
-      hoverColor: 'hover:bg-green-600',
-      borderColor: 'border-green-200',
-      bgColor: 'bg-green-50',
-      lastUpdated: new Date(Date.now() - 1000 * 60 * 5), // 5 minutes ago
-      status: 'warning',
-      stats: [
-        { label: 'Compliance Rate', value: '90%', trend: 'up', change: '+3%' },
-        { label: 'Forms Processed', value: '619', trend: 'up', change: '+32' },
-        { label: 'Audit Ready', value: '88%', trend: 'up', change: '+5%' }
-      ]
     }
   ];
 
@@ -99,7 +81,7 @@ const DashboardIndex = () => {
     {
       icon: Building2,
       label: 'Active Dashboards',
-      value: '2',
+      value: '4',
       description: 'Analytics dashboards',
       status: 'healthy',
       color: 'blue'
@@ -107,7 +89,7 @@ const DashboardIndex = () => {
     {
       icon: Database,
       label: 'Data Sources',
-      value: '5',
+      value: '4',
       description: 'Integrated HR systems',
       status: 'healthy',
       color: 'green'
@@ -345,12 +327,12 @@ const DashboardIndex = () => {
                 <div className="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
                 <div>
                   <p className="text-sm font-medium text-gray-900">
-                    I-9 Compliance Tracking
+                    Exit Survey Dashboard Enhanced
                   </p>
                   <p className="text-xs text-gray-500 mt-1">
-                    Real-time compliance monitoring and audit preparation
+                    Updated with real Q4 2025 data and new insights components
                   </p>
-                  <p className="text-xs text-green-600 mt-1">6 hours ago</p>
+                  <p className="text-xs text-green-600 mt-1">1 hour ago</p>
                 </div>
               </div>
             </div>
@@ -376,13 +358,6 @@ const DashboardIndex = () => {
                 <div className="flex items-center gap-3">
                   <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                   <span className="text-sm font-medium">BambooHR</span>
-                </div>
-                <span className="text-xs text-green-600">Active</span>
-              </div>
-              <div className="flex items-center justify-between p-2 rounded-lg bg-gray-50">
-                <div className="flex items-center gap-3">
-                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <span className="text-sm font-medium">I-9 Management</span>
                 </div>
                 <span className="text-xs text-green-600">Active</span>
               </div>

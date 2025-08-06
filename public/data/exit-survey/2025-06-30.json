@@ -1,73 +1,128 @@
 {
-  "quarter": "Q2-2025",
+  "quarter": "Q4-2025",
   "reportingDate": "2025-06-30",
   "lastUpdated": "2025-06-30T00:00:00Z",
   "metrics": {
-    "totalExits": 98,
-    "totalResponses": 20,
-    "recommendationRate": 55,
-    "avgTenure": 2.4,
-    "exitInterviewCompletion": 20.4
+    "totalExits": 372,
+    "totalResponses": 11,
+    "recommendationRate": 72.7,
+    "avgTenure": "TBD",
+    "exitInterviewCompletion": 2.96
   },
   "exitReasons": {
-    "Career Advancement": 30,
-    "Supervisor Issues": 25,
-    "Compensation": 15,
-    "Work-Life Balance": 12,
-    "Retirement": 10,
-    "Other": 8
+    "Family/Personal reasons": 36.4,
+    "Dissatisfied with supervisor": 18.2,
+    "Retirement": 9.1,
+    "Relocation": 9.1,
+    "Unsatisfactory salary": 9.1,
+    "Career advancement": 9.1,
+    "Other": 9.1
   },
   "satisfaction": {
-    "Overall Experience": {
-      "satisfied": 40,
-      "neutral": 35,
-      "dissatisfied": 25
-    },
     "Career Development": {
-      "satisfied": 30,
-      "neutral": 30,
-      "dissatisfied": 40
+      "satisfied": 50,
+      "neutral": 40,
+      "dissatisfied": 10
     },
-    "Leadership": {
-      "satisfied": 45,
+    "Recognition": {
+      "satisfied": 40,
       "neutral": 30,
-      "dissatisfied": 25
-    },
-    "Compensation": {
-      "satisfied": 35,
-      "neutral": 35,
       "dissatisfied": 30
     },
-    "Work Environment": {
-      "satisfied": 65,
+    "Leadership": {
+      "satisfied": 46,
+      "neutral": 18,
+      "dissatisfied": 36
+    },
+    "Compensation": {
+      "satisfied": 50,
       "neutral": 20,
-      "dissatisfied": 15
+      "dissatisfied": 30
     }
   },
   "byDepartment": {
-    "School of Dentistry": {
-      "exits": 12,
-      "responses": 4
-    },
-    "Student Services": {
-      "exits": 15,
-      "responses": 3
-    },
     "School of Medicine": {
-      "exits": 18,
-      "responses": 3
-    },
-    "Information Technology": {
-      "exits": 8,
+      "exits": 82,
       "responses": 2
     },
-    "Administration": {
-      "exits": 22,
-      "responses": 5
+    "Phoenix": {
+      "exits": 92,
+      "responses": 0
+    },
+    "School of Dentistry": {
+      "exits": 15,
+      "responses": 2
+    },
+    "Athletics": {
+      "exits": 9,
+      "responses": 2
+    },
+    "Information Technology": {
+      "exits": null,
+      "responses": 1
+    },
+    "Arts & Sciences": {
+      "exits": 40,
+      "responses": 0
     },
     "Other Departments": {
-      "exits": 23,
-      "responses": 3
+      "exits": 134,
+      "responses": 4
     }
-  }
+  },
+  "salaryComparison": {
+    "31% or more increase": 27.3,
+    "Salary not a factor": 27.3,
+    "16-20% increase": 9.1,
+    "21-30% increase": 9.1,
+    "Similar salary": 9.1,
+    "Leaving workforce": 18.2
+  },
+  "concernsReported": {
+    "improperConduct": 3,
+    "racialInequality": 2,
+    "supervisorIssues": 2
+  },
+  "keyInsights": {
+    "areasOfConcern": [
+      "30% reported witnessing improper conduct",
+      "18.2% cited supervisor relationship issues as primary exit reason",
+      "Multiple reports of racial inequality concerns",
+      "Limited response rate (2.96%) affects statistical significance"
+    ],
+    "positiveFeedback": [
+      "72.7% would still recommend Creighton as workplace",
+      "Strong university culture and mission alignment",
+      "Meaningful work with students highly valued",
+      "Competitive benefits package appreciated"
+    ],
+    "actionItems": [
+      {
+        "priority": "critical",
+        "text": "Investigate reported improper conduct (3 of 11 respondents)",
+        "status": "critical"
+      },
+      {
+        "priority": "warning", 
+        "text": "Implement supervisor training program - cited by 18% as exit reason",
+        "status": "warning"
+      },
+      {
+        "priority": "warning",
+        "text": "Address retention in Medicine (82 exits) and Phoenix (92 exits)",
+        "status": "warning"
+      },
+      {
+        "priority": "info",
+        "text": "Enhance career development programs - limited advancement cited",
+        "status": "info"
+      },
+      {
+        "priority": "info",
+        "text": "Improve exit survey response rate (currently 2.96%)",
+        "status": "info"
+      }
+    ]
+  },
+  "summaryText": "With a 2.96% response rate (11 of 372 exits), the exit survey provides valuable but limited insights. 72.7% of respondents would still recommend Creighton as a workplace. Key improvement areas include supervisor relationships, career advancement opportunities, and leadership communication.\n\nPositive aspects include strong university culture, meaningful work with students, and competitive benefits package. Improving exit survey participation should be a priority for more comprehensive retention insights and actionable outcomes."
 }

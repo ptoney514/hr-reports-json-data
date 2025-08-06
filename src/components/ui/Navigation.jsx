@@ -8,7 +8,6 @@ import {
   Menu,
   X,
   Settings,
-  Shield,
   UserPlus,
   MessageSquare,
   UsersRound,
@@ -45,13 +44,6 @@ const Navigation = () => {
       path: '/dashboards/turnover',
       icon: TrendingDown,
       isActive: isActive('/dashboards/turnover')
-    },
-    {
-      id: 'i9-compliance',
-      label: 'I-9 Compliance',
-      path: '/dashboards/i9',
-      icon: Shield,
-      isActive: isActive('/dashboards/i9')
     },
     {
       id: 'recruiting',

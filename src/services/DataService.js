@@ -99,33 +99,6 @@ const dataService = {
     return true;
   },
 
-  // I-9 Compliance data
-  getI9ComplianceMetrics: async (period) => {
-    const datePeriod = getPeriodKey(period);
-    const data = dataStore.i9Compliance[datePeriod];
-    
-    if (!data) {
-      console.warn(`No I-9 compliance data found for period: ${period} (mapped to ${datePeriod})`);
-      return null;
-    }
-    
-    return {
-      ...data,
-      lastUpdated: { toDate: () => new Date(data.lastUpdated) }
-    };
-  },
-  
-  // Set compliance metrics (CREATE/UPDATE)
-  setComplianceMetrics: async (period, data) => {
-    const datePeriod = getPeriodKey(period);
-    dataStore.i9Compliance[datePeriod] = {
-      ...data,
-      period: datePeriod,
-      lastUpdated: new Date().toISOString()
-    };
-    console.log(`Compliance data saved for period: ${datePeriod}`);
-    return true;
-  },
 
   // Recruiting data
   getRecruitingMetrics: async (period) => {
@@ -198,9 +171,6 @@ const dataService = {
         case 'turnover':
           data = await dataService.getTurnoverMetrics(period);
           break;
-        case 'i9Compliance':
-          data = await dataService.getI9ComplianceMetrics(period);
-          break;
         case 'recruiting':
           data = await dataService.getRecruitingMetrics(period);
           break;
@@ -223,7 +193,7 @@ const dataService = {
   getAvailablePeriods: (collection) => {
     // If collection is specified, return periods for that collection
     if (collection) {
-      const collectionData = dataStore[collection] || dataStore.i9Compliance;
+      const collectionData = dataStore[collection] || {};
       return Object.keys(collectionData || {}).filter(key => key !== 'lastUpdated');
     }
     // Otherwise return all available periods
@@ -246,9 +216,6 @@ const dataService = {
         break;
       case 'turnover':
         data = dataStore.turnover[datePeriod];
-        break;
-      case 'compliance':
-        data = dataStore.i9Compliance[datePeriod];
         break;
       case 'recruiting':
         data = dataStore.recruiting[datePeriod];
@@ -278,9 +245,6 @@ const dataService = {
       case 'turnover':
         dataStore.turnover[datePeriod] = data;
         break;
-      case 'compliance':
-        dataStore.i9Compliance[datePeriod] = data;
-        break;
       case 'recruiting':
         dataStore.recruiting[datePeriod] = data;
         break;
@@ -306,9 +270,6 @@ const dataService = {
       case 'turnover':
         delete dataStore.turnover[datePeriod];
         break;
-      case 'compliance':
-        delete dataStore.i9Compliance[datePeriod];
-        break;
       case 'recruiting':
         delete dataStore.recruiting[datePeriod];
         break;
@@ -330,8 +291,6 @@ const dataService = {
         return dataService.getWorkforceMetrics(period);
       case 'turnover':
         return dataService.getTurnoverMetrics(period);
-      case 'compliance':
-        return dataService.getI9ComplianceMetrics(period);
       case 'recruiting':
         return dataService.getRecruitingMetrics(period);
       case 'exitSurvey':
@@ -351,9 +310,6 @@ const dataService = {
         break;
       case 'turnover':
         delete dataStore.turnover[datePeriod];
-        break;
-      case 'compliance':
-        delete dataStore.i9Compliance[datePeriod];
         break;
       case 'recruiting':
         delete dataStore.recruiting[datePeriod];
