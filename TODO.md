@@ -43,6 +43,13 @@ This todo list tracks the Phase 11 objectives for user testing and dashboard ref
 
 ## Current Tasks
 
+### ✅ Exit Survey Dashboard UI Improvements (Completed - January 6, 2025)
+- [x] **Remove Exit Satisfaction Scores Chart** - Removed bar chart column to free up layout space
+- [x] **Expand Primary Reasons Chart** - Extended to full width with improved 2-column internal layout
+- [x] **Update Typography Standards** - Matched Workforce Analytics font sizes (text-2xl for values, text-sm for headers)
+- [x] **Standardize Spacing** - Updated padding and margins across all sections for consistency
+- [x] **Enhance Visual Design** - Improved pie chart size, legend spacing, and data bar visualization
+
 ### ✅ Fix Department Headcount Display Data Issue (Completed - January 6, 2025)
 - [x] **Investigate JSON data structure** - Verified departmentalBreakdown exists in workforce-data.json
 - [x] **Fix field mapping issue** - Updated DepartmentHeadcountDisplay to map 'department' field correctly

@@ -186,103 +186,83 @@ const ExitSurveyDashboard = () => {
         {/* Exit Survey Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 print:gap-2 mb-6 print:mb-4">
           <div className="bg-white print:bg-white p-4 print:p-2 rounded-lg shadow-sm border print:border-gray">
-            <h2 className="text-xs font-medium text-blue-700 mb-1">Response Rate</h2>
+            <h2 className="text-sm font-medium text-blue-700 mb-2">Response Rate</h2>
             <div className="flex items-end gap-1">
               <span className="text-2xl font-bold">{exitSurveyData.exitInterviewCompletion}%</span>
               <span className="text-red-500 text-xs">
                 <ArrowDownCircle size={12} className="text-red-500 inline" />
               </span>
             </div>
-            <p className="text-gray-500 text-xs">{exitSurveyData.totalResponses} of {exitSurveyData.totalExits} exits</p>
+            <p className="text-xs text-gray-500 mt-1">{exitSurveyData.totalResponses} of {exitSurveyData.totalExits} exits</p>
           </div>
           <div className="bg-white print:bg-white p-4 print:p-2 rounded-lg shadow-sm border print:border-gray">
-            <h2 className="text-xs font-medium text-blue-700 mb-1">Would Recommend</h2>
+            <h2 className="text-sm font-medium text-blue-700 mb-2">Would Recommend</h2>
             <div className="flex items-end gap-1">
               <span className="text-2xl font-bold">{exitSurveyData.recommendationRate}%</span>
               <span className="text-green-500 text-xs">
                 <ArrowDownCircle size={12} className="text-green-500 inline transform rotate-180" />
               </span>
             </div>
-            <p className="text-gray-500 text-xs">8 of 11 respondents</p>
+            <p className="text-xs text-gray-500 mt-1">8 of 11 respondents</p>
           </div>
           <div className="bg-white print:bg-white p-4 print:p-2 rounded-lg shadow-sm border print:border-gray">
-            <h2 className="text-xs font-medium text-blue-700 mb-1">Avg Tenure at Exit</h2>
+            <h2 className="text-sm font-medium text-blue-700 mb-2">Avg Tenure at Exit</h2>
             <div className="flex items-end gap-1">
               <span className="text-2xl font-bold">{exitSurveyData.avgTenure}</span>
-              {exitSurveyData.avgTenure !== "TBD" && <span className="text-xs">years</span>}
+              {exitSurveyData.avgTenure !== "TBD" && <span className="text-sm text-gray-600">years</span>}
             </div>
-            <p className="text-gray-500 text-xs">Pending calculation</p>
+            <p className="text-xs text-gray-500 mt-1">Pending calculation</p>
           </div>
           <div className="bg-white print:bg-white p-4 print:p-2 rounded-lg shadow-sm border print:border-gray">
-            <h2 className="text-xs font-medium text-blue-700 mb-1">Top Exit Reason</h2>
-            <div className="text-lg font-bold">Family/Personal</div>
-            <p className="text-gray-500 text-xs">36.4% of responses</p>
+            <h2 className="text-sm font-medium text-blue-700 mb-2">Top Exit Reason</h2>
+            <div className="text-2xl font-bold">Family/Personal</div>
+            <p className="text-xs text-gray-500 mt-1">36.4% of responses</p>
           </div>
         </div>
 
-        {/* Charts Row */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 print:gap-2 mb-6 print:mb-4">
-          <div className="bg-white print:bg-white p-6 print:p-4 rounded-lg shadow-sm border print:border-gray">
-            <h2 className="text-sm font-medium text-blue-700 mb-2">Primary Reasons for Leaving</h2>
-            <div className="grid grid-cols-3 gap-2">
-              <div className="col-span-1">
-                <ResponsiveContainer width="100%" height={150}>
-                  <PieChart>
-                    <Pie
-                      data={exitReasons}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      outerRadius={60}
-                      fill="#8884d8"
-                      dataKey="value"
-                      label={({name, percent}) => `${(percent * 100).toFixed(0)}%`}
-                    >
-                      {exitReasons.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <Tooltip formatter={(value) => [`${value}%`, ""]} contentStyle={{fontSize: 10}} />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
-              <div className="col-span-2">
-                <div className="space-y-2">
-                  {exitReasons.map((reason, index) => (
-                    <div key={index}>
-                      <div className="flex justify-between mb-1">
-                        <span className="flex items-center gap-1">
-                          <span className="w-2 h-2 rounded-full" style={{ backgroundColor: COLORS[index % COLORS.length] }}></span>
-                          <span className="text-xs">{reason.name}</span>
-                        </span>
-                        <span className="font-medium text-xs">{reason.value}%</span>
-                      </div>
-                      <div className="w-full bg-gray-200 rounded-full h-1">
-                        <div className="h-1 rounded-full" style={{ width: `${reason.value}%`, backgroundColor: COLORS[index % COLORS.length] }}></div>
-                      </div>
+        {/* Primary Reasons for Leaving - Full Width */}
+        <div className="bg-white print:bg-white p-6 print:p-4 rounded-lg shadow-sm border print:border-gray mb-6 print:mb-4">
+          <h2 className="text-sm font-medium text-blue-700 mb-4">Primary Reasons for Leaving</h2>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="flex justify-center items-center">
+              <ResponsiveContainer width="100%" height={250}>
+                <PieChart>
+                  <Pie
+                    data={exitReasons}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    outerRadius={100}
+                    fill="#8884d8"
+                    dataKey="value"
+                    label={({name, percent}) => `${(percent * 100).toFixed(0)}%`}
+                  >
+                    {exitReasons.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip formatter={(value) => [`${value}%`, ""]} contentStyle={{fontSize: 12}} />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="flex items-center">
+              <div className="w-full space-y-3">
+                {exitReasons.map((reason, index) => (
+                  <div key={index}>
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="flex items-center gap-2">
+                        <span className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: COLORS[index % COLORS.length] }}></span>
+                        <span className="text-sm font-medium text-gray-700">{reason.name}</span>
+                      </span>
+                      <span className="font-bold text-sm text-gray-900">{reason.value}%</span>
                     </div>
-                  ))}
-                </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div className="h-2 rounded-full transition-all duration-300" style={{ width: `${reason.value}%`, backgroundColor: COLORS[index % COLORS.length] }}></div>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
-          </div>
-          <div className="bg-white print:bg-white p-6 print:p-4 rounded-lg shadow-sm border print:border-gray">
-            <h2 className="text-sm font-medium text-blue-700 mb-2">Exit Survey Satisfaction Scores</h2>
-            <ResponsiveContainer width="100%" height={180}>
-              <BarChart
-                data={satisfactionData}
-                margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="category" tick={{fontSize: 9}} angle={-45} textAnchor="end" height={60} />
-                <YAxis tick={{fontSize: 10}} domain={[0, 100]} />
-                <Tooltip formatter={(value) => [`${value}%`, ""]} contentStyle={{fontSize: 10}} />
-                <Legend wrapperStyle={{fontSize: 10}} />
-                <Bar dataKey="dissatisfied" stackId="a" fill="#FF8042" name="Dissatisfied" />
-                <Bar dataKey="neutral" stackId="a" fill="#FFBB28" name="Neutral" />
-                <Bar dataKey="satisfied" stackId="a" fill="#00C49F" name="Satisfied" />
-              </BarChart>
-            </ResponsiveContainer>
           </div>
         </div>
 
@@ -291,16 +271,16 @@ const ExitSurveyDashboard = () => {
           {/* Salary Comparison Widget */}
           <div className="bg-white print:bg-white p-6 print:p-4 rounded-lg shadow-sm border print:border-gray">
             <h2 className="text-sm font-medium text-blue-700 mb-4">Salary Impact on Exit Decision</h2>
-            <div className="space-y-3">
+            <div className="space-y-4">
               {salaryComparison && salaryComparison.length > 0 ? salaryComparison.map((item, index) => (
                 <div key={index} className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 rounded-full bg-blue-500"></div>
-                    <span className="text-xs font-medium text-gray-700">{item.label}</span>
+                    <span className="text-sm font-medium text-gray-700">{item.label}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-bold text-gray-800">{item.count}</span>
-                    <span className="text-xs text-gray-500">({item.percentage}%)</span>
+                    <span className="text-lg font-bold text-gray-800">{item.count}</span>
+                    <span className="text-sm text-gray-500">({item.percentage}%)</span>
                   </div>
                 </div>
               )) : (
@@ -337,11 +317,11 @@ const ExitSurveyDashboard = () => {
 
         {/* Exit Survey Key Insights */}
         <div className="bg-white print:bg-white p-6 print:p-4 rounded-lg shadow-sm border print:border-gray mb-6 print:mb-4">
-          <h2 className="text-sm font-medium text-blue-700 mb-2">Exit Survey Key Insights</h2>
-          <div className="grid grid-cols-3 gap-4 text-xs">
+          <h2 className="text-sm font-medium text-blue-700 mb-4">Exit Survey Key Insights</h2>
+          <div className="grid grid-cols-3 gap-6 text-sm">
             <div>
-              <h3 className="font-medium text-gray-800 mb-1">⚠️ Areas of Concern</h3>
-              <ul className="space-y-1 text-gray-600">
+              <h3 className="font-medium text-gray-800 mb-2">⚠️ Areas of Concern</h3>
+              <ul className="space-y-2 text-xs text-gray-600">
                 {keyInsights?.areasOfConcern?.map((item, index) => (
                   <li key={index}>• {item}</li>
                 )) || [
@@ -353,8 +333,8 @@ const ExitSurveyDashboard = () => {
               </ul>
             </div>
             <div>
-              <h3 className="font-medium text-gray-800 mb-1">✅ Positive Feedback</h3>
-              <ul className="space-y-1 text-gray-600">
+              <h3 className="font-medium text-gray-800 mb-2">✅ Positive Feedback</h3>
+              <ul className="space-y-2 text-xs text-gray-600">
                 {keyInsights?.positiveFeedback?.map((item, index) => (
                   <li key={index}>• {item}</li>
                 )) || [
@@ -366,8 +346,8 @@ const ExitSurveyDashboard = () => {
               </ul>
             </div>
             <div>
-              <h3 className="font-medium text-gray-800 mb-1">🎯 Action Items</h3>
-              <ul className="space-y-1 text-gray-600">
+              <h3 className="font-medium text-gray-800 mb-2">🎯 Action Items</h3>
+              <ul className="space-y-2 text-xs text-gray-600">
                 {keyInsights?.actionItems?.map((item, index) => (
                   <li key={index} className="flex items-start gap-2">
                     <span className={`flex-shrink-0 w-2 h-2 rounded-full mt-1 ${
@@ -405,7 +385,7 @@ const ExitSurveyDashboard = () => {
 
         {/* Department Exit Trends */}
         <div className="bg-white print:bg-white p-6 print:p-4 rounded-lg shadow-sm border print:border-gray">
-          <h2 className="text-sm font-medium text-blue-700 mb-2">Exit Survey Responses by Department</h2>
+          <h2 className="text-sm font-medium text-blue-700 mb-4">Exit Survey Responses by Department</h2>
           <div className="grid grid-cols-2 gap-6">
             <div>
               <table className="w-full text-xs">
@@ -436,9 +416,9 @@ const ExitSurveyDashboard = () => {
                 </tbody>
               </table>
             </div>
-            <div className="bg-blue-50 p-3 rounded">
-              <h3 className="font-medium text-blue-800 mb-2">Q4 2025 Exit Survey Summary</h3>
-              <div className="text-xs text-blue-700">
+            <div className="bg-blue-50 p-4 rounded">
+              <h3 className="font-medium text-sm text-blue-800 mb-3">Q4 2025 Exit Survey Summary</h3>
+              <div className="text-sm text-blue-700">
                 {summaryText ? summaryText.split('\n\n').map((paragraph, index) => (
                   <p key={index} className={index > 0 ? "mt-2" : ""}>
                     {paragraph}

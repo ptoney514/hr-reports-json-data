@@ -5,7 +5,7 @@ import { generateChartAriaLabel, generateChartAriaDescription, handleChartKeyNav
 
 const DepartmentHeadcountDisplay = memo(({ 
   data = [], 
-  title = "Top 10 Benefit Eligible Headcount by Department",
+  title = "Top 5 Benefit Eligible Headcount by Department",
   maxItems = 10,
   className = "",
   compactView = false
@@ -126,7 +126,7 @@ const DepartmentHeadcountDisplay = memo(({
         id={`department-headcount-display-${Date.now()}`}
         data-chart-id="department-headcount-display"
         data-chart-title={title}
-        className={`bg-white print:bg-white p-4 print:p-2 rounded-lg shadow-sm border print:border-gray chart-focusable ${className}`}
+        className={`bg-white print:bg-white p-4 print:p-2 rounded-lg shadow-sm border print:border-gray chart-focusable mb-6 ${className}`}
         role="img"
         aria-label={ariaLabel}
         aria-describedby={`department-display-desc-${Date.now()}`}
@@ -164,7 +164,7 @@ const DepartmentHeadcountDisplay = memo(({
               <div 
                 key={department.name} 
                 className={`
-                  py-3 px-4 border-b border-gray-200 print:border-gray-400
+                  py-4 px-5 border-b border-gray-200 print:border-gray-400
                   hover:bg-blue-50 transition-colors duration-150
                   ${index % 2 === 0 ? 'bg-gray-50/30 print:bg-gray-50' : 'bg-white print:bg-white'}
                 `}
@@ -187,9 +187,9 @@ const DepartmentHeadcountDisplay = memo(({
                   
                   {/* Progress Bar - 2 columns */}
                   <div className="col-span-6 sm:col-span-2">
-                    <div className="w-full bg-gray-200 print:bg-gray-300 rounded-full h-2">
+                    <div className="w-full bg-gray-200 print:bg-gray-300 rounded-full h-3">
                       <div 
-                        className="bg-blue-500 print:bg-gray-700 h-2 rounded-full transition-all duration-300"
+                        className="bg-blue-500 print:bg-gray-700 h-3 rounded-full transition-all duration-300"
                         style={{ width: `${Math.max(department.percentage, 8)}%` }}
                       />
                     </div>
