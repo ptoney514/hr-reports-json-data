@@ -7,7 +7,8 @@ const DepartmentHeadcountDisplay = memo(({
   data = [], 
   title = "Top 10 Benefit Eligible Headcount by Department",
   maxItems = 10,
-  className = ""
+  className = "",
+  compactView = false
 }) => {
   // Accessibility state
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -156,69 +157,123 @@ const DepartmentHeadcountDisplay = memo(({
           )}
         </div>
         
-        <div className="space-y-4 print:space-y-3">
-          {departmentData.map((department, index) => (
-            <div key={department.name} className="relative">
-              {/* Department Header */}
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center min-w-0 flex-1 mr-4">
-                  <Building2 className="text-blue-600 print:text-gray-600 mr-3 flex-shrink-0" size={20} />
-                  <div className="min-w-0 flex-1">
-                    <h4 className="text-lg print:text-base font-bold text-gray-900 print:text-black truncate">
+{compactView ? (
+          /* Compact View Layout with Grid System */
+          <div className="space-y-0">
+            {departmentData.map((department, index) => (
+              <div 
+                key={department.name} 
+                className={`
+                  py-3 px-4 border-b border-gray-200 print:border-gray-400
+                  hover:bg-blue-50 transition-colors duration-150
+                  ${index % 2 === 0 ? 'bg-gray-50/30 print:bg-gray-50' : 'bg-white print:bg-white'}
+                `}
+                aria-label={`${department.name}: ${department.total.toLocaleString()} total employees, ${department.percentage.toFixed(1)}% of workforce`}
+              >
+                <div className="grid grid-cols-12 gap-4 items-center">
+                  {/* Department Name - 5 columns */}
+                  <div className="col-span-12 sm:col-span-5">
+                    <h4 className="font-semibold text-gray-900 text-sm truncate">
                       {department.name}
                     </h4>
-                    <div className="flex items-center space-x-4 mt-1">
-                      <div className="flex items-center text-sm text-gray-600 print:text-black">
-                        <UserCheck className="mr-1" size={14} />
-                        <span>{department.faculty.toLocaleString()} faculty</span>
-                      </div>
-                      <div className="flex items-center text-sm text-gray-600 print:text-black">
-                        <Users className="mr-1" size={14} />
-                        <span>{department.staff.toLocaleString()} staff</span>
-                      </div>
+                  </div>
+                  
+                  {/* Faculty/Staff Breakdown - 3 columns */}
+                  <div className="col-span-6 sm:col-span-3">
+                    <span className="text-xs text-gray-600 print:text-black whitespace-nowrap">
+                      <span className="font-medium">Faculty:</span> {department.faculty.toLocaleString()} | <span className="font-medium">Staff:</span> {department.staff.toLocaleString()}
+                    </span>
+                  </div>
+                  
+                  {/* Progress Bar - 2 columns */}
+                  <div className="col-span-6 sm:col-span-2">
+                    <div className="w-full bg-gray-200 print:bg-gray-300 rounded-full h-2">
+                      <div 
+                        className="bg-blue-500 print:bg-gray-700 h-2 rounded-full transition-all duration-300"
+                        style={{ width: `${Math.max(department.percentage, 8)}%` }}
+                      />
+                    </div>
+                  </div>
+                  
+                  {/* Total & Percentage - 2 columns */}
+                  <div className="col-span-12 sm:col-span-2 text-left sm:text-right mt-2 sm:mt-0">
+                    <div className="font-bold text-gray-900 text-sm">
+                      {department.total.toLocaleString()}
+                    </div>
+                    <div className="text-xs text-gray-500">
+                      {department.percentage.toFixed(1)}%
                     </div>
                   </div>
                 </div>
-                <div className="text-right flex-shrink-0">
-                  <div className="text-2xl print:text-xl font-bold text-gray-900 print:text-black">
-                    {department.total.toLocaleString()}
-                  </div>
-                  <div className="text-sm text-gray-500 print:text-black">
-                    {department.percentage.toFixed(1)}% of total
-                  </div>
-                </div>
               </div>
-              
-              {/* Progress Bar */}
-              <div className="relative">
-                <div className="w-full bg-gray-200 print:bg-gray-300 rounded-full h-6 mb-2 shadow-inner">
-                  <div 
-                    className="bg-gradient-to-r from-blue-600 to-blue-500 print:bg-gray-600 h-6 rounded-full transition-all duration-500 ease-out flex items-center justify-end pr-3 shadow-sm"
-                    style={{ width: `${Math.max(department.percentage, 8)}%` }} // Minimum 8% for visibility
-                  >
-                    {department.percentage >= 15 && (
-                      <span className="text-white print:text-black text-xs font-medium">
-                        {department.percentage.toFixed(1)}%
-                      </span>
-                    )}
+            ))}
+          </div>
+        ) : (
+          /* Original Detailed View Layout */
+          <div className="space-y-4 print:space-y-3">
+            {departmentData.map((department, index) => (
+              <div key={department.name} className="relative">
+                {/* Department Header */}
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center min-w-0 flex-1 mr-4">
+                    <Building2 className="text-blue-600 print:text-gray-600 mr-3 flex-shrink-0" size={20} />
+                    <div className="min-w-0 flex-1">
+                      <h4 className="text-lg print:text-base font-bold text-gray-900 print:text-black truncate">
+                        {department.name}
+                      </h4>
+                      <div className="flex items-center space-x-4 mt-1">
+                        <div className="flex items-center text-sm text-gray-600 print:text-black">
+                          <UserCheck className="mr-1" size={14} />
+                          <span>{department.faculty.toLocaleString()} faculty</span>
+                        </div>
+                        <div className="flex items-center text-sm text-gray-600 print:text-black">
+                          <Users className="mr-1" size={14} />
+                          <span>{department.staff.toLocaleString()} staff</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="text-right flex-shrink-0">
+                    <div className="text-2xl print:text-xl font-bold text-gray-900 print:text-black">
+                      {department.total.toLocaleString()}
+                    </div>
+                    <div className="text-sm text-gray-500 print:text-black">
+                      {department.percentage.toFixed(1)}% of total
+                    </div>
                   </div>
                 </div>
                 
-                {/* Small percentage indicator for narrow bars */}
-                {department.percentage < 15 && (
-                  <div className="absolute -right-1 top-0 text-xs text-gray-600 print:text-black font-medium">
-                    {department.percentage.toFixed(1)}%
+                {/* Progress Bar */}
+                <div className="relative">
+                  <div className="w-full bg-gray-200 print:bg-gray-300 rounded-full h-6 mb-2 shadow-inner">
+                    <div 
+                      className="bg-gradient-to-r from-blue-600 to-blue-500 print:bg-gray-600 h-6 rounded-full transition-all duration-500 ease-out flex items-center justify-end pr-3 shadow-sm"
+                      style={{ width: `${Math.max(department.percentage, 8)}%` }} // Minimum 8% for visibility
+                    >
+                      {department.percentage >= 15 && (
+                        <span className="text-white print:text-black text-xs font-medium">
+                          {department.percentage.toFixed(1)}%
+                        </span>
+                      )}
+                    </div>
                   </div>
+                  
+                  {/* Small percentage indicator for narrow bars */}
+                  {department.percentage < 15 && (
+                    <div className="absolute -right-1 top-0 text-xs text-gray-600 print:text-black font-medium">
+                      {department.percentage.toFixed(1)}%
+                    </div>
+                  )}
+                </div>
+
+                {/* Divider line (except for last item) */}
+                {index < departmentData.length - 1 && (
+                  <div className="border-b border-gray-100 print:border-gray-300 mt-4"></div>
                 )}
               </div>
-
-              {/* Divider line (except for last item) */}
-              {index < departmentData.length - 1 && (
-                <div className="border-b border-gray-100 print:border-gray-300 mt-4"></div>
-              )}
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
 
         {/* Summary Footer */}
         <div className="mt-6 pt-4 border-t border-gray-200 print:border-gray-400">

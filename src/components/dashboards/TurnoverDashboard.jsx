@@ -121,8 +121,8 @@ const TurnoverDashboard = () => {
   // Enhanced subtitle with real-time status
   const realtimeStatus = isRealTime ? '🔴 Live' : '📊 Cached';
   const dataSource = jsonData ? 'JSON Data' : 'Local';
-  const syncInfo = lastSyncTime ? ` | Last sync: ${lastSyncTime.toLocaleTimeString()}` : '';
-  const subtitle = `FY ${filters.fiscalYear || '2024'} | ${realtimeStatus} (${dataSource})${syncInfo}`;
+  const syncInfo = ''; // Removed Last sync display per user request
+  const subtitle = `FY ${filters.fiscalYear || '2024'} | ${realtimeStatus} (${dataSource})`;
 
   // Validate data structure to prevent object rendering errors
   if (!data || typeof data !== 'object') {
@@ -150,7 +150,7 @@ const TurnoverDashboard = () => {
                   <div>
                     <h1 className="text-2xl font-bold text-gray-900">Turnover Analysis Report</h1>
                     <p className="text-gray-600 text-sm mt-1">
-                      Period Ending: June 30, 2025 | {realtimeStatus} ({dataSource}){syncInfo}
+                      Period Ending: June 30, 2025 | {realtimeStatus} ({dataSource})
                     </p>
                   </div>
                 </div>

@@ -96,7 +96,7 @@ const WorkforceDashboard = () => {
 
   // Enhanced subtitle with data source
   const dataSource = jsonData ? 'JSON Data' : 'Local';
-  const syncInfo = lastUpdated ? ` | Last sync: ${lastUpdated.toLocaleTimeString()}` : '';
+  const syncInfo = ''; // Removed Last sync display per user request
 
   // Validate data structure to prevent object rendering errors
   if (!data || typeof data !== 'object') {
@@ -132,7 +132,7 @@ const WorkforceDashboard = () => {
                   <div>
                     <h1 className="text-2xl font-bold text-gray-900">Benefit Eligible Workforce Analytics</h1>
                     <p className="text-gray-600 text-sm mt-1">
-                      Period Ending: June 30, 2025{syncInfo}
+                      Period Ending: June 30, 2025
                     </p>
                   </div>
                 </div>
@@ -237,7 +237,8 @@ const WorkforceDashboard = () => {
                     data={deptData}
                     maxItems={10}
                     title="Top 10 Benefit Eligible Headcount by Department"
-                    className="print:h-80 min-h-[420px]"
+                    className="print:h-80"
+                    compactView={true}
                   />
                 );
               })()}

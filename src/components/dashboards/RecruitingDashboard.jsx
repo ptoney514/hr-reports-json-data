@@ -102,11 +102,6 @@ const RecruitingDashboard = () => {
                     </span>
                     {isRealTime && <Wifi size={14} className="text-green-500" />}
                     {!isRealTime && <WifiOff size={14} className="text-gray-400" />}
-                    {lastSyncTime && (
-                      <span className="text-xs">
-                        | Last sync: {lastSyncTime.toLocaleTimeString()}
-                      </span>
-                    )}
                   </div>
                 </div>
               </div>
