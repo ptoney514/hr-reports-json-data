@@ -91,6 +91,246 @@ export interface WorkforceData {
   reverificationDate?: string;
 }
 
+// ===== COMPREHENSIVE WORKFORCE EMPLOYEE TYPES =====
+
+export interface WorkforceEmployee {
+  // Core Identity Fields
+  id: string;
+  employeeId: string;
+  firstName: string;
+  lastName: string;
+  fullName: string;
+  email: string;
+  phone?: string;
+  ssn?: string; // Encrypted/hashed for security
+  
+  // Employment Details
+  hireDate: string;
+  terminationDate?: string;
+  employmentStatus: 'Active' | 'Inactive' | 'Terminated' | 'Leave' | 'Suspended';
+  employeeType: 'Faculty' | 'Staff' | 'Student' | 'Contractor' | 'Temporary' | 'Intern';
+  employeeClass: 'Full-Time' | 'Part-Time' | 'Casual' | 'Seasonal';
+  
+  // Organizational Structure
+  department: string;
+  division: string;
+  college?: string;
+  school?: string;
+  location: string;
+  campus: 'Omaha' | 'Phoenix' | 'Remote' | 'Multiple';
+  building?: string;
+  room?: string;
+  
+  // Position Information
+  jobTitle: string;
+  jobCode?: string;
+  jobFamily?: string;
+  jobLevel?: string;
+  positionNumber?: string;
+  reportingManager?: string;
+  managerEmployeeId?: string;
+  
+  // Benefits & Classification
+  benefitEligible: boolean;
+  benefitEligibleFaculty: boolean;
+  benefitEligibleStaff: boolean;
+  nonBenefitEligibleFaculty: boolean;
+  nonBenefitEligibleStaff: boolean;
+  unionMember: boolean;
+  unionName?: string;
+  
+  // Compensation
+  annualSalary?: number;
+  hourlyRate?: number;
+  payGrade?: string;
+  payStep?: string;
+  payFrequency?: 'Weekly' | 'Bi-Weekly' | 'Semi-Monthly' | 'Monthly';
+  
+  // Demographics (Optional - for reporting)
+  gender?: 'Male' | 'Female' | 'Non-Binary' | 'Prefer not to say';
+  ethnicity?: string;
+  age?: number;
+  ageGroup?: 'Under 25' | '25-34' | '35-44' | '45-54' | '55-64' | '65+';
+  
+  // Tenure & Service
+  serviceYears?: number;
+  tenureGroup?: '0-1 years' | '1-3 years' | '3-5 years' | '5-10 years' | '10-15 years' | '15+ years';
+  previousServiceYears?: number;
+  totalServiceYears?: number;
+  
+  // I-9 & Compliance
+  i9ComplianceStatus: 'Compliant' | 'Non-Compliant' | 'Pending' | 'Expired' | 'Not Required';
+  i9FormDate?: string;
+  section1CompletionDate?: string;
+  section2CompletionDate?: string;
+  section3CompletionDate?: string;
+  reverificationDate?: string;
+  reverificationRequired: boolean;
+  documentExpirationDate?: string;
+  
+  // Academic Information (for Faculty)
+  tenure?: boolean;
+  tenureTrack?: boolean;
+  academicRank?: 'Professor' | 'Associate Professor' | 'Assistant Professor' | 'Instructor' | 'Lecturer' | 'Adjunct';
+  degreeLevel?: 'Bachelor' | 'Master' | 'Doctorate' | 'Professional';
+  primaryDiscipline?: string;
+  
+  // Student Information (for Student Employees)
+  studentId?: string;
+  studentLevel?: 'Undergraduate' | 'Graduate' | 'Professional' | 'Doctoral';
+  majorField?: string;
+  enrollmentStatus?: 'Full-Time' | 'Part-Time' | 'Not Enrolled';
+  
+  // System & Audit Fields
+  createdDate: string;
+  lastUpdated: string;
+  lastUpdatedBy?: string;
+  version: number;
+  source: 'HRIS' | 'Manual' | 'Import' | 'Integration';
+  
+  // Additional Metadata
+  notes?: string;
+  customFields?: Record<string, any>;
+  tags?: string[];
+}
+
+// ===== WORKFORCE AGGREGATE DATA TYPES =====
+
+export interface WorkforceAggregateData {
+  metadata: {
+    reportingPeriod: string;
+    generatedDate: string;
+    dataSource: string;
+    lastUpdated: string;
+    currency?: string;
+    organization: string;
+  };
+  
+  currentPeriod: {
+    quarter: string;
+    startDate: string;
+    endDate: string;
+    
+    headcount: {
+      total: number;
+      faculty: number;
+      staff: number;
+      students: number;
+      changeFromPrevious: {
+        total: number;
+        faculty: number;
+        staff: number;
+        students: number;
+        percentChange: number;
+      };
+    };
+    
+    positions: {
+      total: number;
+      filled: number;
+      vacant: number;
+      vacancyRate: number;
+      changeFromPrevious: {
+        total: number;
+        filled: number;
+        vacant: number;
+        vacancyRateChange: number;
+      };
+    };
+    
+    locations: Array<{
+      name: string;
+      total: number;
+      breakdown: {
+        faculty: number;
+        staff: number;
+        students: number;
+      };
+      percentOfTotal: number;
+      changeFromPrevious: number;
+    }>;
+    
+    topDivisions: Array<{
+      name: string;
+      headcount: number;
+      faculty: number;
+      staff: number;
+      vacancies: number;
+      vacancyRate: number;
+      changeFromPrevious: number;
+    }>;
+  };
+  
+  // Individual employee records
+  employees?: WorkforceEmployee[];
+  
+  // Historical trends and additional analytics
+  historicalTrends: Array<{
+    quarter: string;
+    startDate: string;
+    endDate: string;
+    headcount: {
+      total: number;
+      faculty: number;
+      staff: number;
+      students: number;
+    };
+    positions: {
+      total: number;
+      filled: number;
+      vacant: number;
+      vacancyRate: number;
+    };
+    startersLeavers: {
+      starters: number;
+      leavers: number;
+      netChange: number;
+      turnoverRate: number;
+    };
+  }>;
+  
+  startersLeaversDetail: {
+    monthlyData: Array<{
+      month: string;
+      starters: number;
+      leavers: number;
+      netChange: number;
+      categories: {
+        starters: {
+          faculty: number;
+          staff: number;
+          students: number;
+        };
+        leavers: {
+          faculty: number;
+          staff: number;
+          students: number;
+        };
+      };
+    }>;
+  };
+  
+  demographics: {
+    ageGroups: Array<{
+      range: string;
+      count: number;
+      percentage: number;
+    }>;
+    tenure: Array<{
+      range: string;
+      count: number;
+      percentage: number;
+    }>;
+  };
+  
+  filters: {
+    availableQuarters: string[];
+    availableLocations: string[];
+    availableEmployeeTypes: string[];
+    availableDivisions: string[];
+  };
+}
+
 export interface TurnoverData {
   id: string;
   employeeId: string;

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { ArrowDownCircle, Wifi, WifiOff, Filter, Download, LogOut } from 'lucide-react';
 import useSimpleExitSurveyData from '../../hooks/useSimpleExitSurveyData';
-import QuarterFilter from '../ui/QuarterFilter';
+// Quarter filter removed - using fixed reporting period
 
 // Enhanced fallback data matching the screenshot for better visual testing
 const FALLBACK_DATA = {
@@ -61,7 +61,9 @@ const FALLBACK_DATA = {
 };
 
 const ExitSurveyDashboard = () => {
-  const [selectedQuarter, setSelectedQuarter] = useState('2025-Q2');
+  // Fixed reporting period - June 30, 2025
+  const REPORTING_DATE = '6/30/2025';
+  const REPORTING_QUARTER = '2025-Q2';
 
   // Use JSON data with fallback
   const { 
@@ -70,7 +72,7 @@ const ExitSurveyDashboard = () => {
     error, 
     isRealTime, 
     lastSyncTime 
-  } = useSimpleExitSurveyData(selectedQuarter);
+  } = useSimpleExitSurveyData(REPORTING_QUARTER);
 
   // Use JSON data if available, otherwise fallback
   const data = jsonData || FALLBACK_DATA;
@@ -97,19 +99,7 @@ const ExitSurveyDashboard = () => {
 
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d'];
 
-  // Debug logging to check data
-  console.log('Exit Survey Data Debug:', {
-    jsonData,
-    fallbackData: FALLBACK_DATA,
-    finalData: data,
-    exitReasons,
-    satisfactionData,
-    exitSurveyData
-  });
-
-  const handleQuarterChange = (quarter) => {
-    setSelectedQuarter(quarter);
-  };
+  // Fixed reporting period - no quarter changes
 
   const handleFilterClick = () => {
     console.log('Filter clicked');
@@ -133,11 +123,11 @@ const ExitSurveyDashboard = () => {
                 </div>
                 <div>
                   <h1 className="text-2xl print:text-xl font-bold text-gray-900 print:text-black">
-                    Exit Survey Insights Dashboard
+                    Exit Survey Insights Report
                   </h1>
                   <div className="flex items-center gap-4 mt-1">
                     <p className="text-sm print:text-xs text-gray-600 print:text-black">
-                      Generated: {new Date().toLocaleDateString()} | University-wide
+                      Period Ending: June 30, 2025 | University-wide
                     </p>
                     <div className="flex items-center gap-2 text-sm text-gray-600 print:hidden">
                       <span className={isRealTime ? 'text-green-600' : 'text-gray-400'}>
@@ -157,14 +147,7 @@ const ExitSurveyDashboard = () => {
               
               {/* Controls Section */}
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 print:hidden">
-                <div className="flex items-center gap-3">
-                  <QuarterFilter
-                    selectedQuarter={selectedQuarter}
-                    onQuarterChange={handleQuarterChange}
-                    className="min-w-[200px]"
-                    showIcon={false}
-                  />
-                </div>
+                {/* Fixed reporting period - no quarter selector */}
                 <div className="flex gap-2">
                   <button 
                     className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"

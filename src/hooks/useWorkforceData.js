@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useDashboard } from '../contexts/DashboardContext';
 import workforceDataJson from '../data/workforce-data.json';
 import { useErrorHandler, handleNetworkError, validateData } from '../utils/errorHandler';
@@ -18,15 +18,25 @@ const useWorkforceData = (customFilters = {}) => {
   const [cachedData, setCachedData] = useState(null);
   const { handleError } = useErrorHandler('useWorkforceData');
 
-  // Merge context filters with custom filters
-  const activeFilters = useMemo(() => ({
-    reportingPeriod: customFilters.reportingPeriod || state.reportingPeriod,
-    locationFilter: customFilters.locationFilter || state.locationFilter,
-    divisionFilter: customFilters.divisionFilter || state.divisionFilter,
-    departmentFilter: customFilters.departmentFilter || state.departmentFilter,
-    employeeTypeFilter: customFilters.employeeTypeFilter || state.employeeTypeFilter,
-    dateRange: customFilters.dateRange || state.dateRange
-  }), [customFilters, state]);
+  // Stabilize activeFilters to prevent unnecessary re-renders
+  const activeFiltersRef = useRef();
+  const activeFilters = useMemo(() => {
+    const newFilters = {
+      reportingPeriod: customFilters.reportingPeriod || state.reportingPeriod,
+      locationFilter: customFilters.locationFilter || state.locationFilter,
+      divisionFilter: customFilters.divisionFilter || state.divisionFilter,
+      departmentFilter: customFilters.departmentFilter || state.departmentFilter,
+      employeeTypeFilter: customFilters.employeeTypeFilter || state.employeeTypeFilter,
+      dateRange: customFilters.dateRange || state.dateRange
+    };
+    
+    // Only update if filters actually changed to prevent circular dependencies
+    if (!activeFiltersRef.current || JSON.stringify(activeFiltersRef.current) !== JSON.stringify(newFilters)) {
+      activeFiltersRef.current = newFilters;
+    }
+    
+    return activeFiltersRef.current;
+  }, [customFilters, state.reportingPeriod, state.locationFilter, state.divisionFilter, state.departmentFilter, state.employeeTypeFilter, state.dateRange]);
 
   // Data validation schema - memoized to prevent re-creation on every render
   const workforceDataSchema = useMemo(() => ({
@@ -45,13 +55,13 @@ const useWorkforceData = (customFilters = {}) => {
   }, []);
 
   // Load data from JSON (simulating API call) with advanced caching
-  const loadData = useCallback(async () => {
-    const cacheKey = getCacheKey(activeFilters);
+  const loadData = useCallback(async (filters, skipStateUpdates = false) => {
+    const cacheKey = getCacheKey(filters);
     
     // Check cache first
     try {
       const cachedResult = await globalCache.get(cacheKey, {
-        params: activeFilters
+        params: filters
       });
       
       if (cachedResult) {
@@ -61,7 +71,7 @@ const useWorkforceData = (customFilters = {}) => {
           if (!validation.valid) {
             console.warn('Cached data validation failed:', validation.errors);
             // Clear invalid cache but don't throw
-            await globalCache.delete(cacheKey, { params: activeFilters });
+            await globalCache.delete(cacheKey, { params: filters });
           } else {
             // Track cache hit performance
             if (window.performanceMonitor) {
@@ -73,7 +83,7 @@ const useWorkforceData = (customFilters = {}) => {
           }
         } catch (validationError) {
           // Clear invalid cache
-          await globalCache.delete(cacheKey, { params: activeFilters });
+          await globalCache.delete(cacheKey, { params: filters });
           console.warn('Invalid cached data removed:', validationError);
         }
       } else {
@@ -87,22 +97,18 @@ const useWorkforceData = (customFilters = {}) => {
     }
 
     const fetchData = async () => {
-      setLocalLoading(true);
-      actions.setLoading('workforce', true);
-      actions.clearError('workforce');
-      setLocalError(null);
+      if (!skipStateUpdates) {
+        setLocalLoading(true);
+        actions.setLoading('workforce', true);
+        actions.clearError('workforce');
+        setLocalError(null);
+      }
 
       try {
         // Simulate network delay
         await new Promise(resolve => setTimeout(resolve, 500));
 
         // In a real app, this would be an API call
-        // const response = await fetch('/api/workforce-data');
-        // if (!response.ok) {
-        //   throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        // }
-        // const data = await response.json();
-        
         const data = workforceDataJson;
 
         // Validate data structure (non-throwing)
@@ -116,11 +122,11 @@ const useWorkforceData = (customFilters = {}) => {
         try {
           await globalCache.set(cacheKey, data, {
             ttl: CACHE_CONFIG.TTL,
-            params: activeFilters,
+            params: filters,
             metadata: {
               version: CACHE_CONFIG.VERSION,
               timestamp: Date.now(),
-              filters: activeFilters,
+              filters: filters,
               dataSource: 'json',
               dependencies: {
                 workforceDataVersion: data.metadata?.version || '1.0'
@@ -134,19 +140,23 @@ const useWorkforceData = (customFilters = {}) => {
 
         return data;
       } catch (error) {
-        handleError(error, {
-          operation: 'loadWorkforceData',
-          filters: activeFilters
-        });
+        if (!skipStateUpdates) {
+          handleError(error, {
+            operation: 'loadWorkforceData',
+            filters: filters
+          });
 
-        const errorMessage = `Failed to load workforce data: ${error.message}`;
-        setLocalError(errorMessage);
-        actions.setError('workforce', errorMessage);
+          const errorMessage = `Failed to load workforce data: ${error.message}`;
+          setLocalError(errorMessage);
+          actions.setError('workforce', errorMessage);
+        }
         
         throw error;
       } finally {
-        setLocalLoading(false);
-        actions.setLoading('workforce', false);
+        if (!skipStateUpdates) {
+          setLocalLoading(false);
+          actions.setLoading('workforce', false);
+        }
       }
     };
 
@@ -156,7 +166,7 @@ const useWorkforceData = (customFilters = {}) => {
       fetchData,
       3 // maxRetries
     );
-  }, [actions, activeFilters, handleError, getCacheKey, workforceDataSchema]);
+  }, [handleError, getCacheKey, workforceDataSchema, actions]);
 
   // Filter workforce data based on active filters
   const filterData = useCallback((data, filters) => {
@@ -269,6 +279,10 @@ const useWorkforceData = (customFilters = {}) => {
         faculty: data.currentPeriod?.headcount?.faculty || 0,
         staff: data.currentPeriod?.headcount?.staff || 0,
         students: data.currentPeriod?.headcount?.students || 0,
+        benefitEligible: data.currentPeriod?.headcount?.benefitEligible || 0,
+        benefitEligibleFaculty: data.currentPeriod?.headcount?.benefitEligibleFaculty || 0,
+        benefitEligibleStaff: data.currentPeriod?.headcount?.benefitEligibleStaff || 0,
+        nonBenefitEligible: data.currentPeriod?.headcount?.nonBenefitEligible || 0,
         totalPositions: data.currentPeriod?.positions?.total || 0,
         vacancies: data.currentPeriod?.positions?.vacant || 0,
         vacancyRate: data.currentPeriod?.positions?.vacancyRate || 0,
@@ -276,7 +290,10 @@ const useWorkforceData = (customFilters = {}) => {
         facultyChange: ((data.currentPeriod?.headcount?.changeFromPrevious?.faculty || 0) / (data.currentPeriod?.headcount?.faculty || 1) * 100) || 0,
         staffChange: ((data.currentPeriod?.headcount?.changeFromPrevious?.staff || 0) / (data.currentPeriod?.headcount?.staff || 1) * 100) || 0,
         vacancyRateChange: data.currentPeriod?.positions?.changeFromPrevious?.vacancyRateChange || 0,
-        growth: data.currentPeriod?.headcount?.changeFromPrevious?.percentChange || 0
+        growth: data.currentPeriod?.headcount?.changeFromPrevious?.percentChange || 0,
+        growthRate: data.currentPeriod?.headcount?.changeFromPrevious?.percentChange || 0,
+        hsp: data.currentPeriod?.headcount?.changeFromPrevious?.percentChange || 0,
+        benefitEligibleChange: data.currentPeriod?.headcount?.changeFromPrevious?.benefitEligiblePercentChange || 0
       },
 
       // Chart data
@@ -364,16 +381,15 @@ const useWorkforceData = (customFilters = {}) => {
     };
   }, []);
 
-  // Main data fetching effect
+  // Separate effect for loading data - removed circular dependency
   useEffect(() => {
     let isMounted = true;
 
     const fetchData = async () => {
       try {
-        const rawData = await loadData();
+        const rawData = await loadData(activeFilters, false);
         if (isMounted) {
           setCachedData(rawData);
-          actions.updateDataTimestamp();
         }
       } catch (error) {
         // Error is already handled in loadData
@@ -386,7 +402,14 @@ const useWorkforceData = (customFilters = {}) => {
     return () => {
       isMounted = false;
     };
-  }, [loadData, actions]);
+  }, [activeFilters, getCacheKey, workforceDataSchema, handleError]);
+
+  // Separate effect for updating timestamp - prevents circular dependency
+  useEffect(() => {
+    if (cachedData) {
+      actions.updateDataTimestamp();
+    }
+  }, [cachedData, actions]);
 
   // Compute filtered and formatted data
   const filteredData = useMemo(() => {
@@ -404,8 +427,9 @@ const useWorkforceData = (customFilters = {}) => {
     const cacheKey = getCacheKey(activeFilters);
     await globalCache.delete(cacheKey, { params: activeFilters });
     setCachedData(null);
-    await loadData();
-  }, [loadData, getCacheKey, activeFilters]);
+    const rawData = await loadData(activeFilters, false);
+    setCachedData(rawData);
+  }, [getCacheKey, activeFilters, loadData]);
 
   const isStale = useCallback(() => {
     // Check if cache is stale using global cache

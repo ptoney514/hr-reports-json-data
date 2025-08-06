@@ -23,7 +23,7 @@ const JsonDataTester = lazy(() => import('./components/testing/JsonDataTester'))
 const HooksTestComponent = lazy(() => import('./components/testing/HooksTestComponentWrapper'));
 const RecruitingDashboard = lazy(() => import('./components/dashboards/RecruitingDashboard'));
 const ExitSurveyDashboard = lazy(() => import('./components/dashboards/ExitSurveyDashboard'));
-const CombinedWorkforceDashboard = lazy(() => import('./components/dashboards/CombinedWorkforceDashboard'));
+const WorkforceDashboard = lazy(() => import('./components/dashboards/WorkforceDashboard'));
 const AdminDashboard = lazy(() => import('./components/dashboards/AdminDashboard'));
 
 function App() {
@@ -82,11 +82,11 @@ function App() {
               <Routes>
               {/* Dashboard Routes */}
               <Route path="/dashboards" element={<DashboardIndex />} />
+              <Route path="/dashboards/workforce" element={<WorkforceDashboard />} />
               <Route path="/dashboards/turnover" element={<TurnoverDashboard />} />
               <Route path="/dashboards/i9" element={<I9HealthDashboard />} />
               <Route path="/dashboards/recruiting" element={<RecruitingDashboard />} />
               <Route path="/dashboards/exit-survey" element={<ExitSurveyDashboard />} />
-              <Route path="/dashboards/combined-workforce" element={<CombinedWorkforceDashboard />} />
               
               {/* Test Suite Routes */}
               <Route path="/test" element={<TestSuite />} />

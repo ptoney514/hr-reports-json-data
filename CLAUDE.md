@@ -192,7 +192,7 @@ Subagents work together on complex tasks:
 
 This is the **HR Reports Project** - a comprehensive React-based dashboard application for I-9 compliance health monitoring and HR analytics. The application has evolved into a production-ready, enterprise-grade platform featuring multiple dashboards, comprehensive testing infrastructure, WCAG 2.1 AA accessibility compliance, database integration, advanced data visualization, automated quality assurance, and enterprise-level security and performance optimization.
 
-**Current Version**: Production-ready enterprise platform with complete file import system, real-time data processing, and comprehensive dashboard analytics.
+**Current Version**: Development-focused enterprise platform with comprehensive dashboard analytics, JSON data architecture, and Docker-based development environment.
 
 **Key Technologies:**
 - **React 19.1.0** with hooks and routing
@@ -228,11 +228,17 @@ npm run eject
 
 ## Docker Development Workflow
 
-### Efficient Development Approach
+### Development Environment Approach
 
-**Docker-Only Development with Automated Management**
+**Development-First with Hot Reloading**
 
-We use Docker exclusively for all development work to ensure maximum consistency and production parity. Docker container management is handled automatically by external scripts, so no manual restart/rebuild commands are needed.
+We use Docker with hot reloading enabled for fast development iterations. The default configuration runs React's development server with live reload, so changes are immediately visible without rebuilds.
+
+### Available Docker Configurations
+
+1. **Development (default)**: `docker-compose.yml` - Hot reloading, development server
+2. **Development (explicit)**: `docker-compose.dev.yml` - Same as default
+3. **Production**: `docker-compose.prod.yml` - Optimized production builds
 
 ### Session Start Checklist
 
@@ -240,47 +246,80 @@ We use Docker exclusively for all development work to ensure maximum consistency
 
 ```bash
 # 1. Navigate to project directory
-cd "/Users/pernelltoney/My Projects/dev/hr-trio-reports"
+cd "/Users/pernelltoney/Projects/dev/hr-reports-json-data"
 
 # 2. Pull latest changes (if team project)
 git pull
 
-# 3. Check if container is running
-docker ps
+# 3. Start development environment (with hot reloading)
+docker-compose up -d
 
 # Application available at: http://localhost:3000
 ```
 
 ### Development Workflow
 
-#### For Code Changes
-- **Save your files** - Changes are automatically detected and applied
-- **No manual restart needed** - Container management is automated
-- **Hot reload enabled** - Most changes appear immediately
+#### For Code Changes (Hot Reloading)
+1. **Make your code changes** - Edit files normally in your IDE
+2. **Changes appear automatically** - Hot reloading shows updates instantly
+3. **No rebuild required** - Development server watches for file changes
+4. **Test in browser** - Visit http://localhost:3000 to see live updates
 
-#### For Dependency Changes
-- **Update package.json** - Dependencies are automatically managed
-- **No manual rebuild needed** - Container rebuilding is automated
+#### For New Components/Features
+1. **Create/modify files** - Changes appear automatically with hot reload
+2. **Add routes and navigation** - Updates reflect immediately
+3. **Test functionality** - All changes visible at http://localhost:3000 instantly
 
-#### For Docker Configuration Changes
-- **Update Dockerfile/docker-compose.yml** - Configuration changes are automatically applied
-- **No manual rebuild needed** - Container rebuilding is automated
+#### For Dependency Changes Only
+When adding new npm packages, rebuild is required:
+```bash
+# Stop container
+docker-compose down
+
+# Rebuild with new dependencies
+docker-compose build
+
+# Start with new dependencies
+docker-compose up -d
+```
 
 ### Development Best Practices
 
 **Daily Workflow:**
-1. **Morning**: Check container status with `docker ps`
-2. **Development**: Work exclusively in Docker (http://localhost:3000)
-3. **Code Changes**: Save files and continue working
-4. **Testing**: All testing done in Docker environment
-5. **Demos**: Docker is always ready for presentations
-6. **End of day**: Commit changes
+1. **Morning**: Start development environment with `docker-compose up -d`
+2. **Development**: Make code changes - see updates instantly with hot reload
+3. **Testing**: All testing done in Docker environment (http://localhost:3000)
+4. **Demos**: Development server always ready for presentations
+5. **End of day**: Commit changes to git, optionally stop container
 
-**Container Management:**
-- Container restart/rebuild is handled automatically
-- Focus on development without worrying about Docker commands
-- Container state is managed by external automation scripts
-- All changes are automatically detected and applied
+**Container Management Commands:**
+```bash
+# Start development environment (hot reloading)
+docker-compose up -d
+
+# Check container status and logs
+docker ps
+docker logs hr-reports-dev
+
+# Restart development container (if needed)
+docker-compose restart
+
+# Stop development environment
+docker-compose down
+
+# Full rebuild (only needed for dependency changes)
+docker-compose build --no-cache && docker-compose up -d
+
+# For production testing (when needed)
+docker-compose -f docker-compose.prod.yml up -d
+```
+
+**Key Benefits:**
+- **Instant feedback**: Hot reloading shows changes immediately
+- **No rebuild cycles**: Code changes don't require container rebuilds
+- **Fast development**: React development server with full debugging
+- **Consistent environment**: Docker ensures same environment across all machines
+- **Production testing**: Separate production configuration when needed
 
 ## Architecture
 

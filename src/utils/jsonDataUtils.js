@@ -2,6 +2,34 @@
 import dataService from '../services/DataService';
 
 /**
+ * Generate a simplified workforce template based on June 30, 2025 screenshot data
+ * @param {string} date - The reporting date (e.g., '6-30-2025')
+ * @returns {object} Simple workforce metrics template
+ */
+export const generateSimpleWorkforceTemplate = (date = '6-30-2025') => {
+  // Base data from screenshot: Total 3,161 (Faculty: 785, Staff: 1,809, HSP: 0)
+  // Calculate students as remainder: 3,161 - 785 - 1,809 = 567
+  return {
+    total_employees: 3161,
+    total_faculty: 785,
+    total_staff: 1809,
+    total_students: 567,
+    total_hsp: 0,
+    hsp_omaha: 0,
+    hsp_phoenix: 0,
+    // Based on screenshot location breakdown: Omaha (2298), Phoenix (296)
+    // Assuming 83% benefit eligible rate for faculty, 90% for staff
+    benefit_eligible_faculty: 651, // ~83% of 785
+    benefit_eligible_staff: 1628, // ~90% of 1809
+    non_benefit_eligible_faculty: 134, // ~17% of 785
+    non_benefit_eligible_staff: 181, // ~10% of 1809
+    vacancy_rate: 11.385,
+    new_hires: 84,
+    terminations: 67
+  };
+};
+
+/**
  * Generate a sample JSON template for a specific quarter
  * @param {string} quarter - The quarter (e.g., 'Q2-2025')
  * @returns {object} Sample JSON data for the quarter
@@ -225,6 +253,16 @@ export const downloadCurrentData = () => {
 export const downloadSampleTemplate = (quarter) => {
   const template = generateSampleTemplate(quarter);
   const filename = `hr-data-template-${quarter || 'sample'}.json`;
+  downloadJSON(template, filename);
+};
+
+/**
+ * Download simple workforce template
+ * @param {string} date - Optional date for the template (default: '6-30-2025')
+ */
+export const downloadSimpleWorkforceTemplate = (date) => {
+  const template = generateSimpleWorkforceTemplate(date);
+  const filename = `workforce-template-${date || '6-30-2025'}.json`;
   downloadJSON(template, filename);
 };
 

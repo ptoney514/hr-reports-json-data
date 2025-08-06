@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import SummaryCard from '../ui/SummaryCard';
 import TurnoverPieChart from '../charts/TurnoverPieChart';
 import PieBarCombinationChart from '../charts/PieBarCombinationChart';
-import QuarterFilter from '../ui/QuarterFilter';
+// Quarter filter removed - using fixed reporting period
 import ErrorBoundary from '../ui/ErrorBoundary';
 import useTurnoverData from '../../hooks/useTurnoverData';
 import { 
@@ -88,22 +88,9 @@ const FALLBACK_DATA = {
 };
 
 const TurnoverDashboard = () => {
-  // Quarter filter state (matches Enhanced Workforce Dashboard)
-  const [selectedQuarter, setSelectedQuarter] = useState('Q1-2025');
-  
-  // Available quarters for filter
-  const QUARTER_DATES = [
-    { value: 'Q1-2025', label: 'Q1 2025 (Jan-Mar)' },
-    { value: 'Q4-2024', label: 'Q4 2024 (Oct-Dec)' },
-    { value: 'Q3-2024', label: 'Q3 2024 (Jul-Sep)' },
-    { value: 'Q2-2024', label: 'Q2 2024 (Apr-Jun)' },
-    { value: 'Q1-2024', label: 'Q1 2024 (Jan-Mar)' }
-  ];
-
-  // Handle quarter changes
-  const handleQuarterChange = (newQuarter) => {
-    setSelectedQuarter(newQuarter);
-  };
+  // Fixed reporting period - June 30, 2025
+  const REPORTING_DATE = '6/30/2025';
+  const REPORTING_QUARTER = 'Q2-2025';
 
   // Use JSON data with fallback
   const { 
@@ -112,11 +99,11 @@ const TurnoverDashboard = () => {
     error, 
     isRealTime, 
     lastSyncTime 
-  } = useTurnoverData(selectedQuarter);
+  } = useTurnoverData(REPORTING_QUARTER);
 
   // Use JSON data if available, otherwise fallback
   const data = jsonData || FALLBACK_DATA;
-  const filters = { fiscalYear: selectedQuarter.split('-')[1] || '2024' };
+  const filters = { fiscalYear: '2025' };
 
 
   // Show loading state
@@ -161,19 +148,13 @@ const TurnoverDashboard = () => {
                 <div className="flex items-center gap-3">
                   <TrendingDown className="text-blue-600" size={24} />
                   <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Turnover Analysis Dashboard</h1>
+                    <h1 className="text-2xl font-bold text-gray-900">Turnover Analysis Report</h1>
                     <p className="text-gray-600 text-sm mt-1">
-                      {subtitle}
+                      Period Ending: June 30, 2025 | {realtimeStatus} ({dataSource}){syncInfo}
                     </p>
                   </div>
                 </div>
-                <div className="w-64">
-                  <QuarterFilter 
-                    selectedQuarter={selectedQuarter}
-                    onQuarterChange={handleQuarterChange}
-                    availableQuarters={QUARTER_DATES}
-                  />
-                </div>
+                {/* Fixed reporting period - no quarter selector */}
               </div>
             </div>
           </div>

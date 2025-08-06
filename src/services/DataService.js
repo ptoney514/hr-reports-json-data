@@ -220,13 +220,107 @@ const dataService = {
   },
 
   // Additional helper methods
-  getAvailablePeriods: () => {
+  getAvailablePeriods: (collection) => {
+    // If collection is specified, return periods for that collection
+    if (collection) {
+      const collectionData = dataStore[collection] || dataStore.i9Compliance;
+      return Object.keys(collectionData || {}).filter(key => key !== 'lastUpdated');
+    }
+    // Otherwise return all available periods
     return Object.keys(dataStore.reportingPeriods);
   },
 
   getPeriodLabel: (period) => {
     const datePeriod = getPeriodKey(period);
     return dataStore.reportingPeriods[datePeriod]?.label || period;
+  },
+  
+  // Get raw metrics for admin editing
+  getRawMetrics: async (collection, period) => {
+    const datePeriod = getPeriodKey(period);
+    let data = null;
+    
+    switch(collection) {
+      case 'workforce':
+        data = dataStore.workforce[datePeriod];
+        break;
+      case 'turnover':
+        data = dataStore.turnover[datePeriod];
+        break;
+      case 'compliance':
+        data = dataStore.i9Compliance[datePeriod];
+        break;
+      case 'recruiting':
+        data = dataStore.recruiting[datePeriod];
+        break;
+      case 'exitSurvey':
+        data = dataStore.exitSurvey[datePeriod];
+        break;
+      default:
+        throw new Error(`Unknown collection type: ${collection}`);
+    }
+    
+    if (!data) {
+      throw new Error(`No data found for ${collection} - ${period}`);
+    }
+    
+    return data;
+  },
+  
+  // Save metrics for admin editing
+  saveMetrics: async (collection, period, data) => {
+    const datePeriod = getPeriodKey(period);
+    
+    switch(collection) {
+      case 'workforce':
+        dataStore.workforce[datePeriod] = data;
+        break;
+      case 'turnover':
+        dataStore.turnover[datePeriod] = data;
+        break;
+      case 'compliance':
+        dataStore.i9Compliance[datePeriod] = data;
+        break;
+      case 'recruiting':
+        dataStore.recruiting[datePeriod] = data;
+        break;
+      case 'exitSurvey':
+        dataStore.exitSurvey[datePeriod] = data;
+        break;
+      default:
+        throw new Error(`Unknown collection type: ${collection}`);
+    }
+    
+    console.log(`Saved ${collection} data for period: ${datePeriod}`);
+    return true;
+  },
+  
+  // Delete metrics for a period
+  deleteMetrics: async (collection, period) => {
+    const datePeriod = getPeriodKey(period);
+    
+    switch(collection) {
+      case 'workforce':
+        delete dataStore.workforce[datePeriod];
+        break;
+      case 'turnover':
+        delete dataStore.turnover[datePeriod];
+        break;
+      case 'compliance':
+        delete dataStore.i9Compliance[datePeriod];
+        break;
+      case 'recruiting':
+        delete dataStore.recruiting[datePeriod];
+        break;
+      case 'exitSurvey':
+        delete dataStore.exitSurvey[datePeriod];
+        break;
+      default:
+        throw new Error(`Unknown collection type: ${collection}`);
+    }
+    
+    console.log(`Deleted ${collection} data for period: ${datePeriod}`);
+    return true;
   },
   
   // Generic method to get metrics by dashboard type (for admin dashboard)
@@ -281,3 +375,6 @@ export default dataService;
 
 // Also export named for flexibility
 export { dataService };
+
+// Export as class for admin components that expect DataService.method() syntax
+export const DataService = dataService;

@@ -59,24 +59,39 @@ const DataGrid = ({ data, isEditMode, onChange, dashboardType, period }) => {
   // Format value for display
   const formatValue = (value) => {
     if (value === null || value === undefined) return 'null';
-    if (typeof value === 'object' && value.toDate) {
-      // Firebase Timestamp
-      return value.toDate().toLocaleString();
+    
+    try {
+      // Handle Firebase timestamp objects
+      if (typeof value === 'object' && value.toDate && typeof value.toDate === 'function') {
+        return value.toDate().toLocaleString();
+      }
+      // Handle regular Date objects
+      if (value instanceof Date) {
+        return value.toLocaleString();
+      }
+      // Handle date strings
+      if (typeof value === 'string' && value.length > 0) {
+        const dateObj = new Date(value);
+        if (!isNaN(dateObj.getTime()) && (value.includes('T') || value.includes('-') || value.includes('/'))) {
+          return dateObj.toLocaleString();
+        }
+      }
+      // Handle objects
+      if (typeof value === 'object') {
+        return `{${Object.keys(value).length} properties}`;
+      }
+      return String(value);
+    } catch (error) {
+      console.warn('Error formatting value:', value, error);
+      return String(value);
     }
-    if (value instanceof Date) {
-      return value.toLocaleString();
-    }
-    if (typeof value === 'object') {
-      return `{${Object.keys(value).length} properties}`;
-    }
-    return String(value);
   };
 
   // Check if value is editable
   const isEditableField = (key, value) => {
-    // Don't edit Firebase timestamps, complex objects with many properties, or system fields
-    if (key === 'lastUpdated' && typeof value === 'object' && value.toDate) return false;
-    if (typeof value === 'object' && Object.keys(value).length > 10) return false;
+    // Don't edit timestamps, complex objects with many properties, or system fields
+    if (key === 'lastUpdated' && (typeof value === 'object' || value instanceof Date)) return false;
+    if (typeof value === 'object' && value !== null && Object.keys(value).length > 10) return false;
     if (key.startsWith('_')) return false; // System fields
     return true;
   };

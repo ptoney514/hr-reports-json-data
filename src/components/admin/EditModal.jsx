@@ -55,7 +55,7 @@ const EditModal = ({ isOpen, onClose, quarterData, onSave }) => {
   // Initialize form data when quarter data changes
   useEffect(() => {
     if (quarterData) {
-      const { period, rawData } = quarterData;
+      const { rawData } = quarterData;
       
       // Extract data from various possible structures
       const demographics = rawData?.demographics || {};
@@ -449,7 +449,7 @@ const EditModal = ({ isOpen, onClose, quarterData, onSave }) => {
         {/* Footer */}
         <div className="px-6 py-3 border-t border-gray-200 flex justify-between items-center bg-gray-50">
           <div className="text-sm text-gray-600">
-            All changes will be saved to Firebase
+            All changes will be saved to the data store
           </div>
           <div className="flex gap-3">
             <button

@@ -8,19 +8,19 @@ const PieBarCombinationChart = memo(({
   height = 350,
   className = ""
 }) => {
-  // Exact color mapping from screenshot
-  const colorMap = {
-    'Career Advancement': '#4f46e5',     // Blue
-    'Compensation': '#10b981',           // Green
-    'Work-Life Balance': '#f59e0b',      // Yellow
-    'Retirement': '#f97316',             // Orange
-    'Relocation': '#8b5cf6',             // Purple
-    'Other': '#6ee7b7'                   // Light Green
-  };
-
   // Transform data for both charts with exact color mapping
   const chartData = useMemo(() => {
     if (!data || data.length === 0) return [];
+    
+    // Exact color mapping from screenshot
+    const colorMap = {
+      'Career Advancement': '#4f46e5',     // Blue
+      'Compensation': '#10b981',           // Green
+      'Work-Life Balance': '#f59e0b',      // Yellow
+      'Retirement': '#f97316',             // Orange
+      'Relocation': '#8b5cf6',             // Purple
+      'Other': '#6ee7b7'                   // Light Green
+    };
     
     return data.map((item) => ({
       name: item.name || 'Unknown',

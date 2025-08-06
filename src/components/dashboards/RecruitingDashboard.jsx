@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { ArrowUpCircle, Wifi, WifiOff, UserPlus, Filter, Download } from 'lucide-react';
 import useSimpleRecruitingData from '../../hooks/useSimpleRecruitingData';
-import QuarterFilter from '../ui/QuarterFilter';
+// Quarter filter removed - using fixed reporting period
 
 // Fallback data to ensure the dashboard always works
 const FALLBACK_DATA = {
@@ -38,7 +38,9 @@ const FALLBACK_DATA = {
 };
 
 const RecruitingDashboard = () => {
-  const [selectedQuarter, setSelectedQuarter] = useState('2025-Q2');
+  // Fixed reporting period - June 30, 2025
+  const REPORTING_DATE = '6/30/2025';
+  const REPORTING_QUARTER = '2025-Q2';
   
   // Use JSON data with fallback
   const { 
@@ -46,18 +48,16 @@ const RecruitingDashboard = () => {
     loading, 
     isRealTime, 
     lastSyncTime 
-  } = useSimpleRecruitingData(selectedQuarter);
+  } = useSimpleRecruitingData(REPORTING_QUARTER);
 
   // Use JSON data if available, otherwise fallback
   const data = jsonData || FALLBACK_DATA;
   const { recruitingData, openPositionsByDept, hireSourceData, timeToFillData } = data;
 
-  const handleQuarterChange = (quarter) => {
-    setSelectedQuarter(quarter);
-  };
-
+  // Fixed reporting period - no quarter changes
+  
   const handleFilterClick = () => {
-    console.log('Filter clicked');
+    // Filter functionality
   };
 
   const handleExportClick = () => {
@@ -90,11 +90,11 @@ const RecruitingDashboard = () => {
               </div>
               <div>
                 <h1 className="text-2xl print:text-xl font-bold text-gray-900 print:text-black">
-                  Recruiting Analytics Dashboard
+                  Recruiting Analytics Report
                 </h1>
                 <div className="flex items-center gap-4 mt-1">
                   <p className="text-sm print:text-xs text-gray-600 print:text-black">
-                    Generated: {new Date().toLocaleDateString()} | University-wide
+                    Period Ending: June 30, 2025 | University-wide
                   </p>
                   <div className="flex items-center gap-2 text-sm text-gray-600 print:hidden">
                     <span className={isRealTime ? 'text-green-600' : 'text-gray-400'}>
@@ -114,14 +114,7 @@ const RecruitingDashboard = () => {
             
             {/* Controls Section */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 print:hidden">
-              <div className="flex items-center gap-3">
-                <QuarterFilter
-                  selectedQuarter={selectedQuarter}
-                  onQuarterChange={handleQuarterChange}
-                  className="min-w-[200px]"
-                  showIcon={false}
-                />
-              </div>
+              {/* Fixed reporting period - no quarter selector */}
               <div className="flex gap-2">
                 <button 
                   className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"

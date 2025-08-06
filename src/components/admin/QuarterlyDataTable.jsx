@@ -5,9 +5,6 @@ import {
   Edit,
   Eye,
   MoreHorizontal,
-  CheckCircle,
-  AlertCircle,
-  Clock,
   FileText,
   Trash2
 } from 'lucide-react';
@@ -112,7 +109,38 @@ const QuarterlyDataTable = ({
     ];
   }, [dashboardType, showSimplifiedColumns]);
 
-  // Transform Firebase data to table rows
+  // Determine data status for status badge
+  const getDataStatus = useCallback((data) => {
+    if (!data || Object.keys(data).length === 0) return 'empty';
+    
+    const hasRequiredFields = data.totalEmployees > 0 || Object.keys(data).length > 5;
+    
+    // Handle date checking for both Firebase timestamps and regular dates
+    let isRecent = false;
+    if (data.lastUpdated) {
+      try {
+        // Handle Firebase timestamp objects
+        if (data.lastUpdated.toDate && typeof data.lastUpdated.toDate === 'function') {
+          isRecent = new Date() - data.lastUpdated.toDate() < 30 * 24 * 60 * 60 * 1000; // 30 days
+        }
+        // Handle regular Date objects or date strings
+        else {
+          const lastUpdatedDate = data.lastUpdated instanceof Date ? data.lastUpdated : new Date(data.lastUpdated);
+          isRecent = new Date() - lastUpdatedDate < 30 * 24 * 60 * 60 * 1000; // 30 days
+        }
+      } catch (error) {
+        console.warn('Error parsing lastUpdated date:', error);
+        isRecent = false;
+      }
+    }
+    
+    if (hasRequiredFields && isRecent) return 'complete';
+    if (hasRequiredFields && !isRecent) return 'outdated';
+    if (!hasRequiredFields) return 'incomplete';
+    return 'draft';
+  }, []);
+
+  // Transform data to table rows
   const transformDataToRows = useCallback((quarterData) => {
     if (!quarterData || Object.keys(quarterData).length === 0) return [];
 
@@ -224,21 +252,7 @@ const QuarterlyDataTable = ({
 
       return row;
     });
-  }, [dashboardType]);
-
-  // Determine data status for status badge
-  const getDataStatus = useCallback((data) => {
-    if (!data || Object.keys(data).length === 0) return 'empty';
-    
-    const hasRequiredFields = data.totalEmployees > 0 || Object.keys(data).length > 5;
-    const isRecent = data.lastUpdated && 
-      new Date() - new Date(data.lastUpdated.toDate?.() || data.lastUpdated) < 30 * 24 * 60 * 60 * 1000; // 30 days
-    
-    if (hasRequiredFields && isRecent) return 'complete';
-    if (hasRequiredFields && !isRecent) return 'outdated';
-    if (!hasRequiredFields) return 'incomplete';
-    return 'draft';
-  }, []);
+  }, [dashboardType, getDataStatus]);
 
   // Calculate growth percentages asynchronously for workforce data
   const calculateGrowthPercentages = useCallback(async (rows) => {
@@ -271,13 +285,24 @@ const QuarterlyDataTable = ({
 
   // Process rows with growth calculations
   useEffect(() => {
+    let isMounted = true;
+
     const processRows = async () => {
       const basicRows = transformDataToRows(allQuartersData);
       const rowsWithGrowth = await calculateGrowthPercentages(basicRows);
-      setProcessedRows(rowsWithGrowth);
+      
+      // Only update state if component is still mounted
+      if (isMounted) {
+        setProcessedRows(rowsWithGrowth);
+      }
     };
 
     processRows();
+
+    // Cleanup function to prevent state updates on unmounted component
+    return () => {
+      isMounted = false;
+    };
   }, [allQuartersData, transformDataToRows, calculateGrowthPercentages]);
 
   // Sort table data
@@ -418,9 +443,27 @@ const QuarterlyDataTable = ({
       case 'percentage':
         return typeof value === 'number' ? `${value.toFixed(1)}%` : value;
       case 'date':
-        if (value?.toDate) return value.toDate().toLocaleDateString();
-        if (value instanceof Date) return value.toLocaleDateString();
-        return value;
+        try {
+          // Handle Firebase timestamp objects
+          if (value?.toDate && typeof value.toDate === 'function') {
+            return value.toDate().toLocaleDateString();
+          }
+          // Handle regular Date objects
+          if (value instanceof Date) {
+            return value.toLocaleDateString();
+          }
+          // Handle date strings
+          if (typeof value === 'string' && value.length > 0) {
+            const dateObj = new Date(value);
+            if (!isNaN(dateObj.getTime())) {
+              return dateObj.toLocaleDateString();
+            }
+          }
+          return value;
+        } catch (error) {
+          console.warn('Error formatting date value:', value, error);
+          return value;
+        }
       default:
         // Format quarter values using display format
         if (columnKey === 'period') {

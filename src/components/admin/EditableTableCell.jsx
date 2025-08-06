@@ -134,9 +134,27 @@ const EditableTableCell = ({
       case 'percentage':
         return typeof val === 'number' ? `${val.toFixed(1)}%` : val;
       case 'date':
-        if (val?.toDate) return val.toDate().toLocaleDateString();
-        if (val instanceof Date) return val.toLocaleDateString();
-        return val;
+        try {
+          // Handle Firebase timestamp objects
+          if (val?.toDate && typeof val.toDate === 'function') {
+            return val.toDate().toLocaleDateString();
+          }
+          // Handle regular Date objects
+          if (val instanceof Date) {
+            return val.toLocaleDateString();
+          }
+          // Handle date strings
+          if (typeof val === 'string' && val.length > 0) {
+            const dateObj = new Date(val);
+            if (!isNaN(dateObj.getTime())) {
+              return dateObj.toLocaleDateString();
+            }
+          }
+          return val;
+        } catch (error) {
+          console.warn('Error formatting date value:', val, error);
+          return val;
+        }
       default:
         return String(val);
     }

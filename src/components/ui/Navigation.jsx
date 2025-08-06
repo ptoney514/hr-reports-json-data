@@ -33,11 +33,11 @@ const Navigation = () => {
       isActive: isActive('/dashboards')
     },
     {
-      id: 'combined-workforce',
+      id: 'workforce',
       label: 'Workforce Analytics',
-      path: '/dashboards/combined-workforce',
-      icon: UsersRound,
-      isActive: isActive('/dashboards/combined-workforce')
+      path: '/dashboards/workforce',
+      icon: Users,
+      isActive: isActive('/dashboards/workforce')
     },
     {
       id: 'turnover',

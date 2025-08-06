@@ -7,17 +7,17 @@ const PeriodSelector = ({ selectedPeriod, onPeriodChange, className = '' }) => {
   const quarters = useMemo(() => {
     const allQuarters = getQuarters();
     
-    // Convert to the format expected by Firebase (2025-Q1)
+    // Convert to the standard format (2025-Q1)
     return allQuarters.map(quarter => {
       // Handle both "Q1-2025" and "2025-Q1" formats
-      let firebasePeriod = quarter.quarter;
+      let standardPeriod = quarter.quarter;
       if (quarter.quarter.match(/^Q\d-\d{4}$/)) {
         // Convert Q1-2025 to 2025-Q1
-        firebasePeriod = quarter.quarter.replace(/^Q(\d)-(\d{4})$/, '$2-Q$1');
+        standardPeriod = quarter.quarter.replace(/^Q(\d)-(\d{4})$/, '$2-Q$1');
       }
       
       return {
-        id: firebasePeriod,
+        id: standardPeriod,
         label: quarter.quarter,
         dateValue: quarter.dateValue,
         endDate: quarter.end_date
