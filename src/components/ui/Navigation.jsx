@@ -7,12 +7,9 @@ import {
   Home,
   Menu,
   X,
-  Settings,
   UserPlus,
   MessageSquare,
-  UsersRound,
-  Database,
-  FileUp
+  Database
 } from 'lucide-react';
 import { announceToScreenReader } from '../../utils/accessibilityUtils';
 

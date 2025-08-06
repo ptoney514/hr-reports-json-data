@@ -5,7 +5,6 @@ import {
   TrendingDown, 
   FileBarChart, 
   ArrowRight, 
-  BarChart3,
   PieChart,
   Activity,
   Building2,

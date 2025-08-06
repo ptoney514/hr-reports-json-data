@@ -61,7 +61,7 @@ const JsonDataTester = () => {
     };
 
     testDirectFetch();
-  }, [selectedDataType, selectedQuarter]);
+  }, [selectedDataType, selectedQuarter, quarterToDate]);
 
   return (
     <div className="p-6 max-w-7xl mx-auto">

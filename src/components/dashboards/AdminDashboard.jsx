@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Database, Upload, Download, Settings, Eye, Edit, Trash2, Plus } from 'lucide-react';
+import { Database, Upload, Download, Settings, Eye, Edit, Plus } from 'lucide-react';
 import { DataViewer } from '../admin/DataViewer';
 import { DataUploader } from '../admin/DataUploader';
 import { DataEditor } from '../admin/DataEditor';

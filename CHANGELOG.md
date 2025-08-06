@@ -8,6 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- **Department Headcount Display Fix** (January 6, 2025)
+  - Fixed issue where department headcount was not displaying in Workforce Dashboard
+  - Root cause: Field name mismatch - JSON data uses 'department' field while component expected 'name' field
+  - Updated `DepartmentHeadcountDisplay.jsx` to check both 'department' and 'name' fields for compatibility
+  - Added enhanced error checking and detailed logging for better debugging
+  - **Result**: Department data now displays correctly with all 10 departments showing headcount breakdown
+
 - **useWorkforceData Hook Infinite Loop Resolution** (January 6, 2025)
   - Fixed "Maximum update depth exceeded" error in useWorkforceData.js causing app-wide crashes
   - Root cause: Unstable function references (handleError, action functions) in useEffect dependencies

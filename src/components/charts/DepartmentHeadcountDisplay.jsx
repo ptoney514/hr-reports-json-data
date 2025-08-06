@@ -20,10 +20,21 @@ const DepartmentHeadcountDisplay = memo(({
     console.log('🔍 DepartmentHeadcountDisplay - Data type:', typeof data);
     console.log('🔍 DepartmentHeadcountDisplay - Data Array.isArray:', Array.isArray(data));
     console.log('🔍 DepartmentHeadcountDisplay - Data length:', data?.length);
-    console.log('🔍 DepartmentHeadcountDisplay - First 3 items:', data?.slice(0, 3));
+    console.log('🔍 DepartmentHeadcountDisplay - First 3 items with structure:', data?.slice(0, 3));
     
-    if (!data || data.length === 0) {
-      console.log('🚫 DepartmentHeadcountDisplay - No data available, showing fallback');
+    // Check for data availability
+    if (!data) {
+      console.log('🚫 DepartmentHeadcountDisplay - Data is null or undefined');
+      return [];
+    }
+    
+    if (!Array.isArray(data)) {
+      console.log('🚫 DepartmentHeadcountDisplay - Data is not an array:', data);
+      return [];
+    }
+    
+    if (data.length === 0) {
+      console.log('🚫 DepartmentHeadcountDisplay - Data array is empty');
       return [];
     }
     
@@ -33,7 +44,7 @@ const DepartmentHeadcountDisplay = memo(({
     
     return data
       .map(dept => ({
-        name: dept.name || 'Unknown Department',
+        name: dept.department || dept.name || 'Unknown Department', // Check both 'department' and 'name' fields
         faculty: dept.faculty || 0,
         staff: dept.staff || 0,
         total: dept.total || 0,

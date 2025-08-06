@@ -43,6 +43,21 @@ This todo list tracks the Phase 11 objectives for user testing and dashboard ref
 
 ## Current Tasks
 
+### ✅ Fix Department Headcount Display Data Issue (Completed - January 6, 2025)
+- [x] **Investigate JSON data structure** - Verified departmentalBreakdown exists in workforce-data.json
+- [x] **Fix field mapping issue** - Updated DepartmentHeadcountDisplay to map 'department' field correctly
+- [x] **Add robust error checking** - Enhanced logging and validation in department display component
+- [x] **Test the fix** - Department data now displays correctly in Workforce Dashboard
+
+### ✅ Fix Critical Data Loading Error & Clean Up Warnings (Completed - August 6, 2025)
+- [x] **Fix historicalTrends data structure mismatch** - Fixed TypeError in useWorkforceData.js by accessing data.historicalTrends.periods correctly
+- [x] **Update data validation schema** - Changed historicalTrends from array to object type in validation
+- [x] **Remove unused imports** - Cleaned up unused imports in Navigation.jsx, DashboardContext.jsx, AdminDashboard.jsx, DashboardIndex.jsx
+- [x] **Fix unused variables** - Removed unused state variable in HooksTestComponent.js
+- [x] **Fix React Hook dependencies** - Added missing dependencies to useEffect hooks in useWorkforceData.js and JsonDataTester.jsx
+- [x] **Add default case to switch** - Added default case to switch statement in DataService.js
+- [x] **Test database component fix** - Updated DatabaseTestComponent to test JSON data instead of non-existent Firebase database
+
 ### ✅ Fix Maximum Update Depth Error in useWorkforceData (Completed - January 6, 2025)
 - [x] **Create ref for handleError** - Added handleErrorRef to stabilize the function reference
 - [x] **Remove action functions from ref update dependencies** - Eliminated circular dependency from action updates

@@ -1,8 +1,17 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useDashboard } from '../contexts/DashboardContext';
-import workforceDataJson from '../data/workforce-data.json';
 import { useErrorHandler, handleNetworkError, validateData } from '../utils/errorHandler';
 import { globalCache } from '../utils/cacheUtils';
+
+// Load comprehensive workforce data from public directory
+// Using fetch instead of import to access the full data file
+const loadWorkforceDataJson = async () => {
+  const response = await fetch('/data/workforce-data.json');
+  if (!response.ok) {
+    throw new Error(`Failed to load workforce data: ${response.status} ${response.statusText}`);
+  }
+  return await response.json();
+};
 
 // Cache configuration
 const CACHE_CONFIG = {
@@ -31,7 +40,7 @@ const useWorkforceData = (customFilters = {}) => {
     setLoadingRef.current = actions.setLoading;
     setErrorRef.current = actions.setError;
     clearErrorRef.current = actions.clearError;
-  }, []); // Remove dependencies to prevent circular updates
+  }, [handleError, actions.updateDataTimestamp, actions.setLoading, actions.setError, actions.clearError]);
 
   // Stabilize activeFilters to prevent unnecessary re-renders
   const activeFiltersRef = useRef();
@@ -58,10 +67,10 @@ const useWorkforceData = (customFilters = {}) => {
     required: ['currentPeriod', 'historicalTrends', 'startersLeaversDetail'],
     properties: {
       currentPeriod: { type: 'object' },
-      historicalTrends: { type: 'array' },
+      historicalTrends: { type: 'object' },
       startersLeaversDetail: { type: 'object' }
     },
-    arrayFields: ['historicalTrends']
+    arrayFields: []
   }), []);
 
   // Generate cache key based on filters
@@ -123,8 +132,8 @@ const useWorkforceData = (customFilters = {}) => {
         // Simulate network delay
         await new Promise(resolve => setTimeout(resolve, 500));
 
-        // In a real app, this would be an API call
-        const data = workforceDataJson;
+        // Load comprehensive workforce data from public directory
+        const data = await loadWorkforceDataJson();
 
         // Validate data structure (non-throwing)
         const validation = validateData(data, workforceDataSchema, 'useWorkforceData');
@@ -192,7 +201,7 @@ const useWorkforceData = (customFilters = {}) => {
     // Filter by reporting period
     if (filters.reportingPeriod && filters.reportingPeriod !== 'Q2-2025') {
       // Find historical data for the selected period
-      const historicalData = (data.historicalTrends || []).find(
+      const historicalData = (data.historicalTrends?.periods || []).find(
         trend => trend?.quarter === filters.reportingPeriod
       );
       
@@ -288,7 +297,7 @@ const useWorkforceData = (customFilters = {}) => {
 
   // Format data for easy consumption by components
   const formatDataForComponents = useCallback((data) => {
-    if (!data || !data.currentPeriod || !data.historicalTrends) return null;
+    if (!data || !data.currentPeriod || !data.historicalTrends?.periods) return null;
 
     return {
       // Summary metrics
@@ -318,7 +327,7 @@ const useWorkforceData = (customFilters = {}) => {
       // Chart data
       charts: {
         // Historical trends for line chart
-        historicalTrends: (data.historicalTrends || []).map(trend => ({
+        historicalTrends: (data.historicalTrends?.periods || []).map(trend => ({
           quarter: trend?.quarter || '',
           period: trend?.quarter || '',
           total: trend?.headcount?.total || 0,

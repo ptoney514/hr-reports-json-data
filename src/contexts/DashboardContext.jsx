@@ -1,6 +1,6 @@
-import React, { createContext, useContext, useReducer, useEffect } from 'react';
+import React, { createContext, useContext, useReducer } from 'react';
 import { format, subMonths, startOfMonth, endOfMonth } from 'date-fns';
-import { getCurrentReportingPeriod, getCurrentReportingDate } from '../services/QuarterConfigService';
+import { getCurrentReportingPeriod } from '../services/QuarterConfigService';
 
 // Action types
 const actionTypes = {

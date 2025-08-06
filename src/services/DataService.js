@@ -177,6 +177,9 @@ const dataService = {
         case 'exitSurvey':
           data = await dataService.getExitSurveyMetrics(period);
           break;
+        default:
+          console.warn(`Unknown metric type: ${metricType}`);
+          break;
       }
       if (data && callback) {
         callback(data);

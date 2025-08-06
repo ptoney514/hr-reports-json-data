@@ -5,7 +5,7 @@ import useWorkforceData from '../../hooks/useWorkforceData';
 import useTurnoverData from '../../hooks/useTurnoverData';
 
 const HooksTestComponent = () => {
-  const { state, actions } = useDashboard();
+  const { actions } = useDashboard();
   const [expandedSections, setExpandedSections] = useState({
     workforce: true,
     turnover: true
