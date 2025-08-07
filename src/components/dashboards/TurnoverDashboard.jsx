@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import SummaryCard from '../ui/SummaryCard';
-import TurnoverPieChart from '../charts/TurnoverPieChart';
-import PieBarCombinationChart from '../charts/PieBarCombinationChart';
+import TurnoverRatesTable from '../charts/TurnoverRatesTable';
+import TopExitReasonsStatic from '../charts/TopExitReasonsStatic';
 // Quarter filter removed - using fixed reporting period
 import ErrorBoundary from '../ui/ErrorBoundary';
 import useTurnoverData from '../../hooks/useTurnoverData';
@@ -10,25 +10,27 @@ import {
   DollarSign, 
   BookOpen,
   Building2,
-  Award,
-  AlertTriangle
+  AlertTriangle,
+  Info,
+  Clock
 } from 'lucide-react';
 
-// Simplified fallback data for consistent dashboard display
+// Simplified fallback data for consistent dashboard display - 6/30/2025
 const FALLBACK_DATA = {
   summary: {
-    overallTurnoverRate: 12.5,
-    totalDepartures: 287,
-    turnoverRateChange: -1.8,
-    facultyTurnoverRate: 8.8,
-    facultyDepartures: 89,
-    facultyTurnoverChange: -0.9,
-    staffTurnoverRate: 15.3,
-    staffDepartures: 178,
-    staffTurnoverChange: -2.1,
-    totalCostImpact: 6780000,
-    avgCostPerDeparture: 23623,
-    costImpactChange: -5.2
+    overallTurnoverRate: 2.2,
+    totalDepartures: 62,
+    turnoverRateChange: -10.3,
+    facultyTurnoverRate: 1.7,
+    facultyDepartures: 21,
+    facultyTurnoverChange: -7.1,
+    staffTurnoverRate: 2.9,
+    staffDepartures: 41,
+    staffTurnoverChange: -12.4,
+    totalCostImpact: 1500000,
+    avgCostPerDeparture: 24200,
+    costImpactChange: -75.0,
+    avgTenure: "TBD"
   },
   charts: {
     voluntaryReasons: [
@@ -59,6 +61,48 @@ const FALLBACK_DATA = {
       { period: 'FY2022', overall: 13.1, faculty: 8.5, staff: 16.2 },
       { period: 'FY2023', overall: 12.9, faculty: 8.7, staff: 15.8 },
       { period: 'FY2024', overall: 12.5, faculty: 8.8, staff: 15.3 }
+    ],
+    turnoverBySchool: [
+      { name: 'Arts & Sciences', value: 11 },
+      { name: 'Athletics', value: 4 },
+      { name: 'CFE', value: 2 },
+      { name: 'Dentistry', value: 5 },
+      { name: 'Facilities', value: 7 },
+      { name: 'GENC', value: 2 },
+      { name: 'Heider College of Business', value: 3 },
+      { name: 'Law School', value: 2 },
+      { name: 'Medicine', value: 5 },
+      { name: 'Nursing', value: 3 },
+      { name: 'Pharmacy & Health Professions', value: 5 },
+      { name: 'Provost', value: 1 },
+      { name: 'Public Safety', value: 2 },
+      { name: 'Research', value: 1 },
+      { name: 'UCOM', value: 1 },
+      { name: 'VPEM', value: 1 },
+      { name: 'VPGE', value: 1 },
+      { name: 'VPIT', value: 3 },
+      { name: 'VPSL', value: 3 }
+    ],
+    topExitReasons: [
+      { reason: 'Resigned', total: 25, percentage: 40.3, faculty: 3, staff: 22 },
+      { reason: 'Retirement', total: 14, percentage: 22.6, faculty: 9, staff: 5 },
+      { reason: 'End Assignment', total: 9, percentage: 14.5, faculty: 7, staff: 2 },
+      { reason: 'Better Opportunity', total: 5, percentage: 8.1, faculty: 0, staff: 5 },
+      { reason: 'Invol Performance', total: 3, percentage: 4.8, faculty: 1, staff: 2 },
+      { reason: 'Personal Reasons', total: 2, percentage: 3.2, faculty: 0, staff: 2 },
+      { reason: 'Relocation', total: 2, percentage: 3.2, faculty: 0, staff: 2 },
+      { reason: 'Death', total: 1, percentage: 1.6, faculty: 1, staff: 0 },
+      { reason: 'Reduction In Force', total: 1, percentage: 1.6, faculty: 0, staff: 1 }
+    ],
+    
+    // Employee reported turnover reasons
+    employeeReportedTurnoverReasons: [
+      { reason: 'Career Advancement', total: 40, percentage: 28, faculty: 5, staff: 35 },
+      { reason: 'Compensation', total: 31, percentage: 22, faculty: 3, staff: 28 },
+      { reason: 'Supervisor Issues', total: 26, percentage: 18, faculty: 3, staff: 23 },
+      { reason: 'Work-Life Balance', total: 21, percentage: 15, faculty: 4, staff: 17 },
+      { reason: 'Retirement', total: 17, percentage: 12, faculty: 3, staff: 14 },
+      { reason: 'Other', total: 7, percentage: 5, faculty: 0, staff: 7 }
     ]
   },
   benchmarks: {
@@ -85,6 +129,14 @@ const FALLBACK_DATA = {
       bestYear: { rate: 10.1, year: '2019' }
     }
   }
+};
+
+// Helper function to safely format numbers
+const safeToFixed = (value, decimals = 1) => {
+  if (typeof value === 'number' && !isNaN(value)) {
+    return value.toFixed(decimals);
+  }
+  return '0.0';
 };
 
 const TurnoverDashboard = () => {
@@ -148,9 +200,9 @@ const TurnoverDashboard = () => {
                 <div className="flex items-center gap-3">
                   <TrendingDown className="text-blue-600" size={24} />
                   <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Turnover Analysis Report</h1>
+                    <h1 className="text-2xl font-bold text-gray-900">Turnover Dashboard - Benefit Eligible</h1>
                     <p className="text-gray-600 text-sm mt-1">
-                      Period Ending: June 30, 2025 | {realtimeStatus} ({dataSource})
+                      Period Ending: June 30, 2025
                     </p>
                   </div>
                 </div>
@@ -159,22 +211,38 @@ const TurnoverDashboard = () => {
             </div>
           </div>
 
+          {/* Data Coverage Information Note */}
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 print:bg-white print:border-gray-300">
+            <div className="flex items-start gap-3">
+              <div className="flex-shrink-0">
+                <Info className="h-5 w-5 text-blue-600 print:text-black mt-0.5" aria-hidden="true" />
+              </div>
+              <div className="flex-grow">
+                <h3 className="text-sm font-semibold text-blue-800 print:text-black mb-1">
+                  Data Coverage Information
+                </h3>
+                <p className="text-sm text-blue-700 print:text-black leading-relaxed">
+                  The turnover data presented in this report comprises benefit-eligible Full-Time and Part-Time employees only, not including HSP's or Temporary employees.
+                </p>
+              </div>
+            </div>
+          </div>
+
           {/* Summary Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 print:gap-2 mb-6 print:mb-4">
         <SummaryCard
-          title="Overall Turnover Rate"
-          value={`${data.summary?.overallTurnoverRate?.toFixed(1) || '0.0'}%`}
+          title="Employee Turnover"
+          value={`${data.summary?.totalDepartures?.toLocaleString() || '0'}`}
           change={data.summary?.turnoverRateChange || 0}
           changeType="percentage"
-          subtitle={`${data.summary?.totalDepartures?.toLocaleString() || '0'} total departures`}
+          subtitle="Omaha (TBD) | Phoenix (TBD)"
           icon={TrendingDown}
           trend={(data.summary?.turnoverRateChange || 0) > 0 ? 'negative' : 'positive'}
-          target="10.5%"
         />
         
         <SummaryCard
           title="Faculty Turnover"
-          value={`${data.summary?.facultyTurnoverRate?.toFixed(1) || '0.0'}%`}
+          value={`${safeToFixed(data.summary?.facultyTurnoverRate)}%`}
           change={data.summary?.facultyTurnoverChange || 0}
           changeType="percentage"
           subtitle={`${data.summary?.facultyDepartures?.toLocaleString() || '0'} departures`}
@@ -184,7 +252,7 @@ const TurnoverDashboard = () => {
         
         <SummaryCard
           title="Staff Turnover"
-          value={`${data.summary?.staffTurnoverRate?.toFixed(1) || '0.0'}%`}
+          value={`${safeToFixed(data.summary?.staffTurnoverRate)}%`}
           change={data.summary?.staffTurnoverChange || 0}
           changeType="percentage"
           subtitle={`${data.summary?.staffDepartures?.toLocaleString() || '0'} departures`}
@@ -193,213 +261,30 @@ const TurnoverDashboard = () => {
         />
         
         <SummaryCard
-          title="Cost Impact"
-          value={`$${((data.summary?.totalCostImpact || 0) / 1000000).toFixed(1)}M`}
-          change={data.summary?.costImpactChange || 0}
-          changeType="percentage"
-          subtitle={`$${data.summary?.avgCostPerDeparture?.toLocaleString() || '0'} avg per departure`}
-          icon={DollarSign}
-          trend={(data.summary?.costImpactChange || 0) > 0 ? 'negative' : 'positive'}
+          title="Avg Tenure"
+          value={typeof data.summary?.avgTenure === 'string' ? data.summary.avgTenure : `${safeToFixed(data.summary?.avgTenure)} years`}
+          change={null}
+          changeType="none"
+          subtitle="Average service length at departure"
+          icon={Clock}
+          trend="neutral"
         />
       </div>
 
-      {/* Charts Row 1: Primary Reasons for Voluntary Turnover + Departures by Tenure */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 print:gap-2 mb-6 print:mb-4">
-        <PieBarCombinationChart
-          data={data.charts?.voluntaryReasons || []}
-          title="Primary Reasons for Voluntary Turnover"
-          height={350}
-        />
-        
-        <TurnoverPieChart
-          data={data.charts?.tenureAnalysis || []}
-          title="Departures by Tenure"
-          height={350}
-          showLegend={true}
-        />
-      </div>
-
-      {/* Charts Row 2: Full Width Benchmark Comparison */}
+      {/* Turnover Rates by Category Table */}
       <div className="mb-6 print:mb-4">
-        <div className="bg-white print:bg-white p-6 print:p-4 rounded-lg shadow-sm border print:border-gray">
-          <h3 className="text-xl print:text-lg font-semibold text-blue-700 print:text-black mb-6 print:mb-4">
-            Higher Education Benchmark Comparison
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div>
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-base font-medium">Overall Turnover</span>
-                <div className="flex items-center gap-2">
-                  <span className="text-lg font-bold text-green-600 print:text-black">
-                    {data.benchmarks?.overall?.creighton || 0}%
-                  </span>
-                  <span className="text-sm text-gray-500 print:text-black">
-                    vs {data.benchmarks?.overall?.industry || 0}% industry
-                  </span>
-                </div>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-3">
-                <div 
-                  className="bg-green-500 h-3 rounded-full transition-all duration-300" 
-                  style={{ width: `${((data.benchmarks?.overall?.creighton || 0) / 20) * 100}%` }}
-                ></div>
-              </div>
-            </div>
-            
-            <div>
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-base font-medium">Faculty Turnover</span>
-                <div className="flex items-center gap-2">
-                  <span className="text-lg font-bold text-blue-600 print:text-black">
-                    {data.benchmarks?.faculty?.creighton || 0}%
-                  </span>
-                  <span className="text-sm text-gray-500 print:text-black">
-                    vs {data.benchmarks?.faculty?.industry || 0}% industry
-                  </span>
-                </div>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-3">
-                <div 
-                  className="bg-blue-500 h-3 rounded-full transition-all duration-300" 
-                  style={{ width: `${((data.benchmarks?.faculty?.creighton || 0) / 20) * 100}%` }}
-                ></div>
-              </div>
-            </div>
-            
-            <div>
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-base font-medium">Staff Turnover</span>
-                <div className="flex items-center gap-2">
-                  <span className="text-lg font-bold text-orange-600 print:text-black">
-                    {data.benchmarks?.staff?.creighton || 0}%
-                  </span>
-                  <span className="text-sm text-gray-500 print:text-black">
-                    vs {data.benchmarks?.staff?.industry || 0}% industry
-                  </span>
-                </div>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-3">
-                <div 
-                  className="bg-orange-500 h-3 rounded-full transition-all duration-300" 
-                  style={{ width: `${((data.benchmarks?.staff?.creighton || 0) / 20) * 100}%` }}
-                ></div>
-              </div>
-            </div>
-          </div>
-          
-          <div className="bg-green-50 print:bg-white p-4 rounded-lg border border-green-200 print:border-gray mt-6">
-            <div className="flex items-center justify-center gap-3">
-              <Award className="text-green-600 print:text-black" size={20} />
-              <span className="text-lg font-semibold text-green-800 print:text-black">
-                Performing 12% better than industry median across all categories
-              </span>
-            </div>
-          </div>
-        </div>
+        <TurnoverRatesTable 
+          data={data}
+          title="Turnover Rates by Category"
+        />
       </div>
 
-      {/* Additional Metrics Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 print:gap-2 mb-6 print:mb-4">
-        <div className="bg-white print:bg-white p-4 print:p-2 rounded-lg shadow-sm border print:border-gray">
-          <h3 className="text-lg print:text-base font-semibold text-blue-700 print:text-black mb-3 print:mb-2">
-            High-Risk Departments
-          </h3>
-          <div className="space-y-3">
-            {(data.metrics?.highRiskDepartments || []).slice(0, 4).map((dept, index) => (
-              <div key={index} className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <AlertTriangle 
-                    className={`${dept.riskLevel === 'High' ? 'text-red-500' : 'text-orange-500'} print:text-black`} 
-                    size={16} 
-                  />
-                  <span className="text-sm">{dept.name}</span>
-                </div>
-                <span className="text-sm font-semibold">
-                  {dept.turnoverRate}%
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="bg-white print:bg-white p-4 print:p-2 rounded-lg shadow-sm border print:border-gray">
-          <h3 className="text-lg print:text-base font-semibold text-blue-700 print:text-black mb-3 print:mb-2">
-            Retention Metrics
-          </h3>
-          <div className="space-y-3">
-            <div className="flex justify-between">
-              <span className="text-sm">Retention Rate</span>
-              <span className="text-sm font-semibold text-green-600 print:text-black">
-                {data.metrics?.retention?.retentionRate || 0}%
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-sm">Avg Time to Fill</span>
-              <span className="text-sm font-semibold">
-                {data.metrics?.retention?.avgTimeToFill || 0} days
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-sm">Exit Interview Rate</span>
-              <span className="text-sm font-semibold">
-                {data.metrics?.retention?.exitInterviewRate || 0}%
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-sm">Preventable Turnover</span>
-              <span className="text-sm font-semibold text-orange-600 print:text-black">
-                {data.metrics?.retention?.preventableTurnover || 0}%
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white print:bg-white p-4 print:p-2 rounded-lg shadow-sm border print:border-gray">
-          <h3 className="text-lg print:text-base font-semibold text-blue-700 print:text-black mb-3 print:mb-2">
-            Historical Context
-          </h3>
-          <div className="space-y-3">
-            <div className="flex justify-between">
-              <span className="text-sm">5-Year Average</span>
-              <span className="text-sm font-semibold">
-                {data.metrics?.historical?.fiveYearAverage || 0}%
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-sm">Current Trend</span>
-              <span className="text-sm font-semibold text-green-600 print:text-black capitalize">
-                {data.metrics?.historical?.trend || 'stable'}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-sm">Best Performance</span>
-              <span className="text-sm font-semibold">
-                {data.metrics?.historical?.bestYear?.rate || 0}% ({data.metrics?.historical?.bestYear?.year || 'N/A'})
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Executive Summary Section */}
-      <div className="bg-gray-50 print:bg-white p-6 print:p-4 rounded-lg border border-gray-200 print:border-gray">
-        <h2 className="text-xl print:text-lg font-bold text-blue-700 print:text-black mb-4 print:mb-3">
-          TURNOVER ANALYSIS EXECUTIVE SUMMARY
-        </h2>
-        <div className="space-y-4 print:space-y-2 text-sm print:text-xs">
-          <p className="text-gray-700 print:text-black">
-            <strong>FY 2024 Turnover Performance:</strong> Creighton University achieved an overall turnover rate of 12.5% in FY 2024, representing 287 total departures. This performance is 12% better than the higher education industry median, demonstrating effective retention strategies and competitive positioning in talent management.
-          </p>
-          <p className="text-gray-700 print:text-black">
-            <strong>Category Analysis:</strong> Faculty turnover remained stable at 8.8% (89 departures), significantly below the industry average of 11.1%. Staff turnover of 15.3% (178 departures) also outperformed industry benchmarks. The organization continues to maintain strong retention across all employee categories.
-          </p>
-          <p className="text-gray-700 print:text-black">
-            <strong>Key Drivers and Insights:</strong> Career advancement opportunities account for 39.2% of voluntary departures, followed by compensation-related factors at 22.9%. Early-tenure employees (0-1 years) show the highest turnover risk at 21.5%, while long-term employees (15+ years) demonstrate strong retention at 3.3% turnover rate.
-          </p>
-          <p className="text-gray-700 print:text-black">
-            <strong>Financial Impact and Strategic Focus:</strong> The estimated total cost impact of $6.8M reflects an average cost of $23,623 per departure. With 34% of turnover classified as preventable, targeted retention initiatives focusing on career development, competitive compensation, and work-life balance could yield significant cost savings and improved organizational stability.
-          </p>
-        </div>
+      {/* Top Exit Reasons Chart */}
+      <div className="mb-6 print:mb-4">
+        <TopExitReasonsStatic
+          data={data.charts?.topExitReasons || []}
+          title="Top Exit Reasons"
+        />
       </div>
         </div>
       </div>

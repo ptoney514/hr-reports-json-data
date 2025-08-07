@@ -180,7 +180,66 @@ const useTurnoverData = (customFilters = {}) => {
         involuntaryRate: (data.currentFiscalYear?.turnoverByCategory || []).reduce((sum, cat) => 
           sum + (cat?.involuntaryRate || 0), 0) / Math.max((data.currentFiscalYear?.turnoverByCategory || []).length, 1),
         changeFromPrevious: data.currentFiscalYear?.overallTurnover?.changeFromPreviousYear || 0,
-        benchmarkComparison: data.benchmarkComparison?.overallComparison?.performance || 'unknown'
+        turnoverRateChange: data.currentFiscalYear?.overallTurnover?.changeFromPreviousYear || 0,
+        benchmarkComparison: data.benchmarkComparison?.overallComparison?.performance || 'unknown',
+        
+        // Faculty specific metrics
+        facultyTurnoverRate: (() => {
+          const facultyData = (data.currentFiscalYear?.turnoverByCategory || []).find(cat => cat.category === 'Faculty');
+          return facultyData?.turnoverRate || 0;
+        })(),
+        facultyDepartures: (() => {
+          const facultyData = (data.currentFiscalYear?.turnoverByCategory || []).find(cat => cat.category === 'Faculty');
+          return facultyData?.departures || 0;
+        })(),
+        facultyTurnoverChange: (() => {
+          const facultyData = (data.currentFiscalYear?.turnoverByCategory || []).find(cat => cat.category === 'Faculty');
+          return facultyData?.changeFromPreviousYear || 0;
+        })(),
+        
+        // Staff specific metrics
+        staffTurnoverRate: (() => {
+          const staffData = (data.currentFiscalYear?.turnoverByCategory || []).find(cat => cat.category === 'Staff');
+          return staffData?.turnoverRate || 0;
+        })(),
+        staffDepartures: (() => {
+          const staffData = (data.currentFiscalYear?.turnoverByCategory || []).find(cat => cat.category === 'Staff');
+          return staffData?.departures || 0;
+        })(),
+        staffTurnoverChange: (() => {
+          const staffData = (data.currentFiscalYear?.turnoverByCategory || []).find(cat => cat.category === 'Staff');
+          return staffData?.changeFromPreviousYear || 0;
+        })(),
+        
+        // Calculate overall average tenure weighted by departures
+        avgTenure: (() => {
+          // Check if we have a direct avgTenure value in the data
+          if (data.currentFiscalYear?.averageTenure !== undefined) {
+            return data.currentFiscalYear.averageTenure;
+          }
+          
+          // Check if we have it in overallTurnover
+          if (data.currentFiscalYear?.overallTurnover?.avgTenure !== undefined) {
+            return data.currentFiscalYear.overallTurnover.avgTenure;
+          }
+          
+          const gradeData = data.currentFiscalYear?.departuresByGrade || [];
+          if (gradeData.length === 0) return "TBD";
+          
+          let totalWeightedTenure = 0;
+          let totalDepartures = 0;
+          
+          gradeData.forEach(grade => {
+            const departures = grade?.departures || 0;
+            const avgTenureStr = grade?.averageTenure || '0 years';
+            const avgTenureNum = parseFloat(avgTenureStr.replace(' years', '')) || 0;
+            
+            totalWeightedTenure += avgTenureNum * departures;
+            totalDepartures += departures;
+          });
+          
+          return totalDepartures > 0 ? (totalWeightedTenure / totalDepartures) : "TBD";
+        })()
       },
 
       // Chart data
@@ -253,6 +312,24 @@ const useTurnoverData = (customFilters = {}) => {
           primaryReasons: dept?.primaryReasons || [],
           benchmarkComparison: dept?.benchmarkComparison || {},
           initiatives: dept?.retentionInitiatives || []
+        })),
+
+        // Top exit reasons for horizontal bar chart
+        topExitReasons: (data.currentFiscalYear?.topExitReasons || []).map(reason => ({
+          reason: reason?.reason || '',
+          total: reason?.total || 0,
+          percentage: reason?.percentage || 0,
+          faculty: reason?.faculty || 0,
+          staff: reason?.staff || 0
+        })),
+
+        // Employee reported turnover reasons
+        employeeReportedTurnoverReasons: (data.currentFiscalYear?.employeeReportedTurnoverReasons || []).map(reason => ({
+          reason: reason?.reason || '',
+          total: reason?.total || 0,
+          percentage: reason?.percentage || 0,
+          faculty: reason?.faculty || 0,
+          staff: reason?.staff || 0
         }))
       },
 

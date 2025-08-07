@@ -306,6 +306,7 @@ const useWorkforceData = (customFilters = {}) => {
         totalHeadcount: data.currentPeriod?.headcount?.total || 0,
         faculty: data.currentPeriod?.headcount?.faculty || 0,
         staff: data.currentPeriod?.headcount?.staff || 0,
+        hsp: data.currentPeriod?.headcount?.hsp || 0,
         students: data.currentPeriod?.headcount?.students || 0,
         benefitEligible: data.currentPeriod?.headcount?.benefitEligible || 0,
         benefitEligibleFaculty: data.currentPeriod?.headcount?.benefitEligibleFaculty || 0,
@@ -317,10 +318,10 @@ const useWorkforceData = (customFilters = {}) => {
         employeeChange: data.currentPeriod?.headcount?.changeFromPrevious?.percentChange || 0,
         facultyChange: ((data.currentPeriod?.headcount?.changeFromPrevious?.faculty || 0) / (data.currentPeriod?.headcount?.faculty || 1) * 100) || 0,
         staffChange: ((data.currentPeriod?.headcount?.changeFromPrevious?.staff || 0) / (data.currentPeriod?.headcount?.staff || 1) * 100) || 0,
+        hspChange: ((data.currentPeriod?.headcount?.changeFromPrevious?.hsp || 0) / (data.currentPeriod?.headcount?.hsp || 1) * 100) || 0,
         vacancyRateChange: data.currentPeriod?.positions?.changeFromPrevious?.vacancyRateChange || 0,
         growth: data.currentPeriod?.headcount?.changeFromPrevious?.percentChange || 0,
         growthRate: data.currentPeriod?.headcount?.changeFromPrevious?.percentChange || 0,
-        hsp: data.currentPeriod?.headcount?.changeFromPrevious?.percentChange || 0,
         benefitEligibleChange: data.currentPeriod?.headcount?.changeFromPrevious?.benefitEligiblePercentChange || 0
       },
 

@@ -3,11 +3,11 @@
   "reportingDate": "2025-06-30",
   "lastUpdated": "2025-06-30T00:00:00Z",
   "metrics": {
-    "totalExits": 372,
+    "totalExits": 62,
     "totalResponses": 11,
     "recommendationRate": 72.7,
     "avgTenure": "TBD",
-    "exitInterviewCompletion": 2.96
+    "exitInterviewCompletion": 17.74
   },
   "exitReasons": {
     "Family/Personal reasons": 36.4,
@@ -41,32 +41,48 @@
     }
   },
   "byDepartment": {
-    "School of Medicine": {
-      "exits": 82,
-      "responses": 2
-    },
-    "Phoenix": {
-      "exits": 92,
+    "Arts & Sciences": {
+      "exits": 11,
       "responses": 0
     },
-    "School of Dentistry": {
-      "exits": 15,
+    "Facilities": {
+      "exits": 7,
+      "responses": 0
+    },
+    "Medicine": {
+      "exits": 5,
       "responses": 2
+    },
+    "Dentistry": {
+      "exits": 5,
+      "responses": 2
+    },
+    "Pharmacy & Health Prof": {
+      "exits": 5,
+      "responses": 0
     },
     "Athletics": {
-      "exits": 9,
+      "exits": 4,
       "responses": 2
     },
-    "Information Technology": {
-      "exits": null,
+    "Heider Business": {
+      "exits": 3,
+      "responses": 0
+    },
+    "Nursing": {
+      "exits": 3,
+      "responses": 0
+    },
+    "VPIT": {
+      "exits": 3,
       "responses": 1
     },
-    "Arts & Sciences": {
-      "exits": 40,
+    "VPSL": {
+      "exits": 3,
       "responses": 0
     },
     "Other Departments": {
-      "exits": 134,
+      "exits": 13,
       "responses": 4
     }
   },
@@ -88,7 +104,7 @@
       "30% reported witnessing improper conduct",
       "18.2% cited supervisor relationship issues as primary exit reason",
       "Multiple reports of racial inequality concerns",
-      "Limited response rate (2.96%) affects statistical significance"
+      "Career advancement limitations cited by respondents"
     ],
     "positiveFeedback": [
       "72.7% would still recommend Creighton as workplace",
@@ -109,7 +125,7 @@
       },
       {
         "priority": "warning",
-        "text": "Address retention in Medicine (82 exits) and Phoenix (92 exits)",
+        "text": "Improve response rate in Arts & Sciences (0 of 11 exits responded)",
         "status": "warning"
       },
       {
@@ -118,11 +134,11 @@
         "status": "info"
       },
       {
-        "priority": "info",
-        "text": "Improve exit survey response rate (currently 2.96%)",
-        "status": "info"
+        "priority": "success",
+        "text": "Build on improved response rate (17.74% vs typical 10-15%)",
+        "status": "success"
       }
     ]
   },
-  "summaryText": "With a 2.96% response rate (11 of 372 exits), the exit survey provides valuable but limited insights. 72.7% of respondents would still recommend Creighton as a workplace. Key improvement areas include supervisor relationships, career advancement opportunities, and leadership communication.\n\nPositive aspects include strong university culture, meaningful work with students, and competitive benefits package. Improving exit survey participation should be a priority for more comprehensive retention insights and actionable outcomes."
+  "summaryText": "With a 17.74% response rate (11 of 62 exits), the exit survey provides meaningful insights, though increased participation would strengthen data reliability. 72.7% of respondents would still recommend Creighton as a workplace. Key improvement areas include supervisor relationships, career advancement opportunities, and addressing reported improper conduct.\n\nNotable patterns: Athletics and Medicine/Dentistry show higher response rates (40-50%), while larger departments like Arts & Sciences show low participation. Focus on improving response rates in underrepresented departments for comprehensive retention insights."
 }

@@ -1,124 +1,229 @@
 {
   "metadata": {
-    "fiscalYear": "FY2024",
-    "reportingPeriod": "FY2024 YTD (Jul 2023 - Mar 2024)",
-    "generatedDate": "2025-01-15T10:30:00Z",
+    "fiscalYear": "FY2025",
+    "reportingPeriod": "FY2025 End of Year (Jul 2024 - Jun 2025)",
+    "generatedDate": "2025-08-07T10:30:00Z",
     "dataSource": "HRIS Turnover Analytics",
-    "lastUpdated": "2025-01-15T08:00:00Z",
+    "lastUpdated": "2025-08-07T08:00:00Z",
     "organization": "University System",
     "benchmarkSource": "CUPA-HR Higher Education Turnover Study"
   },
 
   "currentFiscalYear": {
-    "period": "FY2024 YTD",
-    "startDate": "2023-07-01",
-    "endDate": "2024-03-31",
+    "period": "FY2025 End of Year",
+    "startDate": "2024-07-01",
+    "endDate": "2025-06-30",
     
     "overallTurnover": {
-      "totalDepartures": 287,
-      "averageHeadcount": 2756,
-      "annualizedTurnoverRate": 12.5,
-      "changeFromPreviousYear": -1.8,
+      "totalDepartures": 62,
+      "averageHeadcount": 2800,
+      "annualizedTurnoverRate": 2.2,
+      "changeFromPreviousYear": -10.3,
       "quarterlyProgression": [
-        { "quarter": "Q1-FY24", "rate": 14.2 },
-        { "quarter": "Q2-FY24", "rate": 13.8 },
-        { "quarter": "Q3-FY24", "rate": 11.9 },
-        { "quarter": "Q4-FY24", "rate": 10.4 }
+        { "quarter": "Q1-FY25", "rate": 0.6 },
+        { "quarter": "Q2-FY25", "rate": 0.5 },
+        { "quarter": "Q3-FY25", "rate": 0.6 },
+        { "quarter": "Q4-FY25", "rate": 0.5 }
       ]
     },
 
     "turnoverByCategory": [
       {
         "category": "Faculty",
-        "totalEmployees": 1208,
-        "departures": 89,
-        "turnoverRate": 8.8,
-        "voluntary": 67,
-        "involuntary": 22,
-        "voluntaryRate": 6.6,
-        "involuntaryRate": 2.2,
-        "changeFromPreviousYear": -0.9
+        "totalEmployees": 1220,
+        "departures": 21,
+        "turnoverRate": 1.7,
+        "voluntary": 19,
+        "involuntary": 2,
+        "voluntaryRate": 1.6,
+        "involuntaryRate": 0.2,
+        "changeFromPreviousYear": -7.1
       },
       {
         "category": "Staff",
-        "totalEmployees": 1395,
-        "departures": 178,
-        "turnoverRate": 15.3,
-        "voluntary": 142,
-        "involuntary": 36,
-        "voluntaryRate": 12.2,
-        "involuntaryRate": 3.1,
-        "changeFromPreviousYear": -2.1
+        "totalEmployees": 1420,
+        "departures": 41,
+        "turnoverRate": 2.9,
+        "voluntary": 37,
+        "involuntary": 4,
+        "voluntaryRate": 2.6,
+        "involuntaryRate": 0.3,
+        "changeFromPreviousYear": -12.4
       },
       {
         "category": "Students",
-        "totalEmployees": 153,
-        "departures": 20,
-        "turnoverRate": 15.7,
-        "voluntary": 18,
-        "involuntary": 2,
-        "voluntaryRate": 14.1,
-        "involuntaryRate": 1.6,
-        "changeFromPreviousYear": -3.2
+        "totalEmployees": 160,
+        "departures": 0,
+        "turnoverRate": 0.0,
+        "voluntary": 0,
+        "involuntary": 0,
+        "voluntaryRate": 0.0,
+        "involuntaryRate": 0.0,
+        "changeFromPreviousYear": -15.7
       }
     ],
 
     "voluntaryTurnoverReasons": [
       {
-        "reason": "Career Advancement/Better Opportunity",
-        "count": 89,
-        "percentage": 39.2,
-        "facultyCount": 28,
-        "staffCount": 58,
-        "studentCount": 3
-      },
-      {
-        "reason": "Compensation & Benefits",
-        "count": 52,
-        "percentage": 22.9,
-        "facultyCount": 15,
-        "staffCount": 35,
-        "studentCount": 2
-      },
-      {
-        "reason": "Work-Life Balance",
-        "count": 31,
-        "percentage": 13.7,
-        "facultyCount": 12,
-        "staffCount": 17,
-        "studentCount": 2
-      },
-      {
-        "reason": "Relocation/Personal",
-        "count": 24,
-        "percentage": 10.6,
-        "facultyCount": 8,
-        "staffCount": 14,
-        "studentCount": 2
-      },
-      {
         "reason": "Retirement",
-        "count": 18,
-        "percentage": 7.9,
-        "facultyCount": 3,
-        "staffCount": 15,
+        "count": 14,
+        "percentage": 25.0,
+        "facultyCount": 9,
+        "staffCount": 5,
         "studentCount": 0
       },
       {
-        "reason": "Education/Return to School",
-        "count": 8,
-        "percentage": 3.5,
-        "facultyCount": 1,
-        "staffCount": 3,
-        "studentCount": 4
+        "reason": "Resigned",
+        "count": 25,
+        "percentage": 44.6,
+        "facultyCount": 3,
+        "staffCount": 22,
+        "studentCount": 0
       },
       {
-        "reason": "Other/Undisclosed",
+        "reason": "End Assignment",
+        "count": 9,
+        "percentage": 16.1,
+        "facultyCount": 7,
+        "staffCount": 2,
+        "studentCount": 0
+      },
+      {
+        "reason": "Better Opportunity",
         "count": 5,
-        "percentage": 2.2,
+        "percentage": 8.9,
         "facultyCount": 0,
-        "staffCount": 0,
-        "studentCount": 5
+        "staffCount": 5,
+        "studentCount": 0
+      },
+      {
+        "reason": "Personal Reasons",
+        "count": 2,
+        "percentage": 3.6,
+        "facultyCount": 0,
+        "staffCount": 2,
+        "studentCount": 0
+      },
+      {
+        "reason": "Relocation",
+        "count": 2,
+        "percentage": 3.6,
+        "facultyCount": 0,
+        "staffCount": 2,
+        "studentCount": 0
+      }
+    ],
+
+    "employeeReportedTurnoverReasons": [
+      {
+        "reason": "Career Advancement",
+        "count": 40,
+        "percentage": 28.2,
+        "facultyCount": 5,
+        "staffCount": 35
+      },
+      {
+        "reason": "Compensation",
+        "count": 31,
+        "percentage": 21.8,
+        "facultyCount": 3,
+        "staffCount": 28
+      },
+      {
+        "reason": "Supervisor Issues",
+        "count": 26,
+        "percentage": 18.3,
+        "facultyCount": 3,
+        "staffCount": 23
+      },
+      {
+        "reason": "Work-Life Balance",
+        "count": 21,
+        "percentage": 14.8,
+        "facultyCount": 4,
+        "staffCount": 17
+      },
+      {
+        "reason": "Retirement",
+        "count": 17,
+        "percentage": 12.0,
+        "facultyCount": 3,
+        "staffCount": 14
+      },
+      {
+        "reason": "Other",
+        "count": 7,
+        "percentage": 4.9,
+        "facultyCount": 0,
+        "staffCount": 7
+      }
+    ],
+
+    "averageTenure": "TBD",
+
+    "topExitReasons": [
+      {
+        "reason": "Resigned",
+        "total": 25,
+        "percentage": 40.3,
+        "faculty": 3,
+        "staff": 22
+      },
+      {
+        "reason": "Retirement", 
+        "total": 14,
+        "percentage": 22.6,
+        "faculty": 9,
+        "staff": 5
+      },
+      {
+        "reason": "End Assignment",
+        "total": 9,
+        "percentage": 14.5,
+        "faculty": 7,
+        "staff": 2
+      },
+      {
+        "reason": "Better Opportunity",
+        "total": 5,
+        "percentage": 8.1,
+        "faculty": 0,
+        "staff": 5
+      },
+      {
+        "reason": "Invol Performance",
+        "total": 3,
+        "percentage": 4.8,
+        "faculty": 1,
+        "staff": 2
+      },
+      {
+        "reason": "Personal Reasons",
+        "total": 2,
+        "percentage": 3.2,
+        "faculty": 0,
+        "staff": 2
+      },
+      {
+        "reason": "Relocation",
+        "total": 2,
+        "percentage": 3.2,
+        "faculty": 0,
+        "staff": 2
+      },
+      {
+        "reason": "Death",
+        "total": 1,
+        "percentage": 1.6,
+        "faculty": 1,
+        "staff": 0
+      },
+      {
+        "reason": "Reduction In Force",
+        "total": 1,
+        "percentage": 1.6,
+        "faculty": 0,
+        "staff": 1
       }
     ],
 
@@ -335,7 +440,18 @@
       "voluntaryRate": 9.8,
       "involuntaryRate": 2.7,
       "totalDepartures": 287,
-      "context": "Current period (YTD)"
+      "context": "Previous year data"
+    },
+    {
+      "fiscalYear": "FY2025",
+      "period": "2024-07-01 to 2025-06-30",
+      "overallTurnoverRate": 2.2,
+      "facultyRate": 1.7,
+      "staffRate": 2.9,
+      "voluntaryRate": 2.0,
+      "involuntaryRate": 0.2,
+      "totalDepartures": 62,
+      "context": "Current period - significant improvement"
     }
   ],
 
@@ -486,7 +602,7 @@
   },
 
   "filters": {
-    "availableFiscalYears": ["FY2020", "FY2021", "FY2022", "FY2023", "FY2024"],
+    "availableFiscalYears": ["FY2020", "FY2021", "FY2022", "FY2023", "FY2024", "FY2025"],
     "availableCategories": ["All", "Faculty", "Staff", "Students"],
     "availableGrades": ["All", "A - Executive", "C - Faculty", "D - Professional", "X - Support", "Y - Student"],
     "availableDepartments": [

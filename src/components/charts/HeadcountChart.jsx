@@ -1,6 +1,6 @@
 import React, { memo, useMemo, useState, useRef, useEffect, useCallback } from 'react';
 // Standard recharts imports
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LabelList } from 'recharts';
 import { AlertCircle } from 'lucide-react';
 import ChartErrorBoundary from '../ui/ChartErrorBoundary';
 import { generateChartAriaLabel, generateChartAriaDescription, handleChartKeyNavigation, announceToScreenReader } from '../../utils/accessibilityUtils';
@@ -96,6 +96,31 @@ const HeadcountChart = memo(({
     return null;
   }, []);
 
+  // Custom bar label formatter for top positioning
+  const CustomBarLabel = useCallback(({ x, y, width, value }) => {
+    if (!value || value === 0) return null;
+    
+    // Format value for display
+    const formattedValue = typeof value === 'number' ? value.toLocaleString() : value;
+    
+    // Position label at the top of the bar with some padding
+    const labelX = x + width / 2; // Horizontally centered
+    const labelY = y - 8;          // 8px above the bar
+    
+    return (
+      <text
+        x={labelX}
+        y={labelY}
+        textAnchor="middle"
+        fill="#374151"
+        fontSize="12"
+        fontWeight="500"
+      >
+        {formattedValue}
+      </text>
+    );
+  }, []);
+
   // Error handling for missing or invalid data
   if (!data || data.length === 0) {
     return (
@@ -159,7 +184,7 @@ const HeadcountChart = memo(({
         <ResponsiveContainer width="100%" height={height} className="print:h-48">
           <BarChart 
             data={data} 
-            margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+            margin={{ top: 30, right: 30, left: 20, bottom: 5 }}
           >
             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
             <XAxis 
@@ -187,7 +212,9 @@ const HeadcountChart = memo(({
                 dataKey={key} 
                 fill={colors[index % colors.length]}
                 radius={[2, 2, 0, 0]}
-              />
+              >
+                <LabelList content={CustomBarLabel} />
+              </Bar>
             ))}
           </BarChart>
         </ResponsiveContainer>

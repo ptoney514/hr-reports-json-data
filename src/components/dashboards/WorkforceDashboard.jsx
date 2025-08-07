@@ -124,7 +124,7 @@ const WorkforceDashboard = () => {
                 <div className="flex items-center gap-3">
                   <Users className="text-blue-600" size={24} />
                   <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Benefit Eligible Workforce Analytics</h1>
+                    <h1 className="text-2xl font-bold text-gray-900">Workforce Dashboard - Benefit Eligible</h1>
                     <p className="text-gray-600 text-sm mt-1">
                       Period Ending: June 30, 2025
                     </p>
@@ -188,10 +188,10 @@ const WorkforceDashboard = () => {
             />
           </div>
 
-          {/* Workforce Analytics Charts */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 print:gap-4">
+          {/* Workforce Analytics Charts - Row 1: Department and Location */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 print:gap-4 mb-6">
             {/* Department Headcount Display */}
-            <div className="lg:col-span-1">
+            <div>
               {(() => {
                 const deptData = rawData?.currentPeriod?.departmentalBreakdown || [];
                 console.log('🔍 WorkforceDashboard - Departmental data being passed:', deptData);
@@ -209,15 +209,18 @@ const WorkforceDashboard = () => {
             </div>
             
             {/* Location Distribution Chart */}
-            <div className="lg:col-span-1">
+            <div>
               <LocationDistributionChart 
                 data={rawData?.currentPeriod?.locations || []}
                 className="print:h-80 min-h-[420px]"
               />
             </div>
-            
+          </div>
+
+          {/* Workforce Analytics Charts - Row 2: Assignment Type (Full Width) */}
+          <div className="grid grid-cols-1 gap-6 print:gap-4">
             {/* Assignment Type Chart */}
-            <div className="lg:col-span-1">
+            <div>
               <AssignmentTypeChart 
                 data={rawData?.currentPeriod?.byAssignmentType || []}
                 className="print:h-80 min-h-[420px]"

@@ -9,7 +9,7 @@ import {
   X,
   UserPlus,
   MessageSquare,
-  Database
+  Settings
 } from 'lucide-react';
 import { announceToScreenReader } from '../../utils/accessibilityUtils';
 
@@ -30,7 +30,7 @@ const Navigation = () => {
     },
     {
       id: 'workforce',
-      label: 'Workforce Analytics',
+      label: 'Workforce Dashboard',
       path: '/dashboards/workforce',
       icon: Users,
       isActive: isActive('/dashboards/workforce')
@@ -44,7 +44,7 @@ const Navigation = () => {
     },
     {
       id: 'recruiting',
-      label: 'Recruiting & Retention Analytics',
+      label: 'Recruiting Dashboard',
       path: '/dashboards/recruiting',
       icon: UserPlus,
       isActive: isActive('/dashboards/recruiting')
@@ -58,9 +58,9 @@ const Navigation = () => {
     },
     {
       id: 'admin',
-      label: 'Admin Dashboard',
+      label: 'Settings',
       path: '/admin',
-      icon: Database,
+      icon: Settings,
       isActive: isActive('/admin')
     }
   ];

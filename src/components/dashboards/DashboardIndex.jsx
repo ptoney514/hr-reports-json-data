@@ -5,23 +5,33 @@ import {
   TrendingDown, 
   FileBarChart, 
   ArrowRight, 
-  PieChart,
   Activity,
-  Building2,
   Clock,
   CheckCircle,
   AlertTriangle,
   TrendingUp,
-  Calendar,
+  UserCheck,
+  MessageSquare,
+  Settings,
+  BookOpen,
+  FileText,
+  HelpCircle,
   Database,
-  Zap,
-  Shield,
-  RefreshCw
+  BarChart3
 } from 'lucide-react';
+import useHomePageMetrics from '../../hooks/useHomePageMetrics';
 
 const DashboardIndex = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [lastRefresh, setLastRefresh] = useState(new Date());
+  const { 
+    organizationalInsights, 
+    dashboardPreviews, 
+    recentUpdates, 
+    loading, 
+    error, 
+    getTimeAgo,
+    lastUpdated 
+  } = useHomePageMetrics();
 
   // Update current time every minute
   useEffect(() => {
@@ -32,84 +42,14 @@ const DashboardIndex = () => {
     return () => clearInterval(timer);
   }, []);
 
-  // Simulate data refresh every 5 minutes
-  useEffect(() => {
-    const refreshTimer = setInterval(() => {
-      setLastRefresh(new Date());
-    }, 300000); // 5 minutes
-
-    return () => clearInterval(refreshTimer);
-  }, []);
-
-  const getTimeAgo = (date) => {
-    const now = new Date();
-    const diffInMinutes = Math.floor((now - date) / 60000);
-    
-    if (diffInMinutes < 1) return 'Just now';
-    if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
-    
-    const diffInHours = Math.floor(diffInMinutes / 60);
-    if (diffInHours < 24) return `${diffInHours}h ago`;
-    
-    const diffInDays = Math.floor(diffInHours / 24);
-    return `${diffInDays}d ago`;
+  // Icon mapping for dashboard previews
+  const iconComponents = {
+    Users,
+    TrendingDown,
+    UserCheck,
+    MessageSquare,
+    Settings
   };
-
-  const dashboards = [
-    {
-      id: 'turnover',
-      title: 'Turnover Analysis',
-      description: 'Departure trends, retention metrics, and cost impact analysis',
-      path: '/dashboards/turnover',
-      icon: TrendingDown,
-      color: 'bg-orange-500',
-      hoverColor: 'hover:bg-orange-600',
-      borderColor: 'border-orange-200',
-      bgColor: 'bg-orange-50',
-      lastUpdated: new Date(Date.now() - 1000 * 60 * 8), // 8 minutes ago
-      status: 'healthy',
-      stats: [
-        { label: 'Turnover Rate', value: '12.5%', trend: 'down', change: '-1.2%' },
-        { label: 'Cost Impact', value: '$6.8M', trend: 'down', change: '-$0.4M' },
-        { label: 'vs Industry', value: '-12%', trend: 'up', change: 'Better' }
-      ]
-    }
-  ];
-
-  const systemMetrics = [
-    {
-      icon: Building2,
-      label: 'Active Dashboards',
-      value: '4',
-      description: 'Analytics dashboards',
-      status: 'healthy',
-      color: 'blue'
-    },
-    {
-      icon: Database,
-      label: 'Data Sources',
-      value: '4',
-      description: 'Integrated HR systems',
-      status: 'healthy',
-      color: 'green'
-    },
-    {
-      icon: Activity,
-      label: 'Uptime',
-      value: '99.9%',
-      description: 'System availability',
-      status: 'healthy',
-      color: 'green'
-    },
-    {
-      icon: PieChart,
-      label: 'Reports Generated',
-      value: '127',
-      description: 'This month',
-      status: 'healthy',
-      color: 'blue'
-    }
-  ];
 
   const getStatusIcon = (status) => {
     switch (status) {
@@ -132,15 +72,28 @@ const DashboardIndex = () => {
     );
   };
 
-  const getStatusColor = (color) => {
-    const colors = {
-      blue: 'bg-blue-100 text-blue-600',
-      green: 'bg-green-100 text-green-600',
-      orange: 'bg-orange-100 text-orange-600',
-      red: 'bg-red-100 text-red-600'
-    };
-    return colors[color] || colors.blue;
-  };
+  if (loading) {
+    return (
+      <div className="bg-gray-50 min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading dashboard metrics...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-gray-50 min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <AlertTriangle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+          <p className="text-red-600 mb-2">Failed to load dashboard data</p>
+          <p className="text-gray-500">{error}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-gray-50 min-h-screen">
@@ -153,16 +106,16 @@ const DashboardIndex = () => {
                 HR Analytics Dashboard
               </h1>
               <p className="text-blue-100 text-lg">
-                Comprehensive workforce analytics and reporting platform
+                JSON-based workforce analytics and organizational insights
               </p>
               <div className="flex items-center gap-4 mt-3">
                 <div className="flex items-center gap-2 text-sm text-blue-100">
                   <Clock size={16} />
-                  <span>Last updated: {getTimeAgo(lastRefresh)}</span>
+                  <span>Last updated: {lastUpdated ? getTimeAgo(lastUpdated) : 'Loading...'}</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm text-blue-100">
-                  <CheckCircle size={16} />
-                  <span>All systems operational</span>
+                  <Database size={16} />
+                  <span>JSON data architecture</span>
                 </div>
               </div>
             </div>
@@ -184,47 +137,92 @@ const DashboardIndex = () => {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-8">
-        {/* System Status Overview */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold text-gray-900">System Overview</h2>
-            <button className="flex items-center gap-2 px-3 py-1 text-sm text-gray-600 hover:text-gray-900 transition-colors">
-              <RefreshCw size={16} />
-              Refresh
-            </button>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {systemMetrics.map((metric, index) => {
-              const IconComponent = metric.icon;
-              return (
-                <div key={index} className="bg-white p-4 rounded-lg shadow-sm border hover:shadow-md transition-shadow">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className={`p-2 rounded-lg ${getStatusColor(metric.color)}`}>
-                      <IconComponent size={20} />
-                    </div>
-                    {getStatusIcon(metric.status)}
+        {/* Organizational Insights */}
+        {organizationalInsights && (
+          <div className="mb-8">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">Organizational Overview</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="bg-white p-4 rounded-lg shadow-sm border hover:shadow-md transition-shadow">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="p-2 rounded-lg bg-blue-100 text-blue-600">
+                    <Users size={20} />
                   </div>
-                  <div className="text-2xl font-bold text-gray-900 mb-1">
-                    {metric.value}
-                  </div>
-                  <div className="text-sm font-medium text-gray-700 mb-1">
-                    {metric.label}
-                  </div>
-                  <div className="text-xs text-gray-500">
-                    {metric.description}
-                  </div>
+                  <CheckCircle className="text-green-500" size={16} />
                 </div>
-              );
-            })}
+                <div className="text-2xl font-bold text-gray-900 mb-1">
+                  {organizationalInsights.totalEmployees?.toLocaleString()}
+                </div>
+                <div className="text-sm font-medium text-gray-700 mb-1">
+                  Total Employees
+                </div>
+                <div className="text-xs text-gray-500">
+                  Active workforce
+                </div>
+              </div>
+
+              <div className="bg-white p-4 rounded-lg shadow-sm border hover:shadow-md transition-shadow">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="p-2 rounded-lg bg-green-100 text-green-600">
+                    <TrendingUp size={20} />
+                  </div>
+                  <CheckCircle className="text-green-500" size={16} />
+                </div>
+                <div className="text-2xl font-bold text-gray-900 mb-1">
+                  {organizationalInsights.quarterlyGrowth >= 0 ? '+' : ''}{organizationalInsights.quarterlyGrowth}
+                </div>
+                <div className="text-sm font-medium text-gray-700 mb-1">
+                  Quarterly Growth
+                </div>
+                <div className="text-xs text-gray-500">
+                  Net headcount change
+                </div>
+              </div>
+
+              <div className="bg-white p-4 rounded-lg shadow-sm border hover:shadow-md transition-shadow">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="p-2 rounded-lg bg-orange-100 text-orange-600">
+                    <TrendingDown size={20} />
+                  </div>
+                  <CheckCircle className="text-green-500" size={16} />
+                </div>
+                <div className="text-2xl font-bold text-gray-900 mb-1">
+                  {organizationalInsights.turnoverRate}%
+                </div>
+                <div className="text-sm font-medium text-gray-700 mb-1">
+                  Turnover Rate
+                </div>
+                <div className="text-xs text-gray-500">
+                  Annual turnover
+                </div>
+              </div>
+
+              <div className="bg-white p-4 rounded-lg shadow-sm border hover:shadow-md transition-shadow">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="p-2 rounded-lg bg-purple-100 text-purple-600">
+                    <BarChart3 size={20} />
+                  </div>
+                  <CheckCircle className="text-green-500" size={16} />
+                </div>
+                <div className="text-2xl font-bold text-gray-900 mb-1">
+                  {organizationalInsights.vacancyRate}%
+                </div>
+                <div className="text-sm font-medium text-gray-700 mb-1">
+                  Vacancy Rate
+                </div>
+                <div className="text-xs text-gray-500">
+                  Open positions
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Enhanced Dashboard Cards */}
         <div className="mb-8">
           <h2 className="text-xl font-semibold text-gray-900 mb-4">Available Dashboards</h2>
           <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-            {dashboards.map((dashboard) => {
-              const IconComponent = dashboard.icon;
+            {dashboardPreviews.map((dashboard) => {
+              const IconComponent = iconComponents[dashboard.icon] || Users;
               return (
                 <div key={dashboard.id} className={`bg-white rounded-xl shadow-sm border-2 ${dashboard.borderColor} hover:shadow-lg transition-all duration-200 transform hover:-translate-y-1`}>
                   <div className="p-6">
@@ -298,91 +296,113 @@ const DashboardIndex = () => {
               </h3>
             </div>
             <div className="space-y-4">
-              <div className="flex items-start gap-3 p-3 rounded-lg bg-blue-50">
-                <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
-                <div>
-                  <p className="text-sm font-medium text-gray-900">
-                    Workforce Dashboard Enhanced
-                  </p>
-                  <p className="text-xs text-gray-500 mt-1">
-                    Added 5-quarter trend analysis and campus distribution charts
-                  </p>
-                  <p className="text-xs text-blue-600 mt-1">2 hours ago</p>
+              {recentUpdates.map((update, index) => {
+                // Define color classes to ensure they're not purged by Tailwind
+                const colorClasses = {
+                  blue: {
+                    bg: 'bg-blue-50',
+                    dot: 'bg-blue-500',
+                    text: 'text-blue-600'
+                  },
+                  orange: {
+                    bg: 'bg-orange-50',
+                    dot: 'bg-orange-500',
+                    text: 'text-orange-600'
+                  },
+                  purple: {
+                    bg: 'bg-purple-50',
+                    dot: 'bg-purple-500',
+                    text: 'text-purple-600'
+                  },
+                  green: {
+                    bg: 'bg-green-50',
+                    dot: 'bg-green-500',
+                    text: 'text-green-600'
+                  }
+                };
+                const colors = colorClasses[update.color] || colorClasses.blue;
+                
+                return (
+                  <div key={index} className={`flex items-start gap-3 p-3 rounded-lg ${colors.bg}`}>
+                    <div className={`w-2 h-2 ${colors.dot} rounded-full mt-2`}></div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-900">
+                        {update.title}
+                      </p>
+                      <p className="text-xs text-gray-500 mt-1">
+                        {update.description}
+                      </p>
+                      <p className={`text-xs ${colors.text} mt-1`}>{update.timestamp}</p>
+                    </div>
+                  </div>
+                );
+              })}
+              {recentUpdates.length === 0 && (
+                <div className="flex items-start gap-3 p-3 rounded-lg bg-gray-50">
+                  <div className="w-2 h-2 bg-gray-400 rounded-full mt-2"></div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-900">
+                      Data Loading...
+                    </p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Recent dashboard updates will appear here
+                    </p>
+                  </div>
                 </div>
-              </div>
-              <div className="flex items-start gap-3 p-3 rounded-lg bg-orange-50">
-                <div className="w-2 h-2 bg-orange-500 rounded-full mt-2"></div>
-                <div>
-                  <p className="text-sm font-medium text-gray-900">
-                    Turnover Analysis Updated
-                  </p>
-                  <p className="text-xs text-gray-500 mt-1">
-                    New benchmark comparisons and cost impact metrics
-                  </p>
-                  <p className="text-xs text-orange-600 mt-1">4 hours ago</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3 p-3 rounded-lg bg-green-50">
-                <div className="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
-                <div>
-                  <p className="text-sm font-medium text-gray-900">
-                    Exit Survey Dashboard Enhanced
-                  </p>
-                  <p className="text-xs text-gray-500 mt-1">
-                    Updated with real Q4 2025 data and new insights components
-                  </p>
-                  <p className="text-xs text-green-600 mt-1">1 hour ago</p>
-                </div>
-              </div>
+              )}
             </div>
           </div>
 
-          {/* Data Sources */}
+          {/* Data Architecture */}
           <div className="bg-white p-6 rounded-lg shadow-sm border">
             <div className="flex items-center gap-2 mb-4">
               <Database className="text-green-600" size={20} />
               <h3 className="text-lg font-semibold text-gray-900">
-                Data Sources
+                Data Architecture
               </h3>
             </div>
             <div className="space-y-3">
               <div className="flex items-center justify-between p-2 rounded-lg bg-gray-50">
                 <div className="flex items-center gap-3">
                   <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <span className="text-sm font-medium">Workday HCM</span>
+                  <span className="text-sm font-medium">Workforce Data</span>
                 </div>
-                <span className="text-xs text-green-600">Active</span>
+                <span className="text-xs text-green-600">5 quarters</span>
               </div>
               <div className="flex items-center justify-between p-2 rounded-lg bg-gray-50">
                 <div className="flex items-center gap-3">
                   <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <span className="text-sm font-medium">BambooHR</span>
+                  <span className="text-sm font-medium">Turnover Data</span>
                 </div>
-                <span className="text-xs text-green-600">Active</span>
-              </div>
-              <div className="flex items-center justify-between p-2 rounded-lg bg-gray-50">
-                <div className="flex items-center gap-3">
-                  <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
-                  <span className="text-sm font-medium">Payroll System</span>
-                </div>
-                <span className="text-xs text-yellow-600">Syncing</span>
+                <span className="text-xs text-green-600">5 quarters</span>
               </div>
               <div className="flex items-center justify-between p-2 rounded-lg bg-gray-50">
                 <div className="flex items-center gap-3">
                   <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <span className="text-sm font-medium">Active Directory</span>
+                  <span className="text-sm font-medium">Recruiting Data</span>
                 </div>
-                <span className="text-xs text-green-600">Active</span>
+                <span className="text-xs text-green-600">5 quarters</span>
               </div>
+              <div className="flex items-center justify-between p-2 rounded-lg bg-gray-50">
+                <div className="flex items-center gap-3">
+                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                  <span className="text-sm font-medium">Exit Survey Data</span>
+                </div>
+                <span className="text-xs text-green-600">5 quarters</span>
+              </div>
+            </div>
+            <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+              <p className="text-xs text-blue-700 font-medium">JSON-based file system</p>
+              <p className="text-xs text-blue-600 mt-1">Quarterly snapshots from 2024-Q2 to 2025-Q2</p>
             </div>
           </div>
 
-          {/* Support & Resources */}
+          {/* Documentation Hub */}
           <div className="bg-white p-6 rounded-lg shadow-sm border">
             <div className="flex items-center gap-2 mb-4">
-              <Shield className="text-blue-600" size={20} />
+              <BookOpen className="text-blue-600" size={20} />
               <h3 className="text-lg font-semibold text-gray-900">
-                Support & Resources
+                Documentation & Help
               </h3>
             </div>
             <div className="space-y-3">
@@ -392,49 +412,49 @@ const DashboardIndex = () => {
                 </div>
                 <div>
                   <p className="text-sm font-medium text-gray-900">
-                    Documentation
+                    User Guides
                   </p>
                   <p className="text-xs text-gray-500">
-                    User guides and tutorials
+                    Dashboard navigation and features
                   </p>
                 </div>
               </div>
               <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
                 <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
-                  <Zap className="text-green-600" size={16} />
+                  <FileText className="text-green-600" size={16} />
                 </div>
                 <div>
                   <p className="text-sm font-medium text-gray-900">
-                    API Status
+                    Metric Definitions
                   </p>
                   <p className="text-xs text-gray-500">
-                    All services operational
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
-                <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
-                  <Users className="text-orange-600" size={16} />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-900">
-                    Support Team
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    hr-analytics@creighton.edu
+                    Understanding HR metrics
                   </p>
                 </div>
               </div>
               <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
                 <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
-                  <Calendar className="text-purple-600" size={16} />
+                  <HelpCircle className="text-purple-600" size={16} />
                 </div>
                 <div>
                   <p className="text-sm font-medium text-gray-900">
-                    Refresh Schedule
+                    FAQ & Tutorials
                   </p>
                   <p className="text-xs text-gray-500">
-                    Daily at 6:00 AM
+                    Common questions answered
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
+                <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
+                  <Database className="text-orange-600" size={16} />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-900">
+                    Data Dictionary
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    Field descriptions and sources
                   </p>
                 </div>
               </div>

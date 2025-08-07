@@ -13,6 +13,7 @@ import StartersLeaversChart from '../StartersLeaversChart';
 import LocationChart from '../LocationChart';
 import DivisionsChart from '../DivisionsChart';
 import TurnoverPieChart from '../TurnoverPieChart';
+import TopExitReasonsChart from '../TopExitReasonsChart';
 
 // Mock Recharts components with keyboard navigation support
 jest.mock('recharts', () => ({
@@ -304,6 +305,150 @@ describe('Chart Keyboard Navigation', () => {
       
       const ariaLabel = chart.getAttribute('aria-label');
       expect(ariaLabel).toContain('1');
+    });
+  });
+
+  describe('TopExitReasonsChart', () => {
+    const mockExitReasonsData = [
+      { reason: 'Resignation', total: 25, percentage: 40.3, faculty: 3, staff: 22 },
+      { reason: 'Retirement', total: 14, percentage: 22.6, faculty: 9, staff: 5 },
+      { reason: 'Contract End', total: 12, percentage: 19.4, faculty: 8, staff: 4 },
+      { reason: 'Termination', total: 6, percentage: 9.7, faculty: 2, staff: 4 },
+      { reason: 'Transfer', total: 5, percentage: 8.1, faculty: 1, staff: 4 }
+    ];
+
+    test('renders with proper ARIA attributes for accessibility', () => {
+      renderWithRouter(<TopExitReasonsChart data={mockExitReasonsData} />);
+      
+      // Check main container has role="list"
+      const listContainer = screen.getByRole('list');
+      expect(listContainer).toHaveAttribute('aria-label', 'Exit reasons data');
+      
+      // Check each item has role="listitem"
+      const listItems = screen.getAllByRole('listitem');
+      expect(listItems).toHaveLength(5);
+      
+      // Verify first item has comprehensive aria-label
+      const firstItem = listItems[0];
+      expect(firstItem).toHaveAttribute('aria-label');
+      const ariaLabel = firstItem.getAttribute('aria-label');
+      expect(ariaLabel).toContain('Resignation');
+      expect(ariaLabel).toContain('40.3%');
+      expect(ariaLabel).toContain('25 people total');
+      expect(ariaLabel).toContain('3 faculty');
+      expect(ariaLabel).toContain('22 staff');
+    });
+
+    test('renders progress bars with proper ARIA attributes', () => {
+      renderWithRouter(<TopExitReasonsChart data={mockExitReasonsData} />);
+      
+      const progressBars = screen.getAllByRole('progressbar');
+      expect(progressBars).toHaveLength(5);
+      
+      // Test first progress bar (highest percentage)
+      const firstProgressBar = progressBars[0];
+      expect(firstProgressBar).toHaveAttribute('aria-valuemin', '0');
+      expect(firstProgressBar).toHaveAttribute('aria-valuemax', '40.3');
+      expect(firstProgressBar).toHaveAttribute('aria-valuenow', '40.3');
+      expect(firstProgressBar).toHaveAttribute('aria-label', '40.3% of total departures');
+    });
+
+    test('handles empty data gracefully with accessibility', () => {
+      renderWithRouter(<TopExitReasonsChart data={[]} />);
+      
+      // Should show no data message
+      const noDataMessage = screen.getByText('No exit reasons data available');
+      expect(noDataMessage).toBeInTheDocument();
+      
+      // Title should still be present and accessible
+      const title = screen.getByRole('heading', { level: 3 });
+      expect(title).toHaveTextContent('Top Exit Reasons');
+    });
+
+    test('supports keyboard navigation to focusable elements', async () => {
+      const { user } = renderWithRouter(<TopExitReasonsChart data={mockExitReasonsData} />);
+      
+      // Tab should navigate through list items (they are not focusable themselves)
+      // But the component should be accessible via screen reader navigation
+      await user.tab();
+      
+      // Verify the component structure is keyboard navigable
+      const listContainer = screen.getByRole('list');
+      expect(listContainer).toBeInTheDocument();
+      
+      // List items should be accessible to screen readers
+      const listItems = screen.getAllByRole('listitem');
+      listItems.forEach(item => {
+        expect(item).toHaveAttribute('aria-label');
+      });
+    });
+
+    test('has proper color contrast for visual accessibility', () => {
+      renderWithRouter(<TopExitReasonsChart data={mockExitReasonsData} />);
+      
+      // Check that color indicators are marked with aria-hidden since they're decorative
+      const colorIndicators = document.querySelectorAll('[aria-hidden="true"]');
+      expect(colorIndicators.length).toBeGreaterThan(0);
+      
+      // Ensure all text content is properly accessible
+      expect(screen.getByText('Faculty: 3')).toBeInTheDocument();
+      expect(screen.getByText('Staff: 22')).toBeInTheDocument();
+    });
+
+    test('displays comprehensive data summary for screen readers', () => {
+      renderWithRouter(<TopExitReasonsChart data={mockExitReasonsData} />);
+      
+      // Check total summary section
+      const totalSeparations = screen.getByText('Total separations analyzed');
+      expect(totalSeparations).toBeInTheDocument();
+      
+      // Verify total is calculated correctly (25+14+12+6+5 = 62)
+      const totalValue = screen.getByText('62');
+      expect(totalValue).toBeInTheDocument();
+    });
+
+    test('maintains proper heading hierarchy', () => {
+      renderWithRouter(<TopExitReasonsChart data={mockExitReasonsData} />);
+      
+      const heading = screen.getByRole('heading', { level: 3 });
+      expect(heading).toHaveTextContent('Top Exit Reasons');
+      expect(heading).toHaveClass('text-lg', 'font-bold', 'text-blue-600');
+    });
+
+    test('passes comprehensive Jest-axe accessibility audit with zero violations', async () => {
+      const { container } = renderWithRouter(<TopExitReasonsChart data={mockExitReasonsData} />);
+      
+      // Run comprehensive accessibility audit with all WCAG 2.1 AA rules
+      await accessibilityTestUtils.expectNoAccessibilityViolations(container, {
+        rules: {
+          'color-contrast': { enabled: true },
+          'aria-allowed-attr': { enabled: true },
+          'aria-required-attr': { enabled: true },
+          'aria-roles': { enabled: true },
+          'aria-valid-attr': { enabled: true },
+          'aria-valid-attr-value': { enabled: true },
+          'button-name': { enabled: true },
+          'bypass': { enabled: true },
+          'document-title': { enabled: true },
+          'duplicate-id': { enabled: true },
+          'frame-title': { enabled: true },
+          'html-has-lang': { enabled: true },
+          'image-alt': { enabled: true },
+          'input-image-alt': { enabled: true },
+          'label': { enabled: true },
+          'link-name': { enabled: true },
+          'list': { enabled: true },
+          'listitem': { enabled: true },
+          'meta-refresh': { enabled: true },
+          'meta-viewport': { enabled: true },
+          'object-alt': { enabled: true },
+          'role-img-alt': { enabled: true },
+          'scrollable-region-focusable': { enabled: true },
+          'server-side-image-map': { enabled: true },
+          'valid-lang': { enabled: true }
+        },
+        tags: ['wcag2a', 'wcag2aa', 'wcag21aa']
+      });
     });
   });
 

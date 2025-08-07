@@ -1,5 +1,5 @@
 import React from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LabelList } from 'recharts';
 import { AlertCircle } from 'lucide-react';
 
 const LocationChart = ({ 
@@ -79,6 +79,37 @@ const LocationChart = ({
     Object.keys(data[0])[0]
   ) : 'name';
 
+  // Custom label formatter for bar end positioning (horizontal bars)
+  const CustomBarLabel = ({ value, x, y, width, height }) => {
+    if (!value || value === 0) return null;
+    
+    // Format the value (handle percentages and regular numbers)
+    const formattedValue = typeof value === 'number' 
+      ? value < 1 && value > 0 
+        ? `${(value * 100).toFixed(1)}%`  // Convert decimal to percentage
+        : value.toLocaleString()          // Regular number formatting
+      : value;
+    
+    // Position label at the end of the bar with some padding
+    const labelX = x + width + 8;
+    const labelY = y + height / 2;
+    
+    return (
+      <text
+        x={labelX}
+        y={labelY}
+        dy={4} // Vertical centering adjustment
+        textAnchor="start"
+        fill="#374151"
+        fontSize="12"
+        fontWeight="500"
+        className="recharts-bar-label"
+      >
+        {formattedValue}
+      </text>
+    );
+  };
+
   // Render horizontal bar chart
   if (layout === 'horizontal') {
     return (
@@ -90,7 +121,7 @@ const LocationChart = ({
           <BarChart 
             data={data} 
             layout="horizontal"
-            margin={{ top: 5, right: 30, left: 60, bottom: 5 }}
+            margin={{ top: 5, right: 80, left: 60, bottom: 5 }}
           >
             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
             <XAxis 
@@ -122,7 +153,10 @@ const LocationChart = ({
                 fill={colors[index % colors.length]}
                 stackId={stacked ? "stack" : undefined}
                 radius={stacked ? undefined : [0, 2, 2, 0]}
-              />
+              >
+                {/* Only show labels for non-stacked charts to avoid cluttering */}
+                {!stacked && <LabelList content={CustomBarLabel} />}
+              </Bar>
             ))}
           </BarChart>
         </ResponsiveContainer>

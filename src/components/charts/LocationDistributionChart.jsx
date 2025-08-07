@@ -74,7 +74,7 @@ const LocationDistributionChart = memo(({
   if (!data || data.length === 0) {
     return (
       <div className={`bg-white print:bg-white p-4 print:p-2 rounded-lg shadow-sm border print:border-gray ${className}`}>
-        <h3 className="text-lg print:text-base font-semibold text-blue-700 print:text-black mb-3 print:mb-2">{title}</h3>
+        <h3 className="text-base font-semibold text-blue-700 print:text-black mb-3 print:mb-2">{title}</h3>
         <div className="flex items-center justify-center h-64 text-gray-500">
           <div className="text-center">
             <AlertCircle size={48} className="mx-auto mb-2 text-gray-400" />
@@ -105,7 +105,7 @@ const LocationDistributionChart = memo(({
         onFocus={handleFocus}
         onBlur={handleBlur}
       >
-        <h3 className="text-lg print:text-base font-semibold text-blue-700 print:text-black mb-4 print:mb-2">{title}</h3>
+        <h3 className="text-base font-semibold text-blue-700 print:text-black mb-4 print:mb-2">{title}</h3>
         
         {/* Hidden description for screen readers */}
         <div 

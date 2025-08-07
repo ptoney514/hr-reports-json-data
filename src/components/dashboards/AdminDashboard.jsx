@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Database, Upload, Download, Settings, Eye, Edit, Plus } from 'lucide-react';
+import { Database, Upload, Download, Settings, Eye, Edit, Plus, Users, TrendingUp, Award, Building2 } from 'lucide-react';
 import { DataViewer } from '../admin/DataViewer';
 import { DataUploader } from '../admin/DataUploader';
 import { DataEditor } from '../admin/DataEditor';
@@ -8,6 +8,7 @@ export const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('view');
   const [selectedCollection, setSelectedCollection] = useState('workforce');
   const [selectedPeriod, setSelectedPeriod] = useState(null);
+  const [activeOverviewTab, setActiveOverviewTab] = useState('overview');
   
   // Format the reporting period for display
   const formatReportingPeriod = (dateStr) => {
@@ -61,6 +62,14 @@ export const AdminDashboard = () => {
     { id: 'settings', name: 'Settings', icon: Settings }
   ];
 
+  // Overview tabs configuration from Workforce Dashboard
+  const overviewTabs = [
+    { id: 'overview', label: 'Overview', icon: Users },
+    { id: 'analytics', label: 'Analytics', icon: TrendingUp },
+    { id: 'trends', label: 'Trends', icon: Award },
+    { id: 'reports', label: 'Reports', icon: Building2 }
+  ];
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -89,6 +98,45 @@ export const AdminDashboard = () => {
       </div>
 
       <div className="max-w-7xl mx-auto p-6">
+        {/* Overview Tab Navigation */}
+        <div className="mb-6">
+          <div className="bg-white rounded-lg shadow-sm border">
+            <div className="border-b border-gray-200">
+              <nav className="flex space-x-8 px-6" aria-label="Overview Tabs">
+                {overviewTabs.map((tab) => {
+                  const IconComponent = tab.icon;
+                  return (
+                    <button
+                      key={tab.id}
+                      onClick={() => setActiveOverviewTab(tab.id)}
+                      className={`flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+                        activeOverviewTab === tab.id
+                          ? 'border-blue-500 text-blue-600'
+                          : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                      }`}
+                      aria-current={activeOverviewTab === tab.id ? 'page' : undefined}
+                    >
+                      <IconComponent size={16} />
+                      {tab.label}
+                    </button>
+                  );
+                })}
+              </nav>
+            </div>
+            
+            {/* Overview Tab Content - Placeholder for future implementation */}
+            <div className="p-6">
+              <div className="text-center py-12">
+                <Users className="mx-auto h-12 w-12 text-gray-400" />
+                <h3 className="mt-2 text-sm font-medium text-gray-900">Coming Soon</h3>
+                <p className="mt-1 text-sm text-gray-500">
+                  {overviewTabs.find(tab => tab.id === activeOverviewTab)?.label} content will be available in future updates.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Collection Selector */}
         <div className="mb-6">
           <label className="block text-sm font-medium text-gray-700 mb-2">
