@@ -110,15 +110,20 @@ const TurnoverRatesTable = ({ data, title = "Turnover Rates by Category", classN
   const tableData = transformTableData(data);
 
   return (
-    <div className={`bg-white rounded-lg shadow-sm border print:border-gray ${className}`}>
+    <div className={`bg-white rounded-lg shadow-sm border print:border-gray ${className}`} data-pdf-ready="true">
       <div className="p-6 print:p-4">
         <h3 className="text-xl print:text-lg font-semibold text-blue-700 print:text-black mb-6 print:mb-4">
           {title}
         </h3>
         
         {/* Responsive table container */}
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[800px]" role="table" aria-label="Turnover rates by category comparison table">
+        <div className="overflow-x-auto pdf-table-container" data-content-type="table">
+          <table 
+            className="w-full min-w-[800px] pdf-export-table" 
+            role="table" 
+            aria-label="Turnover rates by category comparison table"
+            data-table-ready="true"
+          >
             {/* Table Header */}
             <thead>
               <tr className="bg-slate-800 text-white">

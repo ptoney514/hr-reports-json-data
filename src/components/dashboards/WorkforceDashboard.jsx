@@ -114,7 +114,7 @@ const WorkforceDashboard = () => {
 
   return (
     <ErrorBoundary>
-      <div className="min-h-screen bg-gray-50 py-8 dashboard-container print:bg-white print:py-0">
+      <div id="workforce-dashboard" data-dashboard-content className="min-h-screen bg-gray-50 py-8 dashboard-container print:bg-white print:py-0">
         <div className="max-w-7xl mx-auto px-4 print:max-w-none print:px-0 print:mx-0">
           {/* Header with Title Above Filters */}
           <div className="mb-6">

@@ -76,7 +76,21 @@ const ExportButton = ({
           await exportToCSV();
           break;
         case 'print':
+          // Enhanced print with proper chart rendering
+          setExportStatus('Preparing for print...');
+          
+          // Add print styles class
+          document.body.classList.add('print-mode');
+          
+          // Wait for any dynamic content to settle
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          
           window.print();
+          
+          // Clean up after print
+          setTimeout(() => {
+            document.body.classList.remove('print-mode');
+          }, 2000);
           break;
         default:
           console.log('Unknown export type:', type);
@@ -99,33 +113,38 @@ const ExportButton = ({
   };
 
   const exportToPDF = async () => {
-    setExportStatus('Generating PDF...');
-    
-    const pdfExporter = new PDFExporter({
-      orientation: 'portrait',
-      includeBranding: true
-    });
-
-    // Add header with dashboard title
-    const subtitle = state?.filters?.reportingPeriod || state?.filters?.fiscalYear || '';
-    pdfExporter.addHeader(dashboardTitle, subtitle);
-
-    // Add filter summary
-    if (state?.filters) {
-      setExportStatus('Adding filter information...');
-      pdfExporter.addFilterSummary(state.filters);
+    try {
+      setExportStatus('Preparing dashboard for PDF export...');
+      
+      // Find the main dashboard container
+      const dashboardContainer = document.querySelector('.dashboard-container, [data-dashboard-content], main, .main-content') || document.body;
+      const dashboardId = dashboardContainer.id || 'dashboard-content';
+      
+      if (!dashboardContainer.id) {
+        dashboardContainer.id = dashboardId;
+      }
+      
+      setExportStatus('Using simplified PDF export for better chart rendering...');
+      
+      // Use the enhanced simplePdfExport utility
+      const { simplePdfExport } = await import('../../utils/simplePdfExport');
+      
+      const result = await simplePdfExport.export(dashboardId, {
+        title: dashboardTitle,
+        orientation: 'portrait'
+      });
+      
+      if (result.success) {
+        setExportStatus(`PDF exported successfully: ${result.filename}`);
+      } else {
+        throw new Error(result.error || 'PDF export failed');
+      }
+      
+    } catch (error) {
+      console.error('PDF export error:', error);
+      setExportStatus(`PDF export failed: ${error.message}`);
+      throw error;
     }
-
-    // Add charts if requested
-    if (includeCharts) {
-      setExportStatus('Capturing dashboard charts...');
-      await addChartsToPDF(pdfExporter);
-    }
-
-    // Save PDF
-    setExportStatus('Saving PDF file...');
-    const filename = `${dashboardTitle.toLowerCase().replace(/\s+/g, '-')}-${new Date().toISOString().split('T')[0]}.pdf`;
-    await pdfExporter.save(filename);
   };
 
   const exportToExcel = async () => {
@@ -163,30 +182,100 @@ const ExportButton = ({
   };
 
   const addChartsToPDF = async (pdfExporter) => {
-    // Look for chart elements in the current dashboard
+    // Enhanced chart detection for all dashboard types
     const chartSelectors = [
       '[data-chart-id]',
+      '[data-chart-title]',
       '[id*="chart"]',
-      '.recharts-wrapper'
+      '.recharts-wrapper',
+      '.chart-container',
+      '.chart-focusable'
     ];
 
     let chartCount = 0;
+    const foundCharts = new Set(); // Prevent duplicate captures
+    
     for (const selector of chartSelectors) {
       const charts = document.querySelectorAll(selector);
       for (const chart of charts) {
-        if (chart.id || chart.dataset.chartId) {
-          chartCount++;
-          setExportStatus(`Capturing chart ${chartCount}...`);
+        // Get chart identifier - prefer data-chart-id, then id, then generate one
+        const chartId = chart.dataset.chartId || chart.id || `chart-${chartCount + 1}`;
+        
+        // Skip if we've already processed this chart
+        if (foundCharts.has(chartId)) continue;
+        foundCharts.add(chartId);
+        
+        chartCount++;
+        setExportStatus(`Capturing chart ${chartCount}: ${chartId}...`);
+        
+        const chartTitle = chart.dataset.chartTitle || chart.getAttribute('aria-label') || chart.querySelector('h3, h2, h1')?.textContent || `Chart ${chartCount}`;
+        
+        try {
+          // Enhanced wait for Recharts specifically
+          const isRechartsChart = chart.querySelector('.recharts-wrapper, .recharts-surface');
+          if (isRechartsChart) {
+            setExportStatus(`Waiting for Recharts to fully render...`);
+            
+            // Wait for SVG content to be present and non-empty
+            let attempts = 0;
+            const maxAttempts = 15;
+            
+            while (attempts < maxAttempts) {
+              const svgs = chart.querySelectorAll('svg');
+              let allSVGsReady = true;
+              
+              for (const svg of svgs) {
+                const hasChartElements = svg.querySelectorAll('.recharts-bar, .recharts-area, .recharts-line, .recharts-pie, .recharts-text, path, rect, circle').length > 0;
+                const hasValidSize = svg.clientWidth > 50 && svg.clientHeight > 50;
+                
+                if (!hasChartElements || !hasValidSize) {
+                  allSVGsReady = false;
+                  break;
+                }
+              }
+              
+              if (allSVGsReady && svgs.length > 0) {
+                console.log(`Chart ${chartId} is ready after ${attempts * 200}ms`);
+                break;
+              }
+              
+              attempts++;
+              await new Promise(resolve => setTimeout(resolve, 200));
+            }
+            
+            // Extra wait to ensure animations have settled
+            await new Promise(resolve => setTimeout(resolve, 1000));
+          } else {
+            // For non-Recharts components (static charts), shorter wait
+            await new Promise(resolve => setTimeout(resolve, 300));
+          }
           
-          const chartId = chart.id || chart.dataset.chartId;
-          const chartTitle = chart.dataset.chartTitle || chart.getAttribute('aria-label') || `Chart ${chartCount}`;
+          setExportStatus(`Adding chart ${chartCount} to PDF...`);
           
-          // Wait a bit for chart to be fully rendered
-          await new Promise(resolve => setTimeout(resolve, 500));
-          await pdfExporter.addComponentCapture(chartId, chartTitle);
+          // Use the simplePdfExport utility for better chart capture
+          const { simplePdfExport } = await import('../../utils/simplePdfExport');
+          
+          // Try to capture just this chart element
+          const result = await simplePdfExport.export(chartId, {
+            title: chartTitle,
+            filename: `temp-chart-${chartCount}.pdf`
+          });
+          
+          if (result.success) {
+            console.log(`Successfully captured chart: ${chartId}`);
+          } else {
+            console.warn(`Failed to capture chart ${chartId}:`, result.error);
+          }
+          
+        } catch (chartError) {
+          console.error(`Error capturing chart ${chartId}:`, chartError);
+          setExportStatus(`Warning: Chart ${chartCount} may not render correctly in PDF`);
+          // Continue with other charts even if one fails
         }
       }
     }
+    
+    console.log(`Found and processed ${chartCount} chart(s)`);
   };
 
   const extractDashboardData = () => {

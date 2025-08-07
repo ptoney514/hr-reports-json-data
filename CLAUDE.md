@@ -118,6 +118,16 @@ The HR Reports application includes custom Claude Code subagents for enhanced de
   - Validate color contrast and visual accessibility
 - **Auto-triggered**: Accessibility violations, compliance testing, WCAG validation
 
+#### 8. **pdf-generator** - PDF & Printing Specialist
+- **Purpose**: PDF generation and printing optimization for HR reports and dashboards
+- **Use Cases**:
+  - Create PDF exports of dashboards and reports
+  - Implement browser printing functionality with optimized layouts
+  - Generate professional multi-page reports with proper formatting
+  - Handle chart and data visualization printing
+  - Optimize print performance for large datasets
+- **Auto-triggered**: PDF export requests, print functionality, report generation
+
 ### Using Subagents Effectively
 
 #### Automatic Delegation
@@ -140,6 +150,8 @@ Subagents work together on complex tasks:
 - **firebase-remover** + **json-master**: ✅ Completed Firebase to JSON migration successfully
 - **test-runner** + **react-optimizer**: Fix performance while maintaining quality
 - **chart-debugger** + **accessibility-guardian**: Accessible chart implementations
+- **pdf-generator** + **chart-debugger**: Print-optimized visualizations and reports
+- **pdf-generator** + **data-transformer**: Professional data reports with complex formatting
 
 ### Benefits
 

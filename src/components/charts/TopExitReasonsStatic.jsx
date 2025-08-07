@@ -18,7 +18,7 @@ const TopExitReasonsStatic = ({
   const totalSeparations = data.reduce((sum, item) => sum + (item.total || 0), 0);
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-sm border print:shadow-none">
+    <div className="bg-white p-6 rounded-lg shadow-sm border print:shadow-none" data-pdf-ready="true">
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <h3 className="text-xl font-semibold text-blue-700 print:text-black">{title}</h3>
@@ -28,9 +28,9 @@ const TopExitReasonsStatic = ({
       </div>
 
       {/* Horizontal Bar Chart */}
-      <div className="space-y-3">
+      <div className="space-y-3 pdf-progress-container" data-content-type="progress-bars">
         {data.map((reason, index) => (
-          <div key={reason.reason} className="mb-3">
+          <div key={reason.reason} className="mb-3 pdf-progress-item" data-progress-ready="true">
             {/* Reason name and percentage */}
             <div className="flex justify-between items-center mb-1">
               <span className="text-sm font-medium text-gray-900 print:text-black">
@@ -42,14 +42,17 @@ const TopExitReasonsStatic = ({
             </div>
             
             {/* Progress bar background */}
-            <div className="w-full bg-gray-200 rounded-md h-8 relative print:border print:border-gray-300">
+            <div className="w-full bg-gray-200 rounded-md h-8 relative print:border print:border-gray-300 pdf-progress-track">
               {/* Progress bar fill */}
               <div 
-                className="h-8 rounded-md flex items-center justify-end pr-2 transition-all duration-300"
+                className="h-8 rounded-md flex items-center justify-end pr-2 pdf-progress-fill"
                 style={{ 
                   width: `${reason.percentage}%`, 
-                  backgroundColor: colors[index % colors.length] 
+                  backgroundColor: colors[index % colors.length],
+                  minWidth: reason.percentage > 0 ? '20px' : '0px' // Ensure small values are visible
                 }}
+                data-progress-width={reason.percentage}
+                data-progress-color={colors[index % colors.length]}
               >
                 {/* Total count badge */}
                 <span className="text-xs text-white font-medium bg-black bg-opacity-20 px-2 py-1 rounded">

@@ -1,0 +1,812 @@
+/**
+ * PDF Export Styles
+ * 
+ * Optimized styles for high-quality PDF generation:
+ * - Color preservation for charts and data
+ * - Proper page break handling
+ * - High-quality text rendering
+ * - Chart and visualization optimization
+ */
+
+/* PDF Export Mode - Applied during PDF generation */
+.pdf-export-mode {
+  /* Force high-quality rendering */
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
+  color-adjust: exact !important;
+  
+  /* Optimize text rendering */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-smooth: always;
+  text-rendering: optimizeLegibility;
+  
+  /* Ensure proper DPI scaling */
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+  
+  /* Disable animations during export */
+  * {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+    transition-duration: 0s !important;
+    transition-delay: 0s !important;
+  }
+}
+
+/* PDF Capture Target - Applied to element being captured */
+.pdf-capture-target {
+  /* Ensure clean layout */
+  position: relative !important;
+  transform: none !important;
+  -webkit-transform: none !important;
+  box-shadow: none !important;
+  
+  /* Force visibility of all content */
+  overflow: visible !important;
+  display: block !important;
+  visibility: visible !important;
+  
+  /* Optimize background rendering */
+  background-attachment: scroll !important;
+  
+  /* Ensure proper dimensions */
+  min-height: auto !important;
+  height: auto !important;
+  width: auto !important;
+  max-width: none !important;
+  
+  /* Ensure all child elements are visible */
+  * {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    overflow: visible !important;
+  }
+  
+  /* Special handling for flex and grid containers */
+  .flex, [style*="display: flex"] {
+    display: flex !important;
+  }
+  
+  .grid, [style*="display: grid"] {
+    display: grid !important;
+  }
+  
+  .inline, [style*="display: inline"] {
+    display: inline !important;
+  }
+  
+  .inline-block, [style*="display: inline-block"] {
+    display: inline-block !important;
+  }
+}
+
+/* Chart Optimization for PDF Export */
+.pdf-export-mode .recharts-wrapper,
+.pdf-export-mode .recharts-surface,
+.pdf-capture-target .recharts-wrapper,
+.pdf-capture-target .recharts-surface {
+  /* Ensure charts render at full quality */
+  width: 100% !important;
+  height: auto !important;
+  min-height: 300px !important;
+  
+  /* Optimize SVG rendering */
+  shape-rendering: geometricPrecision !important;
+  text-rendering: geometricPrecision !important;
+  image-rendering: -webkit-optimize-contrast !important;
+  
+  /* Preserve colors */
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
+  
+  /* Ensure visibility and prevent clipping */
+  overflow: visible !important;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+/* Recharts-specific element optimization */
+.pdf-export-mode .recharts-responsive-container,
+.pdf-capture-target .recharts-responsive-container {
+  width: 100% !important;
+  height: 400px !important;
+  min-height: 300px !important;
+  position: relative !important;
+  display: block !important;
+}
+
+/* SVG elements inside charts */
+.pdf-export-mode .recharts-wrapper svg,
+.pdf-export-mode .recharts-surface svg,
+.pdf-capture-target .recharts-wrapper svg,
+.pdf-capture-target .recharts-surface svg {
+  width: 100% !important;
+  height: 100% !important;
+  background: white !important;
+  display: block !important;
+  
+  /* Optimize rendering */
+  shape-rendering: geometricPrecision !important;
+  text-rendering: geometricPrecision !important;
+}
+
+/* Chart text optimization */
+.pdf-export-mode .recharts-text,
+.pdf-export-mode .recharts-label,
+.pdf-capture-target .recharts-text,
+.pdf-capture-target .recharts-label {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+  font-weight: 400 !important;
+  font-size: 12px !important;
+  fill: #374151 !important;
+  
+  /* Improve text rendering */
+  text-rendering: geometricPrecision !important;
+  dominant-baseline: middle !important;
+}
+
+/* Chart legends */
+.pdf-export-mode .recharts-legend-wrapper,
+.pdf-capture-target .recharts-legend-wrapper {
+  /* Ensure legends are visible and well-positioned */
+  position: relative !important;
+  margin-top: 16px !important;
+}
+
+/* Chart tooltips - hide during export */
+.pdf-export-mode .recharts-tooltip-wrapper,
+.pdf-capture-target .recharts-tooltip-wrapper {
+  display: none !important;
+}
+
+/* Chart colors - ensure they print well */
+.pdf-export-mode .recharts-bar,
+.pdf-export-mode .recharts-area,
+.pdf-export-mode .recharts-line,
+.pdf-capture-target .recharts-bar,
+.pdf-capture-target .recharts-area,
+.pdf-capture-target .recharts-line {
+  /* Preserve fill colors */
+  fill: currentColor !important;
+  stroke: currentColor !important;
+  
+  /* Optimize rendering */
+  shape-rendering: geometricPrecision !important;
+}
+
+/* Table Optimization for PDF */
+.pdf-export-mode table,
+.pdf-capture-target table {
+  /* Ensure tables render properly */
+  border-collapse: collapse !important;
+  width: 100% !important;
+  page-break-inside: auto !important;
+  
+  /* High-quality borders */
+  border-spacing: 0 !important;
+}
+
+.pdf-export-mode table th,
+.pdf-export-mode table td,
+.pdf-capture-target table th,
+.pdf-capture-target table td {
+  /* Optimize cell rendering */
+  page-break-inside: avoid !important;
+  border: 1px solid #e5e7eb !important;
+  padding: 8px !important;
+  
+  /* Text optimization */
+  font-size: 11px !important;
+  line-height: 1.4 !important;
+  color: #374151 !important;
+}
+
+.pdf-export-mode table th,
+.pdf-capture-target table th {
+  /* Header styling */
+  background-color: #f9fafb !important;
+  font-weight: 600 !important;
+  color: #1f2937 !important;
+}
+
+/* Card and Container Optimization */
+.pdf-export-mode .bg-white,
+.pdf-export-mode .bg-gray-50,
+.pdf-export-mode .bg-blue-50,
+.pdf-capture-target .bg-white,
+.pdf-capture-target .bg-gray-50,
+.pdf-capture-target .bg-blue-50 {
+  /* Ensure backgrounds are preserved */
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
+  background-color: inherit !important;
+}
+
+/* Shadow removal for cleaner PDF */
+.pdf-export-mode .shadow,
+.pdf-export-mode .shadow-sm,
+.pdf-export-mode .shadow-md,
+.pdf-export-mode .shadow-lg,
+.pdf-capture-target .shadow,
+.pdf-capture-target .shadow-sm,
+.pdf-capture-target .shadow-md,
+.pdf-capture-target .shadow-lg {
+  box-shadow: none !important;
+}
+
+/* Button and Interactive Element Cleanup */
+.pdf-export-mode button,
+.pdf-export-mode .cursor-pointer,
+.pdf-capture-target button,
+.pdf-capture-target .cursor-pointer {
+  cursor: default !important;
+  pointer-events: none !important;
+}
+
+/* Hide interactive elements that shouldn't appear in PDF */
+.pdf-export-mode .no-pdf,
+.pdf-export-mode [data-no-pdf],
+.pdf-capture-target .no-pdf,
+.pdf-capture-target [data-no-pdf] {
+  display: none !important;
+}
+
+/* Text Color Preservation */
+.pdf-export-mode .text-blue-600,
+.pdf-export-mode .text-blue-700,
+.pdf-capture-target .text-blue-600,
+.pdf-capture-target .text-blue-700 {
+  color: #2563eb !important;
+}
+
+.pdf-export-mode .text-gray-600,
+.pdf-export-mode .text-gray-700,
+.pdf-capture-target .text-gray-600,
+.pdf-capture-target .text-gray-700 {
+  color: #4b5563 !important;
+}
+
+.pdf-export-mode .text-gray-500,
+.pdf-capture-target .text-gray-500 {
+  color: #6b7280 !important;
+}
+
+.pdf-export-mode .text-red-600,
+.pdf-capture-target .text-red-600 {
+  color: #dc2626 !important;
+}
+
+.pdf-export-mode .text-green-600,
+.pdf-capture-target .text-green-600 {
+  color: #059669 !important;
+}
+
+/* Background Color Preservation */
+.pdf-export-mode .bg-blue-100,
+.pdf-capture-target .bg-blue-100 {
+  background-color: #dbeafe !important;
+}
+
+.pdf-export-mode .bg-red-100,
+.pdf-capture-target .bg-red-100 {
+  background-color: #fee2e2 !important;
+}
+
+.pdf-export-mode .bg-green-100,
+.pdf-capture-target .bg-green-100 {
+  background-color: #dcfce7 !important;
+}
+
+.pdf-export-mode .bg-yellow-100,
+.pdf-capture-target .bg-yellow-100 {
+  background-color: #fef3c7 !important;
+}
+
+/* Layout Optimization */
+.pdf-export-mode .grid,
+.pdf-capture-target .grid {
+  /* Ensure grid layouts render properly */
+  display: grid !important;
+  grid-template-columns: repeat(var(--grid-cols, 1), minmax(0, 1fr)) !important;
+  gap: 1rem !important;
+}
+
+.pdf-export-mode .flex,
+.pdf-capture-target .flex {
+  /* Optimize flex layouts */
+  display: flex !important;
+  align-items: inherit !important;
+  justify-content: inherit !important;
+}
+
+/* Page Break Controls */
+.pdf-page-break-before {
+  page-break-before: always !important;
+  break-before: page !important;
+}
+
+.pdf-page-break-after {
+  page-break-after: always !important;
+  break-after: page !important;
+}
+
+.pdf-no-break {
+  page-break-inside: avoid !important;
+  break-inside: avoid !important;
+}
+
+.pdf-break-inside {
+  page-break-inside: auto !important;
+  break-inside: auto !important;
+}
+
+/* Dashboard-specific optimizations */
+.pdf-export-mode .dashboard-content,
+.pdf-capture-target.dashboard-content {
+  /* Ensure dashboard content is properly contained */
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 20px !important;
+  
+  /* Clean background */
+  background: white !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+/* Summary cards optimization */
+.pdf-export-mode .summary-card,
+.pdf-capture-target .summary-card {
+  /* Ensure summary cards render cleanly */
+  border: 1px solid #e5e7eb !important;
+  border-radius: 8px !important;
+  padding: 16px !important;
+  margin-bottom: 16px !important;
+  background: white !important;
+  
+  /* Prevent breaking */
+  page-break-inside: avoid !important;
+  break-inside: avoid !important;
+}
+
+/* Chart container optimization */
+.pdf-export-mode .chart-container,
+.pdf-capture-target .chart-container {
+  /* Ensure charts have proper spacing */
+  margin: 20px 0 !important;
+  padding: 16px !important;
+  background: white !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 8px !important;
+  
+  /* Prevent awkward breaks */
+  page-break-inside: avoid !important;
+  break-inside: avoid !important;
+}
+
+/* Progress bars in charts - specific to TurnoverDashboard */
+.pdf-export-mode .bg-gray-200,
+.pdf-capture-target .bg-gray-200 {
+  /* Ensure progress bar backgrounds are visible */
+  background-color: #e5e7eb !important;
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
+}
+
+.pdf-export-mode [style*="background-color"],
+.pdf-capture-target [style*="background-color"] {
+  /* Preserve inline background colors for progress bars */
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
+}
+
+/* Chart progress bars - TopExitReasonsStatic component */
+.pdf-export-mode .h-8,
+.pdf-capture-target .h-8 {
+  /* Ensure height is preserved for progress bars */
+  height: 2rem !important;
+  min-height: 2rem !important;
+}
+
+/* Table styling - TurnoverRatesTable component */
+.pdf-export-mode .bg-slate-800,
+.pdf-capture-target .bg-slate-800 {
+  /* Preserve dark header backgrounds */
+  background-color: #1e293b !important;
+  color: white !important;
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
+}
+
+.pdf-export-mode .text-white,
+.pdf-capture-target .text-white {
+  /* Ensure white text stays white */
+  color: #ffffff !important;
+}
+
+/* Icon and text rendering */
+.pdf-export-mode svg,
+.pdf-capture-target svg {
+  /* Optimize SVG icon rendering */
+  shape-rendering: geometricPrecision !important;
+  width: auto !important;
+  height: auto !important;
+  display: inline-block !important;
+}
+
+.pdf-export-mode .lucide,
+.pdf-capture-target .lucide {
+  /* Optimize Lucide icons specifically */
+  stroke-width: 1.5 !important;
+  fill: none !important;
+  stroke: currentColor !important;
+}
+
+/* Badge and indicator styling */
+.pdf-export-mode .font-medium,
+.pdf-capture-target .font-medium {
+  font-weight: 500 !important;
+}
+
+.pdf-export-mode .font-semibold,
+.pdf-capture-target .font-semibold {
+  font-weight: 600 !important;
+}
+
+.pdf-export-mode .font-bold,
+.pdf-capture-target .font-bold {
+  font-weight: 700 !important;
+}
+
+/* High DPI / Retina Display Optimization */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .pdf-export-mode,
+  .pdf-capture-target {
+    /* Enhanced rendering for high-DPI displays */
+    -webkit-font-smoothing: subpixel-antialiased;
+    image-rendering: -webkit-optimize-contrast;
+  }
+  
+  .pdf-export-mode .recharts-wrapper,
+  .pdf-capture-target .recharts-wrapper {
+    /* Higher quality charts on retina displays */
+    transform: scale(1) !important;
+    image-rendering: -webkit-optimize-contrast !important;
+  }
+}
+
+/* Print-specific optimizations */
+@media print {
+  .pdf-export-mode,
+  .pdf-capture-target {
+    /* Ensure colors print correctly */
+    -webkit-print-color-adjust: exact !important;
+    color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  
+  .pdf-export-mode *,
+  .pdf-capture-target * {
+    /* Force color preservation */
+    -webkit-print-color-adjust: exact !important;
+    color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}
+
+/* Animation cleanup during export - Enhanced */
+.pdf-export-mode [class*="animate-"],
+.pdf-export-mode [class*="transition-"],
+.pdf-capture-target [class*="animate-"],
+.pdf-capture-target [class*="transition-"] {
+  animation: none !important;
+  transition: none !important;
+  animation-duration: 0s !important;
+  transition-duration: 0s !important;
+  animation-delay: 0s !important;
+  transition-delay: 0s !important;
+}
+
+/* Recharts animation disabling */
+.pdf-export-mode .recharts-bar,
+.pdf-export-mode .recharts-area,
+.pdf-export-mode .recharts-line,
+.pdf-export-mode .recharts-pie,
+.pdf-capture-target .recharts-bar,
+.pdf-capture-target .recharts-area,
+.pdf-capture-target .recharts-line,
+.pdf-capture-target .recharts-pie {
+  /* Disable Recharts animations */
+  animation: none !important;
+  transition: none !important;
+}
+
+/* Force static state for chart elements */
+.pdf-export-mode .recharts-sector,
+.pdf-capture-target .recharts-sector {
+  transform: none !important;
+  animation: none !important;
+  transition: none !important;
+}
+
+/* Scrollbar hiding during export */
+.pdf-export-mode ::-webkit-scrollbar,
+.pdf-capture-target ::-webkit-scrollbar {
+  display: none !important;
+}
+
+.pdf-export-mode,
+.pdf-capture-target {
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
+}
+
+/* ========================================================================
+   TURNOVER DASHBOARD SPECIFIC OPTIMIZATIONS
+   ======================================================================== */
+
+/* Turnover Dashboard PDF Export - Tables */
+.pdf-export-mode .pdf-export-table,
+.pdf-capture-target .pdf-export-table {
+  /* Ensure table structure is preserved */
+  width: 100% !important;
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+  table-layout: fixed !important;
+  
+  /* High-quality border rendering */
+  border: 2px solid #e5e7eb !important;
+  background: white !important;
+}
+
+.pdf-export-mode .pdf-export-table th,
+.pdf-export-mode .pdf-export-table td,
+.pdf-capture-target .pdf-export-table th,
+.pdf-capture-target .pdf-export-table td {
+  /* Enhanced cell styling for PDF */
+  border: 1px solid #e5e7eb !important;
+  padding: 8px 12px !important;
+  text-align: center !important;
+  font-size: 11px !important;
+  line-height: 1.3 !important;
+  
+  /* Prevent text wrapping issues */
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  
+  /* Color preservation */
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
+}
+
+.pdf-export-mode .pdf-export-table thead th,
+.pdf-capture-target .pdf-export-table thead th {
+  /* Table header optimization */
+  background-color: #1e293b !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  font-size: 10px !important;
+  padding: 10px 8px !important;
+  text-align: center !important;
+}
+
+/* Turnover Dashboard PDF Export - Progress Bars */
+.pdf-export-mode .pdf-progress-container,
+.pdf-capture-target .pdf-progress-container {
+  /* Progress container optimization */
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: block !important;
+}
+
+.pdf-export-mode .pdf-progress-item,
+.pdf-capture-target .pdf-progress-item {
+  /* Individual progress item spacing */
+  margin-bottom: 16px !important;
+  width: 100% !important;
+  display: block !important;
+  page-break-inside: avoid !important;
+}
+
+.pdf-export-mode .pdf-progress-track,
+.pdf-capture-target .pdf-progress-track {
+  /* Progress bar background track */
+  width: 100% !important;
+  height: 32px !important;
+  background-color: #e5e7eb !important;
+  border: 1px solid #d1d5db !important;
+  border-radius: 6px !important;
+  position: relative !important;
+  overflow: visible !important;
+  
+  /* Ensure background color is preserved */
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
+}
+
+.pdf-export-mode .pdf-progress-fill,
+.pdf-capture-target .pdf-progress-fill {
+  /* Progress bar fill optimization */
+  height: 32px !important;
+  min-height: 32px !important;
+  border-radius: 6px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  padding-right: 8px !important;
+  
+  /* Force the inline styles to be preserved */
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
+  
+  /* Ensure small progress bars are visible */
+  min-width: 20px !important;
+}
+
+/* Progress bar color preservation */
+.pdf-export-mode .pdf-progress-fill[data-progress-color],
+.pdf-capture-target .pdf-progress-fill[data-progress-color] {
+  /* Ensure inline background colors are preserved */
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
+}
+
+/* Progress bar labels and text */
+.pdf-export-mode .pdf-progress-item span,
+.pdf-capture-target .pdf-progress-item span {
+  /* Text optimization in progress bars */
+  font-size: 11px !important;
+  line-height: 1.3 !important;
+  color: #374151 !important;
+  font-weight: 500 !important;
+}
+
+.pdf-export-mode .pdf-progress-fill span,
+.pdf-capture-target .pdf-progress-fill span {
+  /* Badge text in progress bars */
+  color: #ffffff !important;
+  font-size: 10px !important;
+  font-weight: 600 !important;
+  background-color: rgba(0, 0, 0, 0.3) !important;
+  padding: 2px 6px !important;
+  border-radius: 3px !important;
+  white-space: nowrap !important;
+}
+
+/* Turnover Dashboard specific data attributes */
+.pdf-export-mode [data-pdf-ready="true"],
+.pdf-capture-target [data-pdf-ready="true"] {
+  /* Mark components as ready for capture */
+  visibility: visible !important;
+  display: block !important;
+  opacity: 1 !important;
+}
+
+.pdf-export-mode [data-content-type="table"],
+.pdf-capture-target [data-content-type="table"] {
+  /* Table content type optimization */
+  overflow: visible !important;
+  width: 100% !important;
+}
+
+.pdf-export-mode [data-content-type="progress-bars"],
+.pdf-capture-target [data-content-type="progress-bars"] {
+  /* Progress bars content type optimization */
+  overflow: visible !important;
+  width: 100% !important;
+  display: block !important;
+}
+
+/* Table container for turnover dashboard */
+.pdf-export-mode .pdf-table-container,
+.pdf-capture-target .pdf-table-container {
+  /* Remove scroll and ensure full visibility */
+  overflow: visible !important;
+  width: 100% !important;
+  max-width: none !important;
+}
+
+/* Turnover Dashboard Charts - Color scheme preservation */
+.pdf-export-mode .bg-slate-800,
+.pdf-capture-target .bg-slate-800 {
+  /* Dark table headers */
+  background-color: #1e293b !important;
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
+}
+
+.pdf-export-mode .text-blue-700,
+.pdf-capture-target .text-blue-700 {
+  /* Blue headers and titles */
+  color: #1d4ed8 !important;
+}
+
+.pdf-export-mode .bg-gray-50,
+.pdf-capture-target .bg-gray-50 {
+  /* Alternating table row backgrounds */
+  background-color: #f9fafb !important;
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
+}
+
+.pdf-export-mode .bg-red-100,
+.pdf-capture-target .bg-red-100 {
+  /* Red background for above-benchmark values */
+  background-color: #fee2e2 !important;
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
+}
+
+.pdf-export-mode .text-red-800,
+.pdf-capture-target .text-red-800 {
+  /* Red text for above-benchmark values */
+  color: #991b1b !important;
+}
+
+.pdf-export-mode .text-green-600,
+.pdf-capture-target .text-green-600 {
+  /* Green text for below-benchmark values */
+  color: #059669 !important;
+}
+
+/* Turnover specific icons (Lucide) */
+.pdf-export-mode .lucide-trending-down,
+.pdf-export-mode .lucide-trending-up,
+.pdf-capture-target .lucide-trending-down,
+.pdf-capture-target .lucide-trending-up {
+  /* Trend arrow icons */
+  stroke: currentColor !important;
+  stroke-width: 2 !important;
+  width: 14px !important;
+  height: 14px !important;
+  display: inline-block !important;
+}
+
+/* Prevent transitions and animations in turnover components */
+.pdf-export-mode .pdf-progress-fill,
+.pdf-capture-target .pdf-progress-fill {
+  /* Remove transitions from progress bars */
+  transition: none !important;
+  animation: none !important;
+}
+
+/* Force static state for dynamic content */
+.pdf-export-mode [data-chart-ready="false"],
+.pdf-capture-target [data-chart-ready="false"] {
+  /* Hide content that's not ready */
+  display: none !important;
+}
+
+/* Page break optimization for turnover dashboard */
+.pdf-export-mode .chart-container[data-chart-type="table"],
+.pdf-capture-target .chart-container[data-chart-type="table"] {
+  /* Prevent table from breaking across pages */
+  page-break-inside: avoid !important;
+  break-inside: avoid !important;
+  margin-bottom: 20px !important;
+}
+
+.pdf-export-mode .chart-container[data-chart-type="progress-bars"],
+.pdf-capture-target .chart-container[data-chart-type="progress-bars"] {
+  /* Keep progress bars together */
+  page-break-inside: avoid !important;
+  break-inside: avoid !important;
+  margin-bottom: 20px !important;
+}
+
+/* Summary cards for turnover dashboard */
+.pdf-export-mode .grid,
+.pdf-capture-target .grid {
+  /* Summary cards grid optimization */
+  display: grid !important;
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 16px !important;
+  margin-bottom: 20px !important;
+}

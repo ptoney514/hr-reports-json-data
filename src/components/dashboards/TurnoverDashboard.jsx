@@ -4,6 +4,7 @@ import TurnoverRatesTable from '../charts/TurnoverRatesTable';
 import TopExitReasonsStatic from '../charts/TopExitReasonsStatic';
 // Quarter filter removed - using fixed reporting period
 import ErrorBoundary from '../ui/ErrorBoundary';
+import PDFExportButton from '../ui/PDFExportButton';
 import useTurnoverData from '../../hooks/useTurnoverData';
 import { 
   TrendingDown, 
@@ -190,25 +191,39 @@ const TurnoverDashboard = () => {
 
   return (
     <ErrorBoundary>
-      <div className="min-h-screen bg-gray-50 py-8 dashboard-container print:bg-white print:py-0">
+      <div id="turnover-dashboard" data-dashboard-content className="min-h-screen bg-gray-50 py-8 dashboard-container print:bg-white print:py-0">
         <div className="max-w-7xl mx-auto px-4 print:max-w-none print:px-0 print:mx-0">
-          {/* Header with Title Above Filters */}
-          <div className="mb-6">
-            {/* Title Section */}
-            <div className="bg-white rounded-lg shadow-sm border p-6">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <TrendingDown className="text-blue-600" size={24} />
-                  <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Turnover Dashboard - Benefit Eligible</h1>
-                    <p className="text-gray-600 text-sm mt-1">
-                      Period Ending: June 30, 2025
-                    </p>
+          {/* PDF Export Wrapper - Contains all content for export */}
+          <div id="turnover-dashboard-pdf" className="dashboard-content">
+            {/* Header with Title Above Filters */}
+            <div className="mb-6">
+              {/* Title Section */}
+              <div className="bg-white rounded-lg shadow-sm border p-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <TrendingDown className="text-blue-600" size={24} />
+                    <div>
+                      <h1 className="text-2xl font-bold text-gray-900">Turnover Dashboard - Benefit Eligible</h1>
+                      <p className="text-gray-600 text-sm mt-1">
+                        Period Ending: June 30, 2025
+                      </p>
+                    </div>
+                  </div>
+                  {/* Export Controls */}
+                  <div className="flex items-center gap-3 no-pdf">
+                    <PDFExportButton
+                      dashboardType="turnover"
+                      elementId="turnover-dashboard-pdf"
+                      defaultOrientation="landscape"
+                      title="Export PDF"
+                      customHeader={{
+                        title: "Employee Turnover Analytics - FY 2025",
+                        subtitle: "Period Ending: June 30, 2025"
+                      }}
+                    />
                   </div>
                 </div>
-                {/* Fixed reporting period - no quarter selector */}
               </div>
-            </div>
           </div>
 
           {/* Data Coverage Information Note */}
@@ -272,20 +287,25 @@ const TurnoverDashboard = () => {
       </div>
 
       {/* Turnover Rates by Category Table */}
-      <div className="mb-6 print:mb-4">
-        <TurnoverRatesTable 
-          data={data}
-          title="Turnover Rates by Category"
-        />
+      <div className="mb-6 print:mb-4 chart-container" data-chart-type="table">
+        <div id="turnover-rates-table" data-chart-title="Turnover Rates by Category" data-chart-ready="false">
+          <TurnoverRatesTable 
+            data={data}
+            title="Turnover Rates by Category"
+          />
+        </div>
       </div>
 
       {/* Top Exit Reasons Chart */}
-      <div className="mb-6 print:mb-4">
-        <TopExitReasonsStatic
-          data={data.charts?.topExitReasons || []}
-          title="Top Exit Reasons"
-        />
+      <div className="mb-6 print:mb-4 chart-container" data-chart-type="progress-bars">
+        <div id="top-exit-reasons-chart" data-chart-title="Top Exit Reasons Analysis" data-chart-ready="false">
+          <TopExitReasonsStatic
+            data={data.charts?.topExitReasons || []}
+            title="Top Exit Reasons"
+          />
+        </div>
       </div>
+          </div>
         </div>
       </div>
     </ErrorBoundary>
