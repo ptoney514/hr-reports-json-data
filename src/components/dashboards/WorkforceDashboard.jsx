@@ -4,13 +4,13 @@ import ErrorBoundary from '../ui/ErrorBoundary';
 import useWorkforceData from '../../hooks/useWorkforceData';
 import DepartmentHeadcountDisplay from '../charts/DepartmentHeadcountDisplay';
 import LocationDistributionChart from '../charts/LocationDistributionChart';
+import AssignmentTypeChart from '../charts/AssignmentTypeChart';
 import { 
   Users, 
   TrendingUp, 
   BookOpen,
   Building2,
-  UserPlus,
-  Award
+  Heart
 } from 'lucide-react';
 
 // Simplified fallback data for consistent dashboard display
@@ -30,9 +30,6 @@ const WorkforceDashboard = () => {
   // Fixed reporting period - June 30, 2025
   const REPORTING_DATE = '6/30/2025';
   const REPORTING_QUARTER = 'Q2-2025';
-  
-  // Tab state for future implementation
-  const [activeTab, setActiveTab] = useState('overview');
 
   // Use JSON data with fallback
   const { 
@@ -75,6 +72,10 @@ const WorkforceDashboard = () => {
         omahaCount = omaha.breakdown?.staff || 0;
         phoenixCount = phoenix.breakdown?.staff || 0;
         break;
+      case 'hsp':
+        omahaCount = omaha.breakdown?.hsp || 0;
+        phoenixCount = phoenix.breakdown?.hsp || 0;
+        break;
       default:
         return '';
     }
@@ -110,13 +111,6 @@ const WorkforceDashboard = () => {
     );
   }
 
-  // Tab configuration for future implementation
-  const tabs = [
-    { id: 'overview', label: 'Overview', icon: Users },
-    { id: 'analytics', label: 'Analytics', icon: TrendingUp },
-    { id: 'trends', label: 'Trends', icon: Award },
-    { id: 'reports', label: 'Reports', icon: Building2 }
-  ];
 
   return (
     <ErrorBoundary>
@@ -142,7 +136,7 @@ const WorkforceDashboard = () => {
           </div>
 
           {/* Summary Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 print:gap-2 mb-6 print:mb-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 print:gap-2 mb-6 print:mb-4">
             <SummaryCard
               title="Total Headcount"
               value={`${data.summary?.totalEmployees?.toLocaleString() || '0'}`}
@@ -174,18 +168,28 @@ const WorkforceDashboard = () => {
             />
             
             <SummaryCard
-              title="HSP"
-              value={`${(data.summary?.growthRate || 0).toFixed(1)}%`}
-              change={data.summary?.growthRate || 0}
+              title="Starters"
+              value="262"
+              change={16.4}
               changeType="percentage"
-              subtitle="Year-over-year growth"
+              subtitle="Omaha (162) | Phoenix (100)"
               icon={TrendingUp}
-              trend={(data.summary?.growthRate || 0) >= 0 ? 'positive' : 'negative'}
+              trend="positive"
+            />
+            
+            <SummaryCard
+              title="HSP Count"
+              value={`${data.summary?.hsp?.toLocaleString() || '0'}`}
+              change={data.summary?.hspChange || 0}
+              changeType="percentage"
+              subtitle={getLocationCounts('hsp') || "HSP members"}
+              icon={Heart}
+              trend={(data.summary?.hspChange || 0) >= 0 ? 'positive' : 'negative'}
             />
           </div>
 
           {/* Workforce Analytics Charts */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 print:gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 print:gap-4">
             {/* Department Headcount Display */}
             <div className="lg:col-span-1">
               {(() => {
@@ -196,10 +200,9 @@ const WorkforceDashboard = () => {
                 return (
                   <DepartmentHeadcountDisplay 
                     data={deptData}
-                    maxItems={5}
-                    title="Top 5 Benefit Eligible Headcount by Department"
-                    className="print:h-80"
-                    compactView={true}
+                    maxItems={10}
+                    title="Top 10 Benefit Eligible Headcount by Department"
+                    className="h-full"
                   />
                 );
               })()}
@@ -212,46 +215,16 @@ const WorkforceDashboard = () => {
                 className="print:h-80 min-h-[420px]"
               />
             </div>
-          </div>
-
-          {/* Tab Navigation */}
-          <div className="mt-6">
-            <div className="bg-white rounded-lg shadow-sm border">
-              <div className="border-b border-gray-200">
-                <nav className="flex space-x-8 px-6" aria-label="Tabs">
-                  {tabs.map((tab) => {
-                    const IconComponent = tab.icon;
-                    return (
-                      <button
-                        key={tab.id}
-                        onClick={() => setActiveTab(tab.id)}
-                        className={`flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
-                          activeTab === tab.id
-                            ? 'border-blue-500 text-blue-600'
-                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                        }`}
-                        aria-current={activeTab === tab.id ? 'page' : undefined}
-                      >
-                        <IconComponent size={16} />
-                        {tab.label}
-                      </button>
-                    );
-                  })}
-                </nav>
-              </div>
-              
-              {/* Tab Content - Placeholder for future implementation */}
-              <div className="p-6">
-                <div className="text-center py-12">
-                  <Users className="mx-auto h-12 w-12 text-gray-400" />
-                  <h3 className="mt-2 text-sm font-medium text-gray-900">Coming Soon</h3>
-                  <p className="mt-1 text-sm text-gray-500">
-                    {tabs.find(tab => tab.id === activeTab)?.label} content will be available in future updates.
-                  </p>
-                </div>
-              </div>
+            
+            {/* Assignment Type Chart */}
+            <div className="lg:col-span-1">
+              <AssignmentTypeChart 
+                data={rawData?.currentPeriod?.byAssignmentType || []}
+                className="print:h-80 min-h-[420px]"
+              />
             </div>
           </div>
+
         </div>
       </div>
     </ErrorBoundary>

@@ -14,25 +14,27 @@
     "endDate": "2025-03-31",
     
     "headcount": {
-      "total": 2847,
-      "faculty": 1234,
-      "staff": 1456,
+      "total": 3206,
+      "faculty": 785,
+      "staff": 1809,
+      "hsp": 612,
       "students": 157,
-      "benefitEligible": 2690,
-      "benefitEligibleFaculty": 1234,
-      "benefitEligibleStaff": 1456,
+      "benefitEligible": 3206,
+      "benefitEligibleFaculty": 785,
+      "benefitEligibleStaff": 1809,
       "nonBenefitEligible": 157,
       "nonBenefitEligibleFaculty": 0,
       "nonBenefitEligibleStaff": 0,
       "nonBenefitEligibleStudents": 157,
       "changeFromPrevious": {
-        "total": 43,
-        "faculty": 18,
-        "staff": 22,
+        "total": 359,
+        "faculty": -449,
+        "staff": 353,
+        "hsp": 12,
         "students": 3,
-        "percentChange": 1.5,
-        "benefitEligible": 40,
-        "benefitEligiblePercentChange": 1.5
+        "percentChange": 12.6,
+        "benefitEligible": 516,
+        "benefitEligiblePercentChange": 19.2
       }
     },
     
@@ -52,25 +54,27 @@
     "locations": [
       {
         "name": "Omaha Campus",
-        "total": 2687,
+        "total": 2566,
         "breakdown": {
-          "faculty": 1156,
-          "staff": 1374,
+          "faculty": 727,
+          "staff": 1571,
+          "hsp": 268,
           "students": 157
         },
-        "percentOfTotal": 94.4,
-        "changeFromPrevious": 38
+        "percentOfTotal": 80.0,
+        "changeFromPrevious": -121
       },
       {
         "name": "Phoenix Campus",
-        "total": 160,
+        "total": 640,
         "breakdown": {
-          "faculty": 78,
-          "staff": 82,
+          "faculty": 58,
+          "staff": 238,
+          "hsp": 344,
           "students": 0
         },
-        "percentOfTotal": 5.6,
-        "changeFromPrevious": 5
+        "percentOfTotal": 20.0,
+        "changeFromPrevious": 480
       }
     ],
     
@@ -155,6 +159,19 @@
         "percentOfTotal": 3.9,
         "changeFromPrevious": 5
       }
+    ],
+    
+    "byAssignmentType": [
+      { "name": "F12", "total": 1708 },
+      { "name": "HSR", "total": 612 },
+      { "name": "TEMP", "total": 457 },
+      { "name": "F09", "total": 286 },
+      { "name": "F11", "total": 53 },
+      { "name": "PT12", "total": 52 },
+      { "name": "PT9", "total": 19 },
+      { "name": "F10", "total": 12 },
+      { "name": "PT10", "total": 6 },
+      { "name": "PT11", "total": 1 }
     ],
     
     "topDivisions": [

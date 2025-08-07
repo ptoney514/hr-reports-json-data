@@ -40,6 +40,18 @@
     { "month": "May", "starters": 82, "leavers": 65, "netChange": 17 },
     { "month": "June", "starters": 74, "leavers": 60, "netChange": 14 }
   ],
+  "byAssignmentType": [
+    { "name": "F12", "total": 1708 },
+    { "name": "HSR", "total": 612 },
+    { "name": "TEMP", "total": 457 },
+    { "name": "F09", "total": 286 },
+    { "name": "F11", "total": 53 },
+    { "name": "PT12", "total": 52 },
+    { "name": "PT9", "total": 19 },
+    { "name": "F10", "total": 12 },
+    { "name": "PT10", "total": 6 },
+    { "name": "PT11", "total": 1 }
+  ],
   "demographics": {
     "ageGroups": [
       { "range": "22-30", "count": 1808, "percentage": 25 },
