@@ -81,6 +81,7 @@
   },
   "devDependencies": {
     "@axe-core/react": "^4.10.2",
+    "@tanstack/react-query-devtools": "^5.84.2",
     "@types/file-saver": "^2.0.7",
     "@types/jest": "^30.0.0",
     "@types/lodash": "^4.17.20",

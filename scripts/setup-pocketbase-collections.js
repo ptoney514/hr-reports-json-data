@@ -5,7 +5,7 @@
  * Creates the necessary collections with proper schema
  */
 
-import PocketBase from 'pocketbase';
+const PocketBase = require('pocketbase/cjs');
 
 // Use container name when running inside Docker, localhost otherwise
 const pbUrl = process.env.DOCKER_ENV ? 'http://pocketbase:8090' : 'http://localhost:8091';
@@ -85,11 +85,11 @@ const COLLECTIONS = {
         required: false
       }
     ],
-    listRule: '',
-    viewRule: '',
-    createRule: '',
-    updateRule: '',
-    deleteRule: ''
+    listRule: null, // Public read access
+    viewRule: null, // Public read access  
+    createRule: '', // Admin only create
+    updateRule: '', // Admin only update
+    deleteRule: ''  // Admin only delete
   },
 
   turnover_data: {
@@ -168,11 +168,11 @@ const COLLECTIONS = {
         required: false
       }
     ],
-    listRule: '',
-    viewRule: '',
-    createRule: '',
-    updateRule: '',
-    deleteRule: ''
+    listRule: null, // Public read access
+    viewRule: null, // Public read access  
+    createRule: '', // Admin only create
+    updateRule: '', // Admin only update
+    deleteRule: ''  // Admin only delete
   },
 
   exit_survey_data: {
@@ -242,11 +242,11 @@ const COLLECTIONS = {
         required: false
       }
     ],
-    listRule: '',
-    viewRule: '',
-    createRule: '',
-    updateRule: '',
-    deleteRule: ''
+    listRule: null, // Public read access
+    viewRule: null, // Public read access  
+    createRule: '', // Admin only create
+    updateRule: '', // Admin only update
+    deleteRule: ''  // Admin only delete
   }
 };
 

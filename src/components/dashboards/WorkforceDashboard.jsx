@@ -5,6 +5,7 @@ import useWorkforceData from '../../hooks/useWorkforceData';
 import DepartmentHeadcountDisplay from '../charts/DepartmentHeadcountDisplay';
 import LocationDistributionChart from '../charts/LocationDistributionChart';
 import AssignmentTypeChart from '../charts/AssignmentTypeChart';
+import { DataDebugOverlay } from '../ui/DataDebugOverlay';
 import { 
   Users, 
   TrendingUp, 
@@ -230,6 +231,14 @@ const WorkforceDashboard = () => {
 
         </div>
       </div>
+      
+      {/* Data Debug Overlay - Only in development */}
+      <DataDebugOverlay 
+        data={data}
+        rawData={rawData}
+        source="JSON"
+        dashboardType="workforce"
+      />
     </ErrorBoundary>
   );
 };

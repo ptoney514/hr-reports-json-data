@@ -1,5 +1,7 @@
 import React, { useEffect, Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import Navigation from './components/ui/Navigation';
 import ErrorBoundary from './components/ui/ErrorBoundary';
 import { DataSourceProvider } from './contexts/DataSourceContext';
@@ -22,6 +24,36 @@ const RecruitingDashboard = lazy(() => import('./components/dashboards/Recruitin
 const ExitSurveyDashboard = lazy(() => import('./components/dashboards/ExitSurveyDashboard'));
 const WorkforceDashboard = lazy(() => import('./components/dashboards/WorkforceDashboard'));
 const AdminDashboard = lazy(() => import('./components/dashboards/AdminDashboard'));
+
+// Create QueryClient with optimized configuration for PocketBase
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      // 5-minute stale time to reduce unnecessary refetches
+      staleTime: 5 * 60 * 1000,
+      // 10-minute garbage collection time
+      gcTime: 10 * 60 * 1000,
+      // Retry failed requests twice with exponential backoff
+      retry: (failureCount, error) => {
+        // Don't retry on 4xx errors (client errors)
+        if (error?.status >= 400 && error?.status < 500) {
+          return false;
+        }
+        return failureCount < 2;
+      },
+      retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+      // Better UX - don't refetch on window focus
+      refetchOnWindowFocus: false,
+      // Only refetch on reconnect if data is stale
+      refetchOnReconnect: 'always',
+    },
+    mutations: {
+      // Retry mutations once
+      retry: 1,
+      retryDelay: 1000,
+    },
+  },
+});
 
 function App() {
   // Initialize global error handling
@@ -50,13 +82,14 @@ function App() {
   };
 
   return (
-    <DataSourceProvider>
-      <DashboardProvider>
-        <ErrorBoundary
-          onError={handleAppError}
-          onRetry={handleAppRetry}
-          showHomeButton={false}
-        >
+    <QueryClientProvider client={queryClient}>
+      <DataSourceProvider>
+        <DashboardProvider>
+          <ErrorBoundary
+            onError={handleAppError}
+            onRetry={handleAppRetry}
+            showHomeButton={false}
+          >
           <Router>
             <div className="App flex h-screen bg-gray-50">
               {/* Sidebar Navigation Component */}
@@ -108,10 +141,16 @@ function App() {
               </Suspense>
             </main>
           </div>
-        </Router>
-      </ErrorBoundary>
-    </DashboardProvider>
+          </Router>
+          
+          {/* React Query DevTools - Disabled to remove TanStack logo */}
+          {/* {process.env.NODE_ENV === 'development' && (
+            <ReactQueryDevtools initialIsOpen={false} />
+          )} */}
+        </ErrorBoundary>
+      </DashboardProvider>
     </DataSourceProvider>
+    </QueryClientProvider>
   );
 }
 

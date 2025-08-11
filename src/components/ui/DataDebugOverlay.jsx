@@ -22,11 +22,6 @@ export function DataDebugOverlay({
     calculations: false
   });
 
-  // Only show in development mode
-  if (process.env.NODE_ENV === 'production') {
-    return null;
-  }
-
   const toggleSection = (section) => {
     setExpandedSections(prev => ({
       ...prev,
@@ -321,6 +316,11 @@ export function DataDebugOverlay({
     
     return { missing, errors, total: missing + errors };
   }, [dashboardMappings]);
+
+  // Only show in development mode
+  if (process.env.NODE_ENV === 'production') {
+    return null;
+  }
 
   return (
     <>
