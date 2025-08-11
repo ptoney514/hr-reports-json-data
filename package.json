@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@tanstack/react-query": "^5.45.0",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",
@@ -15,6 +16,7 @@
     "jspdf-autotable": "^5.0.2",
     "lodash": "^4.17.21",
     "lucide-react": "^0.523.0",
+    "pocketbase": "^0.26.2",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-router-dom": "^6.26.1",
@@ -22,7 +24,8 @@
     "react-to-print": "^3.1.0",
     "recharts": "^3.0.0",
     "reselect": "^5.1.1",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "zustand": "^4.5.2"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -34,7 +37,29 @@
     "build:analyze": "npm run build && npm run analyze",
     "optimize": "npm run build:production && npm run analyze",
     "size-check": "bundlesize",
-    "prepare": "npm run build:production"
+    "prepare": "npm run build:production",
+    "pocketbase:setup": "node scripts/setup-pocketbase-collections.js",
+    "pocketbase:dev": "./scripts/pocketbase-dev-setup.sh",
+    "pocketbase:dev-full": "./scripts/pocketbase-dev-setup.sh full",
+    "pocketbase:start": "./scripts/pocketbase-dev-setup.sh start",
+    "pocketbase:collections": "./scripts/pocketbase-dev-setup.sh collections",
+    "pocketbase:migrate": "./scripts/pocketbase-dev-setup.sh migrate",
+    "pocketbase:status": "./scripts/pocketbase-dev-setup.sh status",
+    "pocketbase:admin": "./scripts/setup-admin.sh",
+    "pocketbase:create-admin": "node scripts/create-pocketbase-admin.js",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:restart": "docker-compose restart",
+    "docker:logs": "docker-compose logs -f",
+    "docker:logs:app": "docker-compose logs -f hr-reports-app",
+    "docker:logs:pb": "docker-compose logs -f pocketbase",
+    "docker:build": "docker-compose build",
+    "docker:rebuild": "docker-compose down && docker-compose build --no-cache && docker-compose up -d",
+    "docker:clean": "docker-compose down -v --remove-orphans",
+    "dev": "docker-compose up -d",
+    "dev:full": "npm run docker:clean && npm run docker:build && npm run docker:up && npm run pocketbase:setup",
+    "dev:logs": "docker-compose logs -f",
+    "dev:rebuild": "npm run docker:rebuild"
   },
   "eslintConfig": {
     "extends": [

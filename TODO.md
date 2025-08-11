@@ -1,9 +1,20 @@
-# TODO.md - Phase 11: User Testing & Dashboard Refinement
+# TODO.md - Phase 12: PocketBase Migration with Debug Overlay
 
 ## Overview
-This todo list tracks the Phase 11 objectives for user testing and dashboard refinement of the HR Reports Project. The focus is on testing the Enhanced Workforce Analytics dashboard and iterating based on user feedback.
+This todo list tracks the Phase 12 objectives for migrating from JSON to PocketBase as the primary data source. The migration will be done iteratively with comprehensive debug overlay support to identify and fix field mismatches in real-time.
 
 ## Completed Tasks
+
+### ✅ PocketBase Admin Account Migration Fix (August 11, 2025)
+- [x] **Create pb_migrations directory** - Set up migrations folder for PocketBase
+- [x] **Create migration file** - Built 1736803200_create_superuser.js for automatic admin creation
+- [x] **Update setup scripts** - Modified setup-admin.sh to verify instead of create
+- [x] **Update Node.js script** - Changed create-pocketbase-admin.js to verification-only
+- [x] **Test migration** - Restarted PocketBase container and verified migration success
+- [x] **Verify admin login** - Confirmed admin@admin.com can authenticate successfully
+- [x] **Update documentation** - Added migration approach to POCKETBASE_SETUP.md
+
+**Result**: Successfully fixed PocketBase 400 errors using migration-based superuser creation. Admin account now created automatically on container startup without manual intervention or API errors.
 
 ### ✅ Employee Data Importer Dashboard Implementation (January 14, 2025)
 - [x] **Main Dashboard Component** - ~~Created EmployeeImportDashboard.jsx~~ (REMOVED - replaced with JSON import architecture)
@@ -301,6 +312,52 @@ This todo list tracks the Phase 11 objectives for user testing and dashboard ref
 - Dashboard components dynamically process HSP from data source
 - Location counts automatically calculate from JSON data
 - All percentage changes reflect updated baseline values
+
+## Current Tasks - Phase 12: PocketBase Migration (Started: January 11, 2025)
+
+### Phase 0: Enhanced Debug Overlay Setup
+- [x] **Enhance DataDebugOverlay component** - Add dashboard-specific field mappings ✅
+- [x] **Create field mapping configurations** - Define mappings for each dashboard type ✅
+- [ ] **Add overlay to all dashboards** - Consistent placement across all components
+
+### Phase 1: Docker Container Setup & Verification
+- [x] **Start containers** - Run npm run dev:full for both React and PocketBase ✅
+- [x] **Verify PocketBase accessibility** - Test http://localhost:8091 ✅
+- [x] **Test health endpoint** - Verify PocketBase is healthy ✅
+- [x] **Create admin account** - Set up PocketBase admin credentials ✅ (2025-08-11)
+
+### Phase 2: React Query Provider Setup
+- [ ] **Add QueryClientProvider** - Wrap App.js with React Query provider
+- [ ] **Configure defaults** - Set up 5-minute cache and retry logic
+- [ ] **Test React Query** - Verify DevTools and hot-reload work
+
+### Phase 3: Create PocketBase Collections
+- [ ] **Run collection setup script** - Execute setup-pocketbase-collections.js
+- [ ] **Verify collections** - Check workforce, turnover, recruiting, exit_survey, compliance
+- [ ] **Test manual record creation** - Verify CRUD operations work
+
+### Phase 4: Test Migration - Workforce Dashboard
+- [ ] **Add DataDebugOverlay** - Integrate debug overlay with WorkforceDashboard
+- [ ] **Migrate test data** - Move workforce/2025-06-30.json to PocketBase
+- [ ] **Verify with overlay** - Check all field mappings are correct
+- [ ] **Document mismatches** - Record any field name differences
+
+### Phase 5: Field Mapping Validation
+- [ ] **Test visual elements** - Verify each UI component has correct data
+- [ ] **Fix mapping issues** - Correct any field mismatches found
+- [ ] **Re-test with overlay** - Ensure all fields show green (data present)
+
+### Phase 6: Iterative Dashboard Migration
+- [ ] **Migrate TurnoverDashboard** - Add overlay and migrate data
+- [ ] **Migrate RecruitingDashboard** - Add overlay and migrate data
+- [ ] **Migrate ExitSurveyDashboard** - Add overlay and migrate data
+- [ ] **Document all mappings** - Create comprehensive field guide
+
+### Phase 7: Admin Interface & Final Testing
+- [ ] **Add PocketBaseAdmin** - Integrate admin component
+- [ ] **Test migration tools** - Verify one-click migration works
+- [ ] **Test on different machine** - Ensure portability
+- [ ] **Create documentation** - Field mapping guide and setup instructions
 
 ## High Priority Tasks
 

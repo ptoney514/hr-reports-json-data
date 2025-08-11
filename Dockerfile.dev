@@ -1,5 +1,8 @@
-# Development Dockerfile with hot reload support
+# Development Dockerfile with hot reload support for PocketBase integration
 FROM node:18-alpine
+
+# Install curl for health checks
+RUN apk add --no-cache curl
 
 # Set working directory
 WORKDIR /app
@@ -7,14 +10,25 @@ WORKDIR /app
 # Copy package files first for better caching
 COPY package*.json ./
 
-# Install dependencies without running prepare script
+# Install dependencies including PocketBase-related packages
+# Skip the prepare script which tries to build (we're in dev mode)
 RUN npm install --ignore-scripts
 
 # Copy public directory (needed for development server)
 COPY public/ ./public/
 
+# Create necessary directories for PocketBase integration
+RUN mkdir -p src/core src/hooks src/components
+
 # Expose port 3000 for dev server
 EXPOSE 3000
+
+# Set environment variables for container-based development
+ENV CHOKIDAR_USEPOLLING=true
+ENV WATCHPACK_POLLING=true
+ENV WDS_SOCKET_HOST=0.0.0.0
+ENV WDS_SOCKET_PORT=0
+ENV FAST_REFRESH=true
 
 # Use react-scripts for hot reload
 CMD ["npm", "start"]
