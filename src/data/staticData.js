@@ -209,10 +209,37 @@ export const TURNOVER_DATA = {
 };
 
 export const RECRUITING_DATA = {
+  "2024-12-31": {
+    reportingDate: "12/31/24",
+    openPositions: 98,
+    newHiresYTD: 225,
+    leaversYTD: 50,
+    costPerHire: 4100,
+    timeToFill: 42,
+    applicationCount: 2534,
+    offerAcceptanceRate: 76.2,
+    diversityMetrics: {
+      femaleHires: 61.1,
+      minorityHires: 33.5,
+      veteranHires: 7.8
+    },
+    positionsByDepartment: [
+      { department: "College of Medicine", openings: 25, filled: 13 },
+      { department: "Academic Affairs", openings: 15, filled: 10 },
+      { department: "Student Affairs", openings: 14, filled: 9 },
+      { department: "Information Technology", openings: 12, filled: 7 },
+      { department: "Finance & Administration", openings: 10, filled: 6 }
+    ],
+    headcountByLocation: {
+      phoenix: { faculty: 59, staff: 169, hsp: 341, total: 569 },
+      omaha: { faculty: 905, staff: 1588, hsp: 264, total: 2757 }
+    }
+  },
   "2025-03-31": {
     reportingDate: "3/31/25",
     openPositions: 119,
-    newHiresYTD: 187,
+    newHiresYTD: 168,
+    leaversYTD: 67,
     costPerHire: 4350,
     timeToFill: 44,
     applicationCount: 2847,
@@ -228,12 +255,17 @@ export const RECRUITING_DATA = {
       { department: "Student Affairs", openings: 16, filled: 11 },
       { department: "Information Technology", openings: 14, filled: 9 },
       { department: "Finance & Administration", openings: 12, filled: 8 }
-    ]
+    ],
+    headcountByLocation: {
+      phoenix: { faculty: 61, staff: 171, hsp: 337, total: 569 },
+      omaha: { faculty: 906, staff: 1590, hsp: 263, total: 2759 }
+    }
   },
   "2025-06-30": {
     reportingDate: "6/30/25",
     openPositions: 127,
-    newHiresYTD: 228,
+    newHiresYTD: 262,
+    leaversYTD: 250,
     costPerHire: 4200,
     timeToFill: 45,
     applicationCount: 3156,
@@ -249,7 +281,11 @@ export const RECRUITING_DATA = {
       { department: "Student Affairs", openings: 18, filled: 13 },
       { department: "Information Technology", openings: 16, filled: 11 },
       { department: "Finance & Administration", openings: 14, filled: 10 }
-    ]
+    ],
+    headcountByLocation: {
+      phoenix: { faculty: 58, staff: 238, hsp: 344, total: 640 },
+      omaha: { faculty: 727, staff: 1571, hsp: 268, total: 2566 }
+    }
   }
 };
 
@@ -391,4 +427,74 @@ export const getAllSchoolOrgData = (date = "2025-06-30") => {
   }));
   
   return chartData;
+};
+
+// Get Starters vs Leavers trend data for recruiting dashboard
+export const getStartersLeaversData = () => {
+  const periods = ["2024-12-31", "2025-03-31", "2025-06-30"];
+  
+  return periods.map(period => {
+    const data = RECRUITING_DATA[period];
+    return {
+      period: data.reportingDate,
+      Starters: data.newHiresYTD,
+      Leavers: data.leaversYTD
+    };
+  });
+};
+
+// Get Headcount Trends data by location for recruiting dashboard
+export const getHeadcountTrendsData = () => {
+  const periods = ["2025-03-31", "2025-06-30"];
+  
+  const phoenixData = periods.map(period => {
+    const data = RECRUITING_DATA[period];
+    return {
+      period: data.reportingDate + " - Phoenix",
+      Faculty: data.headcountByLocation.phoenix.faculty,
+      Staff: data.headcountByLocation.phoenix.staff,
+      HSP: data.headcountByLocation.phoenix.hsp
+    };
+  });
+
+  const omahaData = periods.map(period => {
+    const data = RECRUITING_DATA[period];
+    return {
+      period: data.reportingDate + " - Omaha",
+      Faculty: data.headcountByLocation.omaha.faculty,
+      Staff: data.headcountByLocation.omaha.staff,
+      HSP: data.headcountByLocation.omaha.hsp
+    };
+  });
+
+  return [...phoenixData, ...omahaData];
+};
+
+// New separate data functions for dual charts
+export const getPhoenixHeadcountData = () => {
+  const periods = ["2025-03-31", "2025-06-30"];
+  
+  return periods.map(period => {
+    const data = RECRUITING_DATA[period];
+    return {
+      period: data.reportingDate,
+      Faculty: data.headcountByLocation.phoenix.faculty,
+      Staff: data.headcountByLocation.phoenix.staff,
+      HSP: data.headcountByLocation.phoenix.hsp
+    };
+  });
+};
+
+export const getOmahaHeadcountData = () => {
+  const periods = ["2025-03-31", "2025-06-30"];
+  
+  return periods.map(period => {
+    const data = RECRUITING_DATA[period];
+    return {
+      period: data.reportingDate,
+      Faculty: data.headcountByLocation.omaha.faculty,
+      Staff: data.headcountByLocation.omaha.staff,
+      HSP: data.headcountByLocation.omaha.hsp
+    };
+  });
 };
