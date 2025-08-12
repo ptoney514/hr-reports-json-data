@@ -5,7 +5,7 @@ import TopExitReasonsStatic from '../charts/TopExitReasonsStatic';
 // Quarter filter removed - using fixed reporting period
 import ErrorBoundary from '../ui/ErrorBoundary';
 import PDFExportButton from '../ui/PDFExportButton';
-import useTurnoverData from '../../hooks/useTurnoverData';
+import { getTurnoverData } from '../../data/staticData';
 import { 
   TrendingDown, 
   DollarSign, 
@@ -141,41 +141,23 @@ const safeToFixed = (value, decimals = 1) => {
 };
 
 const TurnoverDashboard = () => {
-  // Fixed reporting period - June 30, 2025
-  const REPORTING_DATE = '6/30/2025';
-  const REPORTING_QUARTER = 'Q2-2025';
+  // Static data for 6/30/25 reporting period only
+  const currentData = getTurnoverData("2025-06-30"); // Current period  
+  const previousData = getTurnoverData("2025-03-31"); // For percentage calculations
 
-  // Use JSON data with fallback
-  const { 
-    data: jsonData, 
-    loading, 
-    error, 
-    isRealTime, 
-    lastSyncTime 
-  } = useTurnoverData(REPORTING_QUARTER);
+  // Calculate percentage changes using previous period
+  const calculateChange = (current, previous) => {
+    if (!previous || previous === 0) return 0;
+    return ((current - previous) / previous * 100);
+  };
 
-  // Use JSON data if available, otherwise fallback
-  const data = jsonData || FALLBACK_DATA;
+  // Use static data with fallback
+  const data = FALLBACK_DATA;
   const filters = { fiscalYear: '2025' };
 
-
-  // Show loading state
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading turnover data...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Enhanced subtitle with real-time status
-  const realtimeStatus = isRealTime ? '🔴 Live' : '📊 Cached';
-  const dataSource = jsonData ? 'JSON Data' : 'Local';
-  const syncInfo = ''; // Removed Last sync display per user request
-  const subtitle = `FY ${filters.fiscalYear || '2024'} | ${realtimeStatus} (${dataSource})`;
+  // Enhanced subtitle with data source
+  const dataSource = 'Static Data';
+  const subtitle = `FY ${filters.fiscalYear || '2025'} | 📊 Cached (${dataSource})`;
 
   // Validate data structure to prevent object rendering errors
   if (!data || typeof data !== 'object') {

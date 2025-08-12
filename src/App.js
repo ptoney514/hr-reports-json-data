@@ -4,26 +4,18 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import Navigation from './components/ui/Navigation';
 import ErrorBoundary from './components/ui/ErrorBoundary';
-import { DataSourceProvider } from './contexts/DataSourceContext';
+// Removed DataSourceProvider - using static data now
 import { DashboardProvider } from './contexts/DashboardContext';
 import { setupGlobalErrorHandling } from './utils/errorHandler';
 import { DashboardSkeleton } from './components/ui/LoadingSkeleton';
 // Lazy load dashboard components for better performance
 const DashboardIndex = lazy(() => import('./components/dashboards/DashboardIndex'));
 const TurnoverDashboard = lazy(() => import('./components/dashboards/TurnoverDashboard'));
-const TestSuite = lazy(() => import('./components/testing/TestSuite'));
-const ErrorTestComponent = lazy(() => import('./components/testing/ErrorTestComponent'));
-const ExportTestComponent = lazy(() => import('./components/testing/ExportTestComponent'));
-const PrintTestComponent = lazy(() => import('./components/testing/PrintTestComponent'));
-const AccessibilityTestComponent = lazy(() => import('./components/testing/AccessibilityTestComponent'));
-const DatabaseTestComponent = lazy(() => import('./components/testing/DatabaseTestComponent'));
-const WorkforceDataTester = lazy(() => import('./components/testing/WorkforceDataTester'));
-const JsonDataTester = lazy(() => import('./components/testing/JsonDataTester'));
-const HooksTestComponent = lazy(() => import('./components/testing/HooksTestComponentWrapper'));
+// Testing components removed - using static data approach
 const RecruitingDashboard = lazy(() => import('./components/dashboards/RecruitingDashboard'));
 const ExitSurveyDashboard = lazy(() => import('./components/dashboards/ExitSurveyDashboard'));
 const WorkforceDashboard = lazy(() => import('./components/dashboards/WorkforceDashboard'));
-const AdminDashboard = lazy(() => import('./components/dashboards/AdminDashboard'));
+// AdminDashboard removed - using static data now
 
 // Create QueryClient with optimized configuration for PocketBase
 const queryClient = new QueryClient({
@@ -83,8 +75,7 @@ function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <DataSourceProvider>
-        <DashboardProvider>
+      <DashboardProvider>
           <ErrorBoundary
             onError={handleAppError}
             onRetry={handleAppRetry}
@@ -117,20 +108,11 @@ function App() {
               <Route path="/dashboards/recruiting" element={<RecruitingDashboard />} />
               <Route path="/dashboards/exit-survey" element={<ExitSurveyDashboard />} />
               
-              {/* Test Suite Routes */}
-              <Route path="/test" element={<TestSuite />} />
-              <Route path="/test/errors" element={<ErrorTestComponent />} />
-              <Route path="/test/export" element={<ExportTestComponent />} />
-              <Route path="/test/print" element={<PrintTestComponent />} />
-              <Route path="/test/accessibility" element={<AccessibilityTestComponent />} />
-              <Route path="/test/database" element={<DatabaseTestComponent />} />
-              <Route path="/test/workforce-data" element={<WorkforceDataTester />} />
-              <Route path="/test/json-data" element={<JsonDataTester />} />
-              <Route path="/test/json-hooks" element={<HooksTestComponent />} />
+              {/* Testing routes removed - using static data approach */}
               
               
               {/* Admin Dashboard Route */}
-              <Route path="/admin" element={<AdminDashboard />} />
+              {/* AdminDashboard route removed - using static data */}
               
               {/* Default route - redirect to dashboards index */}
               <Route path="/" element={<Navigate to="/dashboards" replace />} />
@@ -149,7 +131,6 @@ function App() {
           )} */}
         </ErrorBoundary>
       </DashboardProvider>
-    </DataSourceProvider>
     </QueryClientProvider>
   );
 }

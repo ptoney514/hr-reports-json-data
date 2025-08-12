@@ -41,7 +41,7 @@ export function DataDebugOverlay({
             pbField: "total_employees",
             uiField: "totalBE",
             calculation: "beFaculty + beStaff",
-            value: data?.current?.totalBE || data?.metrics?.totalEmployees
+            value: data?.metrics?.totalEmployees
           },
           {
             element: "Faculty Card",
@@ -49,7 +49,7 @@ export function DataDebugOverlay({
             jsonPath: "metrics.beFaculty",
             pbField: "benefit_eligible_faculty",
             uiField: "beFaculty",
-            value: data?.current?.beFaculty || data?.metrics?.beFaculty
+            value: data?.metrics?.beFaculty
           },
           {
             element: "Staff Card",
@@ -57,7 +57,7 @@ export function DataDebugOverlay({
             jsonPath: "metrics.beStaff",
             pbField: "benefit_eligible_staff",
             uiField: "beStaff",
-            value: data?.current?.beStaff || data?.metrics?.beStaff
+            value: data?.metrics?.beStaff
           },
           {
             element: "HSR Card",
@@ -65,7 +65,7 @@ export function DataDebugOverlay({
             jsonPath: "metrics.hsr",
             pbField: "hsr_total",
             uiField: "hsr",
-            value: data?.current?.hsr || data?.metrics?.hsr
+            value: data?.metrics?.hsr
           },
           {
             element: "New Hires Card",
@@ -73,7 +73,7 @@ export function DataDebugOverlay({
             jsonPath: "metrics.newHires",
             pbField: "new_hires",
             uiField: "newHires",
-            value: data?.current?.newHires || data?.metrics?.newHires
+            value: data?.metrics?.newHires
           },
           {
             element: "Departures Card",
@@ -81,7 +81,7 @@ export function DataDebugOverlay({
             jsonPath: "metrics.departures",
             pbField: "terminations",
             uiField: "departures",
-            value: data?.current?.departures || data?.metrics?.departures
+            value: data?.metrics?.departures
           }
         ],
         charts: [
@@ -101,10 +101,10 @@ export function DataDebugOverlay({
           },
           {
             element: "Location Chart",
-            jsonPath: "byLocation",
+            jsonPath: "byLocation | locations",
             pbField: "location_breakdown",
-            dataType: "object",
-            value: data?.charts?.locationBreakdown || data?.byLocation
+            dataType: "object/array",
+            value: data?.charts?.locationBreakdown || data?.byLocation || data?.locations || data?.currentPeriod?.locations
           }
         ],
         calculations: [

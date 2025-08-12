@@ -1,6 +1,6 @@
 import React from 'react';
 import { UserPlus, TrendingUp, Briefcase, Users } from 'lucide-react';
-import useSimpleRecruitingData from '../../hooks/useSimpleRecruitingData';
+import { getRecruitingData } from '../../data/staticData';
 import SummaryCard from '../ui/SummaryCard';
 // Quarter filter removed - using fixed reporting period
 
@@ -16,29 +16,30 @@ const FALLBACK_DATA = {
 };
 
 const RecruitingDashboard = () => {
-  // Fixed reporting period - June 30, 2025
-  const REPORTING_QUARTER = '2025-Q2';
-  
-  // Use JSON data with fallback
-  const { 
-    data: jsonData, 
-    loading
-  } = useSimpleRecruitingData(REPORTING_QUARTER);
+  // Static data for 6/30/25 reporting period only
+  const currentData = getRecruitingData("2025-06-30"); // Current period
+  const previousData = getRecruitingData("2025-03-31"); // For percentage calculations
 
-  // Use JSON data if available, otherwise fallback
-  const data = jsonData || FALLBACK_DATA;
+  // Calculate percentage changes using previous period
+  const calculateChange = (current, previous) => {
+    if (!previous || previous === 0) return 0;
+    return ((current - previous) / previous * 100);
+  };
+
+  // Use static data with fallback
+  const data = FALLBACK_DATA;
   const { recruitingData } = data;
 
   // Standardized recruiting metrics for SummaryCard components
   const recruitingMetrics = [
     {
       title: "Open Requisitions",
-      value: recruitingData.totalOpenPositions,
-      change: -25,
+      value: currentData.openPositions,
+      change: calculateChange(currentData.openPositions, previousData.openPositions),
       changeType: "percentage",
       subtitle: "Omaha (57) | Phoenix (36)",
       icon: Briefcase,
-      trend: "negative"
+      trend: calculateChange(currentData.openPositions, previousData.openPositions) >= 0 ? "positive" : "negative"
     },
     {
       title: "Applications Fiscal YTD", 
@@ -50,18 +51,6 @@ const RecruitingDashboard = () => {
       trend: "positive"
     }
   ];
-
-  // Show loading state
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading recruiting data...</p>
-        </div>
-      </div>
-    );
-  }
 
 
   return (

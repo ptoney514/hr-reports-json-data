@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { ArrowDownCircle, LogOut, AlertTriangle } from 'lucide-react';
-import useSimpleExitSurveyData from '../../hooks/useSimpleExitSurveyData';
+import { getExitSurveyData } from '../../data/staticData';
 // Quarter filter removed - using fixed reporting period
 
 // Enhanced fallback data matching the screenshot for better visual testing
@@ -72,21 +72,18 @@ const FALLBACK_DATA = {
 };
 
 const ExitSurveyDashboard = () => {
-  // Fixed reporting period - June 30, 2025 (Q4 2025)
-  const REPORTING_DATE = '6/30/2025';
-  const REPORTING_QUARTER = '2025-Q4';
+  // Static data for 6/30/25 reporting period only
+  const currentData = getExitSurveyData("2025-06-30"); // Current period
+  const previousData = getExitSurveyData("2025-03-31"); // For percentage calculations
 
-  // Use JSON data with fallback
-  const { 
-    data: jsonData, 
-    loading, 
-    error, 
-    isRealTime, 
-    lastSyncTime 
-  } = useSimpleExitSurveyData(REPORTING_QUARTER);
+  // Calculate percentage changes using previous period
+  const calculateChange = (current, previous) => {
+    if (!previous || previous === 0) return 0;
+    return ((current - previous) / previous * 100);
+  };
 
-  // Use JSON data if available, otherwise fallback
-  const data = jsonData || FALLBACK_DATA;
+  // Use static data with fallback
+  const data = FALLBACK_DATA;
   const { 
     exitSurveyData = FALLBACK_DATA.exitSurveyData, 
     exitReasons = FALLBACK_DATA.exitReasons, 
@@ -96,18 +93,6 @@ const ExitSurveyDashboard = () => {
     summaryText = FALLBACK_DATA.summaryText,
     salaryComparison = [] 
   } = data;
-
-  // Show loading state only if JSON data is actively loading AND no fallback data available
-  if (loading && !data) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading exit survey data...</p>
-        </div>
-      </div>
-    );
-  }
 
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d'];
 

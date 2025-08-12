@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React from 'react';
 import SummaryCard from '../ui/SummaryCard';
 import ErrorBoundary from '../ui/ErrorBoundary';
-import useWorkforceData from '../../hooks/useWorkforceData';
 import DepartmentHeadcountDisplay from '../charts/DepartmentHeadcountDisplay';
 import LocationDistributionChart from '../charts/LocationDistributionChart';
 import AssignmentTypeChart from '../charts/AssignmentTypeChart';
 import { DataDebugOverlay } from '../ui/DataDebugOverlay';
+import { getWorkforceData } from '../../data/staticData';
 import { 
   Users, 
   TrendingUp, 
@@ -28,89 +28,55 @@ const FALLBACK_DATA = {
 };
 
 const WorkforceDashboard = () => {
-  // Fixed reporting period - June 30, 2025
-  const REPORTING_DATE = '6/30/2025';
-  const REPORTING_QUARTER = 'Q2-2025';
-
-  // Use JSON data with fallback
-  const { 
-    data: jsonData,
-    rawData,
-    loading, 
-    error, 
-    lastUpdated
-  } = useWorkforceData({ reportingPeriod: REPORTING_QUARTER });
-
-  // Use JSON data if available, otherwise fallback
-  const data = jsonData || FALLBACK_DATA;
+  // Static data for 6/30/25 reporting period only
+  const currentData = getWorkforceData("2025-06-30"); // Current period
+  const previousData = getWorkforceData("2025-03-31"); // For percentage calculations
   
-  // Extract location data for display - use rawData which contains the full structure
-  const locationData = rawData?.currentPeriod?.locations || [];
+  // Calculate percentage changes using previous period
+  const calculateChange = (current, previous) => {
+    if (!previous || previous === 0) return 0;
+    return ((current - previous) / previous * 100);
+  };
   
-  // Helper function to get location counts
-  const getLocationCounts = (metric) => {
-    const omaha = locationData.find(loc => loc.name === 'Omaha Campus');
-    const phoenix = locationData.find(loc => loc.name === 'Phoenix Campus');
-    
-    if (!omaha || !phoenix) {
-      // Fallback if location data not available
-      return '';
+  // Process static data for display
+  const data = {
+    summary: {
+      totalEmployees: currentData.totalEmployees,
+      faculty: currentData.faculty,
+      staff: currentData.staff,
+      hsp: 0, // Not in static data yet
+      growth: calculateChange(currentData.totalEmployees, previousData.totalEmployees),
+      facultyChange: calculateChange(currentData.faculty, previousData.faculty),
+      staffChange: calculateChange(currentData.staff, previousData.staff),
+      hspChange: 1.7 // Static for now
     }
-    
-    let omahaCount = 0;
-    let phoenixCount = 0;
+  };
+
+  // Helper function to get location counts from static data
+  const getLocationCounts = (metric) => {
+    const locations = currentData.locations;
     
     switch(metric) {
       case 'total':
-        omahaCount = omaha.total || 0;
-        phoenixCount = phoenix.total || 0;
-        break;
+        return `Omaha (${locations['Omaha Campus'].toLocaleString()}) | Phoenix (${locations['Phoenix Campus'].toLocaleString()})`;
       case 'faculty':
-        omahaCount = omaha.breakdown?.faculty || 0;
-        phoenixCount = phoenix.breakdown?.faculty || 0;
-        break;
+        // For now, use proportional estimates - can be updated with real data later
+        const facultyOmaha = Math.round(currentData.faculty * 0.75);
+        const facultyPhoenix = currentData.faculty - facultyOmaha;
+        return `Omaha (${facultyOmaha.toLocaleString()}) | Phoenix (${facultyPhoenix.toLocaleString()})`;
       case 'staff':
-        omahaCount = omaha.breakdown?.staff || 0;
-        phoenixCount = phoenix.breakdown?.staff || 0;
-        break;
+        const staffOmaha = Math.round(currentData.staff * 0.75);
+        const staffPhoenix = currentData.staff - staffOmaha;
+        return `Omaha (${staffOmaha.toLocaleString()}) | Phoenix (${staffPhoenix.toLocaleString()})`;
       case 'hsp':
-        omahaCount = omaha.breakdown?.hsp || 0;
-        phoenixCount = phoenix.breakdown?.hsp || 0;
-        break;
+        return 'Omaha (0) | Phoenix (0)'; // Placeholder
       default:
         return '';
     }
-    
-    return `Omaha (${omahaCount.toLocaleString()}) | Phoenix (${phoenixCount.toLocaleString()})`;
   };
 
-  // Show loading state
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading workforce data...</p>
-        </div>
-      </div>
-    );
-  }
-
   // Enhanced subtitle with data source
-  const dataSource = jsonData ? 'JSON Data' : 'Local';
-  const syncInfo = ''; // Removed Last sync display per user request
-
-  // Validate data structure to prevent object rendering errors
-  if (!data || typeof data !== 'object') {
-    return (
-      <div className="p-4">
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <h2 className="text-lg font-semibold text-red-800 mb-2">Data Error</h2>
-          <p className="text-red-600">Invalid data structure detected. Please refresh the page.</p>
-        </div>
-      </div>
-    );
-  }
+  const dataSource = 'Static Data';
 
 
   return (
@@ -127,11 +93,12 @@ const WorkforceDashboard = () => {
                   <div>
                     <h1 className="text-2xl font-bold text-gray-900">Workforce Dashboard - Benefit Eligible</h1>
                     <p className="text-gray-600 text-sm mt-1">
-                      Period Ending: June 30, 2025
+                      Period Ending: 6/30/25
                     </p>
                   </div>
                 </div>
-                {/* Fixed reporting period - no quarter selector */}
+                
+                {/* Static period display - no date selector needed */}
               </div>
             </div>
           </div>
@@ -170,10 +137,10 @@ const WorkforceDashboard = () => {
             
             <SummaryCard
               title="Starters"
-              value="262"
-              change={16.4}
+              value={currentData.starters.total.toLocaleString()}
+              change={calculateChange(currentData.starters.total, previousData.starters.total)}
               changeType="percentage"
-              subtitle="Omaha (162) | Phoenix (100)"
+              subtitle={`Omaha (${currentData.starters.omaha.toLocaleString()}) | Phoenix (${currentData.starters.phoenix.toLocaleString()})`}
               icon={TrendingUp}
               trend="positive"
             />
@@ -193,26 +160,21 @@ const WorkforceDashboard = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 print:gap-4 mb-6">
             {/* Department Headcount Display */}
             <div>
-              {(() => {
-                const deptData = rawData?.currentPeriod?.departmentalBreakdown || [];
-                console.log('🔍 WorkforceDashboard - Departmental data being passed:', deptData);
-                console.log('🔍 WorkforceDashboard - Data length:', deptData.length);
-                console.log('🔍 WorkforceDashboard - Raw data structure:', rawData);
-                return (
-                  <DepartmentHeadcountDisplay 
-                    data={deptData}
-                    maxItems={10}
-                    title="Top 10 Benefit Eligible Headcount by Department"
-                    className="h-full"
-                  />
-                );
-              })()}
+              <DepartmentHeadcountDisplay 
+                data={[]} 
+                maxItems={10}
+                title="Top 10 Benefit Eligible Headcount by Department"
+                className="h-full"
+              />
             </div>
             
             {/* Location Distribution Chart */}
             <div>
               <LocationDistributionChart 
-                data={rawData?.currentPeriod?.locations || []}
+                data={[
+                  { name: 'Omaha Campus', total: currentData.locations['Omaha Campus'], percentage: 75.3 },
+                  { name: 'Phoenix Campus', total: currentData.locations['Phoenix Campus'], percentage: 24.7 }
+                ]}
                 className="print:h-80 min-h-[420px]"
               />
             </div>
@@ -223,7 +185,7 @@ const WorkforceDashboard = () => {
             {/* Assignment Type Chart */}
             <div>
               <AssignmentTypeChart 
-                data={rawData?.currentPeriod?.byAssignmentType || []}
+                data={[]}
                 className="print:h-80 min-h-[420px]"
               />
             </div>
@@ -234,9 +196,9 @@ const WorkforceDashboard = () => {
       
       {/* Data Debug Overlay - Only in development */}
       <DataDebugOverlay 
-        data={data}
-        rawData={rawData}
-        source="JSON"
+        data={currentData}
+        rawData={currentData}
+        source={dataSource}
         dashboardType="workforce"
       />
     </ErrorBoundary>

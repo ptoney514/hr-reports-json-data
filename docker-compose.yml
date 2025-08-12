@@ -22,7 +22,7 @@ services:
       - REACT_APP_ENV=development
       
       # PocketBase configuration
-      - REACT_APP_POCKETBASE_URL=http://localhost:8091
+      - VITE_POCKETBASE_URL=http://pocketbase:8090
       - REACT_APP_USE_POCKETBASE=true
       
     stdin_open: true

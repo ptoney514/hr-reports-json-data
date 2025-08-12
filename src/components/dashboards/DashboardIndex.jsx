@@ -19,19 +19,23 @@ import {
   Database,
   BarChart3
 } from 'lucide-react';
-import useHomePageMetrics from '../../hooks/useHomePageMetrics';
+// Removed useHomePageMetrics - using static data
 
 const DashboardIndex = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
-  const { 
-    organizationalInsights, 
-    dashboardPreviews, 
-    recentUpdates, 
-    loading, 
-    error, 
-    getTimeAgo,
-    lastUpdated 
-  } = useHomePageMetrics();
+  // Static home page data
+  const loading = false;
+  const error = null;
+  const organizationalInsights = {
+    totalEmployees: 2847,
+    turnoverRate: 8.1,
+    openPositions: 127,
+    exitSurveyResponses: 52
+  };
+  const dashboardPreviews = [];
+  const recentUpdates = [];
+  const getTimeAgo = (date) => "Just now";
+  const lastUpdated = new Date();
 
   // Update current time every minute
   useEffect(() => {

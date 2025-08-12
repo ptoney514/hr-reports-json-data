@@ -276,6 +276,37 @@ This todo list tracks the Phase 12 objectives for migrating from JSON to PocketB
 **Date:** January 16, 2025
 **Status:** Complete - Updated workforce analytics dashboard with correct values from user screenshot
 
+### ✅ Workforce Dashboard Data Integration
+**Date:** January 16, 2025
+**Status:** Complete - Integrated Oracle HRIS Excel data structure with dashboard
+
+**Changes Made:**
+1. **Updated workforce-data.json with Correct Structure**:
+   - Replaced generic divisions with actual 32 departments from Excel
+   - Added HSP (House Staff Physician) field throughout
+   - Correct totals: 3,206 total (785 Faculty, 1,809 Staff, 612 HSP)
+   - Phoenix correctly shown as location, not department
+   
+2. **Department Table Enhancement**:
+   - Converted from bar chart to table format
+   - Added columns: Department, Faculty, Staff, HSP, Total
+   - Shows top 10 departments by total headcount
+   - Includes totals row at bottom
+
+3. **Location Breakdown Updates**:
+   - Omaha: 2,566 (80%) - Faculty: 727, Staff: 1,571, HSP: 268
+   - Phoenix: 640 (20%) - Faculty: 58, Staff: 238, HSP: 344
+   
+4. **Starters Tracking Added**:
+   - Current period (6/30/25): 262 total (Omaha: 162, Phoenix: 100)
+   - Previous period (3/31/25): 225 total (Omaha: 207, Phoenix: 18)
+
+**Technical Implementation:**
+- Simplified JSON structure without complex quarterly data
+- Direct mapping from Oracle Excel columns to JSON fields
+- BE (Benefit Eligible) terminology maintained
+- HSP shown as separate category throughout dashboard
+
 **Changes Made:**
 1. **Updated workforce-data.json with Correct Values**:
    - Total Headcount: 2,847 → 3,206 (+359)

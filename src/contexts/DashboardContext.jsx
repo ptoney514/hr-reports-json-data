@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useReducer } from 'react';
 import { format, subMonths, startOfMonth, endOfMonth } from 'date-fns';
-import { getCurrentReportingPeriod } from '../services/QuarterConfigService';
+// Removed quarter service - using static dates now
 
 // Action types
 const actionTypes = {
@@ -21,12 +21,8 @@ const actionTypes = {
 
 // Get current reporting period for default state (lazy evaluation)
 const getCurrentReportingPeriodSafe = () => {
-  try {
-    return getCurrentReportingPeriod();
-  } catch (error) {
-    console.warn('Could not get current reporting period, using fallback');
-    return { value: 'Q2-2025', label: '6/30/2025' };
-  }
+  // Using static data now - return default date
+  return { value: '2025-06-30', label: '6/30/25' };
 };
 
 // Create default state function to avoid calling service during module load
