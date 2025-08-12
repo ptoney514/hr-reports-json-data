@@ -145,9 +145,9 @@ export const TURNOVER_DATA = {
     staffTurnoverRate: 8.5,
     voluntaryTurnover: 5.8,
     involuntaryTurnover: 2.1,
-    terminations: 69,
+    terminations: 55,
     starters: 225,
-    leavers: 69,
+    leavers: 55,
     netChange: 18,
     monthlyTrends: [
       { month: "Jan", starters: 78, leavers: 23, net: 55 },
@@ -178,9 +178,9 @@ export const TURNOVER_DATA = {
     staffTurnoverRate: 8.7,
     voluntaryTurnover: 6.0,
     involuntaryTurnover: 2.1,
-    terminations: 72,
+    terminations: 62,
     starters: 262,
-    leavers: 72,
+    leavers: 62,
     netChange: 17,
     monthlyTrends: [
       { month: "Apr", starters: 89, leavers: 25, net: 64 },
@@ -188,13 +188,15 @@ export const TURNOVER_DATA = {
       { month: "Jun", starters: 88, leavers: 23, net: 65 }
     ],
     exitReasons: [
-      { reason: "Resignation - Better Opportunity", count: 19, percentage: 26.4 },
-      { reason: "Resignation - Personal", count: 15, percentage: 20.8 },
-      { reason: "Resignation - Career Change", count: 13, percentage: 18.1 },
-      { reason: "Termination - Performance", count: 8, percentage: 11.1 },
-      { reason: "Retirement", count: 7, percentage: 9.7 },
-      { reason: "Termination - Policy", count: 5, percentage: 6.9 },
-      { reason: "Other", count: 5, percentage: 6.9 }
+      { reason: "Resigned", total: 25, percentage: 40.3, faculty: 3, staff: 22 },
+      { reason: "Retirement", total: 14, percentage: 22.6, faculty: 9, staff: 5 },
+      { reason: "End Assignment", total: 9, percentage: 14.5, faculty: 7, staff: 2 },
+      { reason: "Better Opportunity", total: 5, percentage: 8.1, faculty: 0, staff: 5 },
+      { reason: "Invol Performance", total: 3, percentage: 4.8, faculty: 1, staff: 2 },
+      { reason: "Personal Reasons", total: 2, percentage: 3.2, faculty: 0, staff: 2 },
+      { reason: "Relocation", total: 2, percentage: 3.2, faculty: 0, staff: 2 },
+      { reason: "Death", total: 1, percentage: 1.6, faculty: 1, staff: 0 },
+      { reason: "Reduction In Force", total: 1, percentage: 1.6, faculty: 0, staff: 1 }
     ],
     schoolTurnover: [
       { school: "College of Medicine", rate: 7.1, departures: 35 },

@@ -2,7 +2,7 @@ import React from 'react';
 
 const TopExitReasonsStatic = ({ 
   data = [], 
-  title = "Top Exit Reasons"
+  title = "Top Termination Reasons"
 }) => {
   // Color palette matching target design
   const colors = [
@@ -15,7 +15,7 @@ const TopExitReasonsStatic = ({
   ];
 
   // Calculate total separations
-  const totalSeparations = data.reduce((sum, item) => sum + (item.total || 0), 0);
+  const totalSeparations = data && Array.isArray(data) ? data.reduce((sum, item) => sum + (item.total || 0), 0) : 0;
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-sm border print:shadow-none" data-pdf-ready="true">
@@ -23,7 +23,7 @@ const TopExitReasonsStatic = ({
       <div className="flex justify-between items-center mb-6">
         <h3 className="text-xl font-semibold text-blue-700 print:text-black">{title}</h3>
         <div className="text-lg font-medium text-gray-700 print:text-black">
-          Total separations: {totalSeparations}
+          Total terminations: {totalSeparations}
         </div>
       </div>
 
@@ -54,10 +54,12 @@ const TopExitReasonsStatic = ({
                 data-progress-width={reason.percentage}
                 data-progress-color={colors[index % colors.length]}
               >
-                {/* Total count badge */}
-                <span className="text-xs text-white font-medium bg-black bg-opacity-20 px-2 py-1 rounded">
-                  {reason.total}
-                </span>
+                {/* Total count badge - only show if greater than 1 */}
+                {reason.total > 1 && (
+                  <span className="text-xs text-white font-medium bg-black bg-opacity-20 px-2 py-1 rounded">
+                    {reason.total}
+                  </span>
+                )}
               </div>
             </div>
             
@@ -74,7 +76,7 @@ const TopExitReasonsStatic = ({
         <div className="text-sm text-gray-600 print:text-black">
           <span>Top reason accounts for </span>
           <span className="font-semibold text-blue-600 print:text-black">
-            {data.length > 0 ? `${data[0].percentage}% of all exits` : 'N/A'}
+            {data.length > 0 ? `${data[0].percentage}% of all terminations` : 'N/A'}
           </span>
         </div>
       </div>
