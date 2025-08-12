@@ -315,25 +315,29 @@ export const EXIT_SURVEY_DATA = {
   },
   "2025-06-30": {
     reportingDate: "6/30/25",
-    responseRate: 72,
-    totalResponses: 52,
-    overallSatisfaction: 3.4,
-    wouldRecommend: 65,
+    responseRate: 32.3,
+    totalResponses: 20,
+    totalExits: 62,
+    overallSatisfaction: 3.2,
+    wouldRecommend: 57.9,
+    wouldRecommendCount: { positive: 11, total: 19 },
+    concernsReported: { percentage: 40, count: 8, total: 20 },
     departureReasons: [
-      { reason: "Career advancement opportunities", percentage: 26.9 },
-      { reason: "Work-life balance", percentage: 23.1 },
-      { reason: "Compensation", percentage: 17.3 },
-      { reason: "Management/leadership", percentage: 15.4 },
-      { reason: "Job responsibilities", percentage: 11.5 },
-      { reason: "Other", percentage: 5.8 }
+      { reason: "Career advancement opportunities", percentage: 30 },
+      { reason: "Dissatisfied with direct supervisor", percentage: 25 },
+      { reason: "Other", percentage: 15 },
+      { reason: "Retirement", percentage: 10 },
+      { reason: "Lack of career advancement", percentage: 10 },
+      { reason: "Dissatisfied with University leadership", percentage: 5 },
+      { reason: "Lack of work-life balance", percentage: 5 }
     ],
     satisfactionRatings: {
-      jobSatisfaction: 3.4,
-      managementSupport: 3.1,
-      careerDevelopment: 2.9,
-      workLifeBalance: 3.3,
-      compensation: 3.6,
-      benefits: 3.9
+      jobSatisfaction: 3.2,
+      managementSupport: 2.6,
+      careerDevelopment: 2.4,
+      workLifeBalance: 3.1,
+      compensation: 2.8,
+      benefits: 3.7
     }
   }
 };
