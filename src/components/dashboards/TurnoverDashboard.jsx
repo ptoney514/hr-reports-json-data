@@ -154,17 +154,17 @@ const TurnoverDashboard = () => {
   // Transform static data to match dashboard structure
   const data = {
     summary: {
-      totalDepartures: currentData.leavers,
+      totalDepartures: currentData.terminations,
       overallTurnoverRate: currentData.totalTurnoverRate,
-      turnoverRateChange: calculateChange(currentData.totalTurnoverRate, previousData.totalTurnoverRate),
+      turnoverRateChange: calculateChange(currentData.terminations, previousData.terminations),
       facultyTurnoverRate: currentData.facultyTurnoverRate,
-      facultyDepartures: Math.round(currentData.leavers * 0.3), // Estimate based on faculty percentage
+      facultyDepartures: Math.round(currentData.terminations * 0.3), // Estimate based on faculty percentage
       facultyTurnoverChange: calculateChange(currentData.facultyTurnoverRate, previousData.facultyTurnoverRate),
       staffTurnoverRate: currentData.staffTurnoverRate,
-      staffDepartures: Math.round(currentData.leavers * 0.7), // Estimate based on staff percentage
+      staffDepartures: Math.round(currentData.terminations * 0.7), // Estimate based on staff percentage
       staffTurnoverChange: calculateChange(currentData.staffTurnoverRate, previousData.staffTurnoverRate),
       totalCostImpact: 1620000, // Static estimate
-      avgCostPerDeparture: Math.round(1620000 / currentData.leavers),
+      avgCostPerDeparture: Math.round(1620000 / currentData.terminations),
       costImpactChange: -5.2, // Static estimate
       avgTenure: "TBD"
     },
@@ -253,33 +253,33 @@ const TurnoverDashboard = () => {
           {/* Summary Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 print:gap-2 mb-6 print:mb-4">
         <SummaryCard
-          title="Employee Turnover"
+          title="# of Terms"
           value={`${data.summary?.totalDepartures?.toLocaleString() || '0'}`}
           change={data.summary?.turnoverRateChange || 0}
           changeType="percentage"
-          subtitle="OMA (TBD) | PHX (TBD)"
+          subtitle="55 total terms previous period"
           icon={TrendingDown}
           trend={(data.summary?.turnoverRateChange || 0) > 0 ? 'negative' : 'positive'}
         />
         
         <SummaryCard
           title="Faculty Turnover"
-          value={`${safeToFixed(data.summary?.facultyTurnoverRate)}%`}
-          change={data.summary?.facultyTurnoverChange || 0}
+          value="6.1%"
+          change={-1.6}
           changeType="percentage"
-          subtitle={`${data.summary?.facultyDepartures?.toLocaleString() || '0'} departures`}
+          subtitle={`${data.summary?.facultyDepartures?.toLocaleString() || '0'} terminations`}
           icon={BookOpen}
-          trend={(data.summary?.facultyTurnoverChange || 0) > 0 ? 'negative' : 'positive'}
+          trend="positive"
         />
         
         <SummaryCard
-          title="Staff Turnover"
-          value={`${safeToFixed(data.summary?.staffTurnoverRate)}%`}
-          change={data.summary?.staffTurnoverChange || 0}
+          title="Staff Exempt Turnover"
+          value="12.6%"
+          change={-1.0}
           changeType="percentage"
-          subtitle={`${data.summary?.staffDepartures?.toLocaleString() || '0'} departures`}
+          subtitle={`${data.summary?.staffDepartures?.toLocaleString() || '0'} terminations`}
           icon={Building2}
-          trend={(data.summary?.staffTurnoverChange || 0) > 0 ? 'negative' : 'positive'}
+          trend="positive"
         />
         
         <SummaryCard
@@ -287,7 +287,7 @@ const TurnoverDashboard = () => {
           value={typeof data.summary?.avgTenure === 'string' ? data.summary.avgTenure : `${safeToFixed(data.summary?.avgTenure)} years`}
           change={null}
           changeType="none"
-          subtitle="Average service length at departure"
+          subtitle="Average years of service"
           icon={Clock}
           trend="neutral"
         />
@@ -303,12 +303,12 @@ const TurnoverDashboard = () => {
         </div>
       </div>
 
-      {/* Top Exit Reasons Chart */}
+      {/* Top Termination Reasons Chart */}
       <div className="mb-6 print:mb-4 chart-container" data-chart-type="progress-bars">
-        <div id="top-exit-reasons-chart" data-chart-title="Top Exit Reasons Analysis" data-chart-ready="false">
+        <div id="top-termination-reasons-chart" data-chart-title="Top Termination Reasons Analysis" data-chart-ready="false">
           <TopExitReasonsStatic
             data={data.charts?.topExitReasons || []}
-            title="Top Exit Reasons"
+            title="Top Termination Reasons"
           />
         </div>
       </div>

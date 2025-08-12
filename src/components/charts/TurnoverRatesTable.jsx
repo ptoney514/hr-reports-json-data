@@ -84,7 +84,7 @@ const TurnoverRatesTable = ({ data, title = "Turnover Rates by Category", classN
     if (value > benchmark) {
       return "bg-red-100 text-red-800"; // Above benchmark (worse performance)
     } else {
-      return "text-green-600 font-semibold"; // Below benchmark (better performance)
+      return "bg-green-100 text-green-800"; // Below benchmark (better performance) with green background
     }
   };
 
@@ -208,10 +208,7 @@ const TurnoverRatesTable = ({ data, title = "Turnover Rates by Category", classN
                     {row.higherEdAvg2024}%
                   </td>
                   <td className={`text-center py-3 px-2 ${getCellStyling(row.fy2025, row.higherEdAvg2024)}`}>
-                    <div className="flex items-center justify-center gap-2">
-                      <span>{row.fy2025}%</span>
-                      {formatChange(row.change)}
-                    </div>
+                    {row.fy2025}%
                   </td>
                 </tr>
               ))}
