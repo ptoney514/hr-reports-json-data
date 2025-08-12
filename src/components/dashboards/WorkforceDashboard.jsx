@@ -1,11 +1,11 @@
 import React from 'react';
 import SummaryCard from '../ui/SummaryCard';
 import ErrorBoundary from '../ui/ErrorBoundary';
-import DepartmentHeadcountDisplay from '../charts/DepartmentHeadcountDisplay';
+import SchoolOrgHeadcountChart from '../charts/SchoolOrgHeadcountChart';
 import LocationDistributionChart from '../charts/LocationDistributionChart';
 import AssignmentTypeChart from '../charts/AssignmentTypeChart';
 import { DataDebugOverlay } from '../ui/DataDebugOverlay';
-import { getWorkforceData } from '../../data/staticData';
+import { getWorkforceData, getAllSchoolOrgData } from '../../data/staticData';
 import { 
   Users, 
   TrendingUp, 
@@ -44,34 +44,51 @@ const WorkforceDashboard = () => {
       totalEmployees: currentData.totalEmployees,
       faculty: currentData.faculty,
       staff: currentData.staff,
-      hsp: 0, // Not in static data yet
+      hsp: currentData.hsp,
       growth: calculateChange(currentData.totalEmployees, previousData.totalEmployees),
       facultyChange: calculateChange(currentData.faculty, previousData.faculty),
       staffChange: calculateChange(currentData.staff, previousData.staff),
-      hspChange: 1.7 // Static for now
+      hspChange: calculateChange(currentData.hsp, previousData.hsp)
     }
   };
 
   // Helper function to get location counts from static data
   const getLocationCounts = (metric) => {
     const locations = currentData.locations;
+    const locationDetails = currentData.locationDetails;
     
-    switch(metric) {
-      case 'total':
-        return `Omaha (${locations['Omaha Campus'].toLocaleString()}) | Phoenix (${locations['Phoenix Campus'].toLocaleString()})`;
-      case 'faculty':
-        // For now, use proportional estimates - can be updated with real data later
-        const facultyOmaha = Math.round(currentData.faculty * 0.75);
-        const facultyPhoenix = currentData.faculty - facultyOmaha;
-        return `Omaha (${facultyOmaha.toLocaleString()}) | Phoenix (${facultyPhoenix.toLocaleString()})`;
-      case 'staff':
-        const staffOmaha = Math.round(currentData.staff * 0.75);
-        const staffPhoenix = currentData.staff - staffOmaha;
-        return `Omaha (${staffOmaha.toLocaleString()}) | Phoenix (${staffPhoenix.toLocaleString()})`;
-      case 'hsp':
-        return 'Omaha (0) | Phoenix (0)'; // Placeholder
-      default:
-        return '';
+    // Use locationDetails if available, otherwise fall back to estimates
+    if (locationDetails) {
+      switch(metric) {
+        case 'total':
+          return `OMA (${locations['Omaha Campus'].toLocaleString()}) | PHX (${locations['Phoenix Campus'].toLocaleString()})`;
+        case 'faculty':
+          return `OMA (${locationDetails.omaha.faculty.toLocaleString()}) | PHX (${locationDetails.phoenix.faculty.toLocaleString()})`;
+        case 'staff':
+          return `OMA (${locationDetails.omaha.staff.toLocaleString()}) | PHX (${locationDetails.phoenix.staff.toLocaleString()})`;
+        case 'hsp':
+          return `OMA (${locationDetails.omaha.hsp.toLocaleString()}) | PHX (${locationDetails.phoenix.hsp.toLocaleString()})`;
+        default:
+          return '';
+      }
+    } else {
+      // Fallback for older data without locationDetails
+      switch(metric) {
+        case 'total':
+          return `OMA (${locations['Omaha Campus'].toLocaleString()}) | PHX (${locations['Phoenix Campus'].toLocaleString()})`;
+        case 'faculty':
+          const facultyOmaha = Math.round(currentData.faculty * 0.75);
+          const facultyPhoenix = currentData.faculty - facultyOmaha;
+          return `OMA (${facultyOmaha.toLocaleString()}) | PHX (${facultyPhoenix.toLocaleString()})`;
+        case 'staff':
+          const staffOmaha = Math.round(currentData.staff * 0.75);
+          const staffPhoenix = currentData.staff - staffOmaha;
+          return `OMA (${staffOmaha.toLocaleString()}) | PHX (${staffPhoenix.toLocaleString()})`;
+        case 'hsp':
+          return 'OMA (0) | PHX (0)';
+        default:
+          return '';
+      }
     }
   };
 
@@ -140,7 +157,7 @@ const WorkforceDashboard = () => {
               value={currentData.starters.total.toLocaleString()}
               change={calculateChange(currentData.starters.total, previousData.starters.total)}
               changeType="percentage"
-              subtitle={`Omaha (${currentData.starters.omaha.toLocaleString()}) | Phoenix (${currentData.starters.phoenix.toLocaleString()})`}
+              subtitle={`OMA (${currentData.starters.omaha.toLocaleString()}) | PHX (${currentData.starters.phoenix.toLocaleString()})`}
               icon={TrendingUp}
               trend="positive"
             />
@@ -156,15 +173,16 @@ const WorkforceDashboard = () => {
             />
           </div>
 
-          {/* Workforce Analytics Charts - Row 1: Department and Location */}
+          {/* Workforce Analytics Charts - Row 1: Assignment Type and Location */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 print:gap-4 mb-6">
-            {/* Department Headcount Display */}
+            {/* Assignment Type Chart */}
             <div>
-              <DepartmentHeadcountDisplay 
-                data={[]} 
-                maxItems={10}
-                title="Top 10 Benefit Eligible Headcount by Department"
-                className="h-full"
+              <AssignmentTypeChart 
+                data={currentData.assignmentTypes.map(item => ({
+                  name: item.type,
+                  total: item.count
+                }))}
+                className="print:h-80 min-h-[420px]"
               />
             </div>
             
@@ -180,14 +198,125 @@ const WorkforceDashboard = () => {
             </div>
           </div>
 
-          {/* Workforce Analytics Charts - Row 2: Assignment Type (Full Width) */}
-          <div className="grid grid-cols-1 gap-6 print:gap-4">
-            {/* Assignment Type Chart */}
+          {/* Workforce Analytics Charts - Row 2: School/Organization Headcount (Full Width) */}
+          <div className="grid grid-cols-1 gap-6 print:gap-4 mb-6">
+            {/* School/Organization Headcount Chart */}
             <div>
-              <AssignmentTypeChart 
-                data={[]}
-                className="print:h-80 min-h-[420px]"
+              <SchoolOrgHeadcountChart 
+                data={getAllSchoolOrgData("2025-06-30")}
+                height={450}
+                className="h-full"
               />
+            </div>
+          </div>
+
+          {/* Raw Data Table Section */}
+          <div className="bg-white rounded-lg shadow-sm border p-4">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Workforce Raw Data</h3>
+            
+            {/* Benefit Eligible Headcount Table */}
+            <div className="overflow-x-auto">
+              <table className="min-w-full text-sm">
+                <thead>
+                  <tr className="border-b-2 border-gray-300">
+                    <th className="text-left py-2 px-3 font-semibold text-gray-700" colSpan="2">Location</th>
+                    <th className="text-center py-2 px-3 font-semibold text-gray-700">Period</th>
+                    <th className="text-right py-2 px-3 font-semibold text-gray-700">Faculty</th>
+                    <th className="text-right py-2 px-3 font-semibold text-gray-700">Staff</th>
+                    <th className="text-right py-2 px-3 font-semibold text-gray-700">HSP</th>
+                    <th className="text-right py-2 px-3 font-semibold text-gray-700">Total</th>
+                    <th className="text-right py-2 px-3 font-semibold text-gray-700">% Change</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {/* Phoenix Data */}
+                  <tr className="bg-blue-50">
+                    <td className="py-2 px-3 font-medium" rowSpan="2">Phoenix</td>
+                    <td className="py-2 px-3 text-gray-600">Current</td>
+                    <td className="py-2 px-3 text-center">6/30/25</td>
+                    <td className="py-2 px-3 text-right">{currentData.locationDetails?.phoenix.faculty.toLocaleString()}</td>
+                    <td className="py-2 px-3 text-right">{currentData.locationDetails?.phoenix.staff.toLocaleString()}</td>
+                    <td className="py-2 px-3 text-right">{currentData.locationDetails?.phoenix.hsp.toLocaleString()}</td>
+                    <td className="py-2 px-3 text-right font-semibold">{currentData.locations['Phoenix Campus'].toLocaleString()}</td>
+                    <td className="py-2 px-3 text-right font-semibold text-green-600">
+                      +{calculateChange(currentData.locations['Phoenix Campus'], previousData.locations['Phoenix Campus']).toFixed(1)}%
+                    </td>
+                  </tr>
+                  <tr className="bg-gray-50">
+                    <td className="py-2 px-3 text-gray-600">Previous</td>
+                    <td className="py-2 px-3 text-center">3/31/25</td>
+                    <td className="py-2 px-3 text-right">{previousData.locationDetails?.phoenix.faculty.toLocaleString()}</td>
+                    <td className="py-2 px-3 text-right">{previousData.locationDetails?.phoenix.staff.toLocaleString()}</td>
+                    <td className="py-2 px-3 text-right">{previousData.locationDetails?.phoenix.hsp.toLocaleString()}</td>
+                    <td className="py-2 px-3 text-right font-semibold">{previousData.locations['Phoenix Campus'].toLocaleString()}</td>
+                    <td className="py-2 px-3 text-right">-</td>
+                  </tr>
+
+                  {/* Omaha Data */}
+                  <tr className="bg-blue-50">
+                    <td className="py-2 px-3 font-medium" rowSpan="2">Omaha</td>
+                    <td className="py-2 px-3 text-gray-600">Current</td>
+                    <td className="py-2 px-3 text-center">6/30/25</td>
+                    <td className="py-2 px-3 text-right">{currentData.locationDetails?.omaha.faculty.toLocaleString()}</td>
+                    <td className="py-2 px-3 text-right">{currentData.locationDetails?.omaha.staff.toLocaleString()}</td>
+                    <td className="py-2 px-3 text-right">{currentData.locationDetails?.omaha.hsp.toLocaleString()}</td>
+                    <td className="py-2 px-3 text-right font-semibold">{currentData.locations['Omaha Campus'].toLocaleString()}</td>
+                    <td className="py-2 px-3 text-right font-semibold text-red-600">
+                      {calculateChange(currentData.locations['Omaha Campus'], previousData.locations['Omaha Campus']).toFixed(1)}%
+                    </td>
+                  </tr>
+                  <tr className="bg-gray-50">
+                    <td className="py-2 px-3 text-gray-600">Previous</td>
+                    <td className="py-2 px-3 text-center">3/31/25</td>
+                    <td className="py-2 px-3 text-right">{previousData.locationDetails?.omaha.faculty.toLocaleString()}</td>
+                    <td className="py-2 px-3 text-right">{previousData.locationDetails?.omaha.staff.toLocaleString()}</td>
+                    <td className="py-2 px-3 text-right">{previousData.locationDetails?.omaha.hsp.toLocaleString()}</td>
+                    <td className="py-2 px-3 text-right font-semibold">{previousData.locations['Omaha Campus'].toLocaleString()}</td>
+                    <td className="py-2 px-3 text-right">-</td>
+                  </tr>
+
+                  {/* Total Summary */}
+                  <tr className="bg-yellow-50 border-t-2 border-gray-300">
+                    <td className="py-2 px-3 font-bold" rowSpan="2">Total</td>
+                    <td className="py-2 px-3 text-gray-600">Current</td>
+                    <td className="py-2 px-3 text-center font-semibold">6/30/25</td>
+                    <td className="py-2 px-3 text-right font-bold">{currentData.faculty.toLocaleString()}</td>
+                    <td className="py-2 px-3 text-right font-bold">{currentData.staff.toLocaleString()}</td>
+                    <td className="py-2 px-3 text-right font-bold">{currentData.hsp.toLocaleString()}</td>
+                    <td className="py-2 px-3 text-right font-bold text-lg">{currentData.totalEmployees.toLocaleString()}</td>
+                    <td className="py-2 px-3 text-right font-bold text-blue-600">
+                      {calculateChange(currentData.totalEmployees, previousData.totalEmployees).toFixed(1)}%
+                    </td>
+                  </tr>
+                  <tr className="bg-gray-50">
+                    <td className="py-2 px-3 text-gray-600">Previous</td>
+                    <td className="py-2 px-3 text-center font-semibold">3/31/25</td>
+                    <td className="py-2 px-3 text-right font-bold">{previousData.faculty.toLocaleString()}</td>
+                    <td className="py-2 px-3 text-right font-bold">{previousData.staff.toLocaleString()}</td>
+                    <td className="py-2 px-3 text-right font-bold">{previousData.hsp.toLocaleString()}</td>
+                    <td className="py-2 px-3 text-right font-bold text-lg">{previousData.totalEmployees.toLocaleString()}</td>
+                    <td className="py-2 px-3 text-right">-</td>
+                  </tr>
+
+                  {/* Percentage Changes Row */}
+                  <tr className="bg-gray-100 border-t-2 border-gray-300">
+                    <td className="py-2 px-3 font-semibold" colSpan="3">% Change from Previous</td>
+                    <td className="py-2 px-3 text-right font-semibold text-blue-600">
+                      {calculateChange(currentData.faculty, previousData.faculty).toFixed(1)}%
+                    </td>
+                    <td className="py-2 px-3 text-right font-semibold text-blue-600">
+                      {calculateChange(currentData.staff, previousData.staff).toFixed(1)}%
+                    </td>
+                    <td className="py-2 px-3 text-right font-semibold text-blue-600">
+                      {calculateChange(currentData.hsp, previousData.hsp).toFixed(1)}%
+                    </td>
+                    <td className="py-2 px-3 text-right font-bold text-blue-600">
+                      {calculateChange(currentData.totalEmployees, previousData.totalEmployees).toFixed(1)}%
+                    </td>
+                    <td className="py-2 px-3"></td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
 

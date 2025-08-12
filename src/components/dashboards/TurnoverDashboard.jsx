@@ -150,9 +150,34 @@ const TurnoverDashboard = () => {
     if (!previous || previous === 0) return 0;
     return ((current - previous) / previous * 100);
   };
-
-  // Use static data with fallback
-  const data = FALLBACK_DATA;
+  
+  // Transform static data to match dashboard structure
+  const data = {
+    summary: {
+      totalDepartures: currentData.leavers,
+      overallTurnoverRate: currentData.totalTurnoverRate,
+      turnoverRateChange: calculateChange(currentData.totalTurnoverRate, previousData.totalTurnoverRate),
+      facultyTurnoverRate: currentData.facultyTurnoverRate,
+      facultyDepartures: Math.round(currentData.leavers * 0.3), // Estimate based on faculty percentage
+      facultyTurnoverChange: calculateChange(currentData.facultyTurnoverRate, previousData.facultyTurnoverRate),
+      staffTurnoverRate: currentData.staffTurnoverRate,
+      staffDepartures: Math.round(currentData.leavers * 0.7), // Estimate based on staff percentage
+      staffTurnoverChange: calculateChange(currentData.staffTurnoverRate, previousData.staffTurnoverRate),
+      totalCostImpact: 1620000, // Static estimate
+      avgCostPerDeparture: Math.round(1620000 / currentData.leavers),
+      costImpactChange: -5.2, // Static estimate
+      avgTenure: "TBD"
+    },
+    charts: {
+      topExitReasons: currentData.exitReasons,
+      turnoverBySchool: currentData.schoolTurnover.map(school => ({
+        name: school.school,
+        value: school.departures
+      })),
+      monthlyTrends: currentData.monthlyTrends
+    }
+  };
+  
   const filters = { fiscalYear: '2025' };
 
   // Enhanced subtitle with data source
@@ -232,7 +257,7 @@ const TurnoverDashboard = () => {
           value={`${data.summary?.totalDepartures?.toLocaleString() || '0'}`}
           change={data.summary?.turnoverRateChange || 0}
           changeType="percentage"
-          subtitle="Omaha (TBD) | Phoenix (TBD)"
+          subtitle="OMA (TBD) | PHX (TBD)"
           icon={TrendingDown}
           trend={(data.summary?.turnoverRateChange || 0) > 0 ? 'negative' : 'positive'}
         />

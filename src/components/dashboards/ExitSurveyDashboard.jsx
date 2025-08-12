@@ -82,17 +82,37 @@ const ExitSurveyDashboard = () => {
     return ((current - previous) / previous * 100);
   };
 
-  // Use static data with fallback
-  const data = FALLBACK_DATA;
-  const { 
-    exitSurveyData = FALLBACK_DATA.exitSurveyData, 
-    exitReasons = FALLBACK_DATA.exitReasons, 
-    satisfactionData = FALLBACK_DATA.satisfactionData, 
-    departmentExits = FALLBACK_DATA.departmentExits, 
-    keyInsights = FALLBACK_DATA.keyInsights, 
-    summaryText = FALLBACK_DATA.summaryText,
-    salaryComparison = [] 
-  } = data;
+  // Transform static data to dashboard format
+  const exitSurveyData = {
+    totalExits: 72, // From turnover data
+    totalResponses: currentData.totalResponses,
+    recommendationRate: currentData.wouldRecommend,
+    avgTenure: "TBD",
+    exitInterviewCompletion: currentData.responseRate,
+    concernsReported: {
+      percentage: 25,
+      count: 13,
+      total: currentData.totalResponses,
+      description: "reported workplace concerns"
+    }
+  };
+  
+  const exitReasons = currentData.departureReasons.map(reason => ({
+    name: reason.reason,
+    value: reason.percentage
+  }));
+  
+  const satisfactionData = [
+    { category: 'Job Satisfaction', satisfied: Math.round(currentData.satisfactionRatings.jobSatisfaction * 20), neutral: 30, dissatisfied: Math.round((5 - currentData.satisfactionRatings.jobSatisfaction) * 15) },
+    { category: 'Management Support', satisfied: Math.round(currentData.satisfactionRatings.managementSupport * 20), neutral: 35, dissatisfied: Math.round((5 - currentData.satisfactionRatings.managementSupport) * 15) },
+    { category: 'Career Development', satisfied: Math.round(currentData.satisfactionRatings.careerDevelopment * 20), neutral: 40, dissatisfied: Math.round((5 - currentData.satisfactionRatings.careerDevelopment) * 15) },
+    { category: 'Compensation', satisfied: Math.round(currentData.satisfactionRatings.compensation * 20), neutral: 25, dissatisfied: Math.round((5 - currentData.satisfactionRatings.compensation) * 15) }
+  ];
+  
+  const departmentExits = FALLBACK_DATA.departmentExits; // Keep fallback for now
+  const keyInsights = FALLBACK_DATA.keyInsights; // Keep fallback for now
+  const summaryText = FALLBACK_DATA.summaryText; // Keep fallback for now
+  const salaryComparison = []; // Keep empty for now
 
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d'];
 

@@ -26,10 +26,6 @@ const RecruitingDashboard = () => {
     return ((current - previous) / previous * 100);
   };
 
-  // Use static data with fallback
-  const data = FALLBACK_DATA;
-  const { recruitingData } = data;
-
   // Standardized recruiting metrics for SummaryCard components
   const recruitingMetrics = [
     {
@@ -37,16 +33,16 @@ const RecruitingDashboard = () => {
       value: currentData.openPositions,
       change: calculateChange(currentData.openPositions, previousData.openPositions),
       changeType: "percentage",
-      subtitle: "Omaha (57) | Phoenix (36)",
+      subtitle: `${currentData.positionsByDepartment.reduce((sum, dept) => sum + dept.openings, 0)} total openings across departments`,
       icon: Briefcase,
       trend: calculateChange(currentData.openPositions, previousData.openPositions) >= 0 ? "positive" : "negative"
     },
     {
       title: "Applications Fiscal YTD", 
-      value: "4,423",
-      change: 16.4,
+      value: currentData.applicationCount.toLocaleString(),
+      change: calculateChange(currentData.applicationCount, previousData.applicationCount),
       changeType: "percentage",
-      subtitle: "Faculty: 1,651 | Staff: 2,772",
+      subtitle: `${currentData.newHiresYTD} hires from applications`,
       icon: Users,
       trend: "positive"
     }
@@ -92,7 +88,7 @@ const RecruitingDashboard = () => {
           value="262"
           change={16.4}
           changeType="percentage"
-          subtitle="Omaha (162) | Phoenix (100)"
+          subtitle="OMA (162) | PHX (100)"
           icon={TrendingUp}
           trend="positive"
         />
