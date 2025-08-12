@@ -10,7 +10,15 @@ const HeadcountChart = memo(({
   title = "Historical Headcount",
   height = 300,
   showLegend = true,
-  className = ""
+  className = "",
+  hoveredDataKey = null,
+  hoveredPeriod = null,
+  onMouseEnter = null,
+  onMouseLeave = null,
+  yAxisDomain = null,
+  'aria-controls': ariaControls = null,
+  'aria-describedby': ariaDescribedBy = null,
+  ...otherProps
 }) => {
   // Accessibility state
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -152,7 +160,8 @@ const HeadcountChart = memo(({
         className={`bg-white print:bg-white p-4 print:p-2 rounded-lg shadow-sm border print:border-gray chart-focusable ${className}`}
         role="img"
         aria-label={ariaLabel}
-        aria-describedby={`headcount-chart-desc-${Date.now()}`}
+        aria-describedby={[`headcount-chart-desc-${Date.now()}`, ariaDescribedBy].filter(Boolean).join(' ')}
+        aria-controls={ariaControls}
         tabIndex={0}
         onFocus={handleFocus}
         onBlur={handleBlur}
@@ -198,6 +207,7 @@ const HeadcountChart = memo(({
               tickLine={{ stroke: '#d1d5db' }}
               axisLine={{ stroke: '#d1d5db' }}
               tickFormatter={(value) => value.toLocaleString()}
+              domain={yAxisDomain || [0, 'dataMax']}
             />
             <Tooltip content={<CustomTooltip />} />
             {showLegend && (
@@ -211,7 +221,18 @@ const HeadcountChart = memo(({
                 key={key}
                 dataKey={key} 
                 fill={colors[index % colors.length]}
+                fillOpacity={hoveredDataKey && hoveredDataKey !== key ? 0.3 : 1}
                 radius={[2, 2, 0, 0]}
+                onMouseEnter={(data, index) => {
+                  if (onMouseEnter) {
+                    onMouseEnter(key, data.payload ? data.payload.period : null);
+                  }
+                }}
+                onMouseLeave={() => {
+                  if (onMouseLeave) {
+                    onMouseLeave();
+                  }
+                }}
               >
                 <LabelList content={CustomBarLabel} />
               </Bar>
@@ -228,7 +249,12 @@ const HeadcountChart = memo(({
     prevProps.title === nextProps.title &&
     prevProps.height === nextProps.height &&
     prevProps.showLegend === nextProps.showLegend &&
-    prevProps.className === nextProps.className
+    prevProps.className === nextProps.className &&
+    prevProps.hoveredDataKey === nextProps.hoveredDataKey &&
+    prevProps.hoveredPeriod === nextProps.hoveredPeriod &&
+    prevProps.onMouseEnter === nextProps.onMouseEnter &&
+    prevProps.onMouseLeave === nextProps.onMouseLeave &&
+    JSON.stringify(prevProps.yAxisDomain) === JSON.stringify(nextProps.yAxisDomain)
   );
 });
 

@@ -35,37 +35,46 @@ const FALLBACK_DATA = {
     { category: 'Compensation', satisfied: 50, neutral: 20, dissatisfied: 30 }
   ],
   departmentExits: [
-    { department: 'Arts & Sciences', exits: 11, responses: 0, responseRate: 0 },
-    { department: 'Facilities', exits: 7, responses: 0, responseRate: 0 },
-    { department: 'Medicine', exits: 5, responses: 2, responseRate: 40 },
-    { department: 'Dentistry', exits: 5, responses: 2, responseRate: 40 },
-    { department: 'Pharmacy & Health Prof', exits: 5, responses: 0, responseRate: 0 },
-    { department: 'Athletics', exits: 4, responses: 2, responseRate: 50 },
-    { department: 'Heider Business', exits: 3, responses: 0, responseRate: 0 },
-    { department: 'Nursing', exits: 3, responses: 0, responseRate: 0 },
-    { department: 'VPIT', exits: 3, responses: 1, responseRate: 33.3 },
-    { department: 'VPSL', exits: 3, responses: 0, responseRate: 0 },
-    { department: 'Other Departments', exits: 13, responses: 4, responseRate: 30.8 }
+    { department: 'Arts & Sciences', exits: 11, responses: 0, responseRate: '0%' },
+    { department: 'Athletics', exits: 4, responses: 1, responseRate: '25%' },
+    { department: 'CFE', exits: 2, responses: 0, responseRate: '0%' },
+    { department: 'Dentistry', exits: 5, responses: 4, responseRate: '80%' },
+    { department: 'Facilities', exits: 7, responses: 0, responseRate: '0%' },
+    { department: 'GENC', exits: 2, responses: 0, responseRate: '0%' },
+    { department: 'Heider Business', exits: 3, responses: 0, responseRate: '0%' },
+    { department: 'Law School', exits: 2, responses: 0, responseRate: '0%' },
+    { department: 'Medicine', exits: 5, responses: 3, responseRate: '60%' },
+    { department: 'Nursing', exits: 3, responses: 0, responseRate: '0%' },
+    { department: 'Pharmacy & Health Prof', exits: 5, responses: 0, responseRate: '0%' },
+    { department: 'Provost', exits: 1, responses: 0, responseRate: '0%' },
+    { department: 'Public Safety', exits: 2, responses: 0, responseRate: '0%' },
+    { department: 'Research', exits: 1, responses: 0, responseRate: '0%' },
+    { department: 'UCOM', exits: 1, responses: 1, responseRate: '100%' },
+    { department: 'VPEM', exits: 1, responses: 0, responseRate: '0%' },
+    { department: 'VPGE', exits: 1, responses: 0, responseRate: '0%' },
+    { department: 'VPIT', exits: 3, responses: 2, responseRate: '66.7%' },
+    { department: 'VPSL', exits: 3, responses: 3, responseRate: '100%' },
+    { department: 'Other Departments', exits: 0, responses: 6, responseRate: '-' }
   ],
   keyInsights: {
     areasOfConcern: [
-      "25% cite supervisor relationships as primary issue",
-      "40% dissatisfied with career development opportunities", 
-      "Early tenure departures (64% leave within 3 years)",
-      "Leadership communication gaps identified"
+      "40% dissatisfied with career development opportunities",
+      "42% dissatisfied with direct supervisor (8 of 19 who answered)", 
+      "High concern about supervisor relationships and communication",
+      "Salary dissatisfaction at 30% (6 of 20 responses)"
     ],
     positiveFeedback: [
       "60% satisfied with work environment",
       "Students & colleagues highly valued",
-      "Benefits package generally well-received", 
-      "University culture appreciated by most"
+      "Benefits package generally well-received (except salary)",
+      "University culture appreciated by those not reporting issues"
     ],
     actionItems: [
-      "Improve exit survey response rates (currently 20%)",
-      "Management training for supervisors",
-      "Enhanced career development programs",
-      "Improved onboarding for retention",
-      "Regular check-ins for new hires"
+      "Investigate reported improper conduct (40% of respondents)",
+      "Implement comprehensive supervisor training program",
+      "Enhanced career development and advancement programs",
+      "Address salary competitiveness concerns",
+      "Improve exit survey participation strategies"
     ]
   },
   summaryText: "With a 17.74% response rate (11 of 62 exits), the exit survey provides meaningful insights, though increased participation would strengthen data reliability. 72.7% of respondents would still recommend Creighton as a workplace. Key improvement areas include supervisor relationships, career advancement opportunities, and addressing reported improper conduct.\n\nNotable patterns: Athletics and Medicine/Dentistry show higher response rates (40-50%), while larger departments like Arts & Sciences show low participation. Focus on improving response rates in underrepresented departments for comprehensive retention insights."
@@ -82,17 +91,37 @@ const ExitSurveyDashboard = () => {
     return ((current - previous) / previous * 100);
   };
 
-  // Use static data with fallback
-  const data = FALLBACK_DATA;
-  const { 
-    exitSurveyData = FALLBACK_DATA.exitSurveyData, 
-    exitReasons = FALLBACK_DATA.exitReasons, 
-    satisfactionData = FALLBACK_DATA.satisfactionData, 
-    departmentExits = FALLBACK_DATA.departmentExits, 
-    keyInsights = FALLBACK_DATA.keyInsights, 
-    summaryText = FALLBACK_DATA.summaryText,
-    salaryComparison = [] 
-  } = data;
+  // Transform static data to dashboard format
+  const exitSurveyData = {
+    totalExits: currentData.totalExits || 62,
+    totalResponses: currentData.totalResponses,
+    recommendationRate: currentData.wouldRecommend,
+    avgTenure: "TBD",
+    exitInterviewCompletion: currentData.responseRate,
+    concernsReported: currentData.concernsReported || {
+      percentage: 40,
+      count: 8,
+      total: currentData.totalResponses,
+      description: "reported improper conduct"
+    }
+  };
+  
+  const exitReasons = currentData.departureReasons.map(reason => ({
+    name: reason.reason,
+    value: reason.percentage
+  }));
+  
+  const satisfactionData = [
+    { category: 'Job Satisfaction', satisfied: Math.round(currentData.satisfactionRatings.jobSatisfaction * 20), neutral: 30, dissatisfied: Math.round((5 - currentData.satisfactionRatings.jobSatisfaction) * 15) },
+    { category: 'Management Support', satisfied: Math.round(currentData.satisfactionRatings.managementSupport * 20), neutral: 35, dissatisfied: Math.round((5 - currentData.satisfactionRatings.managementSupport) * 15) },
+    { category: 'Career Development', satisfied: Math.round(currentData.satisfactionRatings.careerDevelopment * 20), neutral: 40, dissatisfied: Math.round((5 - currentData.satisfactionRatings.careerDevelopment) * 15) },
+    { category: 'Compensation', satisfied: Math.round(currentData.satisfactionRatings.compensation * 20), neutral: 25, dissatisfied: Math.round((5 - currentData.satisfactionRatings.compensation) * 15) }
+  ];
+  
+  const departmentExits = FALLBACK_DATA.departmentExits; // Keep fallback for now
+  const keyInsights = FALLBACK_DATA.keyInsights; // Keep fallback for now
+  const summaryText = FALLBACK_DATA.summaryText; // Keep fallback for now
+  const salaryComparison = []; // Keep empty for now
 
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d'];
 
@@ -120,17 +149,17 @@ const ExitSurveyDashboard = () => {
           </div>
         </div>
 
-        {/* Response Rate Banner - Positive Framing */}
-        <div className="bg-green-50 border border-green-200 print:border-gray p-4 rounded-lg mb-6 print:mb-2">
+        {/* Response Rate Banner - Needs Improvement */}
+        <div className="bg-amber-50 border border-amber-200 print:border-gray p-4 rounded-lg mb-6 print:mb-2">
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-green-500 rounded-full flex-shrink-0"></div>
+            <div className="w-4 h-4 bg-amber-500 rounded-full flex-shrink-0"></div>
             <div>
-              <p className="text-base font-medium text-green-800 print:text-black">
-                Good Response Rate: Above Industry Average
+              <p className="text-base font-medium text-amber-800 print:text-black">
+                Response Rate Below Industry Standard
               </p>
-              <p className="text-sm text-green-800 print:text-black mt-1">
-                With a 17.74% response rate (11 of 62 exits), this exceeds the typical 10-15% benchmark. 
-                Broader participation would strengthen insights further.
+              <p className="text-sm text-amber-800 print:text-black mt-1">
+                With a 32.3% response rate (20 of 62 exits), this falls below the typical 50%+ benchmark. 
+                Improved participation strategies needed for comprehensive insights.
               </p>
             </div>
           </div>
@@ -156,7 +185,7 @@ const ExitSurveyDashboard = () => {
                 <ArrowDownCircle size={12} className="text-green-500 inline transform rotate-180" />
               </span>
             </div>
-            <p className="text-sm text-gray-600 mt-2">8 of 11 respondents</p>
+            <p className="text-sm text-gray-600 mt-2">{currentData.wouldRecommendCount?.positive || 11} of {currentData.wouldRecommendCount?.total || 19} respondents</p>
           </div>
           <div className="bg-white print:bg-white p-6 print:p-2 rounded-lg shadow-sm border print:border-gray">
             <h2 className="text-base font-semibold text-amber-700 mb-3 flex items-center gap-2">
@@ -172,106 +201,102 @@ const ExitSurveyDashboard = () => {
               </span>
             </div>
             <p className="text-sm text-amber-600 mt-2">
-              {exitSurveyData.concernsReported?.count || 3} of {exitSurveyData.concernsReported?.total || 10} {exitSurveyData.concernsReported?.description || "reported improper conduct"}
+              {exitSurveyData.concernsReported?.count || 8} of {exitSurveyData.concernsReported?.total || 20} {exitSurveyData.concernsReported?.description || "reported improper conduct"}
             </p>
           </div>
           <div className="bg-white print:bg-white p-6 print:p-2 rounded-lg shadow-sm border print:border-gray">
             <h2 className="text-base font-semibold text-blue-700 mb-3">Top Exit Reason</h2>
-            <div className="text-2xl font-bold">Family/Personal</div>
-            <p className="text-sm text-gray-600 mt-2">36.4% of responses</p>
+            <div className="text-2xl font-bold">Career Advancement</div>
+            <p className="text-sm text-gray-600 mt-2">30% of responses</p>
           </div>
         </div>
 
-        {/* Primary Reasons for Leaving - Full Width */}
-        <div className="bg-white print:bg-white p-8 print:p-4 rounded-lg shadow-sm border print:border-gray mb-8 print:mb-4">
-          <h2 className="text-lg font-semibold text-gray-900 mb-6">Primary Reasons for Leaving</h2>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div className="flex justify-center items-center">
-              <ResponsiveContainer width="100%" height={250}>
-                <PieChart>
-                  <Pie
-                    data={exitReasons}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    outerRadius={100}
-                    fill="#8884d8"
-                    dataKey="value"
-                    label={({name, percent}) => `${(percent * 100).toFixed(0)}%`}
-                  >
-                    {exitReasons.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip formatter={(value) => [`${value}%`, ""]} contentStyle={{fontSize: 14}} />
-                </PieChart>
-              </ResponsiveContainer>
+        {/* Primary Reasons, Salary Impact, and Areas of Concern - Combined Row */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8 print:mb-4">
+          {/* Left Column: Primary Reasons for Leaving */}
+          <div className="bg-white print:bg-white p-8 print:p-4 rounded-lg shadow-sm border print:border-gray" 
+               role="img" 
+               aria-labelledby="chart-title" 
+               aria-describedby="chart-desc">
+            <h2 id="chart-title" className="text-lg font-semibold text-gray-900 mb-6">Primary Reasons for Leaving</h2>
+            <div id="chart-desc" className="sr-only">
+              Horizontal bar chart displaying the primary reasons employees cited for leaving. 
+              Career advancement leads at 30%, followed by supervisor relationship issues at 25%, 
+              salary and benefits concerns at 20%, work-life balance at 15%, and other reasons at 10%. 
+              Data represents 20 survey responses from 62 total employee exits in Q1 2025.
             </div>
-            <div className="flex items-center">
-              <div className="w-full space-y-3">
-                {exitReasons.map((reason, index) => (
-                  <div key={index}>
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="flex items-center gap-2">
-                        <span className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: COLORS[index % COLORS.length] }}></span>
-                        <span className="text-base font-medium text-gray-800">{reason.name}</span>
-                      </span>
-                      <span className="font-bold text-base text-gray-900">{reason.value}%</span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div className="h-2 rounded-full transition-all duration-300" style={{ width: `${reason.value}%`, backgroundColor: COLORS[index % COLORS.length] }}></div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Salary Comparison and Areas of Concern Row */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 print:gap-2 mb-8 print:mb-4">
-          {/* Salary Comparison Widget */}
-          <div className="bg-white print:bg-white p-8 print:p-4 rounded-lg shadow-sm border print:border-gray">
-            <h2 className="text-lg font-semibold text-gray-900 mb-6">Salary Impact on Exit Decision</h2>
             <div className="space-y-4">
-              {salaryComparison && salaryComparison.length > 0 ? salaryComparison.map((item, index) => (
-                <div key={index} className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-blue-500"></div>
-                    <span className="text-base font-medium text-gray-800">{item.label}</span>
+              {exitReasons.map((reason, index) => (
+                <div key={index} className="flex items-center justify-between py-2">
+                  <div className="flex items-center gap-3 flex-1">
+                    <span className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: COLORS[index % COLORS.length] }}></span>
+                    <span className="text-sm font-medium text-gray-800 min-w-0 flex-1">{reason.name}</span>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-lg font-bold text-gray-800">{item.count}</span>
-                    <span className="text-sm text-gray-500">({item.percentage}%)</span>
+                  <div className="flex items-center gap-3 ml-4">
+                    <div className="w-24 bg-gray-200 rounded-full h-3">
+                      <div 
+                        className="h-3 rounded-full transition-all duration-300" 
+                        style={{ 
+                          width: `${reason.value}%`, 
+                          backgroundColor: COLORS[index % COLORS.length] 
+                        }}
+                      ></div>
+                    </div>
+                    <span className="font-bold text-sm text-gray-900 w-8 text-right">{reason.value}%</span>
                   </div>
                 </div>
-              )) : (
-                <p className="text-sm text-gray-700">No salary comparison data available</p>
-              )}
+              ))}
+            </div>
+            <div className="mt-4 text-xs text-gray-600 print:text-black">
+              Based on 20 survey responses from 62 employee exits in Q1 2025
             </div>
           </div>
-
-          {/* Areas of Concern Alert Box */}
-          <div className="bg-red-50 print:bg-white border border-red-200 print:border-gray p-8 print:p-4 rounded-lg shadow-sm">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
-              <h2 className="text-lg font-semibold text-red-800 print:text-black">Areas Requiring Immediate Attention</h2>
+          
+          {/* Right Column: Stacked Salary Impact and Areas of Concern */}
+          <div className="flex flex-col gap-6">
+            {/* Salary Comparison Widget */}
+            <div className="bg-white print:bg-white p-6 print:p-4 rounded-lg shadow-sm border print:border-gray">
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">Salary Impact on Exit Decision</h2>
+              <div className="space-y-3">
+                {salaryComparison && salaryComparison.length > 0 ? salaryComparison.map((item, index) => (
+                  <div key={index} className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full bg-blue-500"></div>
+                      <span className="text-sm font-medium text-gray-800">{item.label}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-base font-bold text-gray-800">{item.count}</span>
+                      <span className="text-xs text-gray-500">({item.percentage}%)</span>
+                    </div>
+                  </div>
+                )) : (
+                  <p className="text-sm text-gray-700">No salary comparison data available</p>
+                )}
+              </div>
             </div>
-            <div className="space-y-3">
-              <div className="flex items-center gap-3">
-                <span className="bg-red-600 text-white text-sm font-bold px-3 py-1.5 rounded">30%</span>
-                <span className="text-sm text-red-800 print:text-black">reported witnessing improper conduct</span>
-                <span className="bg-red-100 text-red-800 text-xs px-2 py-1 rounded ml-auto print:hidden">CRITICAL</span>
+
+            {/* Areas of Concern Alert Box */}
+            <div className="bg-red-50 print:bg-white border border-red-200 print:border-gray p-6 print:p-4 rounded-lg shadow-sm">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+                <h2 className="text-base font-semibold text-red-800 print:text-black">Areas Requiring Immediate Attention</h2>
               </div>
-              <div className="flex items-center gap-3">
-                <span className="bg-orange-600 text-white text-sm font-bold px-3 py-1.5 rounded">2</span>
-                <span className="text-sm text-red-800 print:text-black">employees cited racial inequality concerns</span>
-                <span className="bg-orange-100 text-orange-800 text-xs px-2 py-1 rounded ml-auto print:hidden">URGENT</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <span className="bg-yellow-600 text-white text-sm font-bold px-3 py-1.5 rounded">18%</span>
-                <span className="text-sm text-red-800 print:text-black">cited supervisor relationship issues</span>
-                <span className="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded ml-auto print:hidden">WARNING</span>
+              <div className="space-y-3">
+                <div className="flex items-center gap-3">
+                  <span className="bg-red-600 text-white text-xs font-bold px-2.5 py-1 rounded">40%</span>
+                  <span className="text-sm text-red-800 print:text-black">reported witnessing improper conduct</span>
+                  <span className="bg-red-100 text-red-800 text-xs px-2 py-0.5 rounded ml-auto print:hidden">CRITICAL</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="bg-orange-600 text-white text-xs font-bold px-2.5 py-1 rounded">40%</span>
+                  <span className="text-sm text-red-800 print:text-black">cited racial inequality concerns</span>
+                  <span className="bg-orange-100 text-orange-800 text-xs px-2 py-0.5 rounded ml-auto print:hidden">URGENT</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="bg-yellow-600 text-white text-xs font-bold px-2.5 py-1 rounded">30%</span>
+                  <span className="text-sm text-red-800 print:text-black">cited supervisor relationship issues</span>
+                  <span className="bg-yellow-100 text-yellow-800 text-xs px-2 py-0.5 rounded ml-auto print:hidden">WARNING</span>
+                </div>
               </div>
             </div>
           </div>
@@ -308,41 +333,6 @@ const ExitSurveyDashboard = () => {
               </ul>
             </div>
           </div>
-          <div className="mt-8">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">🎯 Action Items</h3>
-            <ul className="space-y-3 text-sm text-gray-700">
-              {keyInsights?.actionItems?.map((item, index) => (
-                <li key={index} className="flex items-start gap-3">
-                  <span className={`flex-shrink-0 w-3 h-3 rounded-full mt-1 ${
-                    item.priority === 'critical' ? 'bg-red-500' :
-                    item.priority === 'warning' ? 'bg-orange-500' : 'bg-blue-500'
-                  }`}></span>
-                  <span>{item.text}</span>
-                </li>
-              )) || [
-                <li key="1" className="flex items-start gap-3">
-                  <span className="flex-shrink-0 w-3 h-3 rounded-full mt-1 bg-red-500"></span>
-                  <span>Investigate reported improper conduct (3 of 11 respondents)</span>
-                </li>,
-                <li key="2" className="flex items-start gap-3">
-                  <span className="flex-shrink-0 w-3 h-3 rounded-full mt-1 bg-orange-500"></span>
-                  <span>Implement supervisor training program - cited by 18% as exit reason</span>
-                </li>,
-                <li key="3" className="flex items-start gap-3">
-                  <span className="flex-shrink-0 w-3 h-3 rounded-full mt-1 bg-orange-500"></span>
-                  <span>Address retention in Medicine (82 exits) and Phoenix (92 exits)</span>
-                </li>,
-                <li key="4" className="flex items-start gap-3">
-                  <span className="flex-shrink-0 w-3 h-3 rounded-full mt-1 bg-blue-500"></span>
-                  <span>Enhance career development programs - limited advancement cited</span>
-                </li>,
-                <li key="5" className="flex items-start gap-3">
-                  <span className="flex-shrink-0 w-3 h-3 rounded-full mt-1 bg-blue-500"></span>
-                  <span>Improve exit survey response rate (currently 2.96%)</span>
-                </li>
-              ]}
-            </ul>
-          </div>
         </div>
 
         {/* Department Exit Trends */}
@@ -350,13 +340,16 @@ const ExitSurveyDashboard = () => {
           <h2 className="text-lg font-semibold text-gray-900 mb-6">Exit Survey Responses by Department</h2>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div>
-              <table className="w-full text-sm">
+              <table className="w-full text-sm" role="table">
+                <caption className="sr-only">
+                  Exit survey response rates by department for Q1 2025, showing total exits, survey responses received, and calculated response rate percentage for each department.
+                </caption>
                 <thead className="bg-gray-100">
                   <tr>
-                    <th className="text-left p-4">Department</th>
-                    <th className="text-center p-4">Exits</th>
-                    <th className="text-center p-4">Responses</th>
-                    <th className="text-center p-4">Response Rate</th>
+                    <th scope="col" className="text-left p-4">Department</th>
+                    <th scope="col" className="text-center p-4">Total Exits</th>
+                    <th scope="col" className="text-center p-4">Survey Responses</th>
+                    <th scope="col" className="text-center p-4">Response Rate Percentage</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -379,26 +372,20 @@ const ExitSurveyDashboard = () => {
               </table>
             </div>
             <div className="bg-blue-50 p-6 rounded-lg">
-              <h3 className="text-lg font-semibold text-blue-800 mb-4">Q4 2025 Exit Survey Summary</h3>
+              <h3 className="text-lg font-semibold text-blue-800 mb-4">Q1 2025 Exit Survey Summary</h3>
               <div className="text-base text-blue-800">
-                {summaryText ? summaryText.split('\n\n').map((paragraph, index) => (
-                  <p key={index} className={index > 0 ? "mt-4" : ""}>
-                    {paragraph}
-                  </p>
-                )) : (
-                  <>
-                    <p className="mb-4 leading-relaxed">
-                      With a 20% response rate (20 of 98 exits), the exit survey provides valuable but limited insights. 
-                      55% of respondents would recommend Creighton as a workplace. Key improvement areas include supervisor 
-                      relationships, career development opportunities, and early career support.
-                    </p>
-                    <p className="leading-relaxed">
-                      Positive aspects include strong university culture, meaningful work with students, and competitive 
-                      benefits. Improving exit survey participation and focusing on management development could significantly 
-                      improve retention insights and outcomes.
-                    </p>
-                  </>
-                )}
+                <p className="mb-4 leading-relaxed">
+                  With a 32.3% response rate (20 of 62 exits), the exit survey reveals concerning trends requiring immediate attention. 
+                  Only 57.9% of respondents would recommend Creighton as a workplace, down from previous periods. Critical areas 
+                  include supervisor relationships (30% dissatisfied), career advancement opportunities (30% primary reason for leaving), 
+                  and reported improper conduct (40% of respondents).
+                </p>
+                <p className="leading-relaxed">
+                  Positive aspects include continued appreciation for university culture and meaningful work with students. However, 
+                  addressing supervisor training, career development programs, and workplace conduct issues are urgent priorities. 
+                  Departments like Dentistry (80% response rate) and VPSL (100% response rate) demonstrate effective engagement, 
+                  providing models for improvement across the institution.
+                </p>
               </div>
             </div>
           </div>

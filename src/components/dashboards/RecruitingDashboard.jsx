@@ -1,7 +1,9 @@
 import React from 'react';
-import { UserPlus, TrendingUp, Briefcase, Users } from 'lucide-react';
-import { getRecruitingData } from '../../data/staticData';
+import { UserPlus, TrendingUp, Briefcase, Users, UserMinus } from 'lucide-react';
+import { getRecruitingData, getStartersLeaversData, getPhoenixHeadcountData, getOmahaHeadcountData } from '../../data/staticData';
 import SummaryCard from '../ui/SummaryCard';
+import StartersLeaversChart from '../charts/StartersLeaversChart';
+import DualHeadcountChart from '../charts/DualHeadcountChart';
 // Quarter filter removed - using fixed reporting period
 
 // Fallback data to ensure the dashboard always works
@@ -19,16 +21,17 @@ const RecruitingDashboard = () => {
   // Static data for 6/30/25 reporting period only
   const currentData = getRecruitingData("2025-06-30"); // Current period
   const previousData = getRecruitingData("2025-03-31"); // For percentage calculations
+  
+  // Chart data
+  const startersLeaversData = getStartersLeaversData();
+  const phoenixHeadcountData = getPhoenixHeadcountData();
+  const omahaHeadcountData = getOmahaHeadcountData();
 
   // Calculate percentage changes using previous period
   const calculateChange = (current, previous) => {
     if (!previous || previous === 0) return 0;
     return ((current - previous) / previous * 100);
   };
-
-  // Use static data with fallback
-  const data = FALLBACK_DATA;
-  const { recruitingData } = data;
 
   // Standardized recruiting metrics for SummaryCard components
   const recruitingMetrics = [
@@ -37,16 +40,16 @@ const RecruitingDashboard = () => {
       value: currentData.openPositions,
       change: calculateChange(currentData.openPositions, previousData.openPositions),
       changeType: "percentage",
-      subtitle: "Omaha (57) | Phoenix (36)",
+      subtitle: `${currentData.positionsByDepartment.reduce((sum, dept) => sum + dept.openings, 0)} total openings across departments`,
       icon: Briefcase,
       trend: calculateChange(currentData.openPositions, previousData.openPositions) >= 0 ? "positive" : "negative"
     },
     {
       title: "Applications Fiscal YTD", 
-      value: "4,423",
-      change: 16.4,
+      value: currentData.applicationCount.toLocaleString(),
+      change: calculateChange(currentData.applicationCount, previousData.applicationCount),
       changeType: "percentage",
-      subtitle: "Faculty: 1,651 | Staff: 2,772",
+      subtitle: `${currentData.newHiresYTD} hires from applications`,
       icon: Users,
       trend: "positive"
     }
@@ -62,7 +65,7 @@ const RecruitingDashboard = () => {
             <div className="flex items-center gap-3">
               <UserPlus className="text-blue-600" size={24} />
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">Recruiting Analytics Report</h1>
+                <h1 className="text-2xl font-bold text-gray-900">Recruiting Dashboard - Benefit Eligible</h1>
                 <p className="text-gray-600 text-sm mt-1">
                   Period Ending: June 30, 2025
                 </p>
@@ -92,9 +95,42 @@ const RecruitingDashboard = () => {
           value="262"
           change={16.4}
           changeType="percentage"
-          subtitle="Omaha (162) | Phoenix (100)"
+          subtitle="OMA (162) | PHX (100)"
           icon={TrendingUp}
           trend="positive"
+        />
+        
+        <SummaryCard
+          title="Leavers"
+          value="250"
+          subtitle="Reason goes here."
+          icon={UserMinus}
+          trend="neutral"
+        />
+      </div>
+
+      {/* Charts Section */}
+      <div className="space-y-6 print:space-y-2 mb-8 print:mb-4">
+        {/* Starters vs Leavers Chart */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 print:gap-2">
+          <StartersLeaversChart
+            data={startersLeaversData}
+            title="Starters vs Leavers Over Time"
+            height={350}
+            showLegend={true}
+            showGrid={true}
+          />
+          
+          {/* Spacer for responsive layout */}
+          <div className="hidden lg:block"></div>
+        </div>
+        
+        {/* Dual Headcount Trends Charts */}
+        <DualHeadcountChart
+          phoenixData={phoenixHeadcountData}
+          omahaData={omahaHeadcountData}
+          height={350}
+          showLegend={true}
         />
       </div>
     </div>

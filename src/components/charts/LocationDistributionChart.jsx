@@ -133,10 +133,10 @@ const LocationDistributionChart = memo(({
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center min-w-0 flex-1 mr-4">
                   <MapPin className="text-blue-600 print:text-gray-600 mr-2 flex-shrink-0" size={20} />
-                  <h4 className="text-xl print:text-lg font-bold text-gray-900 print:text-black truncate">{location.name}</h4>
+                  <h4 className="text-lg print:text-base font-bold text-gray-900 print:text-black truncate">{location.name}</h4>
                 </div>
                 <div className="text-right flex-shrink-0">
-                  <div className="text-2xl print:text-xl font-bold text-gray-900 print:text-black">
+                  <div className="text-xl print:text-lg font-bold text-gray-900 print:text-black">
                     {location.total.toLocaleString()}
                   </div>
                 </div>

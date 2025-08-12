@@ -9,6 +9,7 @@ const SummaryCard = ({
   subtitle,
   icon: Icon,
   trend = 'neutral', // 'positive', 'negative', 'neutral'
+  arrowDirection = null, // 'up', 'down', or null (auto-detect from change value)
   target,
   className = ''
 }) => {
@@ -36,38 +37,45 @@ const SummaryCard = ({
     }
   };
 
-  // Get trend styling
+  // Get trend styling - color based on business impact (positive/negative trend)
   const getTrendStyling = () => {
     switch (actualTrend) {
       case 'positive':
         return {
           text: 'text-green-500 print:text-black',
-          icon: TrendingUp,
           bg: 'bg-green-50'
         };
       case 'negative':
         return {
           text: 'text-red-500 print:text-black',
-          icon: TrendingDown,
           bg: 'bg-red-50'
         };
       case 'custom-positive':
         return {
           text: 'text-blue-700 print:text-black',
-          icon: TrendingDown,
           bg: 'bg-blue-50'
         };
       default:
         return {
           text: 'text-gray-500 print:text-black',
-          icon: null,
           bg: 'bg-gray-50'
         };
     }
   };
 
   const trendStyle = getTrendStyling();
-  const TrendIcon = trendStyle.icon;
+  
+  // Determine arrow direction based on the actual change value or explicit direction
+  const getArrowIcon = () => {
+    if (arrowDirection === 'up' || (!arrowDirection && change > 0)) {
+      return TrendingUp;
+    } else if (arrowDirection === 'down' || (!arrowDirection && change < 0)) {
+      return TrendingDown;
+    }
+    return null;
+  };
+  
+  const TrendIcon = getArrowIcon();
 
   return (
     <div className={`bg-white print:bg-white p-4 print:p-2 rounded-lg shadow-sm border print:border-gray ${className}`}>
