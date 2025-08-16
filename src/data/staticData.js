@@ -204,6 +204,16 @@ export const TURNOVER_DATA = {
       { school: "Student Affairs", rate: 9.2, departures: 23 },
       { school: "Information Technology", rate: 5.6, departures: 11 },
       { school: "Finance & Administration", rate: 9.9, departures: 17 }
+    ],
+    facultyTurnoverByDivision: [
+      { division: "College of Nursing", rate: 13.7 },
+      { division: "Pharmacy & Health Professions", rate: 7.5 },
+      { division: "School of Dentistry", rate: 6.9 },
+      { division: "Total Faculty Turnover", rate: 6.3 },
+      { division: "School of Medicine", rate: 5.6 },
+      { division: "Law School", rate: 3.7 },
+      { division: "Heider College of Business", rate: 1.6 },
+      { division: "Coll of Pro Studies and Cont Ed", rate: 0.0 }
     ]
   }
 };

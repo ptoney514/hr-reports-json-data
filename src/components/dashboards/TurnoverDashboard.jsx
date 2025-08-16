@@ -2,6 +2,7 @@ import React from 'react';
 import SummaryCard from '../ui/SummaryCard';
 import TurnoverRatesTable from '../charts/TurnoverRatesTable';
 import TopExitReasonsStatic from '../charts/TopExitReasonsStatic';
+import FacultyTurnoverByDivisionChart from '../charts/FacultyTurnoverByDivisionChart';
 // Quarter filter removed - using fixed reporting period
 import ErrorBoundary from '../ui/ErrorBoundary';
 import PDFExportButton from '../ui/PDFExportButton';
@@ -174,6 +175,7 @@ const TurnoverDashboard = () => {
         name: school.school,
         value: school.departures
       })),
+      facultyTurnoverByDivision: currentData.facultyTurnoverByDivision || [],
       monthlyTrends: currentData.monthlyTrends
     }
   };
@@ -309,6 +311,16 @@ const TurnoverDashboard = () => {
           <TopExitReasonsStatic
             data={data.charts?.topExitReasons || []}
             title="Top Termination Reasons"
+          />
+        </div>
+      </div>
+
+      {/* Faculty Turnover by Division Chart */}
+      <div className="mb-6 print:mb-4 chart-container" data-chart-type="horizontal-bars">
+        <div id="faculty-turnover-division-chart" data-chart-title="Faculty Turnover by Division" data-chart-ready="false">
+          <FacultyTurnoverByDivisionChart
+            data={data.charts?.facultyTurnoverByDivision || []}
+            title="Faculty Turnover by Division"
           />
         </div>
       </div>
