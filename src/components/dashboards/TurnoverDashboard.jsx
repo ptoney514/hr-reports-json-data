@@ -3,6 +3,7 @@ import SummaryCard from '../ui/SummaryCard';
 import TurnoverRatesTable from '../charts/TurnoverRatesTable';
 import TopExitReasonsStatic from '../charts/TopExitReasonsStatic';
 import FacultyTurnoverByDivisionChart from '../charts/FacultyTurnoverByDivisionChart';
+import FacultyStaffTurnoverByFYChart from '../charts/FacultyStaffTurnoverByFYChart';
 // Quarter filter removed - using fixed reporting period
 import ErrorBoundary from '../ui/ErrorBoundary';
 import PDFExportButton from '../ui/PDFExportButton';
@@ -176,6 +177,11 @@ const TurnoverDashboard = () => {
         value: school.departures
       })),
       facultyTurnoverByDivision: currentData.facultyTurnoverByDivision || [],
+      facultyStaffTurnoverByFY: [
+        { fiscalYear: 'FY2023', rate: 14.9 },
+        { fiscalYear: 'FY2024', rate: 12.8 },
+        { fiscalYear: 'FY2025', rate: 11.2 }
+      ],
       monthlyTrends: currentData.monthlyTrends
     }
   };
@@ -315,13 +321,26 @@ const TurnoverDashboard = () => {
         </div>
       </div>
 
-      {/* Faculty Turnover by Division Chart */}
-      <div className="mb-6 print:mb-4 chart-container" data-chart-type="horizontal-bars">
-        <div id="faculty-turnover-division-chart" data-chart-title="Faculty Turnover by Division" data-chart-ready="false">
-          <FacultyTurnoverByDivisionChart
-            data={data.charts?.facultyTurnoverByDivision || []}
-            title="Faculty Turnover by Division"
-          />
+      {/* Faculty Charts - Side by Side Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 print:gap-4 mb-6 print:mb-4">
+        {/* Faculty Turnover by Division Chart */}
+        <div className="chart-container" data-chart-type="horizontal-bars">
+          <div id="faculty-turnover-division-chart" data-chart-title="Faculty Turnover by Division" data-chart-ready="false">
+            <FacultyTurnoverByDivisionChart
+              data={data.charts?.facultyTurnoverByDivision || []}
+              title="Faculty Turnover by Division"
+            />
+          </div>
+        </div>
+
+        {/* Faculty/Staff Turnover Rate by FY Chart */}
+        <div className="chart-container" data-chart-type="area-chart">
+          <div id="faculty-staff-turnover-fy-chart" data-chart-title="Faculty/Staff Turnover Rate by FY" data-chart-ready="false">
+            <FacultyStaffTurnoverByFYChart
+              data={data.charts?.facultyStaffTurnoverByFY || []}
+              title="Faculty/Staff Turnover Rate by FY"
+            />
+          </div>
         </div>
       </div>
           </div>
