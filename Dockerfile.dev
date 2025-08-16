@@ -1,8 +1,5 @@
-# Development Dockerfile with hot reload support for PocketBase integration
+# Development Dockerfile with hot reload support for JSON-based data
 FROM node:18-alpine
-
-# Install curl for health checks
-RUN apk add --no-cache curl
 
 # Set working directory
 WORKDIR /app
@@ -10,14 +7,14 @@ WORKDIR /app
 # Copy package files first for better caching
 COPY package*.json ./
 
-# Install dependencies including PocketBase-related packages
+# Install dependencies
 # Skip the prepare script which tries to build (we're in dev mode)
 RUN npm install --ignore-scripts
 
-# Copy public directory (needed for development server)
+# Copy public directory (needed for development server and JSON data)
 COPY public/ ./public/
 
-# Create necessary directories for PocketBase integration
+# Create necessary directories for React components
 RUN mkdir -p src/core src/hooks src/components
 
 # Expose port 3000 for dev server

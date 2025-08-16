@@ -21,49 +21,45 @@ services:
       - FAST_REFRESH=true
       - REACT_APP_ENV=development
       
-      # PocketBase configuration
-      - VITE_POCKETBASE_URL=http://pocketbase:8090
-      - REACT_APP_USE_POCKETBASE=true
+      # JSON-based data architecture (no database required)
+      - REACT_APP_USE_JSON_DATA=true
       
     stdin_open: true
     tty: true
     restart: unless-stopped
-    depends_on:
-      pocketbase:
-        condition: service_healthy
     networks:
       - hr-reports-network
 
-  # PocketBase Database Service - Development optimized  
-  pocketbase:
-    image: ghcr.io/muchobien/pocketbase:latest
-    container_name: hr-pocketbase-json
-    restart: unless-stopped
-    command: [
-      "--encryptionEnv", "PB_ENCRYPTION_KEY",
-      "--hooksDir", "/pb_hooks",
-      "--migrationsDir", "/pb_migrations", 
-      "--publicDir", "/pb_public",
-      "--hooksWatch=true",  # Hot reload for hooks
-      "--dev"
-    ]
-    environment:
-      - PB_ENCRYPTION_KEY=${PB_ENCRYPTION_KEY:-hr-reports-json-secure-encrypt32}
-    ports:
-      - "8091:8090"  # Admin UI and API (mapped to avoid conflicts)
-    volumes:
-      - pocketbase_data:/pb_data
-      - ./pb_migrations:/pb_migrations
-      - ./pb_hooks:/pb_hooks:ro  # Read-only for security
-      - ./pb_public:/pb_public:ro
-    healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8090/api/health"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
-      start_period: 15s  # Give PocketBase time to start
-    networks:
-      - hr-reports-network
+  # PocketBase Database Service - DISABLED (preserved for future use)  
+  # pocketbase:
+  #   image: ghcr.io/muchobien/pocketbase:latest
+  #   container_name: hr-pocketbase-json
+  #   restart: unless-stopped
+  #   command: [
+  #     "--encryptionEnv", "PB_ENCRYPTION_KEY",
+  #     "--hooksDir", "/pb_hooks",
+  #     "--migrationsDir", "/pb_migrations", 
+  #     "--publicDir", "/pb_public",
+  #     "--hooksWatch=true",  # Hot reload for hooks
+  #     "--dev"
+  #   ]
+  #   environment:
+  #     - PB_ENCRYPTION_KEY=${PB_ENCRYPTION_KEY:-hr-reports-json-secure-encrypt32}
+  #   ports:
+  #     - "8091:8090"  # Admin UI and API (mapped to avoid conflicts)
+  #   volumes:
+  #     - pocketbase_data:/pb_data
+  #     - ./pb_migrations:/pb_migrations
+  #     - ./pb_hooks:/pb_hooks:ro  # Read-only for security
+  #     - ./pb_public:/pb_public:ro
+  #   healthcheck:
+  #     test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8090/api/health"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 3
+  #     start_period: 15s  # Give PocketBase time to start
+  #   networks:
+  #     - hr-reports-network
 
   # Optional: Nginx load balancer for production scaling
   nginx-lb:
@@ -83,46 +79,46 @@ services:
     profiles:
       - production
 
-  # Optional: PocketBase backup service (runs daily in development)
-  pocketbase-backup:
-    image: alpine:latest
-    container_name: hr-pocketbase-backup
-    restart: unless-stopped
-    volumes:
-      - pocketbase_data:/pb_data:ro  # Read-only access to PocketBase data
-      - ./backups:/backups           # Local backup directory
-    environment:
-      - BACKUP_INTERVAL=86400        # Daily backups (24 hours)
-      - BACKUP_RETENTION_DAYS=7      # Keep 7 days of backups
-    command: >
-      sh -c "
-        echo 'PocketBase backup service started - Development mode';
-        echo 'Backup interval: $$BACKUP_INTERVAL seconds';
-        mkdir -p /backups;
-        while true; do
-          echo '🔄 Creating PocketBase backup...';
-          BACKUP_FILE=\"/backups/pocketbase_backup_$$(date +%Y%m%d_%H%M%S).tar.gz\";
-          tar -czf \"$$BACKUP_FILE\" -C /pb_data . 2>/dev/null;
-          if [ $$? -eq 0 ]; then
-            echo \"✅ Backup created: $$(basename $$BACKUP_FILE)\";
-            echo \"📊 Backup size: $$(du -h $$BACKUP_FILE | cut -f1)\";
-          else
-            echo \"❌ Backup failed\";
-          fi;
-          
-          # Cleanup old backups
-          find /backups -name 'pocketbase_backup_*.tar.gz' -mtime +$$BACKUP_RETENTION_DAYS -delete 2>/dev/null;
-          
-          echo \"⏰ Next backup in $$BACKUP_INTERVAL seconds...\";
-          sleep $$BACKUP_INTERVAL;
-        done
-      "
-    depends_on:
-      - pocketbase
-    networks:
-      - hr-reports-network
-    profiles:
-      - backup  # Optional service, enable with --profile backup
+  # Optional: PocketBase backup service - DISABLED (preserved for future use)
+  # pocketbase-backup:
+  #   image: alpine:latest
+  #   container_name: hr-pocketbase-backup
+  #   restart: unless-stopped
+  #   volumes:
+  #     - pocketbase_data:/pb_data:ro  # Read-only access to PocketBase data
+  #     - ./backups:/backups           # Local backup directory
+  #   environment:
+  #     - BACKUP_INTERVAL=86400        # Daily backups (24 hours)
+  #     - BACKUP_RETENTION_DAYS=7      # Keep 7 days of backups
+  #   command: >
+  #     sh -c "
+  #       echo 'PocketBase backup service started - Development mode';
+  #       echo 'Backup interval: $$BACKUP_INTERVAL seconds';
+  #       mkdir -p /backups;
+  #       while true; do
+  #         echo '🔄 Creating PocketBase backup...';
+  #         BACKUP_FILE=\"/backups/pocketbase_backup_$$(date +%Y%m%d_%H%M%S).tar.gz\";
+  #         tar -czf \"$$BACKUP_FILE\" -C /pb_data . 2>/dev/null;
+  #         if [ $$? -eq 0 ]; then
+  #           echo \"✅ Backup created: $$(basename $$BACKUP_FILE)\";
+  #           echo \"📊 Backup size: $$(du -h $$BACKUP_FILE | cut -f1)\";
+  #         else
+  #           echo \"❌ Backup failed\";
+  #         fi;
+  #         
+  #         # Cleanup old backups
+  #         find /backups -name 'pocketbase_backup_*.tar.gz' -mtime +$$BACKUP_RETENTION_DAYS -delete 2>/dev/null;
+  #         
+  #         echo \"⏰ Next backup in $$BACKUP_INTERVAL seconds...\";
+  #         sleep $$BACKUP_INTERVAL;
+  #       done
+  #     "
+  #   depends_on:
+  #     - pocketbase
+  #   networks:
+  #     - hr-reports-network
+  #   profiles:
+  #     - backup  # Optional service, enable with --profile backup
 
   # Optional: Monitoring stack
   prometheus:

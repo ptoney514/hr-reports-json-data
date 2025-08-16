@@ -246,6 +246,8 @@ npm run eject
 
 We use Docker with hot reloading enabled for fast development iterations. The default configuration runs React's development server with live reload, so changes are immediately visible without rebuilds.
 
+**Note**: PocketBase database service is currently disabled in docker-compose.yml. The application runs entirely on JSON-based data architecture with static data files in `/public/data/`.
+
 ### Available Docker Configurations
 
 1. **Development (default)**: `docker-compose.yml` - Hot reloading, development server
@@ -311,7 +313,7 @@ docker-compose up -d
 
 # Check container status and logs
 docker ps
-docker logs hr-reports-dev
+docker logs hr-reports-json-dev
 
 # Restart development container (if needed)
 docker-compose restart
