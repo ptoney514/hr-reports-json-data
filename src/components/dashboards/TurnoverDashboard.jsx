@@ -2,6 +2,7 @@ import React from 'react';
 import SummaryCard from '../ui/SummaryCard';
 import TurnoverRatesTable from '../charts/TurnoverRatesTable';
 import TopExitReasonsStatic from '../charts/TopExitReasonsStatic';
+import TerminationReasonsPieChart from '../charts/TerminationReasonsPieChart';
 import FacultyTurnoverByDivisionChart from '../charts/FacultyTurnoverByDivisionChart';
 import FacultyStaffTurnoverByFYChart from '../charts/FacultyStaffTurnoverByFYChart';
 // Quarter filter removed - using fixed reporting period
@@ -311,24 +312,25 @@ const TurnoverDashboard = () => {
         </div>
       </div>
 
-      {/* Top Termination Reasons Chart */}
-      <div className="mb-6 print:mb-4 chart-container" data-chart-type="progress-bars">
-        <div id="top-termination-reasons-chart" data-chart-title="Top Termination Reasons Analysis" data-chart-ready="false">
-          <TopExitReasonsStatic
-            data={data.charts?.topExitReasons || []}
-            title="Top Termination Reasons"
+      {/* Faculty Turnover by Division Chart */}
+      <div className="mb-6 print:mb-4 chart-container" data-chart-type="horizontal-bars">
+        <div id="faculty-turnover-division-chart" data-chart-title="Faculty Turnover by Division" data-chart-ready="false">
+          <FacultyTurnoverByDivisionChart
+            data={data.charts?.facultyTurnoverByDivision || []}
+            title="Faculty Turnover by Division"
           />
         </div>
       </div>
 
-      {/* Faculty Charts - Side by Side Layout */}
+      {/* Charts - Side by Side Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 print:gap-4 mb-6 print:mb-4">
-        {/* Faculty Turnover by Division Chart */}
-        <div className="chart-container" data-chart-type="horizontal-bars">
-          <div id="faculty-turnover-division-chart" data-chart-title="Faculty Turnover by Division" data-chart-ready="false">
-            <FacultyTurnoverByDivisionChart
-              data={data.charts?.facultyTurnoverByDivision || []}
-              title="Faculty Turnover by Division"
+        {/* Top Termination Reasons Chart */}
+        <div className="chart-container" data-chart-type="pie-chart">
+          <div id="top-termination-reasons-pie-chart" data-chart-title="Top Termination Reasons Pie Chart" data-chart-ready="false">
+            <TerminationReasonsPieChart
+              data={data.charts?.topExitReasons || []}
+              title="Top Termination Reasons"
+              height={400}
             />
           </div>
         </div>

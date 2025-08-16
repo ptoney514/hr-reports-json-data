@@ -78,7 +78,7 @@ const FacultyTurnoverByDivisionChart = memo(({
                 </div>
                 
                 {/* Bar container */}
-                <div className="flex-1 relative max-w-md">
+                <div className="flex-1 relative">
                   <div className="w-full bg-gray-100 rounded h-7 relative">
                     <div 
                       className={`h-7 rounded transition-all duration-300 flex items-center justify-end pr-2 relative ${

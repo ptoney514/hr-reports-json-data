@@ -5,6 +5,16 @@ This todo list tracks the Phase 13 objectives for implementing a hardcoded data 
 
 ## Completed Tasks
 
+### ✅ Termination Reasons Pie Chart Implementation (August 16, 2025)
+- [x] **Create TerminationReasonsPieChart Component** - Built new pie chart with label line annotations for top 5 termination reasons plus "Other" category
+- [x] **Print-Optimized Design** - Disabled animations, optimized colors and sizing for PDF export
+- [x] **Label Line Annotations** - Implemented custom label rendering with lines extending from pie slices to text labels
+- [x] **Data Processing Logic** - Added top 5 grouping with automatic "Other" category for remaining reasons
+- [x] **Dashboard Integration** - Integrated new pie chart into TurnoverDashboard.jsx replacing previous chart
+- [x] **Visual Design** - Purple color scheme matching reference image with professional styling
+
+**Result**: Successfully created a print-ready annotated pie chart for Top Termination Reasons that groups data into top 5 categories plus "Other", with clear label lines and percentages for enhanced data visualization.
+
 ### ✅ PocketBase Admin Account Migration Fix (August 11, 2025)
 - [x] **Create pb_migrations directory** - Set up migrations folder for PocketBase
 - [x] **Create migration file** - Built 1736803200_create_superuser.js for automatic admin creation

@@ -1,5 +1,5 @@
 import React, { memo, useMemo } from 'react';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LabelList } from 'recharts';
 import { AlertCircle } from 'lucide-react';
 import ChartErrorBoundary from '../ui/ChartErrorBoundary';
 
@@ -41,6 +41,25 @@ const FacultyStaffTurnoverByFYChart = memo(({
       );
     }
     return null;
+  };
+
+  // Custom label for data points
+  const CustomDataLabel = (props) => {
+    const { x, y, value } = props;
+    return (
+      <text
+        x={x}
+        y={y - 10}
+        dy={-6}
+        textAnchor="middle"
+        fill="#1f2937"
+        fontSize="12"
+        fontWeight="600"
+        className="print:fill-black"
+      >
+        {`${value}%`}
+      </text>
+    );
   };
 
   // Error handling for missing or invalid data
@@ -104,7 +123,7 @@ const FacultyStaffTurnoverByFYChart = memo(({
               tick={{ fontSize: 12 }}
               tickLine={{ stroke: '#d1d5db' }}
               axisLine={{ stroke: '#d1d5db' }}
-              domain={['dataMin - 1', 'dataMax + 1']}
+              domain={[10, 16]}
               tickFormatter={(value) => `${value}%`}
             />
             
@@ -118,7 +137,9 @@ const FacultyStaffTurnoverByFYChart = memo(({
               fill="url(#colorTurnover)"
               dot={{ r: 4, fill: '#3b82f6', strokeWidth: 2, stroke: '#ffffff' }}
               activeDot={{ r: 6, stroke: '#3b82f6', strokeWidth: 2 }}
-            />
+            >
+              <LabelList content={CustomDataLabel} />
+            </Area>
           </AreaChart>
         </ResponsiveContainer>
 
