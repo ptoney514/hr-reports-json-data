@@ -171,9 +171,6 @@ const ExitSurveyDashboard = () => {
             <h2 className="text-base font-semibold text-blue-700 mb-3">Response Rate</h2>
             <div className="flex items-end gap-1">
               <span className="text-2xl font-bold">{exitSurveyData.exitInterviewCompletion}%</span>
-              <span className="text-red-500 text-xs">
-                <ArrowDownCircle size={12} className="text-red-500 inline" />
-              </span>
             </div>
             <p className="text-sm text-gray-600 mt-2">{exitSurveyData.totalResponses} of {exitSurveyData.totalExits} exits</p>
           </div>
@@ -181,9 +178,6 @@ const ExitSurveyDashboard = () => {
             <h2 className="text-base font-semibold text-blue-700 mb-3">Would Recommend</h2>
             <div className="flex items-end gap-1">
               <span className="text-2xl font-bold">{exitSurveyData.recommendationRate}%</span>
-              <span className="text-green-500 text-xs">
-                <ArrowDownCircle size={12} className="text-green-500 inline transform rotate-180" />
-              </span>
             </div>
             <p className="text-sm text-gray-600 mt-2">{currentData.wouldRecommendCount?.positive || 11} of {currentData.wouldRecommendCount?.total || 19} respondents</p>
           </div>
