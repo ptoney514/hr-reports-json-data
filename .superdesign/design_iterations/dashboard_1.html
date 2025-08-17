@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Turnover Dashboard</title>
+    <link rel="stylesheet" href="dashboard_theme.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        .stat-card {
+            @apply bg-white rounded-lg p-6 shadow-md border border-gray-100 transition-all duration-200;
+        }
+        .stat-card:hover {
+            @apply shadow-lg transform translate-y-[-2px];
+        }
+        .progress-bar {
+            @apply rounded-full bg-gray-100 overflow-hidden;
+            height: 12px;
+        }
+        .progress-fill {
+            @apply h-full rounded-full transition-all duration-500;
+            background: var(--primary);
+        }
+        .stat-value {
+            @apply text-4xl font-semibold mb-1;
+        }
+        .stat-label {
+            @apply text-sm text-gray-600 mb-2;
+        }
+        .trend {
+            @apply text-sm font-medium rounded-full px-2 py-0.5 inline-flex items-center gap-1;
+        }
+        .trend-up {
+            @apply bg-green-50 text-green-700;
+        }
+        .trend-down {
+            @apply bg-red-50 text-red-700;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen p-8">
+    <div class="max-w-7xl mx-auto">
+        <h1 class="text-3xl font-bold mb-2">Staff Turnover Dashboard</h1>
+        <p class="text-gray-500 mb-8">Real-time workforce analytics and insights</p>
+
+        <!-- Stat Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+            <!-- Total Headcount -->
+            <div class="stat-card">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <div class="stat-label">
+                            <i data-lucide="users" class="inline w-4 h-4 mr-1"></i>
+                            Total Headcount
+                        </div>
+                        <div class="stat-value">3,206</div>
+                        <div class="trend trend-down">
+                            <i data-lucide="arrow-down" class="w-4 h-4"></i>
+                            -3.7%
+                        </div>
+                    </div>
+                </div>
+                <div class="text-xs text-gray-500 mt-2">OMA (2,566) | PHX (640)</div>
+            </div>
+
+            <!-- Faculty Count -->
+            <div class="stat-card">
+                <div class="stat-label">
+                    <i data-lucide="graduation-cap" class="inline w-4 h-4 mr-1"></i>
+                    Faculty Count
+                </div>
+                <div class="stat-value">785</div>
+                <div class="trend trend-down">
+                    <i data-lucide="arrow-down" class="w-4 h-4"></i>
+                    -18.8%
+                </div>
+                <div class="text-xs text-gray-500 mt-2">OMA (727) | PHX (58)</div>
+            </div>
+
+            <!-- Staff Count -->
+            <div class="stat-card">
+                <div class="stat-label">
+                    <i data-lucide="clipboard" class="inline w-4 h-4 mr-1"></i>
+                    Staff Count
+                </div>
+                <div class="stat-value">1,809</div>
+                <div class="trend trend-up">
+                    <i data-lucide="arrow-up" class="w-4 h-4"></i>
+                    +2.7%
+                </div>
+                <div class="text-xs text-gray-500 mt-2">OMA (1,571) | PHX (238)</div>
+            </div>
+
+            <!-- Starters -->
+            <div class="stat-card">
+                <div class="stat-label">
+                    <i data-lucide="user-plus" class="inline w-4 h-4 mr-1"></i>
+                    Starters
+                </div>
+                <div class="stat-value">262</div>
+                <div class="trend trend-up">
+                    <i data-lucide="arrow-up" class="w-4 h-4"></i>
+                    +4.7%
+                </div>
+                <div class="text-xs text-gray-500 mt-2">OMA (162) | PHX (100)</div>
+            </div>
+
+            <!-- HSP Count -->
+            <div class="stat-card">
+                <div class="stat-label">
+                    <i data-lucide="stethoscope" class="inline w-4 h-4 mr-1"></i>
+                    HSP Count
+                </div>
+                <div class="stat-value">612</div>
+                <div class="trend trend-up">
+                    <i data-lucide="arrow-up" class="w-4 h-4"></i>
+                    +2.0%
+                </div>
+                <div class="text-xs text-gray-500 mt-2">OMA (268) | PHX (344)</div>
+            </div>
+        </div>
+
+        <!-- Detail Cards -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Assignment Types -->
+            <div class="bg-white rounded-lg p-6 shadow-md">
+                <h2 class="text-xl font-semibold mb-6">Employees by Assignment Type</h2>
+                
+                <!-- Full-Time -->
+                <div class="mb-6">
+                    <div class="flex justify-between mb-2">
+                        <div class="flex items-center">
+                            <i data-lucide="briefcase" class="w-4 h-4 mr-2"></i>
+                            <span>Full-Time</span>
+                        </div>
+                        <span class="font-semibold">2,059</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 64.2%"></div>
+                    </div>
+                    <div class="text-xs text-gray-500 mt-1">64.2% of total workforce</div>
+                </div>
+
+                <!-- House Staff Physicians -->
+                <div class="mb-6">
+                    <div class="flex justify-between mb-2">
+                        <div class="flex items-center">
+                            <i data-lucide="stethoscope" class="w-4 h-4 mr-2"></i>
+                            <span>House Staff Physicians</span>
+                        </div>
+                        <span class="font-semibold">612</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 19.1%"></div>
+                    </div>
+                    <div class="text-xs text-gray-500 mt-1">19.1% of total workforce</div>
+                </div>
+
+                <!-- Temporary -->
+                <div class="mb-6">
+                    <div class="flex justify-between mb-2">
+                        <div class="flex items-center">
+                            <i data-lucide="clock" class="w-4 h-4 mr-2"></i>
+                            <span>Temporary</span>
+                        </div>
+                        <span class="font-semibold">457</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 14.3%"></div>
+                    </div>
+                    <div class="text-xs text-gray-500 mt-1">14.3% of total workforce</div>
+                </div>
+
+                <!-- Part-Time Regular -->
+                <div class="mb-6">
+                    <div class="flex justify-between mb-2">
+                        <div class="flex items-center">
+                            <i data-lucide="user" class="w-4 h-4 mr-2"></i>
+                            <span>Part-Time Regular</span>
+                        </div>
+                        <span class="font-semibold">77</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 2.4%"></div>
+                    </div>
+                    <div class="text-xs text-gray-500 mt-1">2.4% of total workforce</div>
+                </div>
+
+                <div class="text-sm text-gray-500 mt-4">
+                    Total Workforce: 3,205 employees across 4 assignment types
+                </div>
+            </div>
+
+            <!-- Locations -->
+            <div class="bg-white rounded-lg p-6 shadow-md">
+                <h2 class="text-xl font-semibold mb-6">Employees by Location</h2>
+                
+                <!-- Omaha Campus -->
+                <div class="mb-6">
+                    <div class="flex justify-between mb-2">
+                        <div class="flex items-center">
+                            <i data-lucide="map-pin" class="w-4 h-4 mr-2"></i>
+                            <span>Omaha Campus</span>
+                        </div>
+                        <span class="font-semibold">2,566</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 80%"></div>
+                    </div>
+                    <div class="text-xs text-gray-500 mt-1">80.0% of total workforce</div>
+                </div>
+
+                <!-- Phoenix Campus -->
+                <div class="mb-6">
+                    <div class="flex justify-between mb-2">
+                        <div class="flex items-center">
+                            <i data-lucide="map-pin" class="w-4 h-4 mr-2"></i>
+                            <span>Phoenix Campus</span>
+                        </div>
+                        <span class="font-semibold">640</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 20%"></div>
+                    </div>
+                    <div class="text-xs text-gray-500 mt-1">20.0% of total workforce</div>
+                </div>
+
+                <div class="text-sm text-gray-500 mt-4">
+                    Total Workforce: 3,206 employees across 2 locations
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

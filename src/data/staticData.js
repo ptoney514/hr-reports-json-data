@@ -9,6 +9,11 @@ export const WORKFORCE_DATA = {
       phoenix: 100,
       total: 307
     },
+    studentCount: {
+      total: 1491,
+      studentWorker: 1384,
+      fws: 107
+    },
     totalEmployees: 3328,
     faculty: 967,
     staff: 1761,
@@ -57,6 +62,11 @@ export const WORKFORCE_DATA = {
       omaha: 162,
       phoenix: 100,
       total: 262
+    },
+    studentCount: {
+      total: 1714,
+      studentWorker: 1607,
+      fws: 107
     },
     totalEmployees: 3206,
     faculty: 785,
@@ -214,7 +224,23 @@ export const TURNOVER_DATA = {
       { division: "Law School", rate: 3.7 },
       { division: "Heider College of Business", rate: 1.6 },
       { division: "Coll of Pro Studies and Cont Ed", rate: 0.0 }
-    ]
+    ],
+    turnoverByLengthOfService: {
+      faculty: [
+        { name: "Less Than One", tenure: "< 1 Year", percentage: 13.8, value: 9 },
+        { name: "1 to 5", tenure: "1-5 Years", percentage: 7.2, value: 5 },
+        { name: "5 to 10", tenure: "5-10 Years", percentage: 5.5, value: 4 },
+        { name: "10 to 20", tenure: "10-20 Years", percentage: 4.0, value: 3 },
+        { name: "20 Plus", tenure: "20+ Years", percentage: 6.2, value: 4 }
+      ],
+      staff: [
+        { name: "Less Than One", tenure: "< 1 Year", percentage: 29.8, value: 18 },
+        { name: "1 to 5", tenure: "1-5 Years", percentage: 14.2, value: 9 },
+        { name: "5 to 10", tenure: "5-10 Years", percentage: 11.6, value: 7 },
+        { name: "10 to 20", tenure: "10-20 Years", percentage: 9.0, value: 6 },
+        { name: "20 Plus", tenure: "20+ Years", percentage: 5.3, value: 3 }
+      ]
+    }
   }
 };
 

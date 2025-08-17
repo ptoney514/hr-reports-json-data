@@ -92,7 +92,7 @@ const FacultyStaffTurnoverByFYChart = memo(({
         className={`bg-white print:bg-white p-4 print:p-2 rounded-lg shadow-sm border print:border-gray ${className}`}
       >
         {/* Title */}
-        <h3 className="text-lg print:text-base font-semibold text-blue-700 print:text-black mb-3 print:mb-2">
+        <h3 className="text-lg print:text-base font-semibold print:text-black mb-3 print:mb-2" style={{color: '#0054A6'}}>
           {title}
         </h3>
         
@@ -105,8 +105,8 @@ const FacultyStaffTurnoverByFYChart = memo(({
             {/* Gradient definition */}
             <defs>
               <linearGradient id="colorTurnover" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.8}/>
-                <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.1}/>
+                <stop offset="5%" stopColor="#0054A6" stopOpacity={0.8}/>
+                <stop offset="95%" stopColor="#0054A6" stopOpacity={0.1}/>
               </linearGradient>
             </defs>
             

@@ -11,7 +11,8 @@ import {
   TrendingUp, 
   BookOpen,
   Building2,
-  Heart
+  Heart,
+  GraduationCap
 } from 'lucide-react';
 
 // Simplified fallback data for consistent dashboard display
@@ -153,12 +154,12 @@ const WorkforceDashboard = () => {
             />
             
             <SummaryCard
-              title="Starters"
-              value={currentData.starters.total.toLocaleString()}
-              change={calculateChange(currentData.starters.total, previousData.starters.total)}
+              title="Student Count"
+              value={currentData.studentCount.total.toLocaleString()}
+              change={calculateChange(currentData.studentCount.total, previousData.studentCount.total)}
               changeType="percentage"
-              subtitle={`OMA (${currentData.starters.omaha.toLocaleString()}) | PHX (${currentData.starters.phoenix.toLocaleString()})`}
-              icon={TrendingUp}
+              subtitle={`Student Worker (${currentData.studentCount.studentWorker.toLocaleString()}) | FWS (${currentData.studentCount.fws.toLocaleString()})`}
+              icon={GraduationCap}
               trend="positive"
             />
             
@@ -178,6 +179,7 @@ const WorkforceDashboard = () => {
             {/* Assignment Type Chart */}
             <div>
               <AssignmentTypeChart 
+                title="Benefit Eligible Employees by Assignment Type"
                 data={currentData.assignmentTypes.map(item => ({
                   name: item.type,
                   total: item.count

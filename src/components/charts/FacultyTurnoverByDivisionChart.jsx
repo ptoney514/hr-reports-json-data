@@ -56,7 +56,7 @@ const FacultyTurnoverByDivisionChart = memo(({
         className={`bg-white print:bg-white p-4 print:p-2 rounded-lg shadow-sm border print:border-gray ${className}`}
       >
         {/* Title */}
-        <h3 className="text-lg print:text-base font-semibold text-blue-700 print:text-black mb-3 print:mb-2">
+        <h3 className="text-lg print:text-base font-semibold print:text-black mb-3 print:mb-2" style={{color: '#0054A6'}}>
           {title}
         </h3>
         
@@ -83,12 +83,15 @@ const FacultyTurnoverByDivisionChart = memo(({
                     <div 
                       className={`h-7 rounded transition-all duration-300 flex items-center justify-end pr-2 relative ${
                         isTotalFacultyTurnover 
-                          ? 'bg-gradient-to-r from-blue-500 to-blue-600 shadow-md' 
-                          : 'bg-green-500'
+                          ? 'shadow-md' 
+                          : ''
                       }`}
-                      style={{ 
-                        width: `${(item.rate / maxValue) * 100}%`,
-                        minWidth: item.rate > 0 ? '48px' : '0px' // Ensure minimum width for small values
+                      style={{
+                        backgroundColor: isTotalFacultyTurnover ? '#1F74DB' : '#0054A6',
+                        ...({
+                          width: `${(item.rate / maxValue) * 100}%`,
+                          minWidth: item.rate > 0 ? '48px' : '0px'
+                        })
                       }}
                     >
                       {/* Percentage label inside the bar */}
@@ -121,7 +124,7 @@ const FacultyTurnoverByDivisionChart = memo(({
             Data represents faculty turnover rates by academic division. 
             <span className="inline-flex items-center gap-1 ml-1">
               <span>📊</span>
-              <strong className="text-blue-600">Total Faculty Turnover</strong>
+              <strong style={{color: '#0054A6'}}>Total Faculty Turnover</strong>
             </span>
             {" "}shows the overall average across all divisions.
           </div>

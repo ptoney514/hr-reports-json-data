@@ -5,7 +5,18 @@ module.exports = {
     "./public/index.html"
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        'creighton': {
+          'blue': '#0054A6',
+          'navy': '#00245D',
+          'light-blue': '#1F74DB',
+          'sky-blue': '#95D2F3',
+          'green': '#71CC98',
+          'yellow': '#FFC72C'
+        }
+      }
+    },
   },
   plugins: [],
 }

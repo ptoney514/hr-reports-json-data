@@ -1,10 +1,10 @@
 import React from 'react';
 import SummaryCard from '../ui/SummaryCard';
 import TurnoverRatesTable from '../charts/TurnoverRatesTable';
-import TopExitReasonsStatic from '../charts/TopExitReasonsStatic';
-import TerminationReasonsPieChart from '../charts/TerminationReasonsPieChart';
 import FacultyTurnoverByDivisionChart from '../charts/FacultyTurnoverByDivisionChart';
 import FacultyStaffTurnoverByFYChart from '../charts/FacultyStaffTurnoverByFYChart';
+import TurnoverByLengthOfServiceChart from '../charts/TurnoverByLengthOfServiceChart';
+import VoluntaryInvoluntaryTurnoverChart from '../charts/VoluntaryInvoluntaryTurnoverChart';
 // Quarter filter removed - using fixed reporting period
 import ErrorBoundary from '../ui/ErrorBoundary';
 import PDFExportButton from '../ui/PDFExportButton';
@@ -179,11 +179,13 @@ const TurnoverDashboard = () => {
       })),
       facultyTurnoverByDivision: currentData.facultyTurnoverByDivision || [],
       facultyStaffTurnoverByFY: [
+        { fiscalYear: 'FY2022', rate: 14.5 },
         { fiscalYear: 'FY2023', rate: 14.9 },
         { fiscalYear: 'FY2024', rate: 12.8 },
         { fiscalYear: 'FY2025', rate: 11.2 }
       ],
-      monthlyTrends: currentData.monthlyTrends
+      monthlyTrends: currentData.monthlyTrends,
+      turnoverByLengthOfService: currentData.turnoverByLengthOfService || { faculty: [], staff: [] }
     }
   };
   
@@ -217,7 +219,7 @@ const TurnoverDashboard = () => {
               <div className="bg-white rounded-lg shadow-sm border p-6">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <TrendingDown className="text-blue-600" size={24} />
+                    <TrendingDown style={{color: '#0054A6'}} size={24} />
                     <div>
                       <h1 className="text-2xl font-bold text-gray-900">Turnover Dashboard - Benefit Eligible</h1>
                       <p className="text-gray-600 text-sm mt-1">
@@ -262,13 +264,13 @@ const TurnoverDashboard = () => {
           {/* Summary Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 print:gap-2 mb-6 print:mb-4">
         <SummaryCard
-          title="# of Terms"
-          value={`${data.summary?.totalDepartures?.toLocaleString() || '0'}`}
-          change={data.summary?.turnoverRateChange || 0}
+          title="Total Turnover"
+          value="11.2%"
+          change={-1.6}
           changeType="percentage"
-          subtitle="55 total terms previous period"
+          subtitle="12.8% in FY 2024"
           icon={TrendingDown}
-          trend={(data.summary?.turnoverRateChange || 0) > 0 ? 'negative' : 'positive'}
+          trend="positive"
         />
         
         <SummaryCard
@@ -276,7 +278,7 @@ const TurnoverDashboard = () => {
           value="6.1%"
           change={-1.6}
           changeType="percentage"
-          subtitle={`${data.summary?.facultyDepartures?.toLocaleString() || '0'} terminations`}
+          subtitle="7.7% in FY 2024"
           icon={BookOpen}
           trend="positive"
         />
@@ -286,19 +288,19 @@ const TurnoverDashboard = () => {
           value="12.6%"
           change={-1.0}
           changeType="percentage"
-          subtitle={`${data.summary?.staffDepartures?.toLocaleString() || '0'} terminations`}
+          subtitle="13.6% in FY 2024"
           icon={Building2}
           trend="positive"
         />
         
         <SummaryCard
-          title="Avg Tenure"
-          value={typeof data.summary?.avgTenure === 'string' ? data.summary.avgTenure : `${safeToFixed(data.summary?.avgTenure)} years`}
-          change={null}
-          changeType="none"
-          subtitle="Average years of service"
-          icon={Clock}
-          trend="neutral"
+          title="Staff Non-Exempt Turnover"
+          value="15.3%"
+          change={-2.5}
+          changeType="percentage"
+          subtitle="12.8% in FY 2024"
+          icon={Building2}
+          trend="positive"
         />
       </div>
 
@@ -322,27 +324,51 @@ const TurnoverDashboard = () => {
         </div>
       </div>
 
-      {/* Charts - Side by Side Layout */}
+      {/* Faculty/Staff Turnover Rate by FY Chart */}
+      <div className="mb-6 print:mb-4 chart-container" data-chart-type="area-chart">
+        <div id="faculty-staff-turnover-fy-chart" data-chart-title="Faculty/Staff Turnover Rate by FY" data-chart-ready="false">
+          <FacultyStaffTurnoverByFYChart
+            data={data.charts?.facultyStaffTurnoverByFY || []}
+            title="Faculty/Staff Turnover Rate by FY"
+          />
+        </div>
+      </div>
+
+      {/* Turnover by Length of Service Charts - Side by Side Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 print:gap-4 mb-6 print:mb-4">
-        {/* Top Termination Reasons Chart */}
+        {/* Faculty Turnover by Length of Service */}
         <div className="chart-container" data-chart-type="pie-chart">
-          <div id="top-termination-reasons-pie-chart" data-chart-title="Top Termination Reasons Pie Chart" data-chart-ready="false">
-            <TerminationReasonsPieChart
-              data={data.charts?.topExitReasons || []}
-              title="Top Termination Reasons"
+          <div id="faculty-turnover-length-service-chart" data-chart-title="Faculty Turnover by Length of Service" data-chart-ready="false">
+            <TurnoverByLengthOfServiceChart
+              data={data.charts?.turnoverByLengthOfService?.faculty || []}
+              title="Turnover Rates by Length of Service – FY2025"
+              employeeType="Faculty"
               height={400}
             />
           </div>
         </div>
 
-        {/* Faculty/Staff Turnover Rate by FY Chart */}
-        <div className="chart-container" data-chart-type="area-chart">
-          <div id="faculty-staff-turnover-fy-chart" data-chart-title="Faculty/Staff Turnover Rate by FY" data-chart-ready="false">
-            <FacultyStaffTurnoverByFYChart
-              data={data.charts?.facultyStaffTurnoverByFY || []}
-              title="Faculty/Staff Turnover Rate by FY"
+        {/* Staff Turnover by Length of Service */}
+        <div className="chart-container" data-chart-type="pie-chart">
+          <div id="staff-turnover-length-service-chart" data-chart-title="Staff Turnover by Length of Service" data-chart-ready="false">
+            <TurnoverByLengthOfServiceChart
+              data={data.charts?.turnoverByLengthOfService?.staff || []}
+              title="Turnover Rates by Length of Service – FY2025"
+              employeeType="Staff"
+              height={400}
             />
           </div>
+        </div>
+      </div>
+
+      {/* Voluntary/Involuntary Turnover Chart - Moved to Bottom */}
+      <div className="mb-6 print:mb-4 chart-container" data-chart-type="stacked-bar">
+        <div id="voluntary-involuntary-turnover-chart" data-chart-title="Voluntary/Involuntary Turnover Chart" data-chart-ready="false">
+          <VoluntaryInvoluntaryTurnoverChart
+            title="Creighton University Turnover - Voluntary/Involuntary"
+            subtitle="Fiscal Year Ending June 30, 2025*"
+            height={400}
+          />
         </div>
       </div>
           </div>

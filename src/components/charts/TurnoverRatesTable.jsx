@@ -112,7 +112,7 @@ const TurnoverRatesTable = ({ data, title = "Turnover Rates by Category", classN
   return (
     <div className={`bg-white rounded-lg shadow-sm border print:border-gray ${className}`} data-pdf-ready="true">
       <div className="p-6 print:p-4">
-        <h3 className="text-xl print:text-lg font-semibold text-blue-700 print:text-black mb-6 print:mb-4">
+        <h3 className="text-xl print:text-lg font-semibold print:text-black mb-6 print:mb-4" style={{color: '#0054A6'}}>
           {title}
         </h3>
         
@@ -126,7 +126,7 @@ const TurnoverRatesTable = ({ data, title = "Turnover Rates by Category", classN
           >
             {/* Table Header */}
             <thead>
-              <tr className="bg-slate-800 text-white">
+              <tr className="text-white" style={{backgroundColor: '#00245D'}}>
                 <th 
                   className="text-left py-3 px-4 font-semibold text-sm"
                   scope="col"

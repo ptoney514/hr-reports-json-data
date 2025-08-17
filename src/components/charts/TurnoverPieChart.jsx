@@ -13,8 +13,8 @@ const TurnoverPieChart = memo(({
 }) => {
   // Transform data for pie chart format and calculate percentages (moved before early return)
   const pieData = useMemo(() => {
-    // Consistent color palette (moved inside useMemo)
-    const colors = ['#4f46e5', '#0891b2', '#059669', '#d97706', '#dc2626', '#7c3aed'];
+    // Creighton brand color palette (moved inside useMemo)
+    const colors = ['#0054A6', '#00245D', '#1F74DB', '#95D2F3', '#71CC98', '#FFC72C'];
     
     if (!data || data.length === 0) return [];
     
@@ -30,7 +30,7 @@ const TurnoverPieChart = memo(({
   if (!data || data.length === 0) {
     return (
       <div className={`bg-white p-4 rounded-lg shadow-sm border ${className}`}>
-        <h3 className="text-lg font-semibold text-blue-700 mb-3">{title}</h3>
+        <h3 className="text-lg font-semibold mb-3" style={{color: '#0054A6'}}>{title}</h3>
         <div className="flex items-center justify-center h-64 text-gray-500">
           <div className="text-center">
             <AlertCircle size={48} className="mx-auto mb-2 text-gray-400" />
@@ -76,7 +76,7 @@ const TurnoverPieChart = memo(({
         data-chart-title={title}
         className={`bg-white print:bg-white p-4 print:p-2 rounded-lg shadow-sm border print:border-gray ${className}`}
       >
-        <h3 className="text-lg print:text-base font-semibold text-blue-700 print:text-black mb-3 print:mb-2">
+        <h3 className="text-lg print:text-base font-semibold print:text-black mb-3 print:mb-2" style={{color: '#0054A6'}}>
           {title}
         </h3>
         <ResponsiveContainer width="100%" height={height} className="print:h-48">

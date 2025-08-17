@@ -83,11 +83,12 @@ const SummaryCard = ({
       <div className="flex items-center gap-2 mb-1 print:mb-1">
         {Icon && (
           <Icon 
-            className="text-blue-500 print:text-black" 
+            className="print:text-black" 
+            style={{color: '#0054A6'}}
             size={16} 
           />
         )}
-        <h2 className="text-sm print:text-xs font-medium text-blue-700 print:text-black">
+        <h2 className="text-sm print:text-xs font-medium print:text-black" style={{color: '#0054A6'}}>
           {title}
         </h2>
       </div>

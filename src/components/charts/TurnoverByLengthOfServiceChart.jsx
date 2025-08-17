@@ -1,62 +1,40 @@
 import React, { memo, useMemo } from 'react';
-import { PieChart, Pie, Cell, ResponsiveContainer, LabelList } from 'recharts';
+import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 import { AlertCircle } from 'lucide-react';
 import ChartErrorBoundary from '../ui/ChartErrorBoundary';
 
-const TerminationReasonsPieChart = memo(({ 
+const TurnoverByLengthOfServiceChart = memo(({ 
   data = [], 
-  title = "Top Termination Reasons",
+  title = "Turnover Rates by Length of Service – FY2025",
+  employeeType = "Faculty", // "Faculty" or "Staff"
   height = 400,
   className = ""
 }) => {
-  // Process data for pie chart - top 5 + Other category
+  // Process data for pie chart
   const pieData = useMemo(() => {
     if (!data || data.length === 0) return [];
     
-    // Sort by percentage descending
-    const sortedData = [...data].sort((a, b) => (b.percentage || 0) - (a.percentage || 0));
-    
-    // Take top 5 reasons
-    const top5 = sortedData.slice(0, 5);
-    const remaining = sortedData.slice(5);
-    
     // Color palette using Creighton brand colors
     const colors = [
-      '#0054A6', // Series 1 - Creighton Blue
-      '#00245D', // Series 2 - Creighton Navy
-      '#1F74DB', // Series 3 - Light Blue
-      '#95D2F3', // Series 4 - Sky Blue
-      '#71CC98', // Series 5 - Creighton Green
-      '#D7D2CB'  // Other - Warm Gray
+      '#0054A6', // Series 1 - Creighton Blue (Less Than One)
+      '#00245D', // Series 2 - Creighton Navy (1 to 5)
+      '#1F74DB', // Series 3 - Light Blue (5 to 10)
+      '#95D2F3', // Series 4 - Sky Blue (10 to 20)
+      '#71CC98'  // Series 5 - Creighton Green (20 Plus)
     ];
     
-    let processedData = top5.map((item, index) => ({
-      name: item.reason || item.name || `Reason ${index + 1}`,
-      value: item.total || item.value || 0,
+    return data.map((item, index) => ({
+      name: item.name || item.tenure || `Range ${index + 1}`,
+      value: item.value || 0,
       percentage: item.percentage || 0,
-      fill: colors[index]
+      fill: colors[index] || colors[colors.length - 1]
     }));
-    
-    // Add "Other" category if there are remaining items
-    if (remaining.length > 0) {
-      const otherTotal = remaining.reduce((sum, item) => sum + (item.total || item.value || 0), 0);
-      const otherPercentage = remaining.reduce((sum, item) => sum + (item.percentage || 0), 0);
-      
-      processedData.push({
-        name: 'Other',
-        value: otherTotal,
-        percentage: otherPercentage,
-        fill: colors[5] // Gray color for Other
-      });
-    }
-    
-    return processedData;
   }, [data]);
 
   // Custom label with line annotations
-  const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, name, percentage, index }) => {
+  const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, name, percentage }) => {
     const RADIAN = Math.PI / 180;
-    const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+    const radius = outerRadius; // Start line from outer edge of pie slice
     const labelRadius = outerRadius + 30;
     
     // Calculate positions
@@ -105,7 +83,7 @@ const TerminationReasonsPieChart = memo(({
         <div className="flex items-center justify-center h-64 text-gray-500">
           <div className="text-center">
             <AlertCircle size={48} className="mx-auto mb-2 text-gray-400" />
-            <p>No termination data available</p>
+            <p>No turnover data available</p>
           </div>
         </div>
       </div>
@@ -115,21 +93,23 @@ const TerminationReasonsPieChart = memo(({
 
   return (
     <ChartErrorBoundary
-      chartType="Termination Reasons Pie Chart"
+      chartType="Turnover by Length of Service Chart"
       title={title}
       height={height}
       className={className}
       onRetry={() => window.location.reload()}
     >
       <div 
-        id={`termination-reasons-pie-chart-${Date.now()}`}
-        data-chart-id="termination-reasons-pie-chart"
-        data-chart-title={title}
+        id={`turnover-length-service-chart-${employeeType.toLowerCase()}-${Date.now()}`}
+        data-chart-id={`turnover-length-service-chart-${employeeType.toLowerCase()}`}
+        data-chart-title={`${title} - ${employeeType}`}
         className={`bg-white print:bg-white p-6 print:p-4 rounded-lg shadow-sm border print:border-gray ${className}`}
       >
         {/* Header */}
         <div className="mb-6">
-          <h3 className="text-xl font-semibold print:text-black" style={{color: '#0054A6'}}>{title}</h3>
+          <h3 className="text-xl font-semibold print:text-black" style={{color: '#0054A6'}}>
+            {title} - {employeeType}
+          </h3>
         </div>
         
         {/* Pie Chart Container */}
@@ -145,7 +125,7 @@ const TerminationReasonsPieChart = memo(({
                 outerRadius={100}
                 innerRadius={40}
                 fill="#8884d8"
-                dataKey="value"
+                dataKey="percentage"
                 isAnimationActive={false}
                 stroke="#fff"
                 strokeWidth={2}
@@ -160,17 +140,21 @@ const TerminationReasonsPieChart = memo(({
 
         {/* Summary footer */}
         <div className="mt-4 pt-4 border-t border-gray-200 print:border-gray-400">
-          <div className="text-sm text-gray-600 print:text-black">
-            <span>Top reason accounts for </span>
+          <div className="text-sm text-gray-600 print:text-black mb-3">
+            <span>Highest turnover rate: </span>
             <span className="font-semibold print:text-black" style={{color: '#0054A6'}}>
-              {pieData.length > 0 ? `${pieData[0].percentage.toFixed(1)}% of all terminations` : 'N/A'}
+              {pieData.length > 0 ? `${pieData[0].name} (${pieData[0].percentage.toFixed(1)}%)` : 'N/A'}
             </span>
-            {pieData.length > 5 && (
-              <span className="ml-2">
-                • Other reasons combined: {pieData[pieData.length - 1].percentage.toFixed(1)}%
-              </span>
-            )}
+            <span className="ml-2">
+              • Lowest: {pieData.length > 1 ? `${pieData[pieData.length - 1].name} (${pieData[pieData.length - 1].percentage.toFixed(1)}%)` : 'N/A'}
+            </span>
           </div>
+          <p className="text-sm text-gray-600 print:text-black leading-relaxed">
+            This chart shows turnover rates by employee tenure. Rates are specific to each group 
+            (e.g., {pieData.length > 0 ? `${pieData[0].percentage.toFixed(1)}%` : 'N/A'} of {employeeType.toLowerCase()} 
+            with {pieData.length > 0 ? pieData[0].name.toLowerCase() : 'less tenure'} left), 
+            so percentages are not cumulative and will not total 100%.
+          </p>
         </div>
       </div>
     </ChartErrorBoundary>
@@ -180,9 +164,10 @@ const TerminationReasonsPieChart = memo(({
   return (
     prevProps.data === nextProps.data &&
     prevProps.title === nextProps.title &&
+    prevProps.employeeType === nextProps.employeeType &&
     prevProps.height === nextProps.height &&
     prevProps.className === nextProps.className
   );
 });
 
-export default TerminationReasonsPieChart;
+export default TurnoverByLengthOfServiceChart;
