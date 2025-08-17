@@ -4,6 +4,11 @@ import { getRecruitingData, getStartersLeaversData, getPhoenixHeadcountData, get
 import SummaryCard from '../ui/SummaryCard';
 import StartersLeaversChart from '../charts/StartersLeaversChart';
 import DualHeadcountChart from '../charts/DualHeadcountChart';
+import FacultyHireRateCard from '../charts/FacultyHireRateCard';
+import StaffHiringAnalyticsCard from '../charts/StaffHiringAnalyticsCard';
+import InternalExternalComparisonChart from '../charts/InternalExternalComparisonChart';
+import HiringCompetitivenessChart from '../charts/HiringCompetitivenessChart';
+import StaffHiringInsightsCard from '../charts/StaffHiringInsightsCard';
 // Quarter filter removed - using fixed reporting period
 
 // Fallback data to ensure the dashboard always works
@@ -121,8 +126,51 @@ const RecruitingDashboard = () => {
             showGrid={true}
           />
           
-          {/* Spacer for responsive layout */}
-          <div className="hidden lg:block"></div>
+          {/* Faculty Hire Rate Card */}
+          <FacultyHireRateCard
+            applications={currentData.facultyHiring?.applications || 1746}
+            hires={currentData.facultyHiring?.hires || 53}
+            hireRate={currentData.facultyHiring?.hireRate || 3.0}
+          />
+        </div>
+
+        {/* Staff Hiring Analytics Section */}
+        <div className="space-y-6 print:space-y-2">
+          {/* Staff Hiring Analytics Header */}
+          <div className="bg-white rounded-lg shadow-sm border p-4">
+            <h2 className="text-xl font-bold text-gray-900 mb-2">Staff Position Hiring Analytics</h2>
+            <p className="text-gray-600 text-sm">
+              Comprehensive analysis of staff hiring patterns and candidate success rates
+            </p>
+          </div>
+
+          {/* Staff Analytics Cards Row */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 print:gap-2">
+            <StaffHiringAnalyticsCard
+              internalSuccessRate={currentData.staffHiring?.internalSuccessRate || 24.0}
+              externalSuccessRate={currentData.staffHiring?.externalSuccessRate || 3.7}
+              internalAdvantage={currentData.staffHiring?.internalAdvantage || 6.4}
+            />
+            
+            <HiringCompetitivenessChart
+              totalApplications={currentData.staffHiring?.totalApplications || 7860}
+              totalHired={currentData.staffHiring?.totalHired || 340}
+              internalSuccessRate={currentData.staffHiring?.internalSuccessRate || 24.0}
+              externalSuccessRate={currentData.staffHiring?.externalSuccessRate || 3.7}
+              overallHireRate={currentData.staffHiring?.overallHireRate || 4.3}
+            />
+          </div>
+
+          {/* Internal vs External Comparison */}
+          <InternalExternalComparisonChart
+            internalApplicants={currentData.staffHiring?.internalApplicants || 225}
+            externalApplicants={currentData.staffHiring?.externalApplicants || 7635}
+            internalHired={currentData.staffHiring?.internalHired || 54}
+            externalHired={currentData.staffHiring?.externalHired || 286}
+          />
+
+          {/* Strategic Insights */}
+          <StaffHiringInsightsCard />
         </div>
         
         {/* Dual Headcount Trends Charts */}

@@ -306,6 +306,23 @@ export const RECRUITING_DATA = {
     timeToFill: 45,
     applicationCount: 3156,
     offerAcceptanceRate: 81.2,
+    facultyHiring: {
+      applications: 1746,
+      hires: 53,
+      hireRate: 3.0
+    },
+    staffHiring: {
+      totalApplications: 7860,
+      totalHired: 340,
+      overallHireRate: 4.3,
+      internalApplicants: 225,
+      externalApplicants: 7635,
+      internalHired: 54,
+      externalHired: 286,
+      internalSuccessRate: 24.0,
+      externalSuccessRate: 3.7,
+      internalAdvantage: 6.4
+    },
     diversityMetrics: {
       femaleHires: 64.1,
       minorityHires: 36.8,
