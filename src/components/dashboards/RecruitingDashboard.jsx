@@ -1,8 +1,7 @@
 import React from 'react';
-import { UserPlus, TrendingUp, Briefcase, Users, UserMinus } from 'lucide-react';
-import { getRecruitingData, getStartersLeaversData, getPhoenixHeadcountData, getOmahaHeadcountData } from '../../data/staticData';
+import { UserPlus, TrendingUp, Briefcase, Users } from 'lucide-react';
+import { getRecruitingData, getPhoenixHeadcountData, getOmahaHeadcountData } from '../../data/staticData';
 import SummaryCard from '../ui/SummaryCard';
-import StartersLeaversChart from '../charts/StartersLeaversChart';
 import DualHeadcountChart from '../charts/DualHeadcountChart';
 import FacultyHireRateCard from '../charts/FacultyHireRateCard';
 import StaffHiringAnalyticsCard from '../charts/StaffHiringAnalyticsCard';
@@ -28,7 +27,6 @@ const RecruitingDashboard = () => {
   const previousData = getRecruitingData("2025-03-31"); // For percentage calculations
   
   // Chart data
-  const startersLeaversData = getStartersLeaversData();
   const phoenixHeadcountData = getPhoenixHeadcountData();
   const omahaHeadcountData = getOmahaHeadcountData();
 
@@ -68,10 +66,10 @@ const RecruitingDashboard = () => {
         <div className="bg-white rounded-lg shadow-sm border p-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <UserPlus className="text-blue-600" size={24} />
+              <UserPlus style={{color: '#0054A6'}} size={24} />
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">Recruiting Dashboard - Benefit Eligible</h1>
-                <p className="text-gray-600 text-sm mt-1">
+                <h1 className="text-2xl font-serif font-semibold text-gray-900">Recruiting Dashboard - Benefit Eligible</h1>
+                <p className="text-gray-600 text-sm font-sans mt-1">
                   Period Ending: June 30, 2025
                 </p>
               </div>
@@ -81,7 +79,7 @@ const RecruitingDashboard = () => {
       </div>
 
       {/* Key Metrics Cards - Enhanced layout for better spacing */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 print:gap-2 mb-8 print:mb-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 print:gap-2 mb-6 print:mb-4">
         {recruitingMetrics.map((metric, index) => (
           <SummaryCard
             key={index}
@@ -104,26 +102,16 @@ const RecruitingDashboard = () => {
           icon={TrendingUp}
           trend="positive"
         />
-        
-        <SummaryCard
-          title="Leavers"
-          value="250"
-          subtitle="Reason goes here."
-          icon={UserMinus}
-          trend="neutral"
-        />
       </div>
 
       {/* Charts Section */}
-      <div className="space-y-6 print:space-y-2 mb-8 print:mb-4">
-        {/* Starters vs Leavers Chart */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 print:gap-2">
-          <StartersLeaversChart
-            data={startersLeaversData}
-            title="Starters vs Leavers Over Time"
-            height={350}
-            showLegend={true}
-            showGrid={true}
+      <div className="space-y-6 print:space-y-2 mb-6 print:mb-4">
+        {/* Staff Position Hiring Analytics and Faculty Hire Rate */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 print:gap-2">
+          <StaffHiringAnalyticsCard
+            internalSuccessRate={currentData.staffHiring?.internalSuccessRate || 24.0}
+            externalSuccessRate={currentData.staffHiring?.externalSuccessRate || 3.7}
+            internalAdvantage={currentData.staffHiring?.internalAdvantage || 6.4}
           />
           
           {/* Faculty Hire Rate Card */}
@@ -134,32 +122,15 @@ const RecruitingDashboard = () => {
           />
         </div>
 
-        {/* Staff Hiring Analytics Section */}
+        {/* Additional Staff Hiring Analytics */}
         <div className="space-y-6 print:space-y-2">
-          {/* Staff Hiring Analytics Header */}
-          <div className="bg-white rounded-lg shadow-sm border p-4">
-            <h2 className="text-xl font-bold text-gray-900 mb-2">Staff Position Hiring Analytics</h2>
-            <p className="text-gray-600 text-sm">
-              Comprehensive analysis of staff hiring patterns and candidate success rates
-            </p>
-          </div>
-
-          {/* Staff Analytics Cards Row */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 print:gap-2">
-            <StaffHiringAnalyticsCard
-              internalSuccessRate={currentData.staffHiring?.internalSuccessRate || 24.0}
-              externalSuccessRate={currentData.staffHiring?.externalSuccessRate || 3.7}
-              internalAdvantage={currentData.staffHiring?.internalAdvantage || 6.4}
-            />
-            
-            <HiringCompetitivenessChart
-              totalApplications={currentData.staffHiring?.totalApplications || 7860}
-              totalHired={currentData.staffHiring?.totalHired || 340}
-              internalSuccessRate={currentData.staffHiring?.internalSuccessRate || 24.0}
-              externalSuccessRate={currentData.staffHiring?.externalSuccessRate || 3.7}
-              overallHireRate={currentData.staffHiring?.overallHireRate || 4.3}
-            />
-          </div>
+          <HiringCompetitivenessChart
+            totalApplications={currentData.staffHiring?.totalApplications || 7860}
+            totalHired={currentData.staffHiring?.totalHired || 340}
+            internalSuccessRate={currentData.staffHiring?.internalSuccessRate || 24.0}
+            externalSuccessRate={currentData.staffHiring?.externalSuccessRate || 3.7}
+            overallHireRate={currentData.staffHiring?.overallHireRate || 4.3}
+          />
 
           {/* Internal vs External Comparison */}
           <InternalExternalComparisonChart
