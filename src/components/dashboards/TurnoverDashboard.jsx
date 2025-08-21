@@ -314,6 +314,17 @@ const TurnoverDashboard = () => {
         </div>
       </div>
 
+      {/* Voluntary/Involuntary Turnover Chart - Moved here from bottom */}
+      <div className="mb-6 print:mb-4 chart-container" data-chart-type="stacked-bar">
+        <div id="voluntary-involuntary-turnover-chart" data-chart-title="Voluntary/Involuntary Turnover Chart" data-chart-ready="false">
+          <VoluntaryInvoluntaryTurnoverChart
+            title="Creighton University Turnover - Voluntary/Involuntary"
+            subtitle="Fiscal Year Ending June 30, 2025*"
+            height={400}
+          />
+        </div>
+      </div>
+
       {/* Faculty Turnover by Division Chart */}
       <div className="mb-6 print:mb-4 chart-container" data-chart-type="horizontal-bars">
         <div id="faculty-turnover-division-chart" data-chart-title="Faculty Turnover by Division" data-chart-ready="false">
@@ -361,16 +372,6 @@ const TurnoverDashboard = () => {
         </div>
       </div>
 
-      {/* Voluntary/Involuntary Turnover Chart - Moved to Bottom */}
-      <div className="mb-6 print:mb-4 chart-container" data-chart-type="stacked-bar">
-        <div id="voluntary-involuntary-turnover-chart" data-chart-title="Voluntary/Involuntary Turnover Chart" data-chart-ready="false">
-          <VoluntaryInvoluntaryTurnoverChart
-            title="Creighton University Turnover - Voluntary/Involuntary"
-            subtitle="Fiscal Year Ending June 30, 2025*"
-            height={400}
-          />
-        </div>
-      </div>
           </div>
         </div>
       </div>

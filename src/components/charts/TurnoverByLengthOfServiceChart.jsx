@@ -14,7 +14,7 @@ const TurnoverByLengthOfServiceChart = memo(({
   const pieData = useMemo(() => {
     if (!data || data.length === 0) return [];
     
-    // Color palette using Creighton brand colors
+    // Color palette using official Creighton brand colors from BRAND_GUIDELINES.md
     const colors = [
       '#0054A6', // Series 1 - Creighton Blue (Less Than One)
       '#00245D', // Series 2 - Creighton Navy (1 to 5)
@@ -138,7 +138,7 @@ const TurnoverByLengthOfServiceChart = memo(({
           </ResponsiveContainer>
         </div>
 
-        {/* Summary footer */}
+        {/* Summary footer - just highest/lowest */}
         <div className="mt-4 pt-4 border-t border-gray-200 print:border-gray-400">
           <div className="text-sm text-gray-600 print:text-black mb-3">
             <span>Highest turnover rate: </span>
@@ -149,11 +149,37 @@ const TurnoverByLengthOfServiceChart = memo(({
               • Lowest: {pieData.length > 1 ? `${pieData[pieData.length - 1].name} (${pieData[pieData.length - 1].percentage.toFixed(1)}%)` : 'N/A'}
             </span>
           </div>
-          <p className="text-sm text-gray-600 print:text-black leading-relaxed">
-            This chart shows turnover rates by employee tenure. Rates are specific to each group 
-            (e.g., {pieData.length > 0 ? `${pieData[0].percentage.toFixed(1)}%` : 'N/A'} of {employeeType.toLowerCase()} 
-            with {pieData.length > 0 ? pieData[0].name.toLowerCase() : 'less tenure'} left), 
-            so percentages are not cumulative and will not total 100%.
+        </div>
+
+        {/* Descriptive Box with key insights */}
+        <div className="mt-4 p-4 border-2 rounded-lg print:bg-white print:border-gray-400" 
+             style={{
+               borderColor: '#0054A6', 
+               backgroundColor: '#F3F3F0' // Light Gray from brand guidelines
+             }}>
+          <div>
+            <h4 className="font-semibold print:text-black mb-3" 
+                style={{color: '#00245D'}}> {/* Creighton Navy */}
+              {employeeType} - Key Insights:
+            </h4>
+            <div className="text-sm print:text-black leading-relaxed" 
+                 style={{color: '#0054A6'}}> {/* Creighton Blue */}
+              <p>
+                Turnover rates show{' '}
+                <strong>{pieData.length > 0 ? `${pieData[0].percentage.toFixed(1)}%` : 'N/A'}</strong>{' '}
+                of {employeeType.toLowerCase()} with{' '}
+                <strong>{pieData.length > 0 ? pieData[0].name.toLowerCase() : 'shorter tenure'}</strong> departed,{' '}
+                while only <strong>{pieData.length > 1 ? `${pieData[pieData.length - 1].percentage.toFixed(1)}%` : 'N/A'}</strong>{' '}
+                of those with <strong>20+ years</strong> left.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Note outside the shaded area */}
+        <div className="mt-2">
+          <p className="text-xs text-gray-600 print:text-black italic">
+            <strong>Note:</strong> Percentages represent specific group turnover rates and are not cumulative.
           </p>
         </div>
       </div>
