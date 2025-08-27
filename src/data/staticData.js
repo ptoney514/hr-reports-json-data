@@ -245,6 +245,49 @@ export const TURNOVER_DATA = {
 };
 
 export const RECRUITING_DATA = {
+  "2024-06-30": {
+    reportingDate: "6/30/24",
+    openPositions: 85,
+    newHiresYTD: 185,
+    leaversYTD: 45,
+    costPerHire: 3900,
+    timeToFill: 40,
+    applicationCount: 2150,
+    offerAcceptanceRate: 74.8,
+    facultyHiring: {
+      applications: 1450,
+      hires: 42,
+      hireRate: 2.9
+    },
+    staffHiring: {
+      totalApplications: 6200,
+      totalHired: 275,
+      overallHireRate: 4.4,
+      internalApplicants: 180,
+      externalApplicants: 6020,
+      internalHired: 38,
+      externalHired: 237,
+      internalSuccessRate: 21.1,
+      externalSuccessRate: 3.9,
+      internalAdvantage: 5.4
+    },
+    diversityMetrics: {
+      femaleHires: 58.9,
+      minorityHires: 31.2,
+      veteranHires: 7.1
+    },
+    positionsByDepartment: [
+      { department: "College of Medicine", openings: 22, filled: 11 },
+      { department: "Academic Affairs", openings: 13, filled: 8 },
+      { department: "Student Affairs", openings: 12, filled: 7 },
+      { department: "Information Technology", openings: 10, filled: 5 },
+      { department: "Finance & Administration", openings: 8, filled: 4 }
+    ],
+    headcountByLocation: {
+      phoenix: { faculty: 55, staff: 158, hsp: 315, total: 528 },
+      omaha: { faculty: 875, staff: 1520, hsp: 245, total: 2640 }
+    }
+  },
   "2024-12-31": {
     reportingDate: "12/31/24",
     openPositions: 98,
