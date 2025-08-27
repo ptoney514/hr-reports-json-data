@@ -9,7 +9,9 @@ import {
   X,
   UserPlus,
   MessageSquare,
-  Settings
+  Settings,
+  Calendar,
+  FileText
 } from 'lucide-react';
 import { announceToScreenReader } from '../../utils/accessibilityUtils';
 
@@ -51,10 +53,24 @@ const Navigation = () => {
     },
     {
       id: 'exit-survey',
-      label: 'Exit Survey Insights',
+      label: 'Exit Survey Overview',
       path: '/dashboards/exit-survey',
       icon: MessageSquare,
       isActive: isActive('/dashboards/exit-survey')
+    },
+    {
+      id: 'exit-survey-q1',
+      label: 'Q1 FY25 Exit Analysis',
+      path: '/dashboards/exit-survey-q1',
+      icon: Calendar,
+      isActive: isActive('/dashboards/exit-survey-q1')
+    },
+    {
+      id: 'exit-survey-q4',
+      label: 'Q4 FY25 Survey Insights',
+      path: '/dashboards/exit-survey-q4',
+      icon: FileText,
+      isActive: isActive('/dashboards/exit-survey-q4')
     },
     {
       id: 'admin',
