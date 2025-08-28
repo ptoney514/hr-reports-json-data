@@ -27,6 +27,7 @@ const Navigation = () => {
     {
       id: 'home',
       label: 'Home',
+      shortLabel: 'Home',
       path: '/dashboards',
       icon: Home,
       isActive: isActive('/dashboards')
@@ -34,6 +35,7 @@ const Navigation = () => {
     {
       id: 'workforce',
       label: 'Workforce Dashboard',
+      shortLabel: 'Work',
       path: '/dashboards/workforce',
       icon: Users,
       isActive: isActive('/dashboards/workforce')
@@ -41,6 +43,7 @@ const Navigation = () => {
     {
       id: 'headcount-details',
       label: 'Headcount Details',
+      shortLabel: 'Head',
       path: '/dashboards/headcount-details',
       icon: Building2,
       isActive: isActive('/dashboards/headcount-details')
@@ -48,6 +51,7 @@ const Navigation = () => {
     {
       id: 'turnover',
       label: 'Turnover Dashboard',
+      shortLabel: 'Turn',
       path: '/dashboards/turnover',
       icon: TrendingDown,
       isActive: isActive('/dashboards/turnover')
@@ -55,6 +59,7 @@ const Navigation = () => {
     {
       id: 'recruiting',
       label: 'Recruiting Dashboard',
+      shortLabel: 'Recruit',
       path: '/dashboards/recruiting',
       icon: UserPlus,
       isActive: isActive('/dashboards/recruiting')
@@ -62,6 +67,7 @@ const Navigation = () => {
     {
       id: 'exit-survey',
       label: 'Exit Survey Overview',
+      shortLabel: 'Exit',
       path: '/dashboards/exit-survey',
       icon: MessageSquare,
       isActive: isActive('/dashboards/exit-survey')
@@ -69,6 +75,7 @@ const Navigation = () => {
     {
       id: 'exit-survey-q1',
       label: 'Q1 FY25 Exit Analysis',
+      shortLabel: 'Q1 FY25',
       path: '/dashboards/exit-survey-q1',
       icon: Calendar,
       isActive: isActive('/dashboards/exit-survey-q1')
@@ -76,6 +83,7 @@ const Navigation = () => {
     {
       id: 'exit-survey-q4',
       label: 'Q4 FY25 Survey Insights',
+      shortLabel: 'Q4 FY25',
       path: '/dashboards/exit-survey-q4',
       icon: FileText,
       isActive: isActive('/dashboards/exit-survey-q4')
@@ -83,6 +91,7 @@ const Navigation = () => {
     {
       id: 'admin',
       label: 'Settings',
+      shortLabel: 'Set',
       path: '/admin',
       icon: Settings,
       isActive: isActive('/admin')
@@ -110,22 +119,23 @@ const Navigation = () => {
 
   return (
     <>
-      {/* Desktop Sidebar */}
-      <nav className="hidden md:flex md:flex-col md:w-64 bg-white border-r border-gray-200 h-full no-print navigation sidebar">
+      {/* Desktop Sidebar - Compact Icon Navigation */}
+      <nav className="hidden md:flex md:flex-col md:w-20 bg-white border-r border-gray-200 h-full no-print navigation sidebar">
         <div className="flex flex-col h-full">
-          {/* Logo/Brand */}
-          <div className="flex items-center gap-3 p-6 border-b border-gray-200">
+          {/* Logo/Brand - Compact */}
+          <div className="flex items-center justify-center p-4 border-b border-gray-200">
             <Link 
               to="/dashboards" 
-              className="flex items-center gap-2 text-blue-700 hover:text-blue-800 transition-colors"
+              className="flex flex-col items-center gap-1 text-blue-700 hover:text-blue-800 transition-colors"
+              aria-label="TrioReports Home"
             >
               <BarChart3 size={24} />
-              <span className="text-xl font-bold">TrioReports</span>
+              <span className="text-xs font-bold">Trio</span>
             </Link>
           </div>
 
-          {/* Navigation Items */}
-          <div className="flex-1 py-6 px-4 space-y-2">
+          {/* Navigation Items - Icon with abbreviated labels */}
+          <div className="flex-1 py-4 px-2 space-y-1">
             {navigationItems.map((item) => {
               const IconComponent = item.icon;
               
@@ -134,14 +144,17 @@ const Navigation = () => {
                   key={item.id}
                   to={item.path}
                   onClick={() => announceToScreenReader(`Navigating to ${item.label}`)}
-                  className={`flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium transition-colors focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none ${
+                  aria-label={item.label}
+                  className={`flex flex-col items-center gap-1 px-2 py-2 rounded-lg transition-colors focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none ${
                     item.isActive
                       ? 'bg-blue-50 text-blue-700'
                       : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
                   }`}
                 >
                   <IconComponent size={20} />
-                  {item.label}
+                  <span className="text-xs text-center leading-tight break-words max-w-full">
+                    {item.shortLabel}
+                  </span>
                 </Link>
               );
             })}

@@ -78,24 +78,24 @@ const SummaryCard = ({
   const TrendIcon = getArrowIcon();
 
   return (
-    <div className={`bg-white print:bg-white p-4 print:p-2 rounded-lg shadow-sm border print:border-gray ${className}`}>
+    <div className={`bg-white print:bg-white p-3 print:p-2 rounded-lg shadow-sm border print:border-gray ${className}`}>
       {/* Header with icon and title */}
-      <div className="flex items-center gap-2 mb-1 print:mb-1">
+      <div className="flex items-center gap-1 mb-1 print:mb-1">
         {Icon && (
           <Icon 
             className="print:text-black" 
             style={{color: '#0054A6'}}
-            size={16} 
+            size={14} 
           />
         )}
-        <h2 className="text-sm print:text-xs font-medium print:text-black" style={{color: '#0054A6'}}>
+        <h2 className="text-xs print:text-xs font-medium print:text-black truncate" style={{color: '#0054A6'}}>
           {title}
         </h2>
       </div>
 
       {/* Main value and change indicator */}
-      <div className="flex items-end gap-2 mb-1">
-        <span className="text-2xl print:text-xl font-bold print:text-black">
+      <div className="flex items-end gap-1 mb-1">
+        <span className="text-xl print:text-lg font-bold print:text-black">
           {value}
         </span>
         
@@ -113,7 +113,7 @@ const SummaryCard = ({
 
       {/* Subtitle or additional info */}
       {(subtitle || target) && (
-        <div className="text-gray-500 print:text-black text-xs print:text-xs">
+        <div className="text-gray-500 print:text-black text-xs print:text-xs truncate">
           {target && (
             <span>Target: {target} | </span>
           )}

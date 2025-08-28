@@ -2,6 +2,114 @@
 // No quarterly logic - only specific reporting dates
 
 export const WORKFORCE_DATA = {
+  "2024-06-30": {
+    reportingDate: "6/30/24",
+    starters: {
+      omaha: 145,
+      phoenix: 82,
+      total: 227
+    },
+    studentCount: {
+      total: 1491,
+      studentWorker: 1414,
+      fws: 77
+    },
+    totalEmployees: 3168,
+    faculty: 678,
+    staff: 1431,
+    hsp: 608,
+    temp: 447,
+    locations: {
+      "Omaha Campus": 4260,
+      "Phoenix Campus": 514
+    },
+    locationDetails: {
+      omaha: {
+        faculty: 620,
+        staff: 1300,
+        hsp: 260,
+        temp: 380
+      },
+      phoenix: {
+        faculty: 58,
+        staff: 131,
+        hsp: 348,
+        temp: 67
+      }
+    },
+    categories: {
+      "SUE": 1414,
+      "CWS": 77,
+      "F12": 1694,
+      "TEMP": 447,
+      "F11": 46,
+      "NBE": 14,
+      "PRN": 105,
+      "HSR": 608,
+      "F09": 282,
+      "PT12": 50,
+      "PT10": 5,
+      "PT9": 19,
+      "F10": 12,
+      "PT11": 1
+    },
+    departments: [
+      { name: "College of Medicine", total: 478, faculty: 308, staff: 170 },
+      { name: "Academic Affairs", total: 292, faculty: 194, staff: 98 },
+      { name: "Student Affairs", total: 238, faculty: 86, staff: 152 },
+      { name: "Information Technology", total: 185, faculty: 43, staff: 142 },
+      { name: "Finance & Administration", total: 163, faculty: 22, staff: 141 },
+      { name: "College of Nursing", total: 142, faculty: 95, staff: 47 },
+      { name: "Human Resources", total: 131, faculty: 11, staff: 120 },
+      { name: "Research & Innovation", total: 125, faculty: 84, staff: 41 },
+      { name: "College of Pharmacy", total: 109, faculty: 73, staff: 36 },
+      { name: "Library Services", total: 95, faculty: 32, staff: 63 }
+    ],
+    schoolOrgData: [
+      { name: "Medicine", faculty: 112, staff: 198, hsp: 260, total: 570 },
+      { name: "Phoenix", faculty: 0, staff: 25, hsp: 348, total: 373 },
+      { name: "Pharmacy & Health Professions", faculty: 115, staff: 208, hsp: 0, total: 323 },
+      { name: "Arts & Sciences", faculty: 245, staff: 62, hsp: 0, total: 307 },
+      { name: "Nursing", faculty: 89, staff: 48, hsp: 0, total: 137 },
+      { name: "Dentistry", faculty: 72, staff: 73, hsp: 0, total: 145 },
+      { name: "Facilities", faculty: 0, staff: 148, hsp: 0, total: 148 },
+      { name: "Provost", faculty: 2, staff: 117, hsp: 0, total: 119 },
+      { name: "VPSL", faculty: 0, staff: 105, hsp: 0, total: 105 },
+      { name: "Athletics", faculty: 0, staff: 85, hsp: 0, total: 85 },
+      { name: "Heider College of Business", faculty: 63, staff: 18, hsp: 0, total: 81 },
+      { name: "VPIT", faculty: 0, staff: 82, hsp: 0, total: 82 },
+      { name: "VPEM", faculty: 0, staff: 75, hsp: 0, total: 75 },
+      { name: "VPUR", faculty: 0, staff: 73, hsp: 0, total: 73 },
+      { name: "SueSucs", faculty: 0, staff: 69, hsp: 0, total: 69 },
+      { name: "Law School", faculty: 26, staff: 24, hsp: 0, total: 50 },
+      { name: "VPFN", faculty: 0, staff: 51, hsp: 0, total: 51 },
+      { name: "Public Safety", faculty: 0, staff: 49, hsp: 0, total: 49 },
+      { name: "CollProCE", faculty: 24, staff: 13, hsp: 0, total: 37 },
+      { name: "UCOM", faculty: 0, staff: 33, hsp: 0, total: 33 },
+      { name: "VPLS", faculty: 0, staff: 31, hsp: 0, total: 31 },
+      { name: "Research", faculty: 0, staff: 25, hsp: 0, total: 25 },
+      { name: "HR", faculty: 0, staff: 22, hsp: 0, total: 22 },
+      { name: "VPGE", faculty: 1, staff: 19, hsp: 0, total: 20 },
+      { name: "VPMM", faculty: 0, staff: 18, hsp: 0, total: 18 },
+      { name: "CFE", faculty: 0, staff: 16, hsp: 0, total: 16 },
+      { name: "GENC", faculty: 0, staff: 8, hsp: 0, total: 8 },
+      { name: "EVP", faculty: 0, staff: 7, hsp: 0, total: 7 },
+      { name: "EDI", faculty: 0, staff: 6, hsp: 0, total: 6 },
+      { name: "VPAA", faculty: 0, staff: 5, hsp: 0, total: 5 },
+      { name: "PRES", faculty: 0, staff: 3, hsp: 0, total: 3 },
+      { name: "JesCom", faculty: 0, staff: 2, hsp: 0, total: 2 },
+      { name: "(blank)", faculty: 1, staff: 1, hsp: 0, total: 2 }
+    ],
+    assignmentTypes: [
+      { type: "Full-Time", count: 2012, percentage: 63.5 },
+      { type: "House Staff Physicians", count: 608, percentage: 19.2 },
+      { type: "Temporary", count: 447, percentage: 14.1 },
+      { type: "Part-Time Regular", count: 101, percentage: 3.2 }
+    ],
+    vacancyRate: 4.5,
+    departures: 65,
+    netChange: 15
+  },
   "2025-03-31": {
     reportingDate: "3/31/25",
     starters: {
@@ -69,24 +177,43 @@ export const WORKFORCE_DATA = {
       fws: 107
     },
     totalEmployees: 3206,
-    faculty: 785,
-    staff: 1809,
+    faculty: 689,
+    staff: 1448,
     hsp: 612,
+    temp: 457,
     locations: {
-      "Omaha Campus": 2566,
-      "Phoenix Campus": 640
+      "Omaha Campus": 4287,
+      "Phoenix Campus": 750
     },
     locationDetails: {
       omaha: {
-        faculty: 727,
-        staff: 1571,
-        hsp: 268
+        faculty: 631,
+        staff: 1317,
+        hsp: 268,
+        temp: 387
       },
       phoenix: {
         faculty: 58,
-        staff: 238,
-        hsp: 344
+        staff: 131,
+        hsp: 344,
+        temp: 70
       }
+    },
+    categories: {
+      "SUE": 1607,
+      "CWS": 107,
+      "F12": 1708,
+      "TEMP": 457,
+      "F11": 53,
+      "NBE": 7,
+      "PRN": 110,
+      "HSR": 612,
+      "F09": 286,
+      "PT12": 52,
+      "PT10": 6,
+      "PT9": 19,
+      "F10": 12,
+      "PT11": 1
     },
     departments: [
       { name: "College of Medicine", total: 492, faculty: 318, staff: 174 },

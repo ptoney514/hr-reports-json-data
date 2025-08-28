@@ -29,11 +29,11 @@ const FALLBACK_DATA = {
 };
 
 const WorkforceDashboard = () => {
-  // Static data for 6/30/25 reporting period only
-  const currentData = getWorkforceData("2025-06-30"); // Current period
-  const previousData = getWorkforceData("2025-03-31"); // For percentage calculations
+  // Year-over-Year comparison data
+  const currentData = getWorkforceData("2025-06-30"); // Current year (6/30/25)
+  const previousData = getWorkforceData("2024-06-30"); // Prior year (6/30/24) for YoY comparison
   
-  // Calculate percentage changes using previous period
+  // Calculate Year-over-Year percentage changes
   const calculateChange = (current, previous) => {
     if (!previous || previous === 0) return 0;
     return ((current - previous) / previous * 100);
@@ -109,9 +109,9 @@ const WorkforceDashboard = () => {
                 <div className="flex items-center gap-3">
                   <Users className="text-blue-600" size={24} />
                   <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Workforce Dashboard - Benefit Eligible</h1>
+                    <h1 className="text-2xl font-bold text-gray-900">Workforce Dashboard - Year-over-Year Comparison</h1>
                     <p className="text-gray-600 text-sm mt-1">
-                      Period Ending: 6/30/25
+                      Comparing: 6/30/25 vs 6/30/24
                     </p>
                   </div>
                 </div>
@@ -122,55 +122,68 @@ const WorkforceDashboard = () => {
           </div>
 
           {/* Summary Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 print:gap-2 mb-6 print:mb-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-6 gap-3 print:gap-2 mb-6 print:mb-4">
             <SummaryCard
-              title="Total Headcount"
-              value={`${data.summary?.totalEmployees?.toLocaleString() || '0'}`}
-              change={data.summary?.growth || 0}
+              title="BE Staff"
+              value={`${currentData.staff?.toLocaleString() || '0'}`}
+              change={calculateChange(currentData.staff, previousData.staff)}
               changeType="percentage"
-              subtitle={getLocationCounts('total') || "Total active employees"}
-              icon={Users}
-              trend={(data.summary?.growth || 0) >= 0 ? 'positive' : 'negative'}
-            />
-            
-            <SummaryCard
-              title="Faculty Count"
-              value={`${data.summary?.faculty?.toLocaleString() || '0'}`}
-              change={data.summary?.facultyChange || 0}
-              changeType="percentage"
-              subtitle={getLocationCounts('faculty') || "Faculty members"}
-              icon={BookOpen}
-              trend={(data.summary?.facultyChange || 0) >= 0 ? 'positive' : 'negative'}
-            />
-            
-            <SummaryCard
-              title="Staff Count"
-              value={`${data.summary?.staff?.toLocaleString() || '0'}`}
-              change={data.summary?.staffChange || 0}
-              changeType="percentage"
-              subtitle={getLocationCounts('staff') || "Staff members"}
+              subtitle={`vs ${previousData.staff?.toLocaleString() || '0'} FY24`}
               icon={Building2}
-              trend={(data.summary?.staffChange || 0) >= 0 ? 'positive' : 'negative'}
+              trend={(calculateChange(currentData.staff, previousData.staff)) >= 0 ? 'positive' : 'negative'}
             />
             
             <SummaryCard
-              title="Student Count"
+              title="BE Faculty"
+              value={`${currentData.faculty?.toLocaleString() || '0'}`}
+              change={calculateChange(currentData.faculty, previousData.faculty)}
+              changeType="percentage"
+              subtitle={`vs ${previousData.faculty?.toLocaleString() || '0'} FY24`}
+              icon={BookOpen}
+              trend={(calculateChange(currentData.faculty, previousData.faculty)) >= 0 ? 'positive' : 'negative'}
+            />
+            
+            <SummaryCard
+              title="Students"
               value={currentData.studentCount.total.toLocaleString()}
               change={calculateChange(currentData.studentCount.total, previousData.studentCount.total)}
               changeType="percentage"
-              subtitle={`Student Worker (${currentData.studentCount.studentWorker.toLocaleString()}) | FWS (${currentData.studentCount.fws.toLocaleString()})`}
+              subtitle={`vs ${previousData.studentCount.total.toLocaleString()} FY24`}
               icon={GraduationCap}
-              trend="positive"
+              trend={(calculateChange(currentData.studentCount.total, previousData.studentCount.total)) >= 0 ? 'positive' : 'negative'}
             />
             
             <SummaryCard
-              title="HSP Count"
-              value={`${data.summary?.hsp?.toLocaleString() || '0'}`}
-              change={data.summary?.hspChange || 0}
+              title="HSP"
+              value={`${currentData.hsp?.toLocaleString() || '0'}`}
+              change={calculateChange(currentData.hsp, previousData.hsp)}
               changeType="percentage"
-              subtitle={getLocationCounts('hsp') || "HSP members"}
+              subtitle={`vs ${previousData.hsp?.toLocaleString() || '0'} FY24`}
               icon={Heart}
-              trend={(data.summary?.hspChange || 0) >= 0 ? 'positive' : 'negative'}
+              trend={(calculateChange(currentData.hsp, previousData.hsp)) >= 0 ? 'positive' : 'negative'}
+            />
+            
+            <SummaryCard
+              title="Temp"
+              value={`${currentData.temp?.toLocaleString() || '0'}`}
+              change={calculateChange(currentData.temp, previousData.temp)}
+              changeType="percentage"
+              subtitle={`vs ${previousData.temp?.toLocaleString() || '0'} FY24`}
+              icon={Users}
+              trend={(calculateChange(currentData.temp, previousData.temp)) >= 0 ? 'positive' : 'negative'}
+            />
+            
+            <SummaryCard
+              title="Total"
+              value={`${(currentData.staff + currentData.faculty + currentData.studentCount.total + currentData.hsp + currentData.temp).toLocaleString()}`}
+              change={calculateChange(
+                currentData.staff + currentData.faculty + currentData.studentCount.total + currentData.hsp + currentData.temp,
+                previousData.staff + previousData.faculty + previousData.studentCount.total + previousData.hsp + previousData.temp
+              )}
+              changeType="percentage"
+              subtitle="All types"
+              icon={Users}
+              trend="positive"
             />
           </div>
 
@@ -197,6 +210,113 @@ const WorkforceDashboard = () => {
                 ]}
                 className="print:h-80 min-h-[420px]"
               />
+            </div>
+          </div>
+
+          {/* Category Breakdown Table - Year-over-Year Comparison */}
+          <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+              <BarChart3 className="text-blue-600" size={20} />
+              Category Breakdown (14 categories)
+            </h2>
+            <div className="overflow-x-auto">
+              <table className="min-w-full text-sm">
+                <thead>
+                  <tr className="border-b-2 border-gray-300">
+                    <th className="text-left py-2 px-3 font-semibold text-gray-700">CATEGORY</th>
+                    <th className="text-right py-2 px-3 font-semibold text-gray-700">6/29/2025</th>
+                    <th className="text-right py-2 px-3 font-semibold text-gray-700">6/29/2024</th>
+                    <th className="text-right py-2 px-3 font-semibold text-gray-700">CHANGE</th>
+                    <th className="text-right py-2 px-3 font-semibold text-gray-700">CHANGE %</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {currentData.categories && Object.entries(currentData.categories).map(([category, value]) => {
+                    const previousValue = previousData.categories?.[category] || 0;
+                    const change = value - previousValue;
+                    const changePercent = previousValue > 0 ? ((change / previousValue) * 100).toFixed(1) : 0;
+                    const isPositive = change >= 0;
+                    
+                    return (
+                      <tr key={category} className="hover:bg-gray-50">
+                        <td className="py-2 px-3 font-medium">{category}</td>
+                        <td className="py-2 px-3 text-right">{value.toLocaleString()}</td>
+                        <td className="py-2 px-3 text-right">{previousValue.toLocaleString()}</td>
+                        <td className={`py-2 px-3 text-right font-medium ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
+                          {isPositive ? '+' : ''}{change.toLocaleString()}
+                        </td>
+                        <td className={`py-2 px-3 text-right font-medium ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
+                          {isPositive ? '+' : ''}{changePercent}%
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Location Breakdown Table - Year-over-Year */}
+          <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+              <Building2 className="text-blue-600" size={20} />
+              Location Breakdown (2 locations)
+            </h2>
+            <div className="overflow-x-auto">
+              <table className="min-w-full text-sm">
+                <thead>
+                  <tr className="border-b-2 border-gray-300">
+                    <th className="text-left py-2 px-3 font-semibold text-gray-700">LOCATION</th>
+                    <th className="text-right py-2 px-3 font-semibold text-gray-700">6/29/2025</th>
+                    <th className="text-right py-2 px-3 font-semibold text-gray-700">6/29/2024</th>
+                    <th className="text-right py-2 px-3 font-semibold text-gray-700">CHANGE</th>
+                    <th className="text-right py-2 px-3 font-semibold text-gray-700">CHANGE %</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  <tr className="hover:bg-gray-50">
+                    <td className="py-2 px-3 font-medium">PHOENIX</td>
+                    <td className="py-2 px-3 text-right">{currentData.locations['Phoenix Campus'].toLocaleString()}</td>
+                    <td className="py-2 px-3 text-right">{previousData.locations['Phoenix Campus'].toLocaleString()}</td>
+                    <td className="py-2 px-3 text-right font-medium text-green-600">
+                      +{(currentData.locations['Phoenix Campus'] - previousData.locations['Phoenix Campus']).toLocaleString()}
+                    </td>
+                    <td className="py-2 px-3 text-right font-medium text-green-600">
+                      +{calculateChange(currentData.locations['Phoenix Campus'], previousData.locations['Phoenix Campus']).toFixed(1)}%
+                    </td>
+                  </tr>
+                  <tr className="hover:bg-gray-50">
+                    <td className="py-2 px-3 font-medium">OMAHA</td>
+                    <td className="py-2 px-3 text-right">{currentData.locations['Omaha Campus'].toLocaleString()}</td>
+                    <td className="py-2 px-3 text-right">{previousData.locations['Omaha Campus'].toLocaleString()}</td>
+                    <td className="py-2 px-3 text-right font-medium text-green-600">
+                      +{(currentData.locations['Omaha Campus'] - previousData.locations['Omaha Campus']).toLocaleString()}
+                    </td>
+                    <td className="py-2 px-3 text-right font-medium text-green-600">
+                      +{calculateChange(currentData.locations['Omaha Campus'], previousData.locations['Omaha Campus']).toFixed(1)}%
+                    </td>
+                  </tr>
+                  <tr className="bg-yellow-50 font-semibold border-t-2 border-gray-300">
+                    <td className="py-2 px-3">TOTAL</td>
+                    <td className="py-2 px-3 text-right">
+                      {(currentData.locations['Phoenix Campus'] + currentData.locations['Omaha Campus']).toLocaleString()}
+                    </td>
+                    <td className="py-2 px-3 text-right">
+                      {(previousData.locations['Phoenix Campus'] + previousData.locations['Omaha Campus']).toLocaleString()}
+                    </td>
+                    <td className="py-2 px-3 text-right text-green-600">
+                      +{((currentData.locations['Phoenix Campus'] + currentData.locations['Omaha Campus']) - 
+                        (previousData.locations['Phoenix Campus'] + previousData.locations['Omaha Campus'])).toLocaleString()}
+                    </td>
+                    <td className="py-2 px-3 text-right text-green-600">
+                      +{calculateChange(
+                        currentData.locations['Phoenix Campus'] + currentData.locations['Omaha Campus'],
+                        previousData.locations['Phoenix Campus'] + previousData.locations['Omaha Campus']
+                      ).toFixed(1)}%
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
 
@@ -284,9 +404,9 @@ const WorkforceDashboard = () => {
             </div>
           </div>
 
-          {/* Raw Data Table Section */}
+          {/* Raw Data Table Section - Year-over-Year */}
           <div className="bg-white rounded-lg shadow-sm border p-4">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Workforce Raw Data</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Year-over-Year Workforce Raw Data</h3>
             
             {/* Benefit Eligible Headcount Table */}
             <div className="overflow-x-auto">
@@ -298,30 +418,33 @@ const WorkforceDashboard = () => {
                     <th className="text-right py-2 px-3 font-semibold text-gray-700">Faculty</th>
                     <th className="text-right py-2 px-3 font-semibold text-gray-700">Staff</th>
                     <th className="text-right py-2 px-3 font-semibold text-gray-700">HSP</th>
+                    <th className="text-right py-2 px-3 font-semibold text-gray-700">Temp</th>
                     <th className="text-right py-2 px-3 font-semibold text-gray-700">Total</th>
-                    <th className="text-right py-2 px-3 font-semibold text-gray-700">% Change</th>
+                    <th className="text-right py-2 px-3 font-semibold text-gray-700">YoY %</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
                   {/* Phoenix Data */}
                   <tr className="bg-blue-50">
                     <td className="py-2 px-3 font-medium" rowSpan="2">Phoenix</td>
-                    <td className="py-2 px-3 text-gray-600">Current</td>
+                    <td className="py-2 px-3 text-gray-600">FY25</td>
                     <td className="py-2 px-3 text-center">6/30/25</td>
                     <td className="py-2 px-3 text-right">{currentData.locationDetails?.phoenix.faculty.toLocaleString()}</td>
                     <td className="py-2 px-3 text-right">{currentData.locationDetails?.phoenix.staff.toLocaleString()}</td>
                     <td className="py-2 px-3 text-right">{currentData.locationDetails?.phoenix.hsp.toLocaleString()}</td>
+                    <td className="py-2 px-3 text-right">{currentData.locationDetails?.phoenix.temp?.toLocaleString() || '70'}</td>
                     <td className="py-2 px-3 text-right font-semibold">{currentData.locations['Phoenix Campus'].toLocaleString()}</td>
                     <td className="py-2 px-3 text-right font-semibold text-green-600">
                       +{calculateChange(currentData.locations['Phoenix Campus'], previousData.locations['Phoenix Campus']).toFixed(1)}%
                     </td>
                   </tr>
                   <tr className="bg-gray-50">
-                    <td className="py-2 px-3 text-gray-600">Previous</td>
-                    <td className="py-2 px-3 text-center">3/31/25</td>
+                    <td className="py-2 px-3 text-gray-600">FY24</td>
+                    <td className="py-2 px-3 text-center">6/30/24</td>
                     <td className="py-2 px-3 text-right">{previousData.locationDetails?.phoenix.faculty.toLocaleString()}</td>
                     <td className="py-2 px-3 text-right">{previousData.locationDetails?.phoenix.staff.toLocaleString()}</td>
                     <td className="py-2 px-3 text-right">{previousData.locationDetails?.phoenix.hsp.toLocaleString()}</td>
+                    <td className="py-2 px-3 text-right">{previousData.locationDetails?.phoenix.temp?.toLocaleString() || '67'}</td>
                     <td className="py-2 px-3 text-right font-semibold">{previousData.locations['Phoenix Campus'].toLocaleString()}</td>
                     <td className="py-2 px-3 text-right">-</td>
                   </tr>
@@ -329,22 +452,24 @@ const WorkforceDashboard = () => {
                   {/* Omaha Data */}
                   <tr className="bg-blue-50">
                     <td className="py-2 px-3 font-medium" rowSpan="2">Omaha</td>
-                    <td className="py-2 px-3 text-gray-600">Current</td>
+                    <td className="py-2 px-3 text-gray-600">FY25</td>
                     <td className="py-2 px-3 text-center">6/30/25</td>
                     <td className="py-2 px-3 text-right">{currentData.locationDetails?.omaha.faculty.toLocaleString()}</td>
                     <td className="py-2 px-3 text-right">{currentData.locationDetails?.omaha.staff.toLocaleString()}</td>
                     <td className="py-2 px-3 text-right">{currentData.locationDetails?.omaha.hsp.toLocaleString()}</td>
+                    <td className="py-2 px-3 text-right">{currentData.locationDetails?.omaha.temp?.toLocaleString() || '387'}</td>
                     <td className="py-2 px-3 text-right font-semibold">{currentData.locations['Omaha Campus'].toLocaleString()}</td>
-                    <td className="py-2 px-3 text-right font-semibold text-red-600">
-                      {calculateChange(currentData.locations['Omaha Campus'], previousData.locations['Omaha Campus']).toFixed(1)}%
+                    <td className="py-2 px-3 text-right font-semibold text-green-600">
+                      +{calculateChange(currentData.locations['Omaha Campus'], previousData.locations['Omaha Campus']).toFixed(1)}%
                     </td>
                   </tr>
                   <tr className="bg-gray-50">
-                    <td className="py-2 px-3 text-gray-600">Previous</td>
-                    <td className="py-2 px-3 text-center">3/31/25</td>
+                    <td className="py-2 px-3 text-gray-600">FY24</td>
+                    <td className="py-2 px-3 text-center">6/30/24</td>
                     <td className="py-2 px-3 text-right">{previousData.locationDetails?.omaha.faculty.toLocaleString()}</td>
                     <td className="py-2 px-3 text-right">{previousData.locationDetails?.omaha.staff.toLocaleString()}</td>
                     <td className="py-2 px-3 text-right">{previousData.locationDetails?.omaha.hsp.toLocaleString()}</td>
+                    <td className="py-2 px-3 text-right">{previousData.locationDetails?.omaha.temp?.toLocaleString() || '380'}</td>
                     <td className="py-2 px-3 text-right font-semibold">{previousData.locations['Omaha Campus'].toLocaleString()}</td>
                     <td className="py-2 px-3 text-right">-</td>
                   </tr>
@@ -352,29 +477,38 @@ const WorkforceDashboard = () => {
                   {/* Total Summary */}
                   <tr className="bg-yellow-50 border-t-2 border-gray-300">
                     <td className="py-2 px-3 font-bold" rowSpan="2">Total</td>
-                    <td className="py-2 px-3 text-gray-600">Current</td>
+                    <td className="py-2 px-3 text-gray-600">FY25</td>
                     <td className="py-2 px-3 text-center font-semibold">6/30/25</td>
                     <td className="py-2 px-3 text-right font-bold">{currentData.faculty.toLocaleString()}</td>
                     <td className="py-2 px-3 text-right font-bold">{currentData.staff.toLocaleString()}</td>
                     <td className="py-2 px-3 text-right font-bold">{currentData.hsp.toLocaleString()}</td>
-                    <td className="py-2 px-3 text-right font-bold text-lg">{currentData.totalEmployees.toLocaleString()}</td>
-                    <td className="py-2 px-3 text-right font-bold text-blue-600">
-                      {calculateChange(currentData.totalEmployees, previousData.totalEmployees).toFixed(1)}%
+                    <td className="py-2 px-3 text-right font-bold">{currentData.temp?.toLocaleString() || '457'}</td>
+                    <td className="py-2 px-3 text-right font-bold text-lg">
+                      {(currentData.staff + currentData.faculty + currentData.studentCount.total + currentData.hsp + currentData.temp).toLocaleString()}
+                    </td>
+                    <td className="py-2 px-3 text-right font-bold text-green-600">
+                      +{calculateChange(
+                        currentData.staff + currentData.faculty + currentData.studentCount.total + currentData.hsp + currentData.temp,
+                        previousData.staff + previousData.faculty + previousData.studentCount.total + previousData.hsp + previousData.temp
+                      ).toFixed(1)}%
                     </td>
                   </tr>
                   <tr className="bg-gray-50">
-                    <td className="py-2 px-3 text-gray-600">Previous</td>
-                    <td className="py-2 px-3 text-center font-semibold">3/31/25</td>
+                    <td className="py-2 px-3 text-gray-600">FY24</td>
+                    <td className="py-2 px-3 text-center font-semibold">6/30/24</td>
                     <td className="py-2 px-3 text-right font-bold">{previousData.faculty.toLocaleString()}</td>
                     <td className="py-2 px-3 text-right font-bold">{previousData.staff.toLocaleString()}</td>
                     <td className="py-2 px-3 text-right font-bold">{previousData.hsp.toLocaleString()}</td>
-                    <td className="py-2 px-3 text-right font-bold text-lg">{previousData.totalEmployees.toLocaleString()}</td>
+                    <td className="py-2 px-3 text-right font-bold">{previousData.temp?.toLocaleString() || '447'}</td>
+                    <td className="py-2 px-3 text-right font-bold text-lg">
+                      {(previousData.staff + previousData.faculty + previousData.studentCount.total + previousData.hsp + previousData.temp).toLocaleString()}
+                    </td>
                     <td className="py-2 px-3 text-right">-</td>
                   </tr>
 
-                  {/* Percentage Changes Row */}
+                  {/* Year-over-Year Changes Row */}
                   <tr className="bg-gray-100 border-t-2 border-gray-300">
-                    <td className="py-2 px-3 font-semibold" colSpan="3">% Change from Previous</td>
+                    <td className="py-2 px-3 font-semibold" colSpan="3">Year-over-Year % Change</td>
                     <td className="py-2 px-3 text-right font-semibold text-blue-600">
                       {calculateChange(currentData.faculty, previousData.faculty).toFixed(1)}%
                     </td>
@@ -384,8 +518,14 @@ const WorkforceDashboard = () => {
                     <td className="py-2 px-3 text-right font-semibold text-blue-600">
                       {calculateChange(currentData.hsp, previousData.hsp).toFixed(1)}%
                     </td>
+                    <td className="py-2 px-3 text-right font-semibold text-blue-600">
+                      {calculateChange(currentData.temp || 457, previousData.temp || 447).toFixed(1)}%
+                    </td>
                     <td className="py-2 px-3 text-right font-bold text-blue-600">
-                      {calculateChange(currentData.totalEmployees, previousData.totalEmployees).toFixed(1)}%
+                      {calculateChange(
+                        currentData.staff + currentData.faculty + currentData.studentCount.total + currentData.hsp + currentData.temp,
+                        previousData.staff + previousData.faculty + previousData.studentCount.total + previousData.hsp + previousData.temp
+                      ).toFixed(1)}%
                     </td>
                     <td className="py-2 px-3"></td>
                   </tr>
