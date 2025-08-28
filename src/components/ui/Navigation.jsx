@@ -11,7 +11,8 @@ import {
   MessageSquare,
   Settings,
   Calendar,
-  FileText
+  FileText,
+  Building2
 } from 'lucide-react';
 import { announceToScreenReader } from '../../utils/accessibilityUtils';
 
@@ -36,6 +37,13 @@ const Navigation = () => {
       path: '/dashboards/workforce',
       icon: Users,
       isActive: isActive('/dashboards/workforce')
+    },
+    {
+      id: 'headcount-details',
+      label: 'Headcount Details',
+      path: '/dashboards/headcount-details',
+      icon: Building2,
+      isActive: isActive('/dashboards/headcount-details')
     },
     {
       id: 'turnover',

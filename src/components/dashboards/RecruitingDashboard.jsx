@@ -50,13 +50,13 @@ const RecruitingDashboard = () => {
     },
     {
       title: "Applications Fiscal YTD", 
-      value: ((currentData.staffHiring?.totalApplications || 7860) + (currentData.facultyHiring?.applications || 1746)).toLocaleString(),
+      value: ((currentData.staffHiring?.totalApplications || 6362) + (currentData.facultyHiring?.applications || 1746)).toLocaleString(),
       change: calculateChange(
-        (currentData.staffHiring?.totalApplications || 7860) + (currentData.facultyHiring?.applications || 1746),
+        (currentData.staffHiring?.totalApplications || 6362) + (currentData.facultyHiring?.applications || 1746),
         (previousData.staffHiring?.totalApplications || 6200) + (previousData.facultyHiring?.applications || 1450)
       ),
       changeType: "percentage",
-      subtitle: `${(currentData.staffHiring?.totalApplications || 7860).toLocaleString()} staff | ${(currentData.facultyHiring?.applications || 1746).toLocaleString()} faculty applications`,
+      subtitle: `${(currentData.staffHiring?.totalApplications || 6362).toLocaleString()} Taleo | ${(currentData.facultyHiring?.applications || 1746).toLocaleString()} Interfolio applications`,
       icon: Users,
       trend: "positive"
     }
@@ -98,7 +98,7 @@ const RecruitingDashboard = () => {
         ))}
         
         <SummaryCard
-          title="Starters"
+          title="Total Benefit Eligible Starters"
           value="262"
           change={16.4}
           changeType="percentage"
@@ -114,7 +114,7 @@ const RecruitingDashboard = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 print:gap-2">
           {/* Staff Hire Rate Card */}
           <StaffHireRateCard
-            applications={currentData.staffHiring?.totalApplications || 7860}
+            applications={currentData.staffHiring?.totalApplications || 6362}
             hires={currentData.staffHiring?.totalHired || 340}
             hireRate={currentData.staffHiring?.overallHireRate || 4.3}
           />
@@ -127,7 +127,7 @@ const RecruitingDashboard = () => {
           />
         </div>
 
-        {/* Staff Position Hiring Analytics */}
+        {/* Taleo Hiring Analytics */}
         <div className="w-full">
           <StaffHiringAnalyticsCard
             internalSuccessRate={currentData.staffHiring?.internalSuccessRate || 24.0}
@@ -139,17 +139,17 @@ const RecruitingDashboard = () => {
         {/* Additional Staff Hiring Analytics */}
         <div className="space-y-6 print:space-y-2">
           <HiringCompetitivenessChart
-            totalApplications={currentData.staffHiring?.totalApplications || 7860}
-            totalHired={currentData.staffHiring?.totalHired || 340}
+            totalApplications={((currentData.staffHiring?.totalApplications || 6362) + (currentData.facultyHiring?.applications || 1746))}
+            totalHired={((currentData.staffHiring?.totalHired || 340) + (currentData.facultyHiring?.hires || 53))}
             internalSuccessRate={currentData.staffHiring?.internalSuccessRate || 24.0}
             externalSuccessRate={currentData.staffHiring?.externalSuccessRate || 3.7}
-            overallHireRate={currentData.staffHiring?.overallHireRate || 4.3}
+            overallHireRate={((currentData.staffHiring?.totalHired || 340) + (currentData.facultyHiring?.hires || 53)) / ((currentData.staffHiring?.totalApplications || 6362) + (currentData.facultyHiring?.applications || 1746)) * 100}
           />
 
           {/* Internal vs External Comparison */}
           <InternalExternalComparisonChart
             internalApplicants={currentData.staffHiring?.internalApplicants || 225}
-            externalApplicants={currentData.staffHiring?.externalApplicants || 7635}
+            externalApplicants={currentData.staffHiring?.externalApplicants || 6137}
             internalHired={currentData.staffHiring?.internalHired || 54}
             externalHired={currentData.staffHiring?.externalHired || 286}
           />

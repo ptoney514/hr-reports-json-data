@@ -147,6 +147,147 @@ const ExitSurveyQ4Dashboard = () => {
           </div>
         </div>
 
+        {/* Q4 FY25 Exit Survey Snapshot */}
+        <div className="mb-8">
+          <div className="bg-white rounded-lg shadow-sm border p-8">
+            <div className="mb-6">
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">Q4 FY25 Exit Survey Snapshot</h2>
+              <div className="w-16 h-1 bg-blue-600 rounded"></div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {/* Left Column */}
+              <div className="space-y-6">
+                {/* Overall Picture */}
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900 mb-3" style={{color: '#0054A6'}}>Overall Picture</h3>
+                  <ul className="space-y-2 text-sm text-gray-700">
+                    <li className="flex items-start gap-2">
+                      <span className="w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 flex-shrink-0"></span>
+                      <span><strong>62 exits this quarter, down 22.5% from Q1</strong> — positive progress in retention.</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 flex-shrink-0"></span>
+                      <span><strong>83.3% would still recommend Creighton as an employer</strong> — strong alignment with mission and values.</span>
+                    </li>
+                  </ul>
+                </div>
+
+                {/* Key Concerns */}
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900 mb-3" style={{color: '#0054A6'}}>Key Concerns</h3>
+                  <ul className="space-y-2 text-sm text-gray-700">
+                    <li className="flex items-start gap-2">
+                      <span className="w-1.5 h-1.5 bg-red-500 rounded-full mt-2 flex-shrink-0"></span>
+                      <span><strong>22.2% of respondents (4 of 18)</strong> reported experiencing improper workplace conduct.</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="w-1.5 h-1.5 bg-red-500 rounded-full mt-2 flex-shrink-0"></span>
+                      <span>Signals cultural/leadership challenges that need immediate attention.</span>
+                    </li>
+                  </ul>
+                </div>
+
+                {/* Lowest Satisfaction Areas */}
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900 mb-3" style={{color: '#0054A6'}}>Lowest satisfaction areas:</h3>
+                  <ul className="space-y-2 text-sm text-gray-700">
+                    <li className="flex items-start gap-2">
+                      <span className="w-1.5 h-1.5 bg-yellow-500 rounded-full mt-2 flex-shrink-0"></span>
+                      <span><strong>Career Development</strong> (2.8/5.0)</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="w-1.5 h-1.5 bg-yellow-500 rounded-full mt-2 flex-shrink-0"></span>
+                      <span><strong>Management Support</strong> (3.2/5.0)</span>
+                    </li>
+                  </ul>
+                </div>
+
+                {/* Top Exit Reasons */}
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900 mb-3" style={{color: '#0054A6'}}>Top exit reasons:</h3>
+                  <ul className="space-y-2 text-sm text-gray-700">
+                    <li className="flex items-start gap-2">
+                      <span className="w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 flex-shrink-0"></span>
+                      <span>Relocation</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 flex-shrink-0"></span>
+                      <span>Lack of career advancement</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 flex-shrink-0"></span>
+                      <span>Dissatisfaction with supervisors</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              {/* Right Column */}
+              <div className="space-y-6">
+                {/* What This Means */}
+                <div className="bg-blue-50 p-6 rounded-lg border-l-4 border-blue-500">
+                  <h3 className="text-lg font-bold text-blue-900 mb-3">What This Means</h3>
+                  <p className="text-sm text-blue-800 leading-relaxed">
+                    Employees continue to value Creighton but are frustrated by inconsistent leadership practices and 
+                    unclear career pathways. Conduct concerns highlight risk areas that could erode trust and engagement 
+                    if unaddressed.
+                  </p>
+                </div>
+
+                {/* Priorities Moving Forward */}
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900 mb-3" style={{color: '#0054A6'}}>Priorities Moving Forward</h3>
+                  <ul className="space-y-3 text-sm text-gray-700">
+                    <li className="flex items-start gap-3">
+                      <span className="w-2 h-2 bg-green-500 rounded-full mt-1.5 flex-shrink-0"></span>
+                      <span><strong>Investigation & Assessment</strong> — anonymous climate survey, deeper review of high-exit departments.</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <span className="w-2 h-2 bg-green-500 rounded-full mt-1.5 flex-shrink-0"></span>
+                      <span><strong>Leadership Development</strong> — supervisor training, accountability reviews, and mentorship programs.</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <span className="w-2 h-2 bg-green-500 rounded-full mt-1.5 flex-shrink-0"></span>
+                      <span><strong>Systemic Improvements</strong> — stronger reporting channels, regular pulse surveys, and clearer career advancement pathways.</span>
+                    </li>
+                  </ul>
+                </div>
+
+                {/* Success Measures */}
+                <div className="bg-green-50 p-6 rounded-lg border-l-4 border-green-500">
+                  <h3 className="text-lg font-bold text-green-900 mb-3">Success Measures</h3>
+                  <ul className="space-y-2 text-sm text-green-800">
+                    <li className="flex items-start gap-2">
+                      <CheckCircle size={16} className="text-green-600 mt-0.5 flex-shrink-0" />
+                      <span>Reduce conduct concerns below 10% next quarter</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle size={16} className="text-green-600 mt-0.5 flex-shrink-0" />
+                      <span>Lift Career Development and Management Support above 3.5/5.0</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle size={16} className="text-green-600 mt-0.5 flex-shrink-0" />
+                      <span>Sustain 83%+ recommendation rate</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            {/* Bottom Line */}
+            <div className="mt-8 p-6 rounded-lg" style={{backgroundColor: '#F3F3F0'}}>
+              <div className="flex items-start gap-3">
+                <div className="font-bold text-lg" style={{color: '#0054A6'}}>Bottom Line:</div>
+                <p className="text-sm flex-1" style={{color: '#00245D'}}>
+                  Retention is improving, but leadership development and clearer career growth pathways are essential 
+                  to sustain progress and strengthen employee trust.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <div className="bg-white p-6 rounded-lg shadow-sm border">
             <div className="flex items-center justify-between mb-4">
@@ -209,6 +350,129 @@ const ExitSurveyQ4Dashboard = () => {
             <div className="text-sm text-gray-600 mb-2">Concerns Reported</div>
             <div className="text-xs text-gray-500">
               Improper conduct issues
+            </div>
+          </div>
+        </div>
+
+        {/* Workplace Conduct Analysis Section */}
+        <div className="mb-8">
+          <div className="bg-white rounded-lg shadow-sm border p-8">
+            <div className="flex items-center gap-4 mb-6">
+              <AlertCircle style={{color: '#DC2626'}} size={28} />
+              <div>
+                <h2 className="text-xl font-bold text-gray-900">Workplace Conduct Analysis</h2>
+                <p className="text-gray-600 text-sm mt-1">
+                  Understanding the 22% concerns reported and recommended actions
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {/* Analysis Narrative */}
+              <div className="space-y-6">
+                <div className="bg-red-50 p-6 rounded-lg border-l-4 border-red-500">
+                  <h3 className="text-lg font-semibold text-red-900 mb-3">What the 22% Represents</h3>
+                  <div className="text-sm text-red-800 space-y-3">
+                    <p>
+                      <strong>22.2% of exit survey respondents (4 out of 18 total)</strong> reported experiencing 
+                      improper conduct issues during their employment at Creighton University.
+                    </p>
+                    <p>
+                      This metric indicates potential workplace culture challenges that contributed to employee 
+                      departures and requires immediate attention from leadership.
+                    </p>
+                    <div className="bg-white p-3 rounded border border-red-200 mt-4">
+                      <h4 className="font-semibold text-red-900 text-sm mb-2">Related Indicators:</h4>
+                      <ul className="text-xs text-red-700 space-y-1">
+                        <li>• 11.1% cited "Dissatisfied with direct supervisor" as exit reason</li>
+                        <li>• Management Support rated 3.2/5.0 (below average)</li>
+                        <li>• Career Development rated 2.8/5.0 (lowest satisfaction score)</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-blue-50 p-6 rounded-lg border-l-4 border-blue-500">
+                  <h3 className="text-lg font-semibold text-blue-900 mb-3">Context & Impact</h3>
+                  <div className="text-sm text-blue-800 space-y-3">
+                    <p>
+                      Despite reporting conduct concerns, <strong>83.3% of respondents would still recommend 
+                      Creighton</strong> as an employer, suggesting issues may be isolated to specific 
+                      departments or supervisory relationships.
+                    </p>
+                    <p>
+                      The concerns appear linked to management effectiveness and career development 
+                      opportunities, indicating systemic rather than individual issues.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Recommended Actions */}
+              <div className="space-y-6">
+                <div className="bg-green-50 p-6 rounded-lg border-l-4 border-green-500">
+                  <h3 className="text-lg font-semibold text-green-900 mb-4">Immediate Action Items</h3>
+                  <div className="space-y-4">
+                    <div className="bg-white p-4 rounded-lg border border-green-200">
+                      <h4 className="font-semibold text-green-900 text-sm mb-2 flex items-center gap-2">
+                        <Target size={16} />
+                        Priority 1: Investigation & Assessment
+                      </h4>
+                      <ul className="text-xs text-green-800 space-y-1 ml-6">
+                        <li>• Conduct anonymous workplace climate survey</li>
+                        <li>• Review specific departments with multiple exits</li>
+                        <li>• Assess current reporting mechanisms effectiveness</li>
+                      </ul>
+                    </div>
+
+                    <div className="bg-white p-4 rounded-lg border border-green-200">
+                      <h4 className="font-semibold text-green-900 text-sm mb-2 flex items-center gap-2">
+                        <Users size={16} />
+                        Priority 2: Leadership Development
+                      </h4>
+                      <ul className="text-xs text-green-800 space-y-1 ml-6">
+                        <li>• Implement supervisor training programs</li>
+                        <li>• Establish regular management accountability reviews</li>
+                        <li>• Create mentoring programs for career development</li>
+                      </ul>
+                    </div>
+
+                    <div className="bg-white p-4 rounded-lg border border-green-200">
+                      <h4 className="font-semibold text-green-900 text-sm mb-2 flex items-center gap-2">
+                        <CheckCircle size={16} />
+                        Priority 3: Systemic Improvements
+                      </h4>
+                      <ul className="text-xs text-green-800 space-y-1 ml-6">
+                        <li>• Strengthen anonymous reporting processes</li>
+                        <li>• Implement regular employee pulse surveys</li>
+                        <li>• Create clear career advancement pathways</li>
+                        <li>• Establish follow-up protocols for reported concerns</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-300">
+                  <h4 className="font-semibold text-yellow-900 text-sm mb-2">Success Metrics to Track</h4>
+                  <ul className="text-xs text-yellow-800 space-y-1">
+                    <li>• Reduce concerns reported to &lt;10% in next quarter</li>
+                    <li>• Increase Management Support satisfaction to &gt;3.5/5.0</li>
+                    <li>• Improve Career Development ratings to &gt;3.2/5.0</li>
+                    <li>• Maintain or improve overall recommendation rate (83%+)</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            {/* Strategic Summary */}
+            <div className="mt-8 p-6 rounded-lg" style={{backgroundColor: '#F3F3F0'}}>
+              <p className="text-sm print:text-black" style={{color: '#00245D'}}>
+                <strong>Strategic Insight:</strong> The 22% workplace conduct concerns, while significant, 
+                appear to be addressable through targeted leadership development and systemic improvements. 
+                The high recommendation rate (83%) suggests Creighton's core mission and values remain strong, 
+                but management practices need refinement to create a consistently positive work environment 
+                across all departments.
+              </p>
             </div>
           </div>
         </div>

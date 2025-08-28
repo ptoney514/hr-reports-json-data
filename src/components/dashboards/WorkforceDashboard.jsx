@@ -1,18 +1,18 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import SummaryCard from '../ui/SummaryCard';
 import ErrorBoundary from '../ui/ErrorBoundary';
-import SchoolOrgHeadcountChart from '../charts/SchoolOrgHeadcountChart';
 import LocationDistributionChart from '../charts/LocationDistributionChart';
 import AssignmentTypeChart from '../charts/AssignmentTypeChart';
 import { DataDebugOverlay } from '../ui/DataDebugOverlay';
 import { getWorkforceData, getAllSchoolOrgData } from '../../data/staticData';
 import { 
   Users, 
-  TrendingUp, 
   BookOpen,
   Building2,
   Heart,
-  GraduationCap
+  GraduationCap,
+  BarChart3
 } from 'lucide-react';
 
 // Simplified fallback data for consistent dashboard display
@@ -200,15 +200,87 @@ const WorkforceDashboard = () => {
             </div>
           </div>
 
-          {/* Workforce Analytics Charts - Row 2: School/Organization Headcount (Full Width) */}
+          {/* Workforce Analytics Charts - Row 2: Headcount Overview Link */}
           <div className="grid grid-cols-1 gap-6 print:gap-4 mb-6">
-            {/* School/Organization Headcount Chart */}
-            <div>
-              <SchoolOrgHeadcountChart 
-                data={getAllSchoolOrgData("2025-06-30")}
-                height={450}
-                className="h-full"
-              />
+            {/* Headcount Details Summary Card */}
+            <div className="bg-white rounded-lg shadow-sm border p-8">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-4">
+                  <Building2 style={{color: '#0054A6'}} size={24} />
+                  <div>
+                    <h2 className="text-xl font-bold text-gray-900">Organization Headcount Overview</h2>
+                    <p className="text-gray-600 mt-1">
+                      Benefit-eligible employees distributed across {getAllSchoolOrgData("2025-06-30")?.filter(org => (org.faculty || 0) + (org.staff || 0) + (org.hsp || 0) > 0).length || 0} organizations
+                    </p>
+                  </div>
+                </div>
+                <Link
+                  to="/dashboards/headcount-details"
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center gap-2"
+                >
+                  <BarChart3 size={20} />
+                  View Details
+                </Link>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {/* Top Organizations Preview */}
+                {getAllSchoolOrgData("2025-06-30")?.slice(0, 3).map((org, index) => {
+                  const total = (org.faculty || 0) + (org.staff || 0) + (org.hsp || 0);
+                  const percentage = (total / currentData.totalEmployees * 100).toFixed(1);
+                  
+                  return (
+                    <div key={org.name} className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                      <div className="flex items-center justify-between mb-2">
+                        <div className={`px-2 py-1 rounded text-xs font-bold text-white ${
+                          index === 0 ? 'bg-blue-600' : index === 1 ? 'bg-blue-500' : 'bg-blue-400'
+                        }`}>
+                          #{index + 1}
+                        </div>
+                        <div className="text-lg font-bold" style={{color: '#0054A6'}}>
+                          {total.toLocaleString()}
+                        </div>
+                      </div>
+                      <h3 className="font-semibold text-gray-900 text-sm mb-1">
+                        {org.name.length > 25 ? org.name.substring(0, 25) + '...' : org.name}
+                      </h3>
+                      <div className="text-xs text-gray-600 space-y-1">
+                        <div>Faculty: {org.faculty || 0} | Staff: {org.staff || 0}</div>
+                        <div>{percentage}% of total workforce</div>
+                      </div>
+                    </div>
+                  );
+                }) || []}
+              </div>
+
+              <div className="mt-6 pt-6 border-t border-gray-200">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                  <div>
+                    <div className="text-2xl font-bold" style={{color: '#0054A6'}}>
+                      {getAllSchoolOrgData("2025-06-30")?.filter(org => (org.faculty || 0) + (org.staff || 0) + (org.hsp || 0) > 0).length || 0}
+                    </div>
+                    <div className="text-sm text-gray-600">Organizations</div>
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold" style={{color: '#1F74DB'}}>
+                      {getAllSchoolOrgData("2025-06-30")?.filter(org => (org.faculty || 0) + (org.staff || 0) + (org.hsp || 0) >= 200).length || 0}
+                    </div>
+                    <div className="text-sm text-gray-600">Large (200+)</div>
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold" style={{color: '#71CC98'}}>
+                      {Math.round((getAllSchoolOrgData("2025-06-30")?.reduce((sum, org) => sum + ((org.faculty || 0) + (org.staff || 0) + (org.hsp || 0)), 0) || 0) / (getAllSchoolOrgData("2025-06-30")?.filter(org => (org.faculty || 0) + (org.staff || 0) + (org.hsp || 0) > 0).length || 1))}
+                    </div>
+                    <div className="text-sm text-gray-600">Avg per Org</div>
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold" style={{color: '#FFC72C'}}>
+                      {Math.max(...(getAllSchoolOrgData("2025-06-30")?.map(org => (org.faculty || 0) + (org.staff || 0) + (org.hsp || 0)) || [0])).toLocaleString()}
+                    </div>
+                    <div className="text-sm text-gray-600">Largest Org</div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 

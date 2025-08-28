@@ -355,11 +355,11 @@ export const RECRUITING_DATA = {
       hireRate: 3.0
     },
     staffHiring: {
-      totalApplications: 7860,
+      totalApplications: 6362,
       totalHired: 340,
       overallHireRate: 4.3,
       internalApplicants: 225,
-      externalApplicants: 7635,
+      externalApplicants: 6137,
       internalHired: 54,
       externalHired: 286,
       internalSuccessRate: 24.0,

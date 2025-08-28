@@ -2,10 +2,10 @@ import React, { memo } from 'react';
 import { Briefcase, Target } from 'lucide-react';
 
 const StaffHireRateCard = memo(({ 
-  applications = 7860,
+  applications = 6362,
   hires = 340,
   hireRate = 4.3,
-  title = "Staff Hire Rate",
+  title = "Taleo ATS Hire Rate",
   className = ""
 }) => {
   // Calculate hire rate if not provided
@@ -48,7 +48,7 @@ const StaffHireRateCard = memo(({
           {/* Competitiveness indicator */}
           <div className="flex items-center justify-center gap-2 text-sm print:text-black" style={{color: '#00245D'}}>
             <Target size={16} />
-            <span className="font-medium">Competitive Staff Positions</span>
+            <span className="font-medium">Competitive Taleo Positions</span>
           </div>
         </div>
       </div>
@@ -61,7 +61,7 @@ const StaffHireRateCard = memo(({
         </div>
         
         <div className="flex justify-between items-center">
-          <span className="text-sm text-gray-600 print:text-black">Staff Hired:</span>
+          <span className="text-sm text-gray-600 print:text-black">Taleo Hires:</span>
           <span className="font-semibold text-lg print:text-black" style={{color: '#0054A6'}}>
             {hires.toLocaleString()}
           </span>
@@ -70,8 +70,8 @@ const StaffHireRateCard = memo(({
         {/* Competitiveness message */}
         <div className="mt-4 p-3 rounded-lg" style={{backgroundColor: '#F3F3F0'}}>
           <p className="text-sm print:text-black" style={{color: '#00245D'}}>
-            The {displayRate.toFixed(1)}% hire rate demonstrates competitive staff positions with 
-            strong candidate quality during FY25.
+            The {displayRate.toFixed(1)}% hire rate demonstrates competitive Taleo positions with 
+            strong candidate quality during FY25. <strong>Taleo applications include staff, temporary, PRN and NBE positions.</strong>
           </p>
         </div>
       </div>

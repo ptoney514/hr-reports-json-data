@@ -5,7 +5,7 @@ const StaffHiringAnalyticsCard = memo(({
   internalSuccessRate = 24.0,
   externalSuccessRate = 3.7,
   internalAdvantage = 6.4,
-  title = "Staff Position Hiring Analytics",
+  title = "Taleo Hiring Analytics",
   className = ""
 }) => {
   return (
