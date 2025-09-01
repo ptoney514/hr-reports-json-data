@@ -69,7 +69,7 @@ Optimize React components, fix Hook dependency warnings, and improve component r
 - **Tailwind CSS 3.4.17** for responsive design
 - **Recharts 3.0.0** for data visualization
 - **JSON Data Architecture** with local file-based data management
-- **Docker** development environment with hot reloading
+- **Local Development Server** with hot reloading via react-scripts
 
 ## Development Commands
 
@@ -81,23 +81,15 @@ npm start
 npm test
 
 # Build for production
-npm run build
+npm run build:production
 
 # Analyze bundle size
 npm run analyze
-```
 
-## Docker Quick Start
-
-```bash
-# Start development environment (with hot reloading)
-docker-compose up -d
-
-# Stop development environment
-docker-compose down
-
-# Rebuild (only needed for dependency changes)
-docker-compose build && docker-compose up -d
+# Quick development shortcuts
+npm run dev         # Alias for npm start
+npm run dev:test    # Run tests once
+npm run dev:build   # Build production version
 ```
 
 **Application available at:** http://localhost:3000
@@ -113,22 +105,61 @@ docker-compose build && docker-compose up -d
 
 ## Current Project Status
 
-### 🎯 **Production Ready System - Clean JSON Architecture** 
+### 🎯 **Production Ready System - Pure Local Development** 
 
-**System Status**: All dashboards operational with pure JSON-based data architecture, comprehensive error handling, and clean modern interfaces.
+**System Status**: All dashboards operational with JSON-based data architecture running on local development server. Docker removed for improved performance.
+
+**Recent Updates (September 2025):**
+- ✅ **Simplified to Local-Only Development** - Removed Docker overhead, faster startup
+- ✅ **Source Metrics Structure Created** - New `/source-metrics/` folder for data imports
+- ✅ **Exit Survey Methodology Documented** - Standardized calculation methods in `EXIT_SURVEY_METHODOLOGY.md`
+- ✅ **Data Import Templates** - CSV templates for easy data addition
+- ✅ **Q4 FY25 Exit Survey Analysis** - 62 exits, 29% response rate, 83.3% satisfaction
 
 **Key Achievements:**
-- ✅ **Pure JSON Data Architecture** - Migrated from Firebase to efficient JSON-based system
+- ✅ **Pure JSON Data Architecture** - Efficient local file-based system
 - ✅ **Enhanced Workforce Analytics** - Real-time data processing and visualization
-- ✅ **Modern I-9 Risk Assessment** - Visual severity indicators and trend analysis
-- ✅ **Docker Production Deployment** - Containerized development environment
+- ✅ **Modern Exit Survey Dashboards** - Q1 and Q4 FY25 analysis pages
+- ✅ **Optimized Local Development** - Fast, lightweight, no Docker required
 - ✅ **Chart Synchronization** - All dashboard visualizations properly coordinated
 
 **Architecture:**
 - Multi-dashboard architecture with React Router
-- JSON files as primary data source stored in `/public/data/`
+- Static data source in `/src/data/staticData.js`
+- Source metrics folder at `/source-metrics/` for data imports
 - Custom hooks for data fetching (useWorkforceData, useTurnoverData, useComplianceData)
 - Context providers for cross-component state sharing
+
+## Source Metrics Data Import
+
+### 📁 Folder Structure for Data Import
+The `/source-metrics/` directory is organized for easy data import:
+
+```
+source-metrics/
+├── exit-surveys/       # Exit survey data by fiscal year
+│   ├── fy24/          # Place FY24 exit surveys here
+│   ├── fy25/          # Place FY25 exit surveys here  
+│   └── fy26/          # Place FY26 exit surveys here
+├── workforce/          # Headcount and demographics data
+├── turnover/          # Turnover metrics
+├── recruiting/        # Hiring and recruiting data
+├── compliance/        # I-9 compliance data
+├── templates/         # CSV/Excel templates with correct format
+└── processed-data/    # System-processed data output
+```
+
+### 📊 Adding Exit Survey Data
+1. Use template: `source-metrics/templates/exit_survey_template.csv`
+2. Save as: `exit_survey_Q4_FY25.csv` (or similar)
+3. Place in: `source-metrics/exit-surveys/fy25/`
+4. Required fields: exit_date, department, satisfaction ratings (1-5), exit_reason
+5. See `EXIT_SURVEY_METHODOLOGY.md` for calculation methods
+
+### 📈 Key Metrics Documents
+- **Exit Survey Methodology**: `/EXIT_SURVEY_METHODOLOGY.md` - Calculation formulas
+- **Data Import Guide**: `/source-metrics/templates/DATA_IMPORT_GUIDE.md` - Format requirements
+- **Source Metrics README**: `/source-metrics/README.md` - Complete folder guide
 
 ## Important Reminders
 
@@ -138,6 +169,7 @@ docker-compose build && docker-compose up -d
 3. **Accessibility Always** - Never compromise on accessibility standards
 4. **Performance Conscious** - Consider performance impact of all changes
 5. **Test Coverage** - Maintain high test coverage for reliability
+6. **Data Privacy** - Never commit PII or sensitive employee data
 
 ### Never Do
 - Create files unless absolutely necessary for achieving goals
@@ -145,6 +177,7 @@ docker-compose build && docker-compose up -d
 - Compromise on accessibility standards
 - Introduce breaking changes without migration strategy
 - Add dependencies without thorough evaluation
+- Commit actual employee data (use anonymized data only)
 
 ## Brand & Design Guidelines
 
