@@ -10,7 +10,38 @@ const ExitSurveyFY25Dashboard = () => {
     // Load FY25 turnover data
     import('../../data/fy25TurnoverData.json')
       .then(data => {
-        setTurnoverData(data.default);
+        const loadedData = data.default;
+        
+        // Data integrity checks
+        const quarterlySum = (loadedData.quarterly?.Q1?.count || 0) + 
+                           (loadedData.quarterly?.Q2?.count || 0) + 
+                           (loadedData.quarterly?.Q3?.count || 0) + 
+                           (loadedData.quarterly?.Q4?.count || 0);
+        
+        const facultySum = (loadedData.quarterly?.Q1?.faculty || 0) + 
+                          (loadedData.quarterly?.Q2?.faculty || 0) + 
+                          (loadedData.quarterly?.Q3?.faculty || 0) + 
+                          (loadedData.quarterly?.Q4?.faculty || 0);
+        
+        const staffSum = (loadedData.quarterly?.Q1?.staff || 0) + 
+                        (loadedData.quarterly?.Q2?.staff || 0) + 
+                        (loadedData.quarterly?.Q3?.staff || 0) + 
+                        (loadedData.quarterly?.Q4?.staff || 0);
+        
+        // Log any discrepancies
+        if (Math.abs(quarterlySum - loadedData.summary?.uniqueEmployees) > 5) {
+          console.warn(`Data integrity warning: Quarterly sum (${quarterlySum}) differs from total (${loadedData.summary?.uniqueEmployees})`);
+        }
+        
+        if (facultySum !== loadedData.summary?.facultyCount) {
+          console.warn(`Data integrity warning: Faculty sum (${facultySum}) differs from total (${loadedData.summary?.facultyCount})`);
+        }
+        
+        if (staffSum !== loadedData.summary?.staffCount) {
+          console.warn(`Data integrity warning: Staff sum (${staffSum}) differs from total (${loadedData.summary?.staffCount})`);
+        }
+        
+        setTurnoverData(loadedData);
         setLoading(false);
       })
       .catch(err => {
@@ -46,11 +77,11 @@ const ExitSurveyFY25Dashboard = () => {
     totalSurveyResponses: 69,
     
     // Calculated response rates using corrected turnover data
-    q1ResponseRate: ((20 / 76) * 100).toFixed(1),
-    q2ResponseRate: ((11 / 36) * 100).toFixed(1),
-    q3ResponseRate: ((20 / 52) * 100).toFixed(1),
-    q4ResponseRate: ((18 / 51) * 100).toFixed(1),
-    overallResponseRate: ((69 / 222) * 100).toFixed(1),
+    q1ResponseRate: ((20 / (turnoverData?.quarterly?.Q1?.count || 79)) * 100).toFixed(1),
+    q2ResponseRate: ((11 / (turnoverData?.quarterly?.Q2?.count || 36)) * 100).toFixed(1),
+    q3ResponseRate: ((20 / (turnoverData?.quarterly?.Q3?.count || 52)) * 100).toFixed(1),
+    q4ResponseRate: ((18 / (turnoverData?.quarterly?.Q4?.count || 51)) * 100).toFixed(1),
+    overallResponseRate: ((69 / (turnoverData?.summary?.uniqueEmployees || 222)) * 100).toFixed(1),
     
     // Satisfaction metrics from surveys
     q1Satisfaction: 60, // Would recommend
@@ -64,7 +95,7 @@ const ExitSurveyFY25Dashboard = () => {
   const quarterlyData = [
     { 
       quarter: 'Q1 FY25', 
-      terminations: turnoverData?.quarterly?.Q1?.count || 76,
+      terminations: turnoverData?.quarterly?.Q1?.count || 79,
       faculty: turnoverData?.quarterly?.Q1?.faculty || 5,
       staff: turnoverData?.quarterly?.Q1?.staff || 71,
       responses: 20,
@@ -136,7 +167,7 @@ const ExitSurveyFY25Dashboard = () => {
     },
     {
       category: 'Faculty',
-      count: turnoverData.summary?.facultyCount || 36,
+      count: turnoverData.summary?.facultyCount || 32,
       percentage: ((turnoverData.summary?.facultyCount || 32) / fy25Metrics.uniqueEmployees * 100).toFixed(1),
       color: '#0054A6',
       quarterly: [
@@ -281,7 +312,7 @@ const ExitSurveyFY25Dashboard = () => {
                   </li>
                   <li className="flex items-start gap-2">
                     <AlertCircle size={16} className="text-yellow-600 mt-0.5" />
-                    <span><strong>Q1 spike:</strong> {((turnoverData?.quarterly?.Q1?.count || 76) / fy25Metrics.uniqueEmployees * 100).toFixed(1)}% of all terminations occurred in Q1</span>
+                    <span><strong>Q1 spike:</strong> {((turnoverData?.quarterly?.Q1?.count || 79) / fy25Metrics.uniqueEmployees * 100).toFixed(1)}% of all terminations occurred in Q1</span>
                   </li>
                 </ul>
               </div>
@@ -299,11 +330,11 @@ const ExitSurveyFY25Dashboard = () => {
                   </li>
                   <li className="flex items-start gap-2">
                     <AlertCircle size={16} className="text-yellow-600 mt-0.5" />
-                    <span><strong>Top HR reasons:</strong> Resigned (27%), Graduated (25%), End Assignment (23%)</span>
+                    <span><strong>Top HR reasons:</strong> Resigned ({turnoverData?.termReasonPercentages?.Resigned || 50}%), Retirement ({turnoverData?.termReasonPercentages?.Retirement || 12}%), End Assignment ({turnoverData?.termReasonPercentages?.['End Assignment'] || 10}%)</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <AlertCircle size={16} className="text-yellow-600 mt-0.5" />
-                    <span><strong>Survey participation low:</strong> Need to improve from 11% to 40%+</span>
+                    <span><strong>Survey participation low:</strong> Need to improve from {fy25Metrics.overallResponseRate}% to 40%+</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle size={16} className="text-green-600 mt-0.5" />
@@ -321,7 +352,7 @@ const ExitSurveyFY25Dashboard = () => {
             <Users style={{color: '#0054A6'}} size={20} className="mb-3" />
             <div className="text-3xl font-bold text-gray-900">{fy25Metrics.uniqueEmployees}</div>
             <div className="text-sm text-gray-600">Total Terminations</div>
-            <div className="text-xs text-gray-500 mt-1">9.3% Faculty | 89.5% Staff</div>
+            <div className="text-xs text-gray-500 mt-1">{((fy25Metrics.facultyCount / fy25Metrics.uniqueEmployees) * 100).toFixed(1)}% Faculty | {((fy25Metrics.staffCount / fy25Metrics.uniqueEmployees) * 100).toFixed(1)}% Staff</div>
           </div>
           
           <div className="bg-white p-6 rounded-lg shadow-sm border">
@@ -330,7 +361,7 @@ const ExitSurveyFY25Dashboard = () => {
               {fy25Metrics.overallResponseRate}%
             </div>
             <div className="text-sm text-gray-600">Survey Response Rate</div>
-            <div className="text-xs text-gray-500 mt-1">49 total responses</div>
+            <div className="text-xs text-gray-500 mt-1">{fy25Metrics.totalSurveyResponses} total responses</div>
           </div>
           
           <div className="bg-white p-6 rounded-lg shadow-sm border">
@@ -353,9 +384,9 @@ const ExitSurveyFY25Dashboard = () => {
           
           <div className="bg-white p-6 rounded-lg shadow-sm border">
             <AlertCircle style={{color: '#EF4444'}} size={20} className="mb-3" />
-            <div className="text-3xl font-bold" style={{color: '#EF4444'}}>186</div>
+            <div className="text-3xl font-bold" style={{color: '#EF4444'}}>{turnoverData?.quarterly?.Q4?.count || 51}</div>
             <div className="text-sm text-gray-600">Q4 Terminations</div>
-            <div className="text-xs text-gray-500 mt-1">42.3% of total</div>
+            <div className="text-xs text-gray-500 mt-1">{((turnoverData?.quarterly?.Q4?.count || 51) / fy25Metrics.uniqueEmployees * 100).toFixed(1)}% of total</div>
           </div>
         </div>
 
@@ -956,7 +987,7 @@ const ExitSurveyFY25Dashboard = () => {
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle size={14} className="text-red-600 mt-0.5" />
-                    <span>Address 186 Q4 termination spike causes</span>
+                    <span>Address Q1 termination spike ({turnoverData?.quarterly?.Q1?.count || 79} exits)</span>
                   </li>
                 </ul>
               </div>
@@ -1022,12 +1053,12 @@ const ExitSurveyFY25Dashboard = () => {
                 <div className="text-center p-3 bg-gray-50 rounded">
                   <div className="text-xs text-gray-600">Current</div>
                   <div className="text-2xl font-bold text-gray-900">{fy25Metrics.uniqueEmployees}</div>
-                  <div className="text-xs text-green-600">Target: 374</div>
+                  <div className="text-xs text-green-600">Target: {Math.round(fy25Metrics.uniqueEmployees * 0.85)}</div>
                   <div className="text-xs text-gray-500">Terminations</div>
                 </div>
                 <div className="text-center p-3 bg-gray-50 rounded">
                   <div className="text-xs text-gray-600">Current</div>
-                  <div className="text-2xl font-bold text-gray-900">11.1%</div>
+                  <div className="text-2xl font-bold text-gray-900">{fy25Metrics.overallResponseRate}%</div>
                   <div className="text-xs text-green-600">Target: 50%</div>
                   <div className="text-xs text-gray-500">Response Rate</div>
                 </div>
