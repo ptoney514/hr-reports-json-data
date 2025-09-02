@@ -90,6 +90,12 @@ npm run analyze
 npm run dev         # Alias for npm start
 npm run dev:test    # Run tests once
 npm run dev:build   # Build production version
+
+# Data validation commands
+node scripts/processTurnoverData.js     # Process Excel turnover data
+node scripts/validateExitSurveyData.js  # Validate dashboard data
+node scripts/testCalculations.js        # Test all calculations
+node scripts/analyzeFY25ExitSurveys.js  # Generate FY25 analysis
 ```
 
 **Application available at:** http://localhost:3000
@@ -110,11 +116,11 @@ npm run dev:build   # Build production version
 **System Status**: All dashboards operational with JSON-based data architecture running on local development server. Docker removed for improved performance.
 
 **Recent Updates (September 2025):**
-- ✅ **Simplified to Local-Only Development** - Removed Docker overhead, faster startup
-- ✅ **Source Metrics Structure Created** - New `/source-metrics/` folder for data imports
-- ✅ **Exit Survey Methodology Documented** - Standardized calculation methods in `EXIT_SURVEY_METHODOLOGY.md`
-- ✅ **Data Import Templates** - CSV templates for easy data addition
-- ✅ **Q4 FY25 Exit Survey Analysis** - 62 exits, 29% response rate, 83.3% satisfaction
+- ✅ **Data Validation Process Implemented** - Comprehensive validation scripts for data accuracy
+- ✅ **FY25 Exit Survey Data Corrected** - Fixed Q4 (51 exits) and Q1 (79 exits) termination counts
+- ✅ **Comprehensive FY25 Analysis** - 222 total exits, 31.1% response rate, 65.3% avg satisfaction
+- ✅ **Dynamic Data Integration** - Dashboard now pulls directly from processed JSON data
+- ✅ **Validation Documentation** - Created `DATA_VALIDATION_PROCESS.md` for data flow tracking
 
 **Key Achievements:**
 - ✅ **Pure JSON Data Architecture** - Efficient local file-based system
@@ -159,6 +165,7 @@ source-metrics/
 ### 📈 Key Metrics Documents
 - **Exit Survey Methodology**: `/EXIT_SURVEY_METHODOLOGY.md` - Exit survey calculation formulas and standards
 - **Turnover Methodology**: `/TURNOVER_METHODOLOGY.md` - Turnover data processing and calculations
+- **Data Validation Process**: `/docs/DATA_VALIDATION_PROCESS.md` - Validation methodology and data flow
 - **Data Import Guide**: `/source-metrics/templates/DATA_IMPORT_GUIDE.md` - Format requirements
 - **Source Metrics README**: `/source-metrics/README.md` - Complete folder guide
 
@@ -166,6 +173,9 @@ source-metrics/
 - **Turnover Processing**: `/scripts/processTurnoverData.js` - Extracts and analyzes termination data from Excel
 - **Excel Inspection**: `/scripts/inspectExcelData.js` - Debug tool for Excel file structure
 - **Sheet Inspector**: `/scripts/inspectAllSheets.js` - Reviews all sheets in Excel workbook
+- **Data Validation**: `/scripts/validateExitSurveyData.js` - Validates all dashboard data points
+- **Calculation Testing**: `/scripts/testCalculations.js` - Verifies all mathematical calculations
+- **FY25 Analysis**: `/scripts/analyzeFY25ExitSurveys.js` - Comprehensive year-end analysis generator
 
 ## Important Reminders
 
