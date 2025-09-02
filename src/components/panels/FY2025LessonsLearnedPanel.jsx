@@ -6,8 +6,8 @@ const FY2025LessonsLearnedPanel = ({ className = "" }) => {
     whatWorked: [
       {
         title: "Exit Volume Reduction",
-        description: "22.5% decrease from Q1 (80) to Q4 (62) exits shows retention strategies gaining traction",
-        metric: "↓22.5%",
+        description: "36.3% decrease from Q1 (80) to Q4 (51) exits shows retention strategies gaining traction",
+        metric: "↓36.3%",
         impact: "High"
       },
       {

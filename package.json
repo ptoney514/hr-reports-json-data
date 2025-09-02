@@ -41,7 +41,11 @@
     "prepare": "npm run build:production",
     "dev": "npm start",
     "dev:test": "npm test -- --watchAll=false",
-    "dev:build": "npm run build:production"
+    "dev:build": "npm run build:production",
+    "data:process": "node scripts/processTurnoverData.js",
+    "data:sync": "node scripts/syncTurnoverToStaticData.js",
+    "data:validate": "node scripts/validateDataConsistency.js",
+    "data:update": "npm run data:process && npm run data:sync && npm run data:validate"
   },
   "eslintConfig": {
     "extends": [

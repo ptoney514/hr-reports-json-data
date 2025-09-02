@@ -23,25 +23,25 @@ const FY2025AnnualExitChart = memo(({
       {
         quarter: 'Q2 FY25',
         period: 'Oct-Dec 2024',
-        exits: 71, // Estimated: 80 → 62 linear progression
+        exits: 36, // Actual from turnover data
         satisfaction: null,
-        hasData: false,
+        hasData: true,
         hasSurvey: false,
-        note: 'Estimated'
+        note: 'Actual - No Survey'
       },
       {
         quarter: 'Q3 FY25',
         period: 'Jan-Mar 2025',
-        exits: 66, // Estimated: continuing downward trend
+        exits: 52, // Actual from turnover data
         satisfaction: null,
-        hasData: false,
+        hasData: true,
         hasSurvey: false,
-        note: 'Estimated'
+        note: 'Actual - No Survey'
       },
       {
         quarter: 'Q4 FY25',
         period: 'Apr-Jun 2025',
-        exits: 62,
+        exits: 51,
         satisfaction: 83,
         hasData: true,
         hasSurvey: true,

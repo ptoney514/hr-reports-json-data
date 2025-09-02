@@ -251,7 +251,7 @@ const ExitSurveyDashboard = () => {
                 <ul className="space-y-2 text-gray-700">
                   <li className="flex items-start gap-2">
                     <span className="mt-1" style={{color: '#71CC98'}}>✓</span>
-                    <span><strong>22.5% reduction</strong> in exit volume from Q1 to Q4 (actual data)</span>
+                    <span><strong>36.3% reduction</strong> in exit volume from Q1 to Q4 (actual data)</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="mt-1" style={{color: '#71CC98'}}>✓</span>

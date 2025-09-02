@@ -14,6 +14,7 @@ const TurnoverDashboard = lazy(() => import('./components/dashboards/TurnoverDas
 const RecruitingDashboard = lazy(() => import('./components/dashboards/RecruitingDashboard'));
 const ExitSurveyOverview = lazy(() => import('./components/dashboards/ExitSurveyOverview'));
 const ExitSurveyQ1Dashboard = lazy(() => import('./components/dashboards/ExitSurveyQ1Dashboard'));
+const ExitSurveyQ2Dashboard = lazy(() => import('./components/dashboards/ExitSurveyQ2Dashboard'));
 const ExitSurveyQ3Dashboard = lazy(() => import('./components/dashboards/ExitSurveyQ3Dashboard'));
 const ExitSurveyQ4Dashboard = lazy(() => import('./components/dashboards/ExitSurveyQ4Dashboard'));
 const ExitSurveyFY25Dashboard = lazy(() => import('./components/dashboards/ExitSurveyFY25Dashboard'));
@@ -113,6 +114,7 @@ function App() {
               <Route path="/dashboards/recruiting" element={<RecruitingDashboard />} />
               <Route path="/dashboards/exit-survey" element={<ExitSurveyOverview />} />
               <Route path="/dashboards/exit-survey-q1" element={<ExitSurveyQ1Dashboard />} />
+              <Route path="/dashboards/exit-survey-q2" element={<ExitSurveyQ2Dashboard />} />
               <Route path="/dashboards/exit-survey-q3" element={<ExitSurveyQ3Dashboard />} />
               <Route path="/dashboards/exit-survey-q4" element={<ExitSurveyQ4Dashboard />} />
               <Route path="/dashboards/exit-survey-fy25" element={<ExitSurveyFY25Dashboard />} />

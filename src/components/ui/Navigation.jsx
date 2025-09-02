@@ -82,6 +82,14 @@ const Navigation = () => {
       isActive: isActive('/dashboards/exit-survey-q1')
     },
     {
+      id: 'exit-survey-q2',
+      label: 'Q2 FY25 Exit Analysis',
+      shortLabel: 'Q2 FY25',
+      path: '/dashboards/exit-survey-q2',
+      icon: Calendar,
+      isActive: isActive('/dashboards/exit-survey-q2')
+    },
+    {
       id: 'exit-survey-q3',
       label: 'Q3 FY25 Critical Issues',
       shortLabel: 'Q3 FY25',

@@ -9,9 +9,9 @@ const ExitSurveyOverview = () => {
 
   const overviewMetrics = {
     totalExitsQ1: q1Data?.totalExits || 80,
-    totalExitsQ4: q4Data?.totalExits || 62,
-    improvement: Math.round(((80 - 62) / 80) * 100),
-    totalFY25: (q1Data?.totalExits || 80) + (q4Data?.totalExits || 62),
+    totalExitsQ4: q4Data?.totalExits || 51,
+    improvement: Math.round(((80 - 51) / 80) * 100),
+    totalFY25: (q1Data?.totalExits || 80) + (q4Data?.totalExits || 51),
     q4Satisfaction: q4Data?.wouldRecommend || 83,
     q4ResponseRate: q4Data?.responseRate || 29
   };

@@ -1,10 +1,10 @@
 import React from 'react';
 import { BarChart, Bar, LineChart, Line, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { TrendingUp, UserX, FileText, AlertCircle } from 'lucide-react';
+import { TrendingDown, UserX, FileText, AlertCircle } from 'lucide-react';
 import { getExitSurveyData } from '../../data/staticData';
 
-const ExitSurveyQ1Dashboard = () => {
-  const surveyData = getExitSurveyData("2024-09-30");
+const ExitSurveyQ2Dashboard = () => {
+  const surveyData = getExitSurveyData("2024-12-31");
 
   const satisfactionData = [
     { category: 'Management Support', score: surveyData.satisfactionRatings.managementSupport, target: 3.5 },
@@ -16,28 +16,30 @@ const ExitSurveyQ1Dashboard = () => {
   ];
 
   const departureReasonColors = {
-    'Career advancement opportunities': '#F59E0B',
-    'Relocation': '#10B981',
-    'Better compensation elsewhere': '#EAB308',
-    'Work-life balance': '#84CC16',
+    'Better compensation elsewhere': '#EF4444',
+    'Career advancement opportunities': '#F97316',
+    'Dissatisfied with supervisor': '#F59E0B',
+    'Work-life balance': '#EAB308',
+    'Relocation': '#84CC16',
     'Retirement': '#6B7280',
-    'Dissatisfied with supervisor': '#F97316',
+    'Hostile work environment': '#DC2626',
     'Other': '#94A3B8'
   };
 
-  const quarterlyTrendData = [
-    { quarter: 'Q1 FY25', exits: 79, responses: 25, rate: 31.6 }
+  const concernsTrendData = [
+    { quarter: 'Q1 FY25', percentage: 20.0, label: 'Moderate' },
+    { quarter: 'Q2 FY25', percentage: 26.9, label: 'Rising' }
   ];
 
   return (
     <div className="p-6 space-y-6 bg-gray-50 min-h-screen">
-      {/* Header */}
-      <div className="bg-blue-50 border-l-4 border-blue-400 p-4">
+      {/* Header with Warning */}
+      <div className="bg-orange-50 border-l-4 border-orange-400 p-4">
         <div className="flex items-center">
-          <TrendingUp className="h-6 w-6 text-blue-400 mr-3" />
+          <TrendingDown className="h-6 w-6 text-orange-400 mr-3" />
           <div>
-            <h1 className="text-2xl font-bold text-blue-800">Q1 FY25 Exit Survey Analysis - Program Launch</h1>
-            <p className="text-blue-600 mt-1">First quarter of exit survey data collection establishing baseline metrics</p>
+            <h1 className="text-2xl font-bold text-orange-800">Q2 FY25 Exit Survey Analysis - Declining Trends</h1>
+            <p className="text-orange-600 mt-1">Compensation concerns emerging as primary driver of departures</p>
           </div>
         </div>
       </div>
@@ -49,7 +51,7 @@ const ExitSurveyQ1Dashboard = () => {
             <div>
               <p className="text-sm font-medium text-gray-600">Total Exits</p>
               <p className="text-2xl font-bold text-gray-900">{surveyData.totalExits}</p>
-              <p className="text-xs text-gray-500 mt-1">Q1 FY25</p>
+              <p className="text-xs text-gray-500 mt-1">Q2 FY25</p>
             </div>
             <UserX className="h-8 w-8 text-gray-400" />
           </div>
@@ -66,49 +68,49 @@ const ExitSurveyQ1Dashboard = () => {
           </div>
         </div>
 
-        <div className="bg-yellow-50 rounded-lg shadow p-6">
+        <div className="bg-orange-50 rounded-lg shadow p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Workplace Concerns</p>
-              <p className="text-2xl font-bold text-yellow-600">{surveyData.concernsReported.percentage}%</p>
-              <p className="text-xs text-yellow-600 mt-1">{surveyData.concernsReported.count} of {surveyData.concernsReported.total} reported</p>
+              <p className="text-sm font-medium text-orange-700">Conduct Concerns</p>
+              <p className="text-2xl font-bold text-orange-600">{surveyData.concernsReported.percentage}%</p>
+              <p className="text-xs text-orange-600 mt-1">{surveyData.concernsReported.count} of {surveyData.concernsReported.total} reported</p>
             </div>
-            <AlertCircle className="h-8 w-8 text-yellow-500" />
+            <AlertCircle className="h-8 w-8 text-orange-500" />
           </div>
         </div>
 
-        <div className="bg-green-50 rounded-lg shadow p-6">
+        <div className="bg-yellow-50 rounded-lg shadow p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Would Recommend</p>
-              <p className="text-2xl font-bold text-green-600">{surveyData.wouldRecommend}%</p>
-              <p className="text-xs text-green-600 mt-1">Above 60% threshold</p>
+              <p className="text-2xl font-bold text-yellow-600">{surveyData.wouldRecommend}%</p>
+              <p className="text-xs text-red-500 mt-1">Below 60% threshold</p>
             </div>
-            <TrendingUp className="h-8 w-8 text-green-500" />
+            <TrendingDown className="h-8 w-8 text-yellow-500" />
           </div>
         </div>
       </div>
 
-      {/* Key Findings Box */}
-      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
-        <h3 className="text-lg font-bold text-yellow-800 mb-4">Key First Quarter Findings</h3>
+      {/* Key Issues Alert Box */}
+      <div className="bg-orange-50 border border-orange-200 rounded-lg p-6">
+        <h3 className="text-lg font-bold text-orange-800 mb-4">Emerging Concerns - Q2 FY25</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <h4 className="font-semibold text-yellow-700 mb-2">Primary Concerns:</h4>
-            <ul className="list-disc list-inside text-yellow-600 space-y-1 text-sm">
-              <li>Career advancement top exit reason (28%)</li>
-              <li>79 exits indicate high turnover rate</li>
-              <li>Career development satisfaction low (2.7/5.0)</li>
-              <li>20% reported workplace concerns</li>
+            <h4 className="font-semibold text-orange-700 mb-2">Negative Trends:</h4>
+            <ul className="list-disc list-inside text-orange-600 space-y-1 text-sm">
+              <li>Compensation now #1 departure reason (23.1%)</li>
+              <li>Workplace concerns increased to 26.9%</li>
+              <li>Recommendation rate dropped to 57.7%</li>
+              <li>Management satisfaction declining (2.7/5.0)</li>
             </ul>
           </div>
           <div>
-            <h4 className="font-semibold text-green-700 mb-2">Positive Indicators:</h4>
-            <ul className="list-disc list-inside text-green-600 space-y-1 text-sm">
-              <li>Exit survey program successfully launched</li>
-              <li>64% would recommend as employer</li>
-              <li>Benefits satisfaction strong (3.5/5.0)</li>
-              <li>31.6% response rate for first quarter</li>
+            <h4 className="font-semibold text-orange-700 mb-2">Areas Requiring Action:</h4>
+            <ul className="list-disc list-inside text-orange-600 space-y-1 text-sm">
+              <li>Compensation competitiveness review urgent</li>
+              <li>Supervisor satisfaction deteriorating</li>
+              <li>Hostile environment reports emerging (7.7%)</li>
+              <li>Career development remains weak (2.6/5.0)</li>
             </ul>
           </div>
         </div>
@@ -122,7 +124,7 @@ const ExitSurveyQ1Dashboard = () => {
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={surveyData.departureReasons} layout="horizontal">
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis type="number" domain={[0, 30]} />
+              <XAxis type="number" domain={[0, 25]} />
               <YAxis dataKey="reason" type="category" width={180} fontSize={11} />
               <Tooltip formatter={(value) => `${value}%`} />
               <Bar dataKey="percentage">
@@ -132,8 +134,8 @@ const ExitSurveyQ1Dashboard = () => {
               </Bar>
             </BarChart>
           </ResponsiveContainer>
-          <div className="mt-2 text-xs text-yellow-600">
-            ⚠️ Career advancement is primary concern at 28%
+          <div className="mt-2 text-xs text-red-600">
+            ⚠️ Compensation issues now primary driver at 23.1%
           </div>
         </div>
 
@@ -146,13 +148,13 @@ const ExitSurveyQ1Dashboard = () => {
               <XAxis dataKey="category" angle={-45} textAnchor="end" height={80} fontSize={12} />
               <YAxis domain={[0, 5]} ticks={[0, 1, 2, 3, 4, 5]} />
               <Tooltip formatter={(value) => value.toFixed(1)} />
-              <Bar dataKey="score" fill="#3B82F6" />
+              <Bar dataKey="score" fill="#F97316" />
               <Bar dataKey="target" fill="#E5E7EB" />
             </BarChart>
           </ResponsiveContainer>
           <div className="mt-2 flex justify-between text-xs">
-            <span className="text-blue-600">🔵 Mixed results - some below target</span>
-            <span className="text-gray-700">Lowest: Career Development (2.7)</span>
+            <span className="text-orange-600">🟠 Most categories below target</span>
+            <span className="text-orange-700">Lowest: Career Development (2.6)</span>
           </div>
         </div>
       </div>
@@ -174,7 +176,7 @@ const ExitSurveyQ1Dashboard = () => {
               </thead>
               <tbody className="divide-y divide-gray-200">
                 {surveyData.departmentExits.map((dept, index) => (
-                  <tr key={index} className={dept.exits >= 10 ? 'bg-yellow-50' : ''}>
+                  <tr key={index} className={dept.exits >= 8 ? 'bg-yellow-50' : ''}>
                     <td className="px-4 py-2 text-sm text-gray-900">{dept.department}</td>
                     <td className="px-4 py-2 text-sm text-center font-semibold">{dept.exits}</td>
                     <td className="px-4 py-2 text-sm text-center">{dept.responses}</td>
@@ -190,53 +192,51 @@ const ExitSurveyQ1Dashboard = () => {
           </div>
         </div>
 
-        {/* Quarterly Summary */}
+        {/* Concerns Trend */}
         <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">Q1 FY25 Summary</h3>
+          <h3 className="text-lg font-semibold text-gray-800 mb-4">Workplace Concerns Trend</h3>
           <ResponsiveContainer width="100%" height={250}>
-            <BarChart data={quarterlyTrendData}>
+            <LineChart data={concernsTrendData}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="quarter" />
-              <YAxis yAxisId="left" orientation="left" stroke="#8884d8" />
-              <YAxis yAxisId="right" orientation="right" stroke="#82ca9d" />
-              <Tooltip />
-              <Bar yAxisId="left" dataKey="exits" fill="#8884d8" name="Total Exits" />
-              <Bar yAxisId="left" dataKey="responses" fill="#82ca9d" name="Responses" />
-              <Line yAxisId="right" type="monotone" dataKey="rate" stroke="#ff7300" name="Response Rate %" />
-            </BarChart>
+              <YAxis domain={[0, 50]} />
+              <Tooltip formatter={(value) => `${value}%`} />
+              <Line 
+                type="monotone" 
+                dataKey="percentage" 
+                stroke="#F97316" 
+                strokeWidth={2}
+                dot={{ fill: '#F97316', r: 6 }}
+              />
+            </LineChart>
           </ResponsiveContainer>
-          <div className="mt-4 text-sm text-gray-600">
-            <p className="font-semibold">Program Launch Metrics:</p>
-            <ul className="mt-2 space-y-1 text-xs">
-              <li>• Exit survey program initiated July 2024</li>
-              <li>• 31.6% response rate achieved</li>
-              <li>• Baseline metrics established for tracking</li>
-            </ul>
+          <div className="mt-2 text-xs text-orange-600 text-center">
+            ⚠️ Workplace concerns trending upward from Q1 to Q2
           </div>
         </div>
       </div>
 
       {/* Key Insights and Action Items */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="bg-yellow-50 rounded-lg shadow p-6">
-          <h3 className="text-lg font-semibold text-yellow-800 mb-4">Areas of Concern</h3>
+        <div className="bg-orange-50 rounded-lg shadow p-6">
+          <h3 className="text-lg font-semibold text-orange-800 mb-4">Areas of Concern</h3>
           <ul className="space-y-2">
             {surveyData.keyInsights.areasOfConcern.map((concern, index) => (
               <li key={index} className="flex items-start">
-                <span className="text-yellow-500 mr-2">•</span>
-                <span className="text-sm text-yellow-700">{concern}</span>
+                <span className="text-orange-500 mr-2">•</span>
+                <span className="text-sm text-orange-700">{concern}</span>
               </li>
             ))}
           </ul>
         </div>
 
-        <div className="bg-green-50 rounded-lg shadow p-6">
-          <h3 className="text-lg font-semibold text-green-800 mb-4">Positive Feedback</h3>
+        <div className="bg-yellow-50 rounded-lg shadow p-6">
+          <h3 className="text-lg font-semibold text-yellow-800 mb-4">Limited Positives</h3>
           <ul className="space-y-2">
             {surveyData.keyInsights.positiveFeedback.map((feedback, index) => (
               <li key={index} className="flex items-start">
-                <span className="text-green-500 mr-2">•</span>
-                <span className="text-sm text-green-700">{feedback}</span>
+                <span className="text-yellow-500 mr-2">•</span>
+                <span className="text-sm text-yellow-700">{feedback}</span>
               </li>
             ))}
           </ul>
@@ -258,4 +258,4 @@ const ExitSurveyQ1Dashboard = () => {
   );
 };
 
-export default ExitSurveyQ1Dashboard;
+export default ExitSurveyQ2Dashboard;

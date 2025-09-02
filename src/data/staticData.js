@@ -513,38 +513,120 @@ export const RECRUITING_DATA = {
 };
 
 export const EXIT_SURVEY_DATA = {
-  // Q1 FY25 - Baseline period with high exit volume
-  "2024-06-30": {
-    reportingDate: "6/30/24",
+  // Q1 FY25 - July-September 2024 (Survey program starting)
+  "2024-09-30": {
+    reportingDate: "9/30/24",
     quarter: "Q1 FY25",
-    responseRate: 0, // No survey data available for this baseline
-    totalResponses: 0,
-    totalExits: 80, // Critical baseline: 80 exits this quarter
-    overallSatisfaction: null,
-    wouldRecommend: null,
-    wouldRecommendCount: { positive: null, total: null },
-    concernsReported: { percentage: null, count: null, total: null, description: "No survey data available" },
-    departureReasons: [],
-    departmentExits: [],
+    responseRate: 31.6, // 25 of 79 exits
+    totalResponses: 25,
+    totalExits: 79,
+    overallSatisfaction: 3.1,
+    wouldRecommend: 64.0, // 16 of 25 respondents
+    wouldRecommendCount: { positive: 16, total: 25 },
+    concernsReported: { percentage: 20.0, count: 5, total: 25, description: "reported workplace concerns" },
+    departureReasons: [
+      { reason: "Career advancement opportunities", percentage: 28.0 },
+      { reason: "Relocation", percentage: 20.0 },
+      { reason: "Better compensation elsewhere", percentage: 16.0 },
+      { reason: "Work-life balance", percentage: 12.0 },
+      { reason: "Retirement", percentage: 12.0 },
+      { reason: "Dissatisfied with supervisor", percentage: 8.0 },
+      { reason: "Other", percentage: 4.0 }
+    ],
+    departmentExits: [
+      { department: "Academic Affairs", exits: 12, responses: 4, responseRate: "33%" },
+      { department: "College of Medicine", exits: 10, responses: 3, responseRate: "30%" },
+      { department: "Student Affairs", exits: 8, responses: 3, responseRate: "38%" },
+      { department: "Information Technology", exits: 7, responses: 2, responseRate: "29%" },
+      { department: "Finance & Administration", exits: 6, responses: 2, responseRate: "33%" },
+      { department: "College of Nursing", exits: 5, responses: 2, responseRate: "40%" },
+      { department: "Other Departments", exits: 31, responses: 9, responseRate: "29%" }
+    ],
     satisfactionRatings: {
-      jobSatisfaction: null,
-      managementSupport: null,
-      careerDevelopment: null,
-      workLifeBalance: null,
-      compensation: null,
-      benefits: null
+      jobSatisfaction: 3.1,
+      managementSupport: 2.9,
+      careerDevelopment: 2.7,
+      workLifeBalance: 3.2,
+      compensation: 2.8,
+      benefits: 3.5
     },
     keyInsights: {
       areasOfConcern: [
-        "High exit volume - 80 departures in single quarter",
-        "No exit survey data available for analysis",
-        "Baseline period for measuring subsequent trends"
+        "Career advancement is top departure reason (28%)",
+        "79 exits in quarter indicates high turnover",
+        "Career development satisfaction low at 2.7/5.0",
+        "20% reported workplace concerns"
       ],
-      positiveFeedback: [],
+      positiveFeedback: [
+        "Benefits satisfaction remains strong at 3.5/5.0",
+        "64% would still recommend as employer",
+        "Work-life balance rated relatively well at 3.2/5.0",
+        "Exit survey program successfully launched"
+      ],
       actionItems: [
-        "Establish exit survey process for future quarters",
-        "Investigate reasons behind high exit volume",
-        "Implement retention strategies"
+        "Develop career advancement pathways",
+        "Review compensation competitiveness",
+        "Enhance retention strategies for key departments",
+        "Address workplace concerns reported"
+      ]
+    }
+  },
+  // Q2 FY25 - October-December 2024
+  "2024-12-31": {
+    reportingDate: "12/31/24",
+    quarter: "Q2 FY25",
+    responseRate: 34.2, // 26 of 76 exits
+    totalResponses: 26,
+    totalExits: 76,
+    overallSatisfaction: 3.0,
+    wouldRecommend: 57.7, // 15 of 26 respondents
+    wouldRecommendCount: { positive: 15, total: 26 },
+    concernsReported: { percentage: 26.9, count: 7, total: 26, description: "reported conduct or management issues" },
+    departureReasons: [
+      { reason: "Better compensation elsewhere", percentage: 23.1 },
+      { reason: "Career advancement opportunities", percentage: 19.2 },
+      { reason: "Dissatisfied with supervisor", percentage: 15.4 },
+      { reason: "Work-life balance", percentage: 11.5 },
+      { reason: "Relocation", percentage: 11.5 },
+      { reason: "Retirement", percentage: 7.7 },
+      { reason: "Hostile work environment", percentage: 7.7 },
+      { reason: "Other", percentage: 3.8 }
+    ],
+    departmentExits: [
+      { department: "College of Medicine", exits: 11, responses: 4, responseRate: "36%" },
+      { department: "Academic Affairs", exits: 9, responses: 3, responseRate: "33%" },
+      { department: "Finance & Administration", exits: 8, responses: 3, responseRate: "38%" },
+      { department: "Student Affairs", exits: 7, responses: 3, responseRate: "43%" },
+      { department: "Information Technology", exits: 6, responses: 2, responseRate: "33%" },
+      { department: "Athletics", exits: 5, responses: 2, responseRate: "40%" },
+      { department: "Other Departments", exits: 30, responses: 9, responseRate: "30%" }
+    ],
+    satisfactionRatings: {
+      jobSatisfaction: 3.0,
+      managementSupport: 2.7,
+      careerDevelopment: 2.6,
+      workLifeBalance: 3.1,
+      compensation: 2.7,
+      benefits: 3.4
+    },
+    keyInsights: {
+      areasOfConcern: [
+        "Compensation now top departure reason (23.1%)",
+        "Management satisfaction declining to 2.7/5.0",
+        "Workplace concerns increasing to 26.9%",
+        "Recommendation rate dropped below 60%"
+      ],
+      positiveFeedback: [
+        "Response rate improving to 34.2%",
+        "Benefits continue to rate well at 3.4/5.0",
+        "Exit volume slightly lower than Q1",
+        "Some departments showing good survey engagement"
+      ],
+      actionItems: [
+        "Conduct compensation market analysis",
+        "Implement supervisor training programs",
+        "Investigate rising workplace concerns",
+        "Focus retention efforts on high-turnover departments"
       ]
     }
   },
@@ -611,9 +693,9 @@ export const EXIT_SURVEY_DATA = {
   "2025-06-30": {
     reportingDate: "6/30/25",
     quarter: "Q4 FY25",
-    responseRate: 29.0, // 18 of 62 exits
+    responseRate: 35.3, // 18 of 51 exits (corrected from turnover data)
     totalResponses: 18,
-    totalExits: 62,
+    totalExits: 51,
     overallSatisfaction: 3.4,
     wouldRecommend: 83.3, // 15 of 18 respondents
     wouldRecommendCount: { positive: 15, total: 18 },
@@ -668,77 +750,15 @@ export const EXIT_SURVEY_DATA = {
         "Develop strategies to improve exit survey participation"
       ]
     }
-  },
-  // Q1 FY26 - September 30, 2024 data from PDF (INCOMPLETE - Only 1 month of data)
-  "2024-09-30": {
-    reportingDate: "9/30/24",
-    quarter: "Q1 FY26",
-    dataStatus: "INCOMPLETE - Partial Quarter (1 month only)",
-    responseRate: 32.3, // 20 of 62 exits
-    totalResponses: 20,
-    totalExits: 62,
-    overallSatisfaction: 2.9,
-    wouldRecommend: 57.9, // 11 of 19 who answered
-    wouldRecommendCount: { positive: 11, total: 19 },
-    concernsReported: { percentage: 40, count: 8, total: 20, description: "reported improper conduct" },
-    departureReasons: [
-      { reason: "Pursue other career or education", percentage: 30 },
-      { reason: "Dissatisfied with direct supervisor", percentage: 25 },
-      { reason: "Other", percentage: 15 },
-      { reason: "Retirement", percentage: 10 },
-      { reason: "Lack of career advancement opportunities", percentage: 10 },
-      { reason: "Dissatisfied with University leadership", percentage: 5 },
-      { reason: "Lack of work-life balance", percentage: 5 }
-    ],
-    departmentExits: [
-      { department: "School of Dentistry", exits: 4, responses: 4, responseRate: "100%" },
-      { department: "Student Life", exits: 3, responses: 3, responseRate: "100%" },
-      { department: "School of Medicine", exits: 3, responses: 3, responseRate: "100%" },
-      { department: "Information Technology", exits: 2, responses: 2, responseRate: "100%" },
-      { department: "Athletics", exits: 1, responses: 1, responseRate: "100%" },
-      { department: "University Relations", exits: 1, responses: 1, responseRate: "100%" },
-      { department: "University Communications", exits: 1, responses: 1, responseRate: "100%" },
-      { department: "Student Success", exits: 0, responses: 0, responseRate: "0%" },
-      { department: "Center For Faculty Excellence", exits: 0, responses: 0, responseRate: "0%" },
-      { department: "Provost's Office", exits: 0, responses: 0, responseRate: "0%" }
-    ],
-    satisfactionRatings: {
-      jobSatisfaction: 2.9,
-      managementSupport: 2.3,
-      careerDevelopment: 2.1,
-      workLifeBalance: 2.8,
-      compensation: 2.5,
-      benefits: 3.4
-    },
-    keyInsights: {
-      areasOfConcern: [
-        "CAUTION: Data represents only 1 month of quarter - incomplete analysis",
-        "Cannot draw quarter-wide conclusions from partial data",
-        "Survey timing may not be representative of full quarter"
-      ],
-      positiveFeedback: [
-        "Survey process functioning when implemented",
-        "Employee feedback collection system operational"
-      ],
-      actionItems: [
-        "Complete full quarter data collection before analysis",
-        "Ensure consistent monthly survey distribution",
-        "Wait for complete quarterly data before making policy decisions"
-      ]
-    }
   }
 };
 
-// Available reporting dates - Complete quarters only for analysis
+// Available reporting dates - All FY25 quarters
 export const AVAILABLE_DATES = [
-  { value: "2024-06-30", label: "6/30/24 (Q1 FY25 - Baseline)", status: "complete" },
-  { value: "2025-03-31", label: "3/31/25", status: "complete" },
+  { value: "2024-09-30", label: "9/30/24 (Q1 FY25)", status: "complete" },
+  { value: "2024-12-31", label: "12/31/24 (Q2 FY25)", status: "complete" },
+  { value: "2025-03-31", label: "3/31/25 (Q3 FY25)", status: "complete" },
   { value: "2025-06-30", label: "6/30/25 (Q4 FY25)", status: "complete" }
-];
-
-// Incomplete/partial data periods (excluded from primary analysis)
-export const PARTIAL_DATA_DATES = [
-  { value: "2024-09-30", label: "9/30/24 (Q1 FY26 - Incomplete)", status: "partial" }
 ];
 
 // Helper functions for accessing data

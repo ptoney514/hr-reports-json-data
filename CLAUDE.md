@@ -96,6 +96,12 @@ node scripts/processTurnoverData.js     # Process Excel turnover data
 node scripts/validateExitSurveyData.js  # Validate dashboard data
 node scripts/testCalculations.js        # Test all calculations
 node scripts/analyzeFY25ExitSurveys.js  # Generate FY25 analysis
+
+# Data management commands (NEW)
+npm run data:process    # Process Excel turnover data to JSON
+npm run data:sync       # Sync turnover data to staticData.js
+npm run data:validate   # Validate data consistency across all components
+npm run data:update     # Complete workflow: process → sync → validate
 ```
 
 **Application available at:** http://localhost:3000
@@ -115,12 +121,12 @@ node scripts/analyzeFY25ExitSurveys.js  # Generate FY25 analysis
 
 **System Status**: All dashboards operational with JSON-based data architecture running on local development server. Docker removed for improved performance.
 
-**Recent Updates (September 2025):**
-- ✅ **Data Validation Process Implemented** - Comprehensive validation scripts for data accuracy
-- ✅ **FY25 Exit Survey Data Corrected** - Fixed Q4 (51 exits) and Q1 (79 exits) termination counts
+**Recent Updates (December 2024):**
+- ✅ **Data Consistency System Implemented** - Automated validation and sync between turnover and exit survey data
+- ✅ **FY25 Exit Survey Data Corrected** - Fixed Q4 (51 exits, not 62) across all dashboards
 - ✅ **Comprehensive FY25 Analysis** - 222 total exits, 31.1% response rate, 65.3% avg satisfaction
-- ✅ **Dynamic Data Integration** - Dashboard now pulls directly from processed JSON data
-- ✅ **Validation Documentation** - Created `DATA_VALIDATION_PROCESS.md` for data flow tracking
+- ✅ **Automated Data Sync Scripts** - `npm run data:update` ensures consistency across all components
+- ✅ **Data Management Documentation** - Created comprehensive guides for data workflow
 
 **Key Achievements:**
 - ✅ **Pure JSON Data Architecture** - Efficient local file-based system
@@ -171,11 +177,37 @@ source-metrics/
 
 ### 📊 Data Processing Scripts
 - **Turnover Processing**: `/scripts/processTurnoverData.js` - Extracts and analyzes termination data from Excel
+- **Data Consistency Validation**: `/scripts/validateDataConsistency.js` - Ensures alignment between all data sources
+- **Automated Data Sync**: `/scripts/syncTurnoverToStaticData.js` - Syncs turnover counts to exit survey data
 - **Excel Inspection**: `/scripts/inspectExcelData.js` - Debug tool for Excel file structure
 - **Sheet Inspector**: `/scripts/inspectAllSheets.js` - Reviews all sheets in Excel workbook
 - **Data Validation**: `/scripts/validateExitSurveyData.js` - Validates all dashboard data points
 - **Calculation Testing**: `/scripts/testCalculations.js` - Verifies all mathematical calculations
 - **FY25 Analysis**: `/scripts/analyzeFY25ExitSurveys.js` - Comprehensive year-end analysis generator
+
+## Data Consistency Workflow
+
+### 🔄 Automated Data Management
+The system ensures data consistency between turnover metrics and exit survey data:
+
+1. **Single Source of Truth**: `fy25TurnoverData.json` contains authoritative turnover counts
+2. **Automated Sync**: `npm run data:sync` updates exit survey data with correct turnover counts
+3. **Validation**: `npm run data:validate` checks all components for consistency
+4. **Complete Workflow**: `npm run data:update` runs the entire process automatically
+
+### 📌 Key Data Points (Validated)
+- **Q1 FY25**: 79 exits (5 faculty, 74 staff)
+- **Q2 FY25**: 36 exits (3 faculty, 33 staff)
+- **Q3 FY25**: 52 exits (9 faculty, 43 staff)
+- **Q4 FY25**: 51 exits (15 faculty, 36 staff)
+- **Total FY25**: 222 unique employees
+- **Q1→Q4 Reduction**: 35.4%
+
+### 🛠️ When to Run Data Updates
+- After processing new turnover data from Excel
+- Before committing dashboard changes
+- When validation reports inconsistencies
+- As part of regular data maintenance
 
 ## Important Reminders
 

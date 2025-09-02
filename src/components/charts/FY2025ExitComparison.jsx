@@ -22,7 +22,7 @@ const FY2025ExitComparison = memo(({
     {
       period: 'Q4 FY25',
       label: 'Apr-Jun 2025',
-      exits: 62,
+      exits: 51,
       satisfaction: 83,
       hasData: true,
       hasSurvey: true,
@@ -32,8 +32,8 @@ const FY2025ExitComparison = memo(({
   ];
 
   // Calculate improvement
-  const improvement = Math.round(((80 - 62) / 80) * 100);
-  const totalExits = 80 + 62; // Only actual data
+  const improvement = Math.round(((80 - 51) / 80) * 100);
+  const totalExits = 80 + 51; // Only actual data
 
   // Custom tooltip
   const CustomTooltip = ({ active, payload, label }) => {
@@ -204,11 +204,11 @@ const FY2025ExitComparison = memo(({
                 </li>
                 <li className="flex items-start gap-2">
                   <span style={{color: '#0054A6'}}>•</span>
-                  <span>Q4 FY25: 62 exits (academic year end)</span>
+                  <span>Q4 FY25: 51 exits (academic year end)</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span style={{color: '#71CC98'}}>•</span>
-                  <span>22.5% reduction demonstrates successful retention efforts</span>
+                  <span>36.3% reduction demonstrates successful retention efforts</span>
                 </li>
               </ul>
             </div>
