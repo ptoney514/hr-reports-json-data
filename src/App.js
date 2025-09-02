@@ -1,7 +1,6 @@
 import React, { useEffect, Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import Navigation from './components/ui/Navigation';
 import ErrorBoundary from './components/ui/ErrorBoundary';
 // Removed DataSourceProvider - using static data now
@@ -13,8 +12,13 @@ const DashboardIndex = lazy(() => import('./components/dashboards/DashboardIndex
 const TurnoverDashboard = lazy(() => import('./components/dashboards/TurnoverDashboard'));
 // Testing components removed - using static data approach
 const RecruitingDashboard = lazy(() => import('./components/dashboards/RecruitingDashboard'));
-const ExitSurveyDashboard = lazy(() => import('./components/dashboards/ExitSurveyDashboard'));
+const ExitSurveyOverview = lazy(() => import('./components/dashboards/ExitSurveyOverview'));
+const ExitSurveyQ1Dashboard = lazy(() => import('./components/dashboards/ExitSurveyQ1Dashboard'));
+const ExitSurveyQ3Dashboard = lazy(() => import('./components/dashboards/ExitSurveyQ3Dashboard'));
+const ExitSurveyQ4Dashboard = lazy(() => import('./components/dashboards/ExitSurveyQ4Dashboard'));
+const ExitSurveyFY25Dashboard = lazy(() => import('./components/dashboards/ExitSurveyFY25Dashboard'));
 const WorkforceDashboard = lazy(() => import('./components/dashboards/WorkforceDashboard'));
+const HeadcountDetailsDashboard = lazy(() => import('./components/dashboards/HeadcountDetailsDashboard'));
 // AdminDashboard removed - using static data now
 
 // Create QueryClient with optimized configuration for PocketBase
@@ -104,9 +108,14 @@ function App() {
               {/* Dashboard Routes */}
               <Route path="/dashboards" element={<DashboardIndex />} />
               <Route path="/dashboards/workforce" element={<WorkforceDashboard />} />
+              <Route path="/dashboards/headcount-details" element={<HeadcountDetailsDashboard />} />
               <Route path="/dashboards/turnover" element={<TurnoverDashboard />} />
               <Route path="/dashboards/recruiting" element={<RecruitingDashboard />} />
-              <Route path="/dashboards/exit-survey" element={<ExitSurveyDashboard />} />
+              <Route path="/dashboards/exit-survey" element={<ExitSurveyOverview />} />
+              <Route path="/dashboards/exit-survey-q1" element={<ExitSurveyQ1Dashboard />} />
+              <Route path="/dashboards/exit-survey-q3" element={<ExitSurveyQ3Dashboard />} />
+              <Route path="/dashboards/exit-survey-q4" element={<ExitSurveyQ4Dashboard />} />
+              <Route path="/dashboards/exit-survey-fy25" element={<ExitSurveyFY25Dashboard />} />
               
               {/* Testing routes removed - using static data approach */}
               

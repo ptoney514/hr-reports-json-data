@@ -1,0 +1,28 @@
+# Ignore actual data files but keep folder structure
+*/fy*/*.csv
+*/fy*/*.xlsx
+*/fy*/*.xls
+*/fy*/*.json
+
+# Keep processed data private
+processed-data/*
+!processed-data/.gitkeep
+
+# Allow templates
+!templates/*.csv
+!templates/*.xlsx
+
+# Keep README files
+!README.md
+!*/README.md
+
+# Ignore any files with PII indicators
+*_pii.*
+*_private.*
+*_confidential.*
+*.bak
+*.tmp
+
+# Ignore large data dumps
+raw-exports/*/*
+!raw-exports/*/.gitkeep

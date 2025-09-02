@@ -1,0 +1,132 @@
+# Pocketbase Docker Compose Template
+# Copy this to your project root as docker-compose.yml or docker-compose.pocketbase.yml
+# Replace ${PROJECT_NAME} with your actual project name
+
+version: '3.8'
+
+services:
+  # Pocketbase Database Service
+  pocketbase:
+    image: ghcr.io/muchobien/pocketbase:latest
+    container_name: ${PROJECT_NAME:-myproject}-pocketbase
+    restart: unless-stopped
+    command: [
+      "--encryptionEnv", "PB_ENCRYPTION_KEY",
+      "--hooksDir", "/pb_hooks",
+      "--migrationsDir", "/pb_migrations",
+      "--publicDir", "/pb_public",
+      "--hooksWatch=true",  # Enable hot reload for hooks
+      "--dev"
+    ]
+    environment:
+      # IMPORTANT: Generate a secure 32-character encryption key
+      - PB_ENCRYPTION_KEY=${PB_ENCRYPTION_KEY:-CHANGE-THIS-32-CHAR-KEY-FOR-PROD}
+    ports:
+      # CRITICAL: Use port 8091 (not 8090) to avoid conflicts
+      - "8091:8090"
+    volumes:
+      # Persistent data storage
+      - pocketbase_data:/pb_data
+      # Migration files (read-only for security)
+      - ./pb_migrations:/pb_migrations:ro
+      - ./pb_hooks:/pb_hooks:ro
+      - ./pb_public:/pb_public:ro
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8090/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 15s  # Give Pocketbase time to start and run migrations
+    networks:
+      - app-network
+
+  # React Application Service  
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: ${PROJECT_NAME:-myproject}-react
+    restart: unless-stopped
+    ports:
+      - "3000:3000"  # Standard React development port
+    volumes:
+      # Mount project for hot reload
+      - .:/app
+      # Prevent node_modules from being overwritten
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      
+      # Pocketbase configuration
+      - REACT_APP_POCKETBASE_URL=http://localhost:8091
+      - REACT_APP_USE_POCKETBASE=true
+      
+      # CRITICAL: Docker hot reload configuration
+      - CHOKIDAR_USEPOLLING=true
+      - WATCHPACK_POLLING=true
+      - WDS_SOCKET_HOST=0.0.0.0
+      - WDS_SOCKET_PORT=0
+      - FAST_REFRESH=true
+      
+    depends_on:
+      pocketbase:
+        condition: service_healthy
+    stdin_open: true
+    tty: true
+    networks:
+      - app-network
+
+  # Optional: Pocketbase Backup Service
+  pocketbase-backup:
+    image: alpine:latest
+    container_name: ${PROJECT_NAME:-myproject}-pocketbase-backup
+    restart: unless-stopped
+    volumes:
+      - pocketbase_data:/pb_data:ro
+      - ./backups:/backups
+    environment:
+      - BACKUP_INTERVAL=86400  # Daily backups
+      - BACKUP_RETENTION_DAYS=7
+    command: >
+      sh -c "
+        echo 'Pocketbase backup service started';
+        mkdir -p /backups;
+        while true; do
+          echo '🔄 Creating Pocketbase backup...';
+          BACKUP_FILE=\"/backups/pocketbase_backup_$$(date +%Y%m%d_%H%M%S).tar.gz\";
+          tar -czf \"$$BACKUP_FILE\" -C /pb_data . 2>/dev/null;
+          if [ $$? -eq 0 ]; then
+            echo \"✅ Backup created: $$(basename $$BACKUP_FILE)\";
+          fi;
+          find /backups -name 'pocketbase_backup_*.tar.gz' -mtime +$$BACKUP_RETENTION_DAYS -delete 2>/dev/null;
+          sleep $$BACKUP_INTERVAL;
+        done
+      "
+    depends_on:
+      - pocketbase
+    networks:
+      - app-network
+    profiles:
+      - backup  # Enable with: docker-compose --profile backup up -d
+
+# Named volumes for data persistence
+volumes:
+  pocketbase_data:
+    driver: local
+    labels:
+      - "project=${PROJECT_NAME:-myproject}"
+      - "component=database"
+
+# Network configuration
+networks:
+  app-network:
+    driver: bridge
+    labels:
+      - "project=${PROJECT_NAME:-myproject}"
+
+# Usage Instructions:
+# 1. Copy this file to your project root
+# 2. Create .env file with PROJECT_NAME and PB_ENCRYPTION_KEY
+# 3. Create pb_migrations directory with admin migration
+# 4. Run: docker-compose up -d
+# 5. Access admin at: http://localhost:8091/_/

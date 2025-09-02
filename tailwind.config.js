@@ -15,6 +15,10 @@ module.exports = {
           'green': '#71CC98',
           'yellow': '#FFC72C'
         }
+      },
+      fontFamily: {
+        'serif': ['"Nocturne Serif"', '"Gentium Book Basic"', 'Georgia', 'serif'],
+        'sans': ['"Proxima Nova"', 'Arial', 'sans-serif']
       }
     },
   },

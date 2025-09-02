@@ -4,6 +4,7 @@ import { getRecruitingData, getPhoenixHeadcountData, getOmahaHeadcountData } fro
 import SummaryCard from '../ui/SummaryCard';
 import DualHeadcountChart from '../charts/DualHeadcountChart';
 import FacultyHireRateCard from '../charts/FacultyHireRateCard';
+import StaffHireRateCard from '../charts/StaffHireRateCard';
 import StaffHiringAnalyticsCard from '../charts/StaffHiringAnalyticsCard';
 import InternalExternalComparisonChart from '../charts/InternalExternalComparisonChart';
 import HiringCompetitivenessChart from '../charts/HiringCompetitivenessChart';
@@ -22,9 +23,9 @@ const FALLBACK_DATA = {
 };
 
 const RecruitingDashboard = () => {
-  // Static data for 6/30/25 reporting period only
-  const currentData = getRecruitingData("2025-06-30"); // Current period
-  const previousData = getRecruitingData("2025-03-31"); // For percentage calculations
+  // FY 2025 vs FY 2024 comparison
+  const currentData = getRecruitingData("2025-06-30"); // FY 2025 end
+  const previousData = getRecruitingData("2024-06-30"); // FY 2024 baseline for year-over-year comparisons
   
   // Chart data
   const phoenixHeadcountData = getPhoenixHeadcountData();
@@ -49,10 +50,13 @@ const RecruitingDashboard = () => {
     },
     {
       title: "Applications Fiscal YTD", 
-      value: currentData.applicationCount.toLocaleString(),
-      change: calculateChange(currentData.applicationCount, previousData.applicationCount),
+      value: ((currentData.staffHiring?.totalApplications || 6362) + (currentData.facultyHiring?.applications || 1746)).toLocaleString(),
+      change: calculateChange(
+        (currentData.staffHiring?.totalApplications || 6362) + (currentData.facultyHiring?.applications || 1746),
+        (previousData.staffHiring?.totalApplications || 6200) + (previousData.facultyHiring?.applications || 1450)
+      ),
       changeType: "percentage",
-      subtitle: `${currentData.newHiresYTD} hires from applications`,
+      subtitle: `${(currentData.staffHiring?.totalApplications || 6362).toLocaleString()} Taleo | ${(currentData.facultyHiring?.applications || 1746).toLocaleString()} Interfolio applications`,
       icon: Users,
       trend: "positive"
     }
@@ -68,9 +72,9 @@ const RecruitingDashboard = () => {
             <div className="flex items-center gap-3">
               <UserPlus style={{color: '#0054A6'}} size={24} />
               <div>
-                <h1 className="text-2xl font-serif font-semibold text-gray-900">Recruiting Dashboard - Benefit Eligible</h1>
+                <h1 className="text-2xl font-serif font-semibold text-gray-900">FY 2025 Recruiting Dashboard - Benefit Eligible</h1>
                 <p className="text-gray-600 text-sm font-sans mt-1">
-                  Period Ending: June 30, 2025
+                  Reporting Period: July 1, 2024 - June 30, 2025
                 </p>
               </div>
             </div>
@@ -94,7 +98,7 @@ const RecruitingDashboard = () => {
         ))}
         
         <SummaryCard
-          title="Starters"
+          title="Total Benefit Eligible Starters"
           value="262"
           change={16.4}
           changeType="percentage"
@@ -106,12 +110,13 @@ const RecruitingDashboard = () => {
 
       {/* Charts Section */}
       <div className="space-y-6 print:space-y-2 mb-6 print:mb-4">
-        {/* Staff Position Hiring Analytics and Faculty Hire Rate */}
+        {/* Staff and Faculty Hire Rate Cards */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 print:gap-2">
-          <StaffHiringAnalyticsCard
-            internalSuccessRate={currentData.staffHiring?.internalSuccessRate || 24.0}
-            externalSuccessRate={currentData.staffHiring?.externalSuccessRate || 3.7}
-            internalAdvantage={currentData.staffHiring?.internalAdvantage || 6.4}
+          {/* Staff Hire Rate Card */}
+          <StaffHireRateCard
+            applications={currentData.staffHiring?.totalApplications || 6362}
+            hires={currentData.staffHiring?.totalHired || 340}
+            hireRate={currentData.staffHiring?.overallHireRate || 4.3}
           />
           
           {/* Faculty Hire Rate Card */}
@@ -122,20 +127,29 @@ const RecruitingDashboard = () => {
           />
         </div>
 
+        {/* Taleo Hiring Analytics */}
+        <div className="w-full">
+          <StaffHiringAnalyticsCard
+            internalSuccessRate={currentData.staffHiring?.internalSuccessRate || 24.0}
+            externalSuccessRate={currentData.staffHiring?.externalSuccessRate || 3.7}
+            internalAdvantage={currentData.staffHiring?.internalAdvantage || 6.4}
+          />
+        </div>
+
         {/* Additional Staff Hiring Analytics */}
         <div className="space-y-6 print:space-y-2">
           <HiringCompetitivenessChart
-            totalApplications={currentData.staffHiring?.totalApplications || 7860}
-            totalHired={currentData.staffHiring?.totalHired || 340}
+            totalApplications={((currentData.staffHiring?.totalApplications || 6362) + (currentData.facultyHiring?.applications || 1746))}
+            totalHired={((currentData.staffHiring?.totalHired || 340) + (currentData.facultyHiring?.hires || 53))}
             internalSuccessRate={currentData.staffHiring?.internalSuccessRate || 24.0}
             externalSuccessRate={currentData.staffHiring?.externalSuccessRate || 3.7}
-            overallHireRate={currentData.staffHiring?.overallHireRate || 4.3}
+            overallHireRate={((currentData.staffHiring?.totalHired || 340) + (currentData.facultyHiring?.hires || 53)) / ((currentData.staffHiring?.totalApplications || 6362) + (currentData.facultyHiring?.applications || 1746)) * 100}
           />
 
           {/* Internal vs External Comparison */}
           <InternalExternalComparisonChart
             internalApplicants={currentData.staffHiring?.internalApplicants || 225}
-            externalApplicants={currentData.staffHiring?.externalApplicants || 7635}
+            externalApplicants={currentData.staffHiring?.externalApplicants || 6137}
             internalHired={currentData.staffHiring?.internalHired || 54}
             externalHired={currentData.staffHiring?.externalHired || 286}
           />

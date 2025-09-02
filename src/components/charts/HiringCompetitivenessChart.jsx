@@ -8,7 +8,7 @@ const HiringCompetitivenessChart = memo(({
   internalSuccessRate = 24.0,
   externalSuccessRate = 3.7,
   overallHireRate = 4.3,
-  title = "Hiring Competitiveness Analysis",
+  title = "Hiring Competitiveness",
   className = ""
 }) => {
   // Calculate competitiveness metrics
@@ -102,36 +102,6 @@ const HiringCompetitivenessChart = memo(({
         </div>
       </div>
 
-      {/* Success Rates Bar Chart */}
-      <div className="mb-6">
-        <h4 className="text-md font-semibold mb-4 print:text-black" style={{color: '#00245D'}}>
-          Success Rates by Candidate Type
-        </h4>
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={competitivenessData} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis 
-              dataKey="category" 
-              tick={{ fontSize: 12 }}
-              interval={0}
-              angle={-45}
-              textAnchor="end"
-              height={80}
-            />
-            <YAxis 
-              label={{ value: 'Success Rate (%)', angle: -90, position: 'insideLeft' }}
-              tick={{ fontSize: 12 }}
-              domain={[0, 25]}
-            />
-            <Tooltip content={<CustomTooltip />} />
-            <Bar 
-              dataKey="rate" 
-              fill="#0054A6"
-              radius={[4, 4, 0, 0]}
-            />
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
 
       {/* Competitiveness Analysis */}
       <div className="space-y-4">
@@ -149,7 +119,7 @@ const HiringCompetitivenessChart = memo(({
               </span>
             </div>
             <ul className="text-sm space-y-1 print:text-black" style={{color: '#00245D'}}>
-              <li>• {overallHireRate}% overall success rate</li>
+              <li>• {overallHireRate.toFixed(0)}% overall success rate</li>
               <li>• {applicantsPerPosition} people compete per position</li>
               <li>• Strong employer brand attraction</li>
             </ul>
@@ -175,7 +145,7 @@ const HiringCompetitivenessChart = memo(({
       {/* Bottom Insight */}
       <div className="mt-6 p-4 rounded-lg" style={{backgroundColor: '#F3F3F0'}}>
         <p className="text-sm print:text-black" style={{color: '#00245D'}}>
-          <strong>Strategic Insight:</strong> The {overallHireRate}% overall hire rate indicates Creighton maintains 
+          <strong>Strategic Insight:</strong> The {overallHireRate.toFixed(0)}% overall hire rate indicates Creighton maintains 
           rigorous selection standards while prioritizing internal talent development. External candidates 
           face significant competition, with only 1 in {Math.round(100/externalSuccessRate)} being successful.
         </p>

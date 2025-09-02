@@ -1,0 +1,211 @@
+{
+  "overall": {
+    "totalResponses": 69,
+    "totalTerminations": 222,
+    "overallResponseRate": "31.1",
+    "avgRecommend": "65.3"
+  },
+  "avgSatisfaction": {
+    "careerDevelopment": "2.5",
+    "managementSupport": "2.9",
+    "workLifeBalance": "3.2",
+    "compensation": "2.8",
+    "benefits": "3.4",
+    "jobSatisfaction": "3.2"
+  },
+  "exitReasonTrends": [
+    {
+      "reason": "Supervisor Issues",
+      "avgPercentage": "27.7",
+      "quarterCount": 3
+    },
+    {
+      "reason": "Better Opportunity",
+      "avgPercentage": "27.0",
+      "quarterCount": 1
+    },
+    {
+      "reason": "Career Advancement",
+      "avgPercentage": "26.0",
+      "quarterCount": 4
+    },
+    {
+      "reason": "Relocation",
+      "avgPercentage": "22.0",
+      "quarterCount": 1
+    },
+    {
+      "reason": "Work Environment",
+      "avgPercentage": "20.0",
+      "quarterCount": 1
+    },
+    {
+      "reason": "Compensation",
+      "avgPercentage": "19.3",
+      "quarterCount": 3
+    },
+    {
+      "reason": "Retirement",
+      "avgPercentage": "17.0",
+      "quarterCount": 1
+    },
+    {
+      "reason": "Work-Life Balance",
+      "avgPercentage": "15.0",
+      "quarterCount": 1
+    },
+    {
+      "reason": "Family Reasons",
+      "avgPercentage": "11.0",
+      "quarterCount": 1
+    }
+  ],
+  "conductTrend": [
+    {
+      "quarter": "Q1",
+      "percentage": 15
+    },
+    {
+      "quarter": "Q2",
+      "percentage": 18
+    },
+    {
+      "quarter": "Q3",
+      "percentage": 20
+    },
+    {
+      "quarter": "Q4",
+      "percentage": 22.2
+    }
+  ],
+  "quarterlyMetrics": {
+    "Q1": {
+      "responses": 20,
+      "terminations": 79,
+      "wouldRecommend": 60,
+      "satisfactionScores": {
+        "careerDevelopment": 2.2,
+        "managementSupport": 2.8,
+        "workLifeBalance": 3.1,
+        "compensation": 2.8,
+        "benefits": 3.4,
+        "jobSatisfaction": 3.2
+      },
+      "topExitReasons": [
+        {
+          "reason": "Career Advancement",
+          "percentage": 35
+        },
+        {
+          "reason": "Supervisor Issues",
+          "percentage": 30
+        },
+        {
+          "reason": "Compensation",
+          "percentage": 20
+        },
+        {
+          "reason": "Work-Life Balance",
+          "percentage": 15
+        }
+      ],
+      "conductConcerns": 15
+    },
+    "Q2": {
+      "responses": 11,
+      "terminations": 36,
+      "wouldRecommend": 72.7,
+      "satisfactionScores": {
+        "careerDevelopment": 2.5,
+        "managementSupport": 3,
+        "workLifeBalance": 3.2,
+        "compensation": 2.9,
+        "benefits": 3.5,
+        "jobSatisfaction": 3.3
+      },
+      "topExitReasons": [
+        {
+          "reason": "Career Advancement",
+          "percentage": 27
+        },
+        {
+          "reason": "Better Opportunity",
+          "percentage": 27
+        },
+        {
+          "reason": "Supervisor Issues",
+          "percentage": 18
+        },
+        {
+          "reason": "Compensation",
+          "percentage": 18
+        }
+      ],
+      "conductConcerns": 18
+    },
+    "Q3": {
+      "responses": 20,
+      "terminations": 52,
+      "wouldRecommend": 45,
+      "satisfactionScores": {
+        "careerDevelopment": 2.3,
+        "managementSupport": 2.7,
+        "workLifeBalance": 3,
+        "compensation": 2.7,
+        "benefits": 3.3,
+        "jobSatisfaction": 2.9
+      },
+      "topExitReasons": [
+        {
+          "reason": "Supervisor Issues",
+          "percentage": 35
+        },
+        {
+          "reason": "Career Advancement",
+          "percentage": 25
+        },
+        {
+          "reason": "Work Environment",
+          "percentage": 20
+        },
+        {
+          "reason": "Compensation",
+          "percentage": 20
+        }
+      ],
+      "conductConcerns": 20
+    },
+    "Q4": {
+      "responses": 18,
+      "terminations": 51,
+      "wouldRecommend": 83.3,
+      "satisfactionScores": {
+        "careerDevelopment": 2.8,
+        "managementSupport": 3.2,
+        "workLifeBalance": 3.3,
+        "compensation": 3,
+        "benefits": 3.6,
+        "jobSatisfaction": 3.4
+      },
+      "topExitReasons": [
+        {
+          "reason": "Relocation",
+          "percentage": 22
+        },
+        {
+          "reason": "Retirement",
+          "percentage": 17
+        },
+        {
+          "reason": "Career Advancement",
+          "percentage": 17
+        },
+        {
+          "reason": "Family Reasons",
+          "percentage": 11
+        }
+      ],
+      "conductConcerns": 22.2
+    }
+  }
+}

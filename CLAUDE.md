@@ -69,7 +69,7 @@ Optimize React components, fix Hook dependency warnings, and improve component r
 - **Tailwind CSS 3.4.17** for responsive design
 - **Recharts 3.0.0** for data visualization
 - **JSON Data Architecture** with local file-based data management
-- **Docker** development environment with hot reloading
+- **Local Development Server** with hot reloading via react-scripts
 
 ## Development Commands
 
@@ -81,23 +81,21 @@ npm start
 npm test
 
 # Build for production
-npm run build
+npm run build:production
 
 # Analyze bundle size
 npm run analyze
-```
 
-## Docker Quick Start
+# Quick development shortcuts
+npm run dev         # Alias for npm start
+npm run dev:test    # Run tests once
+npm run dev:build   # Build production version
 
-```bash
-# Start development environment (with hot reloading)
-docker-compose up -d
-
-# Stop development environment
-docker-compose down
-
-# Rebuild (only needed for dependency changes)
-docker-compose build && docker-compose up -d
+# Data validation commands
+node scripts/processTurnoverData.js     # Process Excel turnover data
+node scripts/validateExitSurveyData.js  # Validate dashboard data
+node scripts/testCalculations.js        # Test all calculations
+node scripts/analyzeFY25ExitSurveys.js  # Generate FY25 analysis
 ```
 
 **Application available at:** http://localhost:3000
@@ -113,22 +111,71 @@ docker-compose build && docker-compose up -d
 
 ## Current Project Status
 
-### 🎯 **Production Ready System - Clean JSON Architecture** 
+### 🎯 **Production Ready System - Pure Local Development** 
 
-**System Status**: All dashboards operational with pure JSON-based data architecture, comprehensive error handling, and clean modern interfaces.
+**System Status**: All dashboards operational with JSON-based data architecture running on local development server. Docker removed for improved performance.
+
+**Recent Updates (September 2025):**
+- ✅ **Data Validation Process Implemented** - Comprehensive validation scripts for data accuracy
+- ✅ **FY25 Exit Survey Data Corrected** - Fixed Q4 (51 exits) and Q1 (79 exits) termination counts
+- ✅ **Comprehensive FY25 Analysis** - 222 total exits, 31.1% response rate, 65.3% avg satisfaction
+- ✅ **Dynamic Data Integration** - Dashboard now pulls directly from processed JSON data
+- ✅ **Validation Documentation** - Created `DATA_VALIDATION_PROCESS.md` for data flow tracking
 
 **Key Achievements:**
-- ✅ **Pure JSON Data Architecture** - Migrated from Firebase to efficient JSON-based system
+- ✅ **Pure JSON Data Architecture** - Efficient local file-based system
 - ✅ **Enhanced Workforce Analytics** - Real-time data processing and visualization
-- ✅ **Modern I-9 Risk Assessment** - Visual severity indicators and trend analysis
-- ✅ **Docker Production Deployment** - Containerized development environment
+- ✅ **Modern Exit Survey Dashboards** - Q1 and Q4 FY25 analysis pages
+- ✅ **Optimized Local Development** - Fast, lightweight, no Docker required
 - ✅ **Chart Synchronization** - All dashboard visualizations properly coordinated
 
 **Architecture:**
 - Multi-dashboard architecture with React Router
-- JSON files as primary data source stored in `/public/data/`
+- Static data source in `/src/data/staticData.js`
+- Source metrics folder at `/source-metrics/` for data imports
 - Custom hooks for data fetching (useWorkforceData, useTurnoverData, useComplianceData)
 - Context providers for cross-component state sharing
+
+## Source Metrics Data Import
+
+### 📁 Folder Structure for Data Import
+The `/source-metrics/` directory is organized for easy data import:
+
+```
+source-metrics/
+├── exit-surveys/       # Exit survey data by fiscal year
+│   ├── fy24/          # Place FY24 exit surveys here
+│   ├── fy25/          # Place FY25 exit surveys here  
+│   └── fy26/          # Place FY26 exit surveys here
+├── workforce/          # Headcount and demographics data
+├── turnover/          # Turnover metrics
+├── recruiting/        # Hiring and recruiting data
+├── compliance/        # I-9 compliance data
+├── templates/         # CSV/Excel templates with correct format
+└── processed-data/    # System-processed data output
+```
+
+### 📊 Adding Exit Survey Data
+1. Use template: `source-metrics/templates/exit_survey_template.csv`
+2. Save as: `exit_survey_Q4_FY25.csv` (or similar)
+3. Place in: `source-metrics/exit-surveys/fy25/`
+4. Required fields: exit_date, department, satisfaction ratings (1-5), exit_reason
+5. See `EXIT_SURVEY_METHODOLOGY.md` for calculation methods
+
+### 📈 Key Metrics Documents
+- **Exit Survey Methodology**: `/EXIT_SURVEY_METHODOLOGY.md` - Exit survey calculation formulas and standards
+- **Turnover Methodology**: `/TURNOVER_METHODOLOGY.md` - Turnover data processing and calculations
+- **Data Validation Process**: `/docs/DATA_VALIDATION_PROCESS.md` - Validation methodology and data flow
+- **Data Import Guide**: `/source-metrics/templates/DATA_IMPORT_GUIDE.md` - Format requirements
+- **Source Metrics README**: `/source-metrics/README.md` - Complete folder guide
+
+### 📊 Data Processing Scripts
+- **Turnover Processing**: `/scripts/processTurnoverData.js` - Extracts and analyzes termination data from Excel
+- **Excel Inspection**: `/scripts/inspectExcelData.js` - Debug tool for Excel file structure
+- **Sheet Inspector**: `/scripts/inspectAllSheets.js` - Reviews all sheets in Excel workbook
+- **Data Validation**: `/scripts/validateExitSurveyData.js` - Validates all dashboard data points
+- **Calculation Testing**: `/scripts/testCalculations.js` - Verifies all mathematical calculations
+- **FY25 Analysis**: `/scripts/analyzeFY25ExitSurveys.js` - Comprehensive year-end analysis generator
 
 ## Important Reminders
 
@@ -138,6 +185,7 @@ docker-compose build && docker-compose up -d
 3. **Accessibility Always** - Never compromise on accessibility standards
 4. **Performance Conscious** - Consider performance impact of all changes
 5. **Test Coverage** - Maintain high test coverage for reliability
+6. **Data Privacy** - Never commit PII or sensitive employee data
 
 ### Never Do
 - Create files unless absolutely necessary for achieving goals
@@ -145,6 +193,7 @@ docker-compose build && docker-compose up -d
 - Compromise on accessibility standards
 - Introduce breaking changes without migration strategy
 - Add dependencies without thorough evaluation
+- Commit actual employee data (use anonymized data only)
 
 ## Brand & Design Guidelines
 

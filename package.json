@@ -25,6 +25,7 @@
     "recharts": "^3.0.0",
     "reselect": "^5.1.1",
     "web-vitals": "^2.1.4",
+    "xlsx": "^0.18.5",
     "zustand": "^4.5.2"
   },
   "scripts": {
@@ -38,28 +39,9 @@
     "optimize": "npm run build:production && npm run analyze",
     "size-check": "bundlesize",
     "prepare": "npm run build:production",
-    "pocketbase:setup": "node scripts/setup-pocketbase-collections.js",
-    "pocketbase:dev": "./scripts/pocketbase-dev-setup.sh",
-    "pocketbase:dev-full": "./scripts/pocketbase-dev-setup.sh full",
-    "pocketbase:start": "./scripts/pocketbase-dev-setup.sh start",
-    "pocketbase:collections": "./scripts/pocketbase-dev-setup.sh collections",
-    "pocketbase:migrate": "./scripts/pocketbase-dev-setup.sh migrate",
-    "pocketbase:status": "./scripts/pocketbase-dev-setup.sh status",
-    "pocketbase:admin": "./scripts/setup-admin.sh",
-    "pocketbase:create-admin": "node scripts/create-pocketbase-admin.js",
-    "docker:up": "docker-compose up -d",
-    "docker:down": "docker-compose down",
-    "docker:restart": "docker-compose restart",
-    "docker:logs": "docker-compose logs -f",
-    "docker:logs:app": "docker-compose logs -f hr-reports-app",
-    "docker:logs:pb": "docker-compose logs -f pocketbase",
-    "docker:build": "docker-compose build",
-    "docker:rebuild": "docker-compose down && docker-compose build --no-cache && docker-compose up -d",
-    "docker:clean": "docker-compose down -v --remove-orphans",
-    "dev": "docker-compose up -d",
-    "dev:full": "npm run docker:clean && npm run docker:build && npm run docker:up && npm run pocketbase:setup",
-    "dev:logs": "docker-compose logs -f",
-    "dev:rebuild": "npm run docker:rebuild"
+    "dev": "npm start",
+    "dev:test": "npm test -- --watchAll=false",
+    "dev:build": "npm run build:production"
   },
   "eslintConfig": {
     "extends": [

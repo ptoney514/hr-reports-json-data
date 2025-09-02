@@ -2,20 +2,20 @@
 
 A comprehensive React-based dashboard application for I-9 compliance health monitoring and HR analytics. Features multiple dashboards, comprehensive testing infrastructure, WCAG 2.1 AA accessibility compliance, JSON-based data architecture, and enterprise-level performance optimization.
 
-## 🚀 Quick Start (Docker - Recommended)
-
-**For consistent cross-platform development (Mac/PC):**
+## 🚀 Quick Start
 
 ```bash
 # 1. Clone the repository
 git clone <repository-url>
-cd hr-trio-reports
+cd hr-reports-json-data
 
-# 2. Build and start Docker container
-docker-compose build --no-cache
-docker-compose up -d
+# 2. Install dependencies
+npm install
 
-# 3. Open the application
+# 3. Start development server
+npm start
+
+# 4. Open the application
 # Navigate to: http://localhost:3000
 ```
 
@@ -25,8 +25,7 @@ docker-compose up -d
 ## 🛠️ Development Setup
 
 ### Prerequisites
-- **Docker** and **Docker Compose** (recommended)
-- **Node.js** 18+ and **npm** (for local development)
+- **Node.js** 18+ and **npm**
 - **Git**
 
 ### Session Start Checklist
@@ -35,67 +34,51 @@ docker-compose up -d
 
 ```bash
 # Navigate to project
-cd hr-trio-reports
+cd hr-reports-json-data
 
-# Pull latest changes (if team project)
+# Pull latest changes
 git pull
 
-# Install dependencies
+# Install/update dependencies
 npm install
 
-# Rebuild Docker with latest changes
-docker-compose down && docker-compose build --no-cache && docker-compose up -d
+# Start development server
+npm start
 ```
 
-## 🔄 Development Workflows
+## 🔄 Development Workflow
 
-### Option 1: Development-First (Recommended)
 ```bash
-# Fast development with hot reload
+# Start development server with hot reload
 npm start  # http://localhost:3000
 
-# When ready to test production build
-docker-compose down
-docker-compose build --no-cache
-docker-compose up -d
-```
+# Run tests in watch mode
+npm test
 
-### Option 2: Docker-First (Maximum Consistency)
-```bash
-# Always use Docker for development
-docker-compose down && docker-compose build --no-cache && docker-compose up -d
+# Build for production
+npm run build:production
+
+# Analyze bundle size
+npm run analyze
 ```
 
 ## 📋 Available Commands
 
-### Development
 ```bash
-# Start development server
-npm start
+# Development
+npm start              # Start development server (port 3000)
+npm test               # Run tests in watch mode
+npm run dev:test       # Run tests once
+npm run dev:build      # Build production version
 
-# Run tests
-npm test
+# Build & Optimization
+npm run build          # Build for production
+npm run build:production  # Build without source maps
+npm run analyze        # Analyze bundle size
+npm run optimize       # Build and analyze
 
-# Build for production
-npm run build
-```
-
-### Docker
-```bash
-# Build and start container
-docker-compose build --no-cache && docker-compose up -d
-
-# View running containers
-docker ps
-
-# View logs
-docker-compose logs -f
-
-# Stop containers
-docker-compose down
-
-# Clean up Docker system
-docker system prune -f
+# Shortcuts
+npm run dev            # Alias for npm start
 ```
 
 ## 🔧 When to Rebuild Docker

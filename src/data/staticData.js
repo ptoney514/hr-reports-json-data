@@ -2,6 +2,114 @@
 // No quarterly logic - only specific reporting dates
 
 export const WORKFORCE_DATA = {
+  "2024-06-30": {
+    reportingDate: "6/30/24",
+    starters: {
+      omaha: 145,
+      phoenix: 82,
+      total: 227
+    },
+    studentCount: {
+      total: 1491,
+      studentWorker: 1414,
+      fws: 77
+    },
+    totalEmployees: 3168,
+    faculty: 678,
+    staff: 1431,
+    hsp: 608,
+    temp: 447,
+    locations: {
+      "Omaha Campus": 4260,
+      "Phoenix Campus": 514
+    },
+    locationDetails: {
+      omaha: {
+        faculty: 620,
+        staff: 1300,
+        hsp: 260,
+        temp: 380
+      },
+      phoenix: {
+        faculty: 58,
+        staff: 131,
+        hsp: 348,
+        temp: 67
+      }
+    },
+    categories: {
+      "SUE": 1414,
+      "CWS": 77,
+      "F12": 1694,
+      "TEMP": 447,
+      "F11": 46,
+      "NBE": 14,
+      "PRN": 105,
+      "HSR": 608,
+      "F09": 282,
+      "PT12": 50,
+      "PT10": 5,
+      "PT9": 19,
+      "F10": 12,
+      "PT11": 1
+    },
+    departments: [
+      { name: "College of Medicine", total: 478, faculty: 308, staff: 170 },
+      { name: "Academic Affairs", total: 292, faculty: 194, staff: 98 },
+      { name: "Student Affairs", total: 238, faculty: 86, staff: 152 },
+      { name: "Information Technology", total: 185, faculty: 43, staff: 142 },
+      { name: "Finance & Administration", total: 163, faculty: 22, staff: 141 },
+      { name: "College of Nursing", total: 142, faculty: 95, staff: 47 },
+      { name: "Human Resources", total: 131, faculty: 11, staff: 120 },
+      { name: "Research & Innovation", total: 125, faculty: 84, staff: 41 },
+      { name: "College of Pharmacy", total: 109, faculty: 73, staff: 36 },
+      { name: "Library Services", total: 95, faculty: 32, staff: 63 }
+    ],
+    schoolOrgData: [
+      { name: "Medicine", faculty: 112, staff: 198, hsp: 260, total: 570 },
+      { name: "Phoenix", faculty: 0, staff: 25, hsp: 348, total: 373 },
+      { name: "Pharmacy & Health Professions", faculty: 115, staff: 208, hsp: 0, total: 323 },
+      { name: "Arts & Sciences", faculty: 245, staff: 62, hsp: 0, total: 307 },
+      { name: "Nursing", faculty: 89, staff: 48, hsp: 0, total: 137 },
+      { name: "Dentistry", faculty: 72, staff: 73, hsp: 0, total: 145 },
+      { name: "Facilities", faculty: 0, staff: 148, hsp: 0, total: 148 },
+      { name: "Provost", faculty: 2, staff: 117, hsp: 0, total: 119 },
+      { name: "VPSL", faculty: 0, staff: 105, hsp: 0, total: 105 },
+      { name: "Athletics", faculty: 0, staff: 85, hsp: 0, total: 85 },
+      { name: "Heider College of Business", faculty: 63, staff: 18, hsp: 0, total: 81 },
+      { name: "VPIT", faculty: 0, staff: 82, hsp: 0, total: 82 },
+      { name: "VPEM", faculty: 0, staff: 75, hsp: 0, total: 75 },
+      { name: "VPUR", faculty: 0, staff: 73, hsp: 0, total: 73 },
+      { name: "SueSucs", faculty: 0, staff: 69, hsp: 0, total: 69 },
+      { name: "Law School", faculty: 26, staff: 24, hsp: 0, total: 50 },
+      { name: "VPFN", faculty: 0, staff: 51, hsp: 0, total: 51 },
+      { name: "Public Safety", faculty: 0, staff: 49, hsp: 0, total: 49 },
+      { name: "CollProCE", faculty: 24, staff: 13, hsp: 0, total: 37 },
+      { name: "UCOM", faculty: 0, staff: 33, hsp: 0, total: 33 },
+      { name: "VPLS", faculty: 0, staff: 31, hsp: 0, total: 31 },
+      { name: "Research", faculty: 0, staff: 25, hsp: 0, total: 25 },
+      { name: "HR", faculty: 0, staff: 22, hsp: 0, total: 22 },
+      { name: "VPGE", faculty: 1, staff: 19, hsp: 0, total: 20 },
+      { name: "VPMM", faculty: 0, staff: 18, hsp: 0, total: 18 },
+      { name: "CFE", faculty: 0, staff: 16, hsp: 0, total: 16 },
+      { name: "GENC", faculty: 0, staff: 8, hsp: 0, total: 8 },
+      { name: "EVP", faculty: 0, staff: 7, hsp: 0, total: 7 },
+      { name: "EDI", faculty: 0, staff: 6, hsp: 0, total: 6 },
+      { name: "VPAA", faculty: 0, staff: 5, hsp: 0, total: 5 },
+      { name: "PRES", faculty: 0, staff: 3, hsp: 0, total: 3 },
+      { name: "JesCom", faculty: 0, staff: 2, hsp: 0, total: 2 },
+      { name: "(blank)", faculty: 1, staff: 1, hsp: 0, total: 2 }
+    ],
+    assignmentTypes: [
+      { type: "Full-Time", count: 2012, percentage: 63.5 },
+      { type: "House Staff Physicians", count: 608, percentage: 19.2 },
+      { type: "Temporary", count: 447, percentage: 14.1 },
+      { type: "Part-Time Regular", count: 101, percentage: 3.2 }
+    ],
+    vacancyRate: 4.5,
+    departures: 65,
+    netChange: 15
+  },
   "2025-03-31": {
     reportingDate: "3/31/25",
     starters: {
@@ -69,24 +177,43 @@ export const WORKFORCE_DATA = {
       fws: 107
     },
     totalEmployees: 3206,
-    faculty: 785,
-    staff: 1809,
+    faculty: 689,
+    staff: 1448,
     hsp: 612,
+    temp: 457,
     locations: {
-      "Omaha Campus": 2566,
-      "Phoenix Campus": 640
+      "Omaha Campus": 4287,
+      "Phoenix Campus": 750
     },
     locationDetails: {
       omaha: {
-        faculty: 727,
-        staff: 1571,
-        hsp: 268
+        faculty: 631,
+        staff: 1317,
+        hsp: 268,
+        temp: 387
       },
       phoenix: {
         faculty: 58,
-        staff: 238,
-        hsp: 344
+        staff: 131,
+        hsp: 344,
+        temp: 70
       }
+    },
+    categories: {
+      "SUE": 1607,
+      "CWS": 107,
+      "F12": 1708,
+      "TEMP": 457,
+      "F11": 53,
+      "NBE": 7,
+      "PRN": 110,
+      "HSR": 612,
+      "F09": 286,
+      "PT12": 52,
+      "PT10": 6,
+      "PT9": 19,
+      "F10": 12,
+      "PT11": 1
     },
     departments: [
       { name: "College of Medicine", total: 492, faculty: 318, staff: 174 },
@@ -245,6 +372,49 @@ export const TURNOVER_DATA = {
 };
 
 export const RECRUITING_DATA = {
+  "2024-06-30": {
+    reportingDate: "6/30/24",
+    openPositions: 85,
+    newHiresYTD: 185,
+    leaversYTD: 45,
+    costPerHire: 3900,
+    timeToFill: 40,
+    applicationCount: 2150,
+    offerAcceptanceRate: 74.8,
+    facultyHiring: {
+      applications: 1450,
+      hires: 42,
+      hireRate: 2.9
+    },
+    staffHiring: {
+      totalApplications: 6200,
+      totalHired: 275,
+      overallHireRate: 4.4,
+      internalApplicants: 180,
+      externalApplicants: 6020,
+      internalHired: 38,
+      externalHired: 237,
+      internalSuccessRate: 21.1,
+      externalSuccessRate: 3.9,
+      internalAdvantage: 5.4
+    },
+    diversityMetrics: {
+      femaleHires: 58.9,
+      minorityHires: 31.2,
+      veteranHires: 7.1
+    },
+    positionsByDepartment: [
+      { department: "College of Medicine", openings: 22, filled: 11 },
+      { department: "Academic Affairs", openings: 13, filled: 8 },
+      { department: "Student Affairs", openings: 12, filled: 7 },
+      { department: "Information Technology", openings: 10, filled: 5 },
+      { department: "Finance & Administration", openings: 8, filled: 4 }
+    ],
+    headcountByLocation: {
+      phoenix: { faculty: 55, staff: 158, hsp: 315, total: 528 },
+      omaha: { faculty: 875, staff: 1520, hsp: 245, total: 2640 }
+    }
+  },
   "2024-12-31": {
     reportingDate: "12/31/24",
     openPositions: 98,
@@ -312,11 +482,11 @@ export const RECRUITING_DATA = {
       hireRate: 3.0
     },
     staffHiring: {
-      totalApplications: 7860,
+      totalApplications: 6362,
       totalHired: 340,
       overallHireRate: 4.3,
       internalApplicants: 225,
-      externalApplicants: 7635,
+      externalApplicants: 6137,
       internalHired: 54,
       externalHired: 286,
       internalSuccessRate: 24.0,
@@ -343,62 +513,232 @@ export const RECRUITING_DATA = {
 };
 
 export const EXIT_SURVEY_DATA = {
-  "2025-03-31": {
-    reportingDate: "3/31/25",
-    responseRate: 68,
-    totalResponses: 47,
-    overallSatisfaction: 3.2,
-    wouldRecommend: 62,
-    departureReasons: [
-      { reason: "Career advancement opportunities", percentage: 28.7 },
-      { reason: "Work-life balance", percentage: 21.3 },
-      { reason: "Compensation", percentage: 19.1 },
-      { reason: "Management/leadership", percentage: 14.9 },
-      { reason: "Job responsibilities", percentage: 10.6 },
-      { reason: "Other", percentage: 5.3 }
-    ],
+  // Q1 FY25 - Baseline period with high exit volume
+  "2024-06-30": {
+    reportingDate: "6/30/24",
+    quarter: "Q1 FY25",
+    responseRate: 0, // No survey data available for this baseline
+    totalResponses: 0,
+    totalExits: 80, // Critical baseline: 80 exits this quarter
+    overallSatisfaction: null,
+    wouldRecommend: null,
+    wouldRecommendCount: { positive: null, total: null },
+    concernsReported: { percentage: null, count: null, total: null, description: "No survey data available" },
+    departureReasons: [],
+    departmentExits: [],
     satisfactionRatings: {
-      jobSatisfaction: 3.2,
-      managementSupport: 2.9,
-      careerDevelopment: 2.7,
-      workLifeBalance: 3.1,
-      compensation: 3.4,
-      benefits: 3.8
+      jobSatisfaction: null,
+      managementSupport: null,
+      careerDevelopment: null,
+      workLifeBalance: null,
+      compensation: null,
+      benefits: null
+    },
+    keyInsights: {
+      areasOfConcern: [
+        "High exit volume - 80 departures in single quarter",
+        "No exit survey data available for analysis",
+        "Baseline period for measuring subsequent trends"
+      ],
+      positiveFeedback: [],
+      actionItems: [
+        "Establish exit survey process for future quarters",
+        "Investigate reasons behind high exit volume",
+        "Implement retention strategies"
+      ]
     }
   },
+  // Q3 FY25 - Critical workplace culture issues identified
+  "2025-03-31": {
+    reportingDate: "3/31/25",
+    quarter: "Q3 FY25",
+    totalExits: 52,
+    totalResponses: 20,
+    responseRate: 38.5,
+    overallSatisfaction: 2.8,
+    wouldRecommend: 45,
+    wouldRecommendCount: { positive: 9, total: 20 },
+    concernsReported: { 
+      percentage: 40, 
+      count: 8, 
+      total: 20, 
+      description: "reported harassment, hostile environment, discrimination" 
+    },
+    departureReasons: [
+      { reason: "Hostile work environment", percentage: 30 },
+      { reason: "Lack of management support", percentage: 25 },
+      { reason: "Career advancement opportunities", percentage: 20 },
+      { reason: "Better compensation elsewhere", percentage: 15 },
+      { reason: "Work-life balance", percentage: 5 },
+      { reason: "Other", percentage: 5 }
+    ],
+    departmentExits: [
+      { department: "Academic Affairs", exits: 8, responses: 4, responseRate: 50 },
+      { department: "College of Medicine", exits: 6, responses: 3, responseRate: 50 },
+      { department: "Finance & Administration", exits: 5, responses: 2, responseRate: 40 },
+      { department: "Student Affairs", exits: 4, responses: 2, responseRate: 50 },
+      { department: "Information Technology", exits: 4, responses: 1, responseRate: 25 },
+      { department: "Other Departments", exits: 25, responses: 8, responseRate: 32 }
+    ],
+    satisfactionRatings: {
+      jobSatisfaction: 2.6,
+      managementSupport: 2.1,
+      careerDevelopment: 2.3,
+      workLifeBalance: 2.8,
+      compensation: 2.5,
+      benefits: 3.2
+    },
+    keyInsights: {
+      areasOfConcern: [
+        "40% reported workplace conduct issues including harassment",
+        "Management support rated lowest at 2.1/5.0",
+        "30% cited hostile work environment as departure reason",
+        "Only 45% would recommend Creighton as employer"
+      ],
+      positiveFeedback: [
+        "Benefits still rated relatively well at 3.2/5.0",
+        "38.5% response rate shows engagement"
+      ],
+      actionItems: [
+        "Immediate investigation of harassment claims",
+        "Management training on supportive leadership",
+        "Review and strengthen workplace conduct policies",
+        "Department-specific interventions for high-concern areas"
+      ]
+    }
+  },
+  // Q4 FY25 - Actual June 30, 2025 data from PDF
   "2025-06-30": {
     reportingDate: "6/30/25",
-    responseRate: 32.3,
+    quarter: "Q4 FY25",
+    responseRate: 29.0, // 18 of 62 exits
+    totalResponses: 18,
+    totalExits: 62,
+    overallSatisfaction: 3.4,
+    wouldRecommend: 83.3, // 15 of 18 respondents
+    wouldRecommendCount: { positive: 15, total: 18 },
+    concernsReported: { percentage: 22.2, count: 4, total: 18, description: "reported improper conduct" },
+    departureReasons: [
+      { reason: "Relocation", percentage: 22.2 },
+      { reason: "Lack of career advancement opportunities", percentage: 16.7 },
+      { reason: "Other", percentage: 16.7 },
+      { reason: "Retirement", percentage: 11.1 },
+      { reason: "Dissatisfied with direct supervisor", percentage: 11.1 },
+      { reason: "Pursue other career or education", percentage: 11.1 },
+      { reason: "Remote/Hybrid option not available", percentage: 5.6 },
+      { reason: "Leaving the workforce", percentage: 5.6 }
+    ],
+    departmentExits: [
+      { department: "Athletics", exits: 4, responses: 4, responseRate: "100%" },
+      { department: "Information Technology", exits: 2, responses: 2, responseRate: "100%" },
+      { department: "Center For Faculty Excellence", exits: 1, responses: 1, responseRate: "100%" },
+      { department: "University Communications", exits: 1, responses: 1, responseRate: "100%" },
+      { department: "Student Life", exits: 1, responses: 1, responseRate: "100%" },
+      { department: "School of Medicine", exits: 1, responses: 1, responseRate: "100%" },
+      { department: "Student Success", exits: 0, responses: 0, responseRate: "0%" },
+      { department: "University Relations", exits: 0, responses: 0, responseRate: "0%" },
+      { department: "School of Dentistry", exits: 0, responses: 0, responseRate: "0%" },
+      { department: "Provost's Office", exits: 0, responses: 0, responseRate: "0%" }
+    ],
+    satisfactionRatings: {
+      jobSatisfaction: 3.4,
+      managementSupport: 3.2,
+      careerDevelopment: 2.8,
+      workLifeBalance: 3.3,
+      compensation: 3.0,
+      benefits: 3.6
+    },
+    keyInsights: {
+      areasOfConcern: [
+        "Career advancement opportunities primary concern (16.7%)",
+        "Supervisor relationships causing 11.1% of exits",
+        "Remote work policy changes driving departures",
+        "Low response rate indicates potential survey fatigue"
+      ],
+      positiveFeedback: [
+        "High recommendation rate at 83%",
+        "Strong departmental response rates (Athletics, IT)",
+        "Benefits package satisfaction remains high",
+        "Work environment generally positive"
+      ],
+      actionItems: [
+        "Review and improve career advancement pathways",
+        "Enhance remote/hybrid work policy flexibility",
+        "Continue supervisor training initiatives",
+        "Develop strategies to improve exit survey participation"
+      ]
+    }
+  },
+  // Q1 FY26 - September 30, 2024 data from PDF (INCOMPLETE - Only 1 month of data)
+  "2024-09-30": {
+    reportingDate: "9/30/24",
+    quarter: "Q1 FY26",
+    dataStatus: "INCOMPLETE - Partial Quarter (1 month only)",
+    responseRate: 32.3, // 20 of 62 exits
     totalResponses: 20,
     totalExits: 62,
-    overallSatisfaction: 3.2,
-    wouldRecommend: 57.9,
+    overallSatisfaction: 2.9,
+    wouldRecommend: 57.9, // 11 of 19 who answered
     wouldRecommendCount: { positive: 11, total: 19 },
-    concernsReported: { percentage: 40, count: 8, total: 20 },
+    concernsReported: { percentage: 40, count: 8, total: 20, description: "reported improper conduct" },
     departureReasons: [
-      { reason: "Career advancement opportunities", percentage: 30 },
+      { reason: "Pursue other career or education", percentage: 30 },
       { reason: "Dissatisfied with direct supervisor", percentage: 25 },
       { reason: "Other", percentage: 15 },
       { reason: "Retirement", percentage: 10 },
-      { reason: "Lack of career advancement", percentage: 10 },
+      { reason: "Lack of career advancement opportunities", percentage: 10 },
       { reason: "Dissatisfied with University leadership", percentage: 5 },
       { reason: "Lack of work-life balance", percentage: 5 }
     ],
+    departmentExits: [
+      { department: "School of Dentistry", exits: 4, responses: 4, responseRate: "100%" },
+      { department: "Student Life", exits: 3, responses: 3, responseRate: "100%" },
+      { department: "School of Medicine", exits: 3, responses: 3, responseRate: "100%" },
+      { department: "Information Technology", exits: 2, responses: 2, responseRate: "100%" },
+      { department: "Athletics", exits: 1, responses: 1, responseRate: "100%" },
+      { department: "University Relations", exits: 1, responses: 1, responseRate: "100%" },
+      { department: "University Communications", exits: 1, responses: 1, responseRate: "100%" },
+      { department: "Student Success", exits: 0, responses: 0, responseRate: "0%" },
+      { department: "Center For Faculty Excellence", exits: 0, responses: 0, responseRate: "0%" },
+      { department: "Provost's Office", exits: 0, responses: 0, responseRate: "0%" }
+    ],
     satisfactionRatings: {
-      jobSatisfaction: 3.2,
-      managementSupport: 2.6,
-      careerDevelopment: 2.4,
-      workLifeBalance: 3.1,
-      compensation: 2.8,
-      benefits: 3.7
+      jobSatisfaction: 2.9,
+      managementSupport: 2.3,
+      careerDevelopment: 2.1,
+      workLifeBalance: 2.8,
+      compensation: 2.5,
+      benefits: 3.4
+    },
+    keyInsights: {
+      areasOfConcern: [
+        "CAUTION: Data represents only 1 month of quarter - incomplete analysis",
+        "Cannot draw quarter-wide conclusions from partial data",
+        "Survey timing may not be representative of full quarter"
+      ],
+      positiveFeedback: [
+        "Survey process functioning when implemented",
+        "Employee feedback collection system operational"
+      ],
+      actionItems: [
+        "Complete full quarter data collection before analysis",
+        "Ensure consistent monthly survey distribution",
+        "Wait for complete quarterly data before making policy decisions"
+      ]
     }
   }
 };
 
-// Available reporting dates (no quarters!)
+// Available reporting dates - Complete quarters only for analysis
 export const AVAILABLE_DATES = [
-  { value: "2025-03-31", label: "3/31/25" },
-  { value: "2025-06-30", label: "6/30/25" }
+  { value: "2024-06-30", label: "6/30/24 (Q1 FY25 - Baseline)", status: "complete" },
+  { value: "2025-03-31", label: "3/31/25", status: "complete" },
+  { value: "2025-06-30", label: "6/30/25 (Q4 FY25)", status: "complete" }
+];
+
+// Incomplete/partial data periods (excluded from primary analysis)
+export const PARTIAL_DATA_DATES = [
+  { value: "2024-09-30", label: "9/30/24 (Q1 FY26 - Incomplete)", status: "partial" }
 ];
 
 // Helper functions for accessing data
