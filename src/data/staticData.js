@@ -16,11 +16,11 @@ export const WORKFORCE_DATA = {
     },
     totalEmployees: 4774,
     faculty: 786,
-    staff: 3988,
+    staff: 1323,  // Corrected: BE staff only (from F12, F11, F09, F10, PT12, PT9, PT11, PT10 categories)
     hsp: 608,
-    temp: 447,
+    temp: 566,  // Corrected: TEMP (447) + NBE (14) + PRN (105) = 566
     jesuits: 17,
-    other: 102,
+    other: 0,  // NBE and PRN moved to temp
     locations: {
       "Omaha Campus": 4260,
       "Phoenix Campus": 514
@@ -812,11 +812,11 @@ export const WORKFORCE_DATA = {
     },
     totalEmployees: 5037,
     faculty: 788,
-    staff: 4249,
+    staff: 1349,  // Corrected: BE staff only (from F12, F11, F09, F10, PT12, PT9, PT11, PT10 categories)
     hsp: 612,
-    temp: 457,
+    temp: 574,  // Corrected: TEMP (457) + NBE (7) + PRN (110) = 574
     jesuits: 17,
-    other: 100,
+    other: 0,  // NBE and PRN moved to temp
     locations: {
       "Omaha Campus": 4287,
       "Phoenix Campus": 750
@@ -1824,4 +1824,43 @@ export const getOmahaHeadcountData = () => {
       HSP: data.headcountByLocation.omaha.hsp
     };
   });
+};
+
+// Helper function to get total temporary employees (TEMP + NBE + PRN)
+export const getTempTotal = (date = "2025-06-30") => {
+  const workforceData = getWorkforceData(date);
+  
+  if (!workforceData.categories) {
+    return workforceData.temp || 0;
+  }
+  
+  const temp = workforceData.categories["TEMP"] || 0;
+  const nbe = workforceData.categories["NBE"] || 0;
+  const prn = workforceData.categories["PRN"] || 0;
+  
+  return temp + nbe + prn;
+};
+
+// Helper function to get benefit-eligible breakdown
+export const getBenefitEligibleBreakdown = (date = "2025-06-30") => {
+  const workforceData = getWorkforceData(date);
+  
+  if (!workforceData.categories) {
+    return {
+      faculty: workforceData.faculty || 0,
+      staff: workforceData.staff || 0,
+      total: (workforceData.faculty || 0) + (workforceData.staff || 0)
+    };
+  }
+  
+  // Benefit-eligible categories
+  const beCategories = ["F12", "F11", "F09", "F10", "PT12", "PT9", "PT11", "PT10"];
+  const beTotal = beCategories.reduce((sum, cat) => sum + (workforceData.categories[cat] || 0), 0);
+  
+  // Use the faculty/staff values from the data which represent the BE split
+  return {
+    faculty: workforceData.faculty || 0,
+    staff: workforceData.staff || 0,
+    total: beTotal
+  };
 };

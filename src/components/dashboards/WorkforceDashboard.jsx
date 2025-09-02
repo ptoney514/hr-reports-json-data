@@ -5,7 +5,7 @@ import ErrorBoundary from '../ui/ErrorBoundary';
 import LocationDistributionChart from '../charts/LocationDistributionChart';
 import AssignmentTypeChart from '../charts/AssignmentTypeChart';
 import { DataDebugOverlay } from '../ui/DataDebugOverlay';
-import { getWorkforceData, getAllSchoolOrgData } from '../../data/staticData';
+import { getWorkforceData, getAllSchoolOrgData, getTempTotal, getBenefitEligibleBreakdown } from '../../data/staticData';
 import { 
   Users, 
   BookOpen,
@@ -33,6 +33,10 @@ const WorkforceDashboard = () => {
   const currentData = getWorkforceData("2025-06-30"); // Current year (6/30/25)
   const previousData = getWorkforceData("2024-06-30"); // Prior year (6/30/24) for YoY comparison
   
+  // Get corrected temp totals
+  const currentTempTotal = getTempTotal("2025-06-30");
+  const previousTempTotal = getTempTotal("2024-06-30");
+  
   // Calculate Year-over-Year percentage changes
   const calculateChange = (current, previous) => {
     if (!previous || previous === 0) return 0;
@@ -46,10 +50,12 @@ const WorkforceDashboard = () => {
       faculty: currentData.faculty,
       staff: currentData.staff,
       hsp: currentData.hsp,
+      temp: currentTempTotal,
       growth: calculateChange(currentData.totalEmployees, previousData.totalEmployees),
       facultyChange: calculateChange(currentData.faculty, previousData.faculty),
       staffChange: calculateChange(currentData.staff, previousData.staff),
-      hspChange: calculateChange(currentData.hsp, previousData.hsp)
+      hspChange: calculateChange(currentData.hsp, previousData.hsp),
+      tempChange: calculateChange(currentTempTotal, previousTempTotal)
     }
   };
 
@@ -165,20 +171,20 @@ const WorkforceDashboard = () => {
             
             <SummaryCard
               title="Temp"
-              value={`${currentData.temp?.toLocaleString() || '0'}`}
-              change={calculateChange(currentData.temp, previousData.temp)}
+              value={`${currentTempTotal.toLocaleString()}`}
+              change={calculateChange(currentTempTotal, previousTempTotal)}
               changeType="percentage"
-              subtitle={`vs ${previousData.temp?.toLocaleString() || '0'} FY24`}
+              subtitle={`vs ${previousTempTotal.toLocaleString()} FY24`}
               icon={Users}
-              trend={(calculateChange(currentData.temp, previousData.temp)) >= 0 ? 'positive' : 'negative'}
+              trend={(calculateChange(currentTempTotal, previousTempTotal)) >= 0 ? 'positive' : 'negative'}
             />
             
             <SummaryCard
               title="Total"
-              value={`${(currentData.staff + currentData.faculty + currentData.studentCount.total + currentData.hsp + currentData.temp).toLocaleString()}`}
+              value={`${(currentData.staff + currentData.faculty + currentData.studentCount.total + currentData.hsp + currentTempTotal).toLocaleString()}`}
               change={calculateChange(
-                currentData.staff + currentData.faculty + currentData.studentCount.total + currentData.hsp + currentData.temp,
-                previousData.staff + previousData.faculty + previousData.studentCount.total + previousData.hsp + previousData.temp
+                currentData.staff + currentData.faculty + currentData.studentCount.total + currentData.hsp + currentTempTotal,
+                previousData.staff + previousData.faculty + previousData.studentCount.total + previousData.hsp + previousTempTotal
               )}
               changeType="percentage"
               subtitle="All types"
@@ -218,12 +224,12 @@ const WorkforceDashboard = () => {
                     </div>
                     <div className="flex justify-between items-center py-1">
                       <span className="text-gray-700">Temporary Employees</span>
-                      <span className="font-semibold text-gray-900">{currentData.temp.toLocaleString()}</span>
+                      <span className="font-semibold text-gray-900">{currentTempTotal.toLocaleString()}</span>
                     </div>
                     <div className="flex justify-between items-center py-2 pt-3 border-t-2 border-blue-300">
                       <span className="font-bold text-gray-900">Total Workforce</span>
                       <span className="font-bold text-lg text-blue-600">
-                        {(currentData.staff + currentData.faculty + currentData.studentCount.total + currentData.hsp + currentData.temp).toLocaleString()}
+                        {(currentData.staff + currentData.faculty + currentData.studentCount.total + currentData.hsp + currentTempTotal).toLocaleString()}
                       </span>
                     </div>
                   </div>
@@ -249,11 +255,11 @@ const WorkforceDashboard = () => {
                         <div className="font-semibold text-gray-900 text-sm">Overall Growth</div>
                         <div className="text-sm text-gray-700">
                           Total workforce increased by <span className="font-bold text-green-700">
-                            {(currentData.staff + currentData.faculty + currentData.studentCount.total + currentData.hsp + currentData.temp - 
-                              (previousData.staff + previousData.faculty + previousData.studentCount.total + previousData.hsp + previousData.temp)).toLocaleString()}
+                            {(currentData.staff + currentData.faculty + currentData.studentCount.total + currentData.hsp + currentTempTotal - 
+                              (previousData.staff + previousData.faculty + previousData.studentCount.total + previousData.hsp + previousTempTotal)).toLocaleString()}
                           </span> employees ({calculateChange(
-                            currentData.staff + currentData.faculty + currentData.studentCount.total + currentData.hsp + currentData.temp,
-                            previousData.staff + previousData.faculty + previousData.studentCount.total + previousData.hsp + previousData.temp
+                            currentData.staff + currentData.faculty + currentData.studentCount.total + currentData.hsp + currentTempTotal,
+                            previousData.staff + previousData.faculty + previousData.studentCount.total + previousData.hsp + previousTempTotal
                           ).toFixed(1)}%) from FY24 to FY25
                         </div>
                       </div>
@@ -302,10 +308,10 @@ const WorkforceDashboard = () => {
                       <div className="flex-1">
                         <div className="font-semibold text-gray-900 text-sm">Staff Workforce Expansion</div>
                         <div className="text-sm text-gray-700">
-                          BE Staff increased by <span className="font-bold text-purple-700">
-                            {(currentData.staff - previousData.staff).toLocaleString()}
-                          </span> positions (+{calculateChange(currentData.staff, previousData.staff).toFixed(1)}%), 
-                          while Faculty remained stable at {calculateChange(currentData.faculty, previousData.faculty).toFixed(1)}% growth
+                          BE Staff {currentData.staff >= previousData.staff ? "increased" : "decreased"} by <span className="font-bold text-purple-700">
+                            {Math.abs(currentData.staff - previousData.staff).toLocaleString()}
+                          </span> positions ({calculateChange(currentData.staff, previousData.staff).toFixed(1)}%), 
+                          while Faculty {currentData.faculty >= previousData.faculty ? "increased" : "decreased"} by {calculateChange(currentData.faculty, previousData.faculty).toFixed(1)}%
                         </div>
                       </div>
                     </div>

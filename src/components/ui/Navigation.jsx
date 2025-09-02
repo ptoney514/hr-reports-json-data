@@ -50,6 +50,14 @@ const Navigation = () => {
       isActive: isActive('/dashboards/headcount-details')
     },
     {
+      id: 'headcount-report',
+      label: 'Headcount Report',
+      shortLabel: 'Report',
+      path: '/dashboards/headcount-report',
+      icon: BarChart3,
+      isActive: isActive('/dashboards/headcount-report')
+    },
+    {
       id: 'turnover',
       label: 'Turnover Dashboard',
       shortLabel: 'Turn',

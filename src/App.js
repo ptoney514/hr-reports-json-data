@@ -20,6 +20,7 @@ const ExitSurveyQ4Dashboard = lazy(() => import('./components/dashboards/ExitSur
 const ExitSurveyFY25Dashboard = lazy(() => import('./components/dashboards/ExitSurveyFY25Dashboard'));
 const WorkforceDashboard = lazy(() => import('./components/dashboards/WorkforceDashboard'));
 const HeadcountDetailsDashboard = lazy(() => import('./components/dashboards/HeadcountDetailsDashboard'));
+const HeadcountReport = lazy(() => import('./components/dashboards/HeadcountReport'));
 // AdminDashboard removed - using static data now
 
 // Create QueryClient with optimized configuration for PocketBase
@@ -110,6 +111,7 @@ function App() {
               <Route path="/dashboards" element={<DashboardIndex />} />
               <Route path="/dashboards/workforce" element={<WorkforceDashboard />} />
               <Route path="/dashboards/headcount-details" element={<HeadcountDetailsDashboard />} />
+              <Route path="/dashboards/headcount-report" element={<HeadcountReport />} />
               <Route path="/dashboards/turnover" element={<TurnoverDashboard />} />
               <Route path="/dashboards/recruiting" element={<RecruitingDashboard />} />
               <Route path="/dashboards/exit-survey" element={<ExitSurveyOverview />} />
