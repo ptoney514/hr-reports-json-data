@@ -253,6 +253,12 @@ function calculateMetrics(periodData) {
     const fws = period.byCategory['CWS'] || 0;
     const totalStudents = studentWorker + fws;
     
+    // Calculate Jesuits and Other per HR methodology
+    const prn = period.byCategory['PRN'] || 0;
+    const nbe = period.byCategory['NBE'] || 0;
+    const jesuits = 17; // Fixed constant for religious order members
+    const other = prn + nbe - jesuits; // Remaining PRN + NBE employees
+    
     // Calculate benefit eligible
     let benefitEligible = 0;
     BENEFIT_ELIGIBLE_CATEGORIES.forEach(cat => {
@@ -342,6 +348,8 @@ function calculateMetrics(periodData) {
       staff,
       hsp,
       temp,
+      jesuits,
+      other,
       studentCount: {
         total: totalStudents,
         studentWorker,
@@ -375,6 +383,16 @@ function calculateMetrics(periodData) {
           type: "Student Workers", 
           count: totalStudents, 
           percentage: ((totalStudents / totalEmployees) * 100).toFixed(1) 
+        },
+        { 
+          type: "Jesuits", 
+          count: jesuits, 
+          percentage: ((jesuits / totalEmployees) * 100).toFixed(1) 
+        },
+        { 
+          type: "Other", 
+          count: other, 
+          percentage: ((other / totalEmployees) * 100).toFixed(1) 
         }
       ],
       demographics: period.demographics,
@@ -421,6 +439,8 @@ function main() {
     console.log(`├─ Staff: ${data.staff}`);
     console.log(`├─ HSP: ${data.hsp}`);
     console.log(`├─ Temporary: ${data.temp}`);
+    console.log(`├─ Jesuits: ${data.jesuits}`);
+    console.log(`├─ Other: ${data.other}`);
     console.log(`└─ Students: ${data.studentCount.total} (SUE: ${data.studentCount.studentWorker}, CWS: ${data.studentCount.fws})`);
   });
   

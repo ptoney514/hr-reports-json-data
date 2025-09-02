@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "processedDate": "2025-09-02T11:53:43.530Z",
+    "processedDate": "2025-09-02T12:48:16.972Z",
     "sourceFile": "New Emp List since FY20 to Q1FY25 1031 PT.csv",
     "periodCount": 24
   },
@@ -12,6 +12,8 @@
       "staff": 3651,
       "hsp": 251,
       "temp": 480,
+      "jesuits": 17,
+      "other": -17,
       "studentCount": {
         "total": 1888,
         "studentWorker": 1333,
@@ -364,6 +366,16 @@
           "type": "Student Workers",
           "count": 1888,
           "percentage": "40.4"
+        },
+        {
+          "type": "Jesuits",
+          "count": 17,
+          "percentage": "0.4"
+        },
+        {
+          "type": "Other",
+          "count": -17,
+          "percentage": "-0.4"
         }
       ],
       "demographics": {
@@ -398,6 +410,8 @@
       "staff": 3509,
       "hsp": 252,
       "temp": 440,
+      "jesuits": 17,
+      "other": -17,
       "studentCount": {
         "total": 1780,
         "studentWorker": 1261,
@@ -750,6 +764,16 @@
           "type": "Student Workers",
           "count": 1780,
           "percentage": "39.5"
+        },
+        {
+          "type": "Jesuits",
+          "count": 17,
+          "percentage": "0.4"
+        },
+        {
+          "type": "Other",
+          "count": -17,
+          "percentage": "-0.4"
         }
       ],
       "demographics": {
@@ -784,6 +808,8 @@
       "staff": 3369,
       "hsp": 251,
       "temp": 476,
+      "jesuits": 17,
+      "other": -17,
       "studentCount": {
         "total": 1631,
         "studentWorker": 1139,
@@ -1136,6 +1162,16 @@
           "type": "Student Workers",
           "count": 1631,
           "percentage": "37.1"
+        },
+        {
+          "type": "Jesuits",
+          "count": 17,
+          "percentage": "0.4"
+        },
+        {
+          "type": "Other",
+          "count": -17,
+          "percentage": "-0.4"
         }
       ],
       "demographics": {
@@ -1170,6 +1206,8 @@
       "staff": 2589,
       "hsp": 253,
       "temp": 264,
+      "jesuits": 17,
+      "other": -8,
       "studentCount": {
         "total": 898,
         "studentWorker": 883,
@@ -1530,6 +1568,16 @@
           "type": "Student Workers",
           "count": 898,
           "percentage": "26.2"
+        },
+        {
+          "type": "Jesuits",
+          "count": 17,
+          "percentage": "0.5"
+        },
+        {
+          "type": "Other",
+          "count": -8,
+          "percentage": "-0.2"
         }
       ],
       "demographics": {
@@ -1564,6 +1612,8 @@
       "staff": 3315,
       "hsp": 250,
       "temp": 173,
+      "jesuits": 17,
+      "other": 225,
       "studentCount": {
         "total": 1618,
         "studentWorker": 1168,
@@ -1925,6 +1975,16 @@
           "type": "Student Workers",
           "count": 1618,
           "percentage": "37.9"
+        },
+        {
+          "type": "Jesuits",
+          "count": 17,
+          "percentage": "0.4"
+        },
+        {
+          "type": "Other",
+          "count": 225,
+          "percentage": "5.3"
         }
       ],
       "demographics": {
@@ -1959,6 +2019,8 @@
       "staff": 3250,
       "hsp": 250,
       "temp": 135,
+      "jesuits": 17,
+      "other": 125,
       "studentCount": {
         "total": 1590,
         "studentWorker": 1155,
@@ -2320,6 +2382,16 @@
           "type": "Student Workers",
           "count": 1590,
           "percentage": "38.8"
+        },
+        {
+          "type": "Jesuits",
+          "count": 17,
+          "percentage": "0.4"
+        },
+        {
+          "type": "Other",
+          "count": 125,
+          "percentage": "3.1"
         }
       ],
       "demographics": {
@@ -2354,6 +2426,8 @@
       "staff": 3420,
       "hsp": 250,
       "temp": 238,
+      "jesuits": 17,
+      "other": 209,
       "studentCount": {
         "total": 1701,
         "studentWorker": 1246,
@@ -2722,6 +2796,16 @@
           "type": "Student Workers",
           "count": 1701,
           "percentage": "38.7"
+        },
+        {
+          "type": "Jesuits",
+          "count": 17,
+          "percentage": "0.4"
+        },
+        {
+          "type": "Other",
+          "count": 209,
+          "percentage": "4.8"
         }
       ],
       "demographics": {
@@ -2756,6 +2840,8 @@
       "staff": 2995,
       "hsp": 338,
       "temp": 234,
+      "jesuits": 17,
+      "other": 135,
       "studentCount": {
         "total": 1168,
         "studentWorker": 1117,
@@ -3124,6 +3210,16 @@
           "type": "Student Workers",
           "count": 1168,
           "percentage": "30.4"
+        },
+        {
+          "type": "Jesuits",
+          "count": 17,
+          "percentage": "0.4"
+        },
+        {
+          "type": "Other",
+          "count": 135,
+          "percentage": "3.5"
         }
       ],
       "demographics": {
@@ -3158,6 +3254,8 @@
       "staff": 3955,
       "hsp": 567,
       "temp": 240,
+      "jesuits": 17,
+      "other": 209,
       "studentCount": {
         "total": 1873,
         "studentWorker": 1440,
@@ -3526,6 +3624,16 @@
           "type": "Student Workers",
           "count": 1873,
           "percentage": "38.1"
+        },
+        {
+          "type": "Jesuits",
+          "count": 17,
+          "percentage": "0.3"
+        },
+        {
+          "type": "Other",
+          "count": 209,
+          "percentage": "4.3"
         }
       ],
       "demographics": {
@@ -3560,6 +3668,8 @@
       "staff": 3984,
       "hsp": 567,
       "temp": 222,
+      "jesuits": 17,
+      "other": 200,
       "studentCount": {
         "total": 1896,
         "studentWorker": 1456,
@@ -3935,6 +4045,16 @@
           "type": "Student Workers",
           "count": 1896,
           "percentage": "38.6"
+        },
+        {
+          "type": "Jesuits",
+          "count": 17,
+          "percentage": "0.3"
+        },
+        {
+          "type": "Other",
+          "count": 200,
+          "percentage": "4.1"
         }
       ],
       "demographics": {
@@ -3969,6 +4089,8 @@
       "staff": 4143,
       "hsp": 565,
       "temp": 259,
+      "jesuits": 17,
+      "other": 238,
       "studentCount": {
         "total": 2047,
         "studentWorker": 1592,
@@ -4344,6 +4466,16 @@
           "type": "Student Workers",
           "count": 2047,
           "percentage": "39.9"
+        },
+        {
+          "type": "Jesuits",
+          "count": 17,
+          "percentage": "0.3"
+        },
+        {
+          "type": "Other",
+          "count": 238,
+          "percentage": "4.6"
         }
       ],
       "demographics": {
@@ -4379,6 +4511,8 @@
       "staff": 3845,
       "hsp": 711,
       "temp": 250,
+      "jesuits": 17,
+      "other": 171,
       "studentCount": {
         "total": 1545,
         "studentWorker": 1473,
@@ -4754,6 +4888,16 @@
           "type": "Student Workers",
           "count": 1545,
           "percentage": "32.9"
+        },
+        {
+          "type": "Jesuits",
+          "count": 17,
+          "percentage": "0.4"
+        },
+        {
+          "type": "Other",
+          "count": 171,
+          "percentage": "3.6"
         }
       ],
       "demographics": {
@@ -4789,6 +4933,8 @@
       "staff": 4269,
       "hsp": 573,
       "temp": 248,
+      "jesuits": 17,
+      "other": 229,
       "studentCount": {
         "total": 2112,
         "studentWorker": 1795,
@@ -5164,6 +5310,16 @@
           "type": "Student Workers",
           "count": 2112,
           "percentage": "40.4"
+        },
+        {
+          "type": "Jesuits",
+          "count": 17,
+          "percentage": "0.3"
+        },
+        {
+          "type": "Other",
+          "count": 229,
+          "percentage": "4.4"
         }
       ],
       "demographics": {
@@ -5200,6 +5356,8 @@
       "staff": 4192,
       "hsp": 569,
       "temp": 228,
+      "jesuits": 17,
+      "other": 215,
       "studentCount": {
         "total": 2025,
         "studentWorker": 1581,
@@ -5568,6 +5726,16 @@
           "type": "Student Workers",
           "count": 2025,
           "percentage": "39.4"
+        },
+        {
+          "type": "Jesuits",
+          "count": 17,
+          "percentage": "0.3"
+        },
+        {
+          "type": "Other",
+          "count": 215,
+          "percentage": "4.2"
         }
       ],
       "demographics": {
@@ -5604,6 +5772,8 @@
       "staff": 4269,
       "hsp": 570,
       "temp": 336,
+      "jesuits": 17,
+      "other": 137,
       "studentCount": {
         "total": 2090,
         "studentWorker": 1649,
@@ -6021,6 +6191,16 @@
           "type": "Student Workers",
           "count": 2090,
           "percentage": "39.8"
+        },
+        {
+          "type": "Jesuits",
+          "count": 17,
+          "percentage": "0.3"
+        },
+        {
+          "type": "Other",
+          "count": 137,
+          "percentage": "2.6"
         }
       ],
       "demographics": {
@@ -6057,6 +6237,8 @@
       "staff": 3895,
       "hsp": 548,
       "temp": 341,
+      "jesuits": 17,
+      "other": 47,
       "studentCount": {
         "total": 1701,
         "studentWorker": 1637,
@@ -6432,6 +6614,16 @@
           "type": "Student Workers",
           "count": 1701,
           "percentage": "36.0"
+        },
+        {
+          "type": "Jesuits",
+          "count": 17,
+          "percentage": "0.4"
+        },
+        {
+          "type": "Other",
+          "count": 47,
+          "percentage": "1.0"
         }
       ],
       "demographics": {
@@ -6468,6 +6660,8 @@
       "staff": 4070,
       "hsp": 585,
       "temp": 482,
+      "jesuits": 17,
+      "other": 14,
       "studentCount": {
         "total": 1821,
         "studentWorker": 1459,
@@ -6829,6 +7023,16 @@
           "type": "Student Workers",
           "count": 1821,
           "percentage": "36.3"
+        },
+        {
+          "type": "Jesuits",
+          "count": 17,
+          "percentage": "0.3"
+        },
+        {
+          "type": "Other",
+          "count": 14,
+          "percentage": "0.3"
         }
       ],
       "demographics": {
@@ -6865,6 +7069,8 @@
       "staff": 4197,
       "hsp": 587,
       "temp": 483,
+      "jesuits": 17,
+      "other": 68,
       "studentCount": {
         "total": 1851,
         "studentWorker": 1463,
@@ -7226,6 +7432,16 @@
           "type": "Student Workers",
           "count": 1851,
           "percentage": "36.2"
+        },
+        {
+          "type": "Jesuits",
+          "count": 17,
+          "percentage": "0.3"
+        },
+        {
+          "type": "Other",
+          "count": 68,
+          "percentage": "1.3"
         }
       ],
       "demographics": {
@@ -7262,6 +7478,8 @@
       "staff": 4439,
       "hsp": 587,
       "temp": 544,
+      "jesuits": 17,
+      "other": 106,
       "studentCount": {
         "total": 2040,
         "studentWorker": 1617,
@@ -7623,6 +7841,16 @@
           "type": "Student Workers",
           "count": 2040,
           "percentage": "37.7"
+        },
+        {
+          "type": "Jesuits",
+          "count": 17,
+          "percentage": "0.3"
+        },
+        {
+          "type": "Other",
+          "count": 106,
+          "percentage": "2.0"
         }
       ],
       "demographics": {
@@ -7659,6 +7887,8 @@
       "staff": 3988,
       "hsp": 608,
       "temp": 447,
+      "jesuits": 17,
+      "other": 102,
       "studentCount": {
         "total": 1491,
         "studentWorker": 1414,
@@ -8020,6 +8250,16 @@
           "type": "Student Workers",
           "count": 1491,
           "percentage": "31.2"
+        },
+        {
+          "type": "Jesuits",
+          "count": 17,
+          "percentage": "0.4"
+        },
+        {
+          "type": "Other",
+          "count": 102,
+          "percentage": "2.1"
         }
       ],
       "demographics": {
@@ -8056,6 +8296,8 @@
       "staff": 4577,
       "hsp": 601,
       "temp": 547,
+      "jesuits": 17,
+      "other": 106,
       "studentCount": {
         "total": 2129,
         "studentWorker": 1764,
@@ -8417,6 +8659,16 @@
           "type": "Student Workers",
           "count": 2129,
           "percentage": "38.6"
+        },
+        {
+          "type": "Jesuits",
+          "count": 17,
+          "percentage": "0.3"
+        },
+        {
+          "type": "Other",
+          "count": 106,
+          "percentage": "1.9"
         }
       ],
       "demographics": {
@@ -8453,6 +8705,8 @@
       "staff": 4385,
       "hsp": 600,
       "temp": 539,
+      "jesuits": 17,
+      "other": 104,
       "studentCount": {
         "total": 1916,
         "studentWorker": 1519,
@@ -8828,6 +9082,16 @@
           "type": "Student Workers",
           "count": 1916,
           "percentage": "36.1"
+        },
+        {
+          "type": "Jesuits",
+          "count": 17,
+          "percentage": "0.3"
+        },
+        {
+          "type": "Other",
+          "count": 104,
+          "percentage": "2.0"
         }
       ],
       "demographics": {
@@ -8864,6 +9128,8 @@
       "staff": 4444,
       "hsp": 600,
       "temp": 605,
+      "jesuits": 17,
+      "other": 101,
       "studentCount": {
         "total": 1969,
         "studentWorker": 1545,
@@ -9239,6 +9505,16 @@
           "type": "Student Workers",
           "count": 1969,
           "percentage": "36.4"
+        },
+        {
+          "type": "Jesuits",
+          "count": 17,
+          "percentage": "0.3"
+        },
+        {
+          "type": "Other",
+          "count": 101,
+          "percentage": "1.9"
         }
       ],
       "demographics": {
@@ -9275,6 +9551,8 @@
       "staff": 4249,
       "hsp": 612,
       "temp": 457,
+      "jesuits": 17,
+      "other": 100,
       "studentCount": {
         "total": 1714,
         "studentWorker": 1607,
@@ -9629,6 +9907,16 @@
           "type": "Student Workers",
           "count": 1714,
           "percentage": "34.0"
+        },
+        {
+          "type": "Jesuits",
+          "count": 17,
+          "percentage": "0.3"
+        },
+        {
+          "type": "Other",
+          "count": 100,
+          "percentage": "2.0"
         }
       ],
       "demographics": {

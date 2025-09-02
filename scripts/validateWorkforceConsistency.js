@@ -73,8 +73,8 @@ periodsToCheck.forEach(period => {
   console.log(`${colors.cyan}${period.label}:${colors.reset}`);
   
   // Extract static data values - search in the entire file for WORKFORCE_DATA entries
-  // The pattern looks for the date key followed by the workforce metrics
-  const searchPattern = `"${period.staticKey}":[\\s\\S]*?reportingDate:[\\s\\S]*?totalEmployees:\\s*(\\d+)[\\s\\S]*?faculty:\\s*(\\d+)[\\s\\S]*?staff:\\s*(\\d+)[\\s\\S]*?hsp:\\s*(\\d+)[\\s\\S]*?temp:\\s*(\\d+)`;
+  // The pattern looks for the date key followed by the workforce metrics including new Jesuits and Other
+  const searchPattern = `"${period.staticKey}":[\\s\\S]*?reportingDate:[\\s\\S]*?totalEmployees:\\s*(\\d+)[\\s\\S]*?faculty:\\s*(\\d+)[\\s\\S]*?staff:\\s*(\\d+)[\\s\\S]*?hsp:\\s*(\\d+)[\\s\\S]*?temp:\\s*(\\d+)[\\s\\S]*?jesuits:\\s*(\\d+)[\\s\\S]*?other:\\s*(\\d+)`;
   const datePattern = new RegExp(searchPattern);
   
   // Find the WORKFORCE_DATA section first
@@ -93,7 +93,9 @@ periodsToCheck.forEach(period => {
       faculty: parseInt(match[2]),
       staff: parseInt(match[3]),
       hsp: parseInt(match[4]),
-      temp: parseInt(match[5])
+      temp: parseInt(match[5]),
+      jesuits: parseInt(match[6]),
+      other: parseInt(match[7])
     };
     
     // Compare values
@@ -122,6 +124,16 @@ periodsToCheck.forEach(period => {
         metric: 'Temporary', 
         workforce: workforcePeriod.temp, 
         static: staticValues.temp 
+      },
+      { 
+        metric: 'Jesuits', 
+        workforce: workforcePeriod.jesuits, 
+        static: staticValues.jesuits 
+      },
+      { 
+        metric: 'Other', 
+        workforce: workforcePeriod.other, 
+        static: staticValues.other 
       }
     ];
     
@@ -146,15 +158,22 @@ periodsToCheck.forEach(period => {
       }
     });
     
-    // Additional validations
-    const csvSum = workforcePeriod.faculty + workforcePeriod.staff + workforcePeriod.hsp + workforcePeriod.temp;
+    // Additional validations - now includes all categories
+    const csvSum = workforcePeriod.faculty + workforcePeriod.staff + workforcePeriod.hsp + workforcePeriod.temp + 
+                   workforcePeriod.jesuits + workforcePeriod.other + workforcePeriod.studentCount.total;
     if (csvSum !== workforcePeriod.totalEmployees) {
-      console.log(`  ${colors.yellow}⚠${colors.reset} CSV sum mismatch: ${csvSum} ≠ ${workforcePeriod.totalEmployees}`);
+      console.log(`  ${colors.yellow}⚠${colors.reset} CSV sum validation: ${csvSum} ≠ ${workforcePeriod.totalEmployees}`);
+      console.log(`    (Faculty: ${workforcePeriod.faculty} + Staff: ${workforcePeriod.staff} + HSP: ${workforcePeriod.hsp} + Temp: ${workforcePeriod.temp} + Jesuits: ${workforcePeriod.jesuits} + Other: ${workforcePeriod.other} + Students: ${workforcePeriod.studentCount.total})`);
+    } else {
+      console.log(`  ${colors.green}✓${colors.reset} CSV sum validation: All categories total to ${workforcePeriod.totalEmployees}`);
     }
     
-    const staticSum = staticValues.faculty + staticValues.staff + staticValues.hsp + staticValues.temp;
+    const staticSum = staticValues.faculty + staticValues.staff + staticValues.hsp + staticValues.temp + 
+                     staticValues.jesuits + staticValues.other + workforcePeriod.studentCount.total;
     if (staticSum !== staticValues.totalEmployees) {
-      console.log(`  ${colors.yellow}⚠${colors.reset} Static sum mismatch: ${staticSum} ≠ ${staticValues.totalEmployees}`);
+      console.log(`  ${colors.yellow}⚠${colors.reset} Static sum validation: ${staticSum} ≠ ${staticValues.totalEmployees}`);
+    } else {
+      console.log(`  ${colors.green}✓${colors.reset} Static sum validation: All categories total correctly`);
     }
     
   } else {

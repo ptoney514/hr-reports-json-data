@@ -19,8 +19,6 @@ export const WORKFORCE_DATA = {
     staff: 3988,
     hsp: 608,
     temp: 447,
-    jesuits: 17,
-    other: 102,
     locations: {
       "Omaha Campus": 4260,
       "Phoenix Campus": 514
@@ -377,16 +375,6 @@ export const WORKFORCE_DATA = {
                 "type": "Student Workers",
                 "count": 1491,
                 "percentage": "31.2"
-          },
-          {
-                "type": "Jesuits",
-                "count": 17,
-                "percentage": "0.4"
-          },
-          {
-                "type": "Other",
-                "count": 102,
-                "percentage": "2.1"
           }
     ],
     vacancyRate: 0,
@@ -410,8 +398,6 @@ export const WORKFORCE_DATA = {
     staff: 4444,
     hsp: 600,
     temp: 605,
-    jesuits: 17,
-    other: 101,
     locations: {
       "Omaha Campus": 4809,
       "Phoenix Campus": 606
@@ -782,16 +768,6 @@ export const WORKFORCE_DATA = {
                 "type": "Student Workers",
                 "count": 1969,
                 "percentage": "36.4"
-          },
-          {
-                "type": "Jesuits",
-                "count": 17,
-                "percentage": "0.3"
-          },
-          {
-                "type": "Other",
-                "count": 101,
-                "percentage": "1.9"
           }
     ],
     vacancyRate: 0,
@@ -815,8 +791,6 @@ export const WORKFORCE_DATA = {
     staff: 4249,
     hsp: 612,
     temp: 457,
-    jesuits: 17,
-    other: 100,
     locations: {
       "Omaha Campus": 4287,
       "Phoenix Campus": 750
@@ -1166,16 +1140,6 @@ export const WORKFORCE_DATA = {
                 "type": "Student Workers",
                 "count": 1714,
                 "percentage": "34.0"
-          },
-          {
-                "type": "Jesuits",
-                "count": 17,
-                "percentage": "0.3"
-          },
-          {
-                "type": "Other",
-                "count": 100,
-                "percentage": "2.0"
           }
     ],
     vacancyRate: 0,
