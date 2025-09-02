@@ -9,6 +9,7 @@
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^13.5.0",
     "ajv": "^8.17.1",
+    "csv-parse": "^6.1.0",
     "date-fns": "^3.6.0",
     "file-saver": "^2.0.5",
     "html2canvas": "^1.4.1",
@@ -45,7 +46,11 @@
     "data:process": "node scripts/processTurnoverData.js",
     "data:sync": "node scripts/syncTurnoverToStaticData.js",
     "data:validate": "node scripts/validateDataConsistency.js",
-    "data:update": "npm run data:process && npm run data:sync && npm run data:validate"
+    "data:update": "npm run data:process && npm run data:sync && npm run data:validate",
+    "workforce:process": "node scripts/processWorkforceData.js",
+    "workforce:sync": "node scripts/syncWorkforceToStaticData.js",
+    "workforce:validate": "node scripts/validateWorkforceConsistency.js",
+    "workforce:update": "npm run workforce:process && npm run workforce:sync && npm run workforce:validate"
   },
   "eslintConfig": {
     "extends": [
