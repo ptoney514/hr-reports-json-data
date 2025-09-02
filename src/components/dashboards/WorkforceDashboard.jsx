@@ -187,13 +187,15 @@ const WorkforceDashboard = () => {
             />
           </div>
 
-          {/* Workforce Analytics Charts - Row 1: Assignment Type and Location */}
+          {/* Workforce Analytics Charts - Row 1: Assignment Type and Non-Benefit Eligible */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 print:gap-4 mb-6">
             {/* Assignment Type Chart */}
             <div>
               <AssignmentTypeChart 
                 title="Benefit Eligible Employees by Assignment Type"
-                data={currentData.assignmentTypes.map(item => ({
+                data={currentData.assignmentTypes.filter(item => 
+                  !['Jesuits', 'Other'].includes(item.type)
+                ).map(item => ({
                   name: item.type,
                   total: item.count
                 }))}
@@ -201,12 +203,13 @@ const WorkforceDashboard = () => {
               />
             </div>
             
-            {/* Location Distribution Chart */}
+            {/* Non-Benefit Eligible Chart */}
             <div>
-              <LocationDistributionChart 
+              <AssignmentTypeChart 
+                title="Non-Benefit Eligible Employees"
                 data={[
-                  { name: 'Omaha Campus', total: currentData.locations['Omaha Campus'], percentage: 75.3 },
-                  { name: 'Phoenix Campus', total: currentData.locations['Phoenix Campus'], percentage: 24.7 }
+                  { name: 'Jesuits', total: currentData.jesuits || 17 },
+                  { name: 'Other (PRN/NBE)', total: currentData.other || 100 }
                 ]}
                 className="print:h-80 min-h-[420px]"
               />
@@ -256,69 +259,6 @@ const WorkforceDashboard = () => {
             </div>
           </div>
 
-          {/* Location Breakdown Table - Year-over-Year */}
-          <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-              <Building2 className="text-blue-600" size={20} />
-              Location Breakdown (2 locations)
-            </h2>
-            <div className="overflow-x-auto">
-              <table className="min-w-full text-sm">
-                <thead>
-                  <tr className="border-b-2 border-gray-300">
-                    <th className="text-left py-2 px-3 font-semibold text-gray-700">LOCATION</th>
-                    <th className="text-right py-2 px-3 font-semibold text-gray-700">6/29/2025</th>
-                    <th className="text-right py-2 px-3 font-semibold text-gray-700">6/29/2024</th>
-                    <th className="text-right py-2 px-3 font-semibold text-gray-700">CHANGE</th>
-                    <th className="text-right py-2 px-3 font-semibold text-gray-700">CHANGE %</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200">
-                  <tr className="hover:bg-gray-50">
-                    <td className="py-2 px-3 font-medium">PHOENIX</td>
-                    <td className="py-2 px-3 text-right">{currentData.locations['Phoenix Campus'].toLocaleString()}</td>
-                    <td className="py-2 px-3 text-right">{previousData.locations['Phoenix Campus'].toLocaleString()}</td>
-                    <td className="py-2 px-3 text-right font-medium text-green-600">
-                      +{(currentData.locations['Phoenix Campus'] - previousData.locations['Phoenix Campus']).toLocaleString()}
-                    </td>
-                    <td className="py-2 px-3 text-right font-medium text-green-600">
-                      +{calculateChange(currentData.locations['Phoenix Campus'], previousData.locations['Phoenix Campus']).toFixed(1)}%
-                    </td>
-                  </tr>
-                  <tr className="hover:bg-gray-50">
-                    <td className="py-2 px-3 font-medium">OMAHA</td>
-                    <td className="py-2 px-3 text-right">{currentData.locations['Omaha Campus'].toLocaleString()}</td>
-                    <td className="py-2 px-3 text-right">{previousData.locations['Omaha Campus'].toLocaleString()}</td>
-                    <td className="py-2 px-3 text-right font-medium text-green-600">
-                      +{(currentData.locations['Omaha Campus'] - previousData.locations['Omaha Campus']).toLocaleString()}
-                    </td>
-                    <td className="py-2 px-3 text-right font-medium text-green-600">
-                      +{calculateChange(currentData.locations['Omaha Campus'], previousData.locations['Omaha Campus']).toFixed(1)}%
-                    </td>
-                  </tr>
-                  <tr className="bg-yellow-50 font-semibold border-t-2 border-gray-300">
-                    <td className="py-2 px-3">TOTAL</td>
-                    <td className="py-2 px-3 text-right">
-                      {(currentData.locations['Phoenix Campus'] + currentData.locations['Omaha Campus']).toLocaleString()}
-                    </td>
-                    <td className="py-2 px-3 text-right">
-                      {(previousData.locations['Phoenix Campus'] + previousData.locations['Omaha Campus']).toLocaleString()}
-                    </td>
-                    <td className="py-2 px-3 text-right text-green-600">
-                      +{((currentData.locations['Phoenix Campus'] + currentData.locations['Omaha Campus']) - 
-                        (previousData.locations['Phoenix Campus'] + previousData.locations['Omaha Campus'])).toLocaleString()}
-                    </td>
-                    <td className="py-2 px-3 text-right text-green-600">
-                      +{calculateChange(
-                        currentData.locations['Phoenix Campus'] + currentData.locations['Omaha Campus'],
-                        previousData.locations['Phoenix Campus'] + previousData.locations['Omaha Campus']
-                      ).toFixed(1)}%
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
 
           {/* Workforce Analytics Charts - Row 2: Headcount Overview Link */}
           <div className="grid grid-cols-1 gap-6 print:gap-4 mb-6">
@@ -528,6 +468,70 @@ const WorkforceDashboard = () => {
                       ).toFixed(1)}%
                     </td>
                     <td className="py-2 px-3"></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Location Breakdown Table - Year-over-Year (Moved Below) */}
+          <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+              <Building2 className="text-blue-600" size={20} />
+              Location Breakdown (2 locations)
+            </h2>
+            <div className="overflow-x-auto">
+              <table className="min-w-full text-sm">
+                <thead>
+                  <tr className="border-b-2 border-gray-300">
+                    <th className="text-left py-2 px-3 font-semibold text-gray-700">LOCATION</th>
+                    <th className="text-right py-2 px-3 font-semibold text-gray-700">6/30/2025</th>
+                    <th className="text-right py-2 px-3 font-semibold text-gray-700">6/30/2024</th>
+                    <th className="text-right py-2 px-3 font-semibold text-gray-700">CHANGE</th>
+                    <th className="text-right py-2 px-3 font-semibold text-gray-700">CHANGE %</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  <tr className="hover:bg-gray-50">
+                    <td className="py-2 px-3 font-medium">PHOENIX</td>
+                    <td className="py-2 px-3 text-right">{currentData.locations['Phoenix Campus'].toLocaleString()}</td>
+                    <td className="py-2 px-3 text-right">{previousData.locations['Phoenix Campus'].toLocaleString()}</td>
+                    <td className="py-2 px-3 text-right font-medium text-green-600">
+                      +{(currentData.locations['Phoenix Campus'] - previousData.locations['Phoenix Campus']).toLocaleString()}
+                    </td>
+                    <td className="py-2 px-3 text-right font-medium text-green-600">
+                      +{calculateChange(currentData.locations['Phoenix Campus'], previousData.locations['Phoenix Campus']).toFixed(1)}%
+                    </td>
+                  </tr>
+                  <tr className="hover:bg-gray-50">
+                    <td className="py-2 px-3 font-medium">OMAHA</td>
+                    <td className="py-2 px-3 text-right">{currentData.locations['Omaha Campus'].toLocaleString()}</td>
+                    <td className="py-2 px-3 text-right">{previousData.locations['Omaha Campus'].toLocaleString()}</td>
+                    <td className="py-2 px-3 text-right font-medium text-green-600">
+                      +{(currentData.locations['Omaha Campus'] - previousData.locations['Omaha Campus']).toLocaleString()}
+                    </td>
+                    <td className="py-2 px-3 text-right font-medium text-green-600">
+                      +{calculateChange(currentData.locations['Omaha Campus'], previousData.locations['Omaha Campus']).toFixed(1)}%
+                    </td>
+                  </tr>
+                  <tr className="bg-yellow-50 font-semibold border-t-2 border-gray-300">
+                    <td className="py-2 px-3">TOTAL</td>
+                    <td className="py-2 px-3 text-right">
+                      {(currentData.locations['Phoenix Campus'] + currentData.locations['Omaha Campus']).toLocaleString()}
+                    </td>
+                    <td className="py-2 px-3 text-right">
+                      {(previousData.locations['Phoenix Campus'] + previousData.locations['Omaha Campus']).toLocaleString()}
+                    </td>
+                    <td className="py-2 px-3 text-right text-green-600">
+                      +{((currentData.locations['Phoenix Campus'] + currentData.locations['Omaha Campus']) - 
+                        (previousData.locations['Phoenix Campus'] + previousData.locations['Omaha Campus'])).toLocaleString()}
+                    </td>
+                    <td className="py-2 px-3 text-right text-green-600">
+                      +{calculateChange(
+                        currentData.locations['Phoenix Campus'] + currentData.locations['Omaha Campus'],
+                        previousData.locations['Phoenix Campus'] + previousData.locations['Omaha Campus']
+                      ).toFixed(1)}%
+                    </td>
                   </tr>
                 </tbody>
               </table>
