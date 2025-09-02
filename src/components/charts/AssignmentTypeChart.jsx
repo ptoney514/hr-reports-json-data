@@ -1,5 +1,14 @@
 import React, { memo, useMemo, useState, useRef, useEffect, useCallback } from 'react';
-import { AlertCircle, Briefcase } from 'lucide-react';
+import { 
+  AlertCircle, 
+  Briefcase, 
+  GraduationCap, 
+  Stethoscope, 
+  Clock, 
+  Cross, 
+  Users,
+  Heart
+} from 'lucide-react';
 import ChartErrorBoundary from '../ui/ChartErrorBoundary';
 import { generateChartAriaLabel, generateChartAriaDescription, handleChartKeyNavigation, announceToScreenReader } from '../../utils/accessibilityUtils';
 
@@ -24,7 +33,8 @@ const AssignmentTypeChart = memo(({
       .map(assignment => ({
         name: assignment.name || 'Unknown',
         total: assignment.total || 0,
-        percentage: total > 0 ? ((assignment.total || 0) / total * 100) : 0
+        percentage: total > 0 ? ((assignment.total || 0) / total * 100) : 0,
+        icon: assignment.icon || 'briefcase'
       }))
       .sort((a, b) => b.total - a.total); // Sort by total count descending
   }, [data]);
@@ -106,7 +116,9 @@ const AssignmentTypeChart = memo(({
         onFocus={handleFocus}
         onBlur={handleBlur}
       >
-        <h3 className="text-base font-semibold text-blue-700 print:text-black mb-4 print:mb-2">{title}</h3>
+        {title && title.trim() !== "" && (
+          <h3 className="text-base font-semibold text-blue-700 print:text-black mb-4 print:mb-2">{title}</h3>
+        )}
         
         {/* Hidden description for screen readers */}
         <div 
@@ -133,7 +145,17 @@ const AssignmentTypeChart = memo(({
               {/* Assignment Type Header */}
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center min-w-0 flex-1 mr-4">
-                  <Briefcase className="text-blue-600 print:text-gray-600 mr-2 flex-shrink-0" size={20} />
+                  {(() => {
+                    const IconComponent = 
+                      assignment.icon === 'student' ? GraduationCap :
+                      assignment.icon === 'medical' ? Stethoscope :
+                      assignment.icon === 'clock' ? Clock :
+                      assignment.icon === 'cross' ? Cross :
+                      assignment.icon === 'users' ? Users :
+                      assignment.icon === 'heart' ? Heart :
+                      Briefcase;
+                    return <IconComponent className="text-blue-600 print:text-gray-600 mr-2 flex-shrink-0" size={20} />;
+                  })()}
                   <h4 className="text-lg print:text-base font-bold text-gray-900 print:text-black truncate">{assignment.name}</h4>
                 </div>
                 <div className="text-right flex-shrink-0">
@@ -174,15 +196,6 @@ const AssignmentTypeChart = memo(({
           ))}
         </div>
         
-        {/* Summary */}
-        {assignmentTypeData.length > 0 && (
-          <div className="mt-4 print:mt-2 pt-4 print:pt-2 border-t border-gray-200">
-            <div className="text-sm print:text-xs text-gray-600 print:text-black text-center">
-              Total Workforce: {assignmentTypeData.reduce((sum, assignment) => sum + assignment.total, 0).toLocaleString()} employees
-              across {assignmentTypeData.length} assignment type{assignmentTypeData.length !== 1 ? 's' : ''}
-            </div>
-          </div>
-        )}
       </div>
     </ChartErrorBoundary>
   );

@@ -187,17 +187,148 @@ const WorkforceDashboard = () => {
             />
           </div>
 
+          {/* Executive Summary Section */}
+          <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+              <BarChart3 className="text-blue-600" size={20} />
+              Executive Summary - Workforce Composition
+            </h2>
+            
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Calculation Breakdown */}
+              <div>
+                <h3 className="text-md font-semibold text-gray-800 mb-3">Total Workforce Calculation (FY25)</h3>
+                <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between items-center py-1">
+                      <span className="text-gray-700">Benefit-Eligible Staff</span>
+                      <span className="font-semibold text-gray-900">{currentData.staff.toLocaleString()}</span>
+                    </div>
+                    <div className="flex justify-between items-center py-1">
+                      <span className="text-gray-700">Benefit-Eligible Faculty</span>
+                      <span className="font-semibold text-gray-900">{currentData.faculty.toLocaleString()}</span>
+                    </div>
+                    <div className="flex justify-between items-center py-1">
+                      <span className="text-gray-700">Student Workers</span>
+                      <span className="font-semibold text-gray-900">{currentData.studentCount.total.toLocaleString()}</span>
+                    </div>
+                    <div className="flex justify-between items-center py-1">
+                      <span className="text-gray-700">House Staff Physicians (HSP)</span>
+                      <span className="font-semibold text-gray-900">{currentData.hsp.toLocaleString()}</span>
+                    </div>
+                    <div className="flex justify-between items-center py-1">
+                      <span className="text-gray-700">Temporary Employees</span>
+                      <span className="font-semibold text-gray-900">{currentData.temp.toLocaleString()}</span>
+                    </div>
+                    <div className="flex justify-between items-center py-2 pt-3 border-t-2 border-blue-300">
+                      <span className="font-bold text-gray-900">Total Workforce</span>
+                      <span className="font-bold text-lg text-blue-600">
+                        {(currentData.staff + currentData.faculty + currentData.studentCount.total + currentData.hsp + currentData.temp).toLocaleString()}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="mt-3 text-xs text-gray-600 italic">
+                  * Excludes non-benefit eligible: Jesuits ({currentData.jesuits}) and Other PRN/NBE ({currentData.other})
+                </div>
+              </div>
+              
+              {/* Year-over-Year Key Insights */}
+              <div>
+                <h3 className="text-md font-semibold text-gray-800 mb-3">Year-over-Year Key Insights</h3>
+                <div className="space-y-3">
+                  <div className="bg-green-50 rounded-lg p-3 border border-green-200">
+                    <div className="flex items-start gap-2">
+                      <div className="text-green-600 mt-0.5">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                        </svg>
+                      </div>
+                      <div className="flex-1">
+                        <div className="font-semibold text-gray-900 text-sm">Overall Growth</div>
+                        <div className="text-sm text-gray-700">
+                          Total workforce increased by <span className="font-bold text-green-700">
+                            {(currentData.staff + currentData.faculty + currentData.studentCount.total + currentData.hsp + currentData.temp - 
+                              (previousData.staff + previousData.faculty + previousData.studentCount.total + previousData.hsp + previousData.temp)).toLocaleString()}
+                          </span> employees ({calculateChange(
+                            currentData.staff + currentData.faculty + currentData.studentCount.total + currentData.hsp + currentData.temp,
+                            previousData.staff + previousData.faculty + previousData.studentCount.total + previousData.hsp + previousData.temp
+                          ).toFixed(1)}%) from FY24 to FY25
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-blue-50 rounded-lg p-3 border border-blue-200">
+                    <div className="flex items-start gap-2">
+                      <div className="text-blue-600 mt-0.5">
+                        <GraduationCap size={20} />
+                      </div>
+                      <div className="flex-1">
+                        <div className="font-semibold text-gray-900 text-sm">Student Employment Surge</div>
+                        <div className="text-sm text-gray-700">
+                          Student workers grew by <span className="font-bold text-blue-700">
+                            {(currentData.studentCount.total - previousData.studentCount.total).toLocaleString()}
+                          </span> positions (+{calculateChange(currentData.studentCount.total, previousData.studentCount.total).toFixed(1)}%), 
+                          the largest growth category
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-yellow-50 rounded-lg p-3 border border-yellow-200">
+                    <div className="flex items-start gap-2">
+                      <div className="text-yellow-700 mt-0.5">
+                        <Building2 size={20} />
+                      </div>
+                      <div className="flex-1">
+                        <div className="font-semibold text-gray-900 text-sm">Phoenix Campus Expansion</div>
+                        <div className="text-sm text-gray-700">
+                          Phoenix grew by <span className="font-bold text-yellow-700">
+                            {(currentData.locations['Phoenix Campus'] - previousData.locations['Phoenix Campus']).toLocaleString()}
+                          </span> employees (+{calculateChange(currentData.locations['Phoenix Campus'], previousData.locations['Phoenix Campus']).toFixed(1)}%), 
+                          significantly outpacing Omaha's growth rate
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-purple-50 rounded-lg p-3 border border-purple-200">
+                    <div className="flex items-start gap-2">
+                      <div className="text-purple-600 mt-0.5">
+                        <Users size={20} />
+                      </div>
+                      <div className="flex-1">
+                        <div className="font-semibold text-gray-900 text-sm">Staff Workforce Expansion</div>
+                        <div className="text-sm text-gray-700">
+                          BE Staff increased by <span className="font-bold text-purple-700">
+                            {(currentData.staff - previousData.staff).toLocaleString()}
+                          </span> positions (+{calculateChange(currentData.staff, previousData.staff).toFixed(1)}%), 
+                          while Faculty remained stable at {calculateChange(currentData.faculty, previousData.faculty).toFixed(1)}% growth
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* Workforce Analytics Charts - Row 1: Assignment Type and Non-Benefit Eligible */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 print:gap-4 mb-6">
             {/* Assignment Type Chart */}
             <div>
               <AssignmentTypeChart 
-                title="Benefit Eligible Employees by Assignment Type"
+                title=""
                 data={currentData.assignmentTypes.filter(item => 
-                  !['Jesuits', 'Other'].includes(item.type)
+                  !['Jesuits', 'Other', 'Temporary'].includes(item.type)
                 ).map(item => ({
                   name: item.type,
-                  total: item.count
+                  total: item.count,
+                  icon: item.type === 'Student Workers' ? 'student' : 
+                        item.type === 'House Staff Physicians' ? 'medical' : 
+                        item.type === 'Full-Time' ? 'briefcase' : 'users'
                 }))}
                 className="print:h-80 min-h-[420px]"
               />
@@ -206,10 +337,11 @@ const WorkforceDashboard = () => {
             {/* Non-Benefit Eligible Chart */}
             <div>
               <AssignmentTypeChart 
-                title="Non-Benefit Eligible Employees"
+                title=""
                 data={[
-                  { name: 'Jesuits', total: currentData.jesuits || 17 },
-                  { name: 'Other (PRN/NBE)', total: currentData.other || 100 }
+                  { name: 'Temporary', total: currentData.temp || 457, icon: 'clock' },
+                  { name: 'Jesuits', total: currentData.jesuits || 17, icon: 'cross' },
+                  { name: 'Other (PRN/NBE)', total: currentData.other || 100, icon: 'users' }
                 ]}
                 className="print:h-80 min-h-[420px]"
               />
