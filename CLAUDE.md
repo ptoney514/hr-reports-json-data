@@ -2,6 +2,9 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## 📋 Project Status
+**IMPORTANT**: Always check `PROJECT.md` for current project status, active branches, in-progress work, and feature backlog. Keep PROJECT.md updated as you work on tasks.
+
 ## Standard Workflow
 
 1. First think through the problem, read the codebase for relevant files, and write a plan to tasks/todo.md.
@@ -247,3 +250,38 @@ The system ensures data consistency between turnover metrics and exit survey dat
 - Follow typography hierarchy and spacing guidelines
 - Ensure accessibility compliance in all implementations
 - Reference brand voice and messaging when creating user-facing content
+
+## Project Management
+
+### 📊 Keeping PROJECT.md Updated
+**CRITICAL**: Always update PROJECT.md when:
+- Starting work on a new feature or bug
+- Completing a task or milestone
+- Discovering new bugs or issues
+- Adding ideas to the backlog
+- Changing project status or focus
+
+### Key Sections to Maintain
+1. **Current Status**: Update dates and current focus
+2. **In Progress**: Move items as you work on them
+3. **Completed Features**: Mark items done with [x]
+4. **Bug Tracker**: Log any issues discovered
+5. **Feature Backlog**: Add new requirements as discussed
+
+### Quick Update Commands
+```bash
+# After completing a feature
+- Move item from "In Progress" to "Completed Features"
+- Update "Last worked on" date
+- Add any new bugs discovered to Bug Tracker
+
+# When starting new work
+- Update "Current focus" in Current Status
+- Add task to "In Progress" section
+- Note any blockers encountered
+```
+
+### Integration with Todo Management
+- Use TodoWrite for session-specific tasks
+- Update PROJECT.md for project-level tracking
+- Keep both in sync for complete visibility
