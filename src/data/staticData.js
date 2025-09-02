@@ -548,27 +548,63 @@ export const EXIT_SURVEY_DATA = {
       ]
     }
   },
+  // Q3 FY25 - Critical workplace culture issues identified
   "2025-03-31": {
     reportingDate: "3/31/25",
-    responseRate: 68,
-    totalResponses: 47,
-    overallSatisfaction: 3.2,
-    wouldRecommend: 62,
+    quarter: "Q3 FY25",
+    totalExits: 52,
+    totalResponses: 20,
+    responseRate: 38.5,
+    overallSatisfaction: 2.8,
+    wouldRecommend: 45,
+    wouldRecommendCount: { positive: 9, total: 20 },
+    concernsReported: { 
+      percentage: 40, 
+      count: 8, 
+      total: 20, 
+      description: "reported harassment, hostile environment, discrimination" 
+    },
     departureReasons: [
-      { reason: "Career advancement opportunities", percentage: 28.7 },
-      { reason: "Work-life balance", percentage: 21.3 },
-      { reason: "Compensation", percentage: 19.1 },
-      { reason: "Management/leadership", percentage: 14.9 },
-      { reason: "Job responsibilities", percentage: 10.6 },
-      { reason: "Other", percentage: 5.3 }
+      { reason: "Hostile work environment", percentage: 30 },
+      { reason: "Lack of management support", percentage: 25 },
+      { reason: "Career advancement opportunities", percentage: 20 },
+      { reason: "Better compensation elsewhere", percentage: 15 },
+      { reason: "Work-life balance", percentage: 5 },
+      { reason: "Other", percentage: 5 }
+    ],
+    departmentExits: [
+      { department: "Academic Affairs", exits: 8, responses: 4, responseRate: 50 },
+      { department: "College of Medicine", exits: 6, responses: 3, responseRate: 50 },
+      { department: "Finance & Administration", exits: 5, responses: 2, responseRate: 40 },
+      { department: "Student Affairs", exits: 4, responses: 2, responseRate: 50 },
+      { department: "Information Technology", exits: 4, responses: 1, responseRate: 25 },
+      { department: "Other Departments", exits: 25, responses: 8, responseRate: 32 }
     ],
     satisfactionRatings: {
-      jobSatisfaction: 3.2,
-      managementSupport: 2.9,
-      careerDevelopment: 2.7,
-      workLifeBalance: 3.1,
-      compensation: 3.4,
-      benefits: 3.8
+      jobSatisfaction: 2.6,
+      managementSupport: 2.1,
+      careerDevelopment: 2.3,
+      workLifeBalance: 2.8,
+      compensation: 2.5,
+      benefits: 3.2
+    },
+    keyInsights: {
+      areasOfConcern: [
+        "40% reported workplace conduct issues including harassment",
+        "Management support rated lowest at 2.1/5.0",
+        "30% cited hostile work environment as departure reason",
+        "Only 45% would recommend Creighton as employer"
+      ],
+      positiveFeedback: [
+        "Benefits still rated relatively well at 3.2/5.0",
+        "38.5% response rate shows engagement"
+      ],
+      actionItems: [
+        "Immediate investigation of harassment claims",
+        "Management training on supportive leadership",
+        "Review and strengthen workplace conduct policies",
+        "Department-specific interventions for high-concern areas"
+      ]
     }
   },
   // Q4 FY25 - Actual June 30, 2025 data from PDF

@@ -12,7 +12,8 @@ import {
   Settings,
   Calendar,
   FileText,
-  Building2
+  Building2,
+  AlertCircle
 } from 'lucide-react';
 import { announceToScreenReader } from '../../utils/accessibilityUtils';
 
@@ -81,12 +82,28 @@ const Navigation = () => {
       isActive: isActive('/dashboards/exit-survey-q1')
     },
     {
+      id: 'exit-survey-q3',
+      label: 'Q3 FY25 Critical Issues',
+      shortLabel: 'Q3 FY25',
+      path: '/dashboards/exit-survey-q3',
+      icon: AlertCircle,
+      isActive: isActive('/dashboards/exit-survey-q3')
+    },
+    {
       id: 'exit-survey-q4',
       label: 'Q4 FY25 Survey Insights',
       shortLabel: 'Q4 FY25',
       path: '/dashboards/exit-survey-q4',
       icon: FileText,
       isActive: isActive('/dashboards/exit-survey-q4')
+    },
+    {
+      id: 'exit-survey-fy25',
+      label: 'FY25 Complete Analysis',
+      shortLabel: 'FY25',
+      path: '/dashboards/exit-survey-fy25',
+      icon: BarChart3,
+      isActive: isActive('/dashboards/exit-survey-fy25')
     },
     {
       id: 'admin',

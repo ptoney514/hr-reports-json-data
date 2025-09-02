@@ -1,0 +1,123 @@
+{
+  "metadata": {
+    "processedDate": "2025-09-02T02:08:08.242Z",
+    "sourceFile": "Terms Since 2017 Detail PT.xlsx",
+    "fiscalYear": "FY25",
+    "dateRange": {
+      "start": "2024-07-01",
+      "end": "2025-06-30"
+    },
+    "note": "CORRECTED - Uses latest termination date per employee, handles duplicates"
+  },
+  "summary": {
+    "totalTerminations": 222,
+    "uniqueEmployees": 222,
+    "facultyCount": 36,
+    "staffCount": 186,
+    "averageYearsOfService": 6.5
+  },
+  "quarterly": {
+    "Q1": {
+      "count": 76,
+      "faculty": 5,
+      "staff": 71,
+      "employees": []
+    },
+    "Q2": {
+      "count": 36,
+      "faculty": 3,
+      "staff": 33,
+      "employees": []
+    },
+    "Q3": {
+      "count": 52,
+      "faculty": 9,
+      "staff": 43,
+      "employees": []
+    },
+    "Q4": {
+      "count": 51,
+      "faculty": 15,
+      "staff": 36,
+      "employees": []
+    }
+  },
+  "termReasons": {
+    "Resigned": 109,
+    "Retirement": 27,
+    "End Assignment": 22,
+    "Better Opportunity": 21,
+    "Personal Reasons": 13,
+    "Reduction In Force": 4,
+    "Job Abandonment": 4,
+    "Relocation": 4,
+    "Invol - Perfromance": 4,
+    "Invol Performance": 3,
+    "Going to School": 2,
+    "Care Family Member": 2,
+    "Retirement Ineligble": 2,
+    "Death": 2,
+    "Reduction in Force": 2,
+    "Not Specified": 1
+  },
+  "termReasonPercentages": {
+    "Retirement": 12.2,
+    "End Assignment": 9.9,
+    "Personal Reasons": 5.9,
+    "Resigned": 49.1,
+    "Better Opportunity": 9.5,
+    "Going to School": 0.9,
+    "Care Family Member": 0.9,
+    "Retirement Ineligble": 0.9,
+    "Reduction In Force": 1.8,
+    "Job Abandonment": 1.8,
+    "Death": 0.9,
+    "Relocation": 1.8,
+    "Reduction in Force": 0.9,
+    "Invol - Perfromance": 1.8,
+    "Not Specified": 0.5,
+    "Invol Performance": 1.4
+  },
+  "departments": {
+    "Unknown": 222
+  },
+  "yearsOfService": {
+    "0-1": 48,
+    "1-3": 77,
+    "3-5": 20,
+    "5-10": 37,
+    "10-15": 10,
+    "15-20": 12,
+    "20+": 21
+  },
+  "assignmentCategories": {
+    "F12": 189,
+    "PT12": 7,
+    "F11": 10,
+    "F09": 16,
+    "PT10": 1,
+    "PT9": 2
+  },
+  "demographics": {
+    "gender": {
+      "F": 133,
+      "M": 92
+    },
+    "ethnicity": {
+      "1": 32,
+      "3": 3,
+      "4": 4,
+      "5": 5,
+      "8": 2,
+      "White": 112,
+      "Asian": 8,
+      "Hispanic": 14,
+      "2 or More": 3,
+      "Black": 12,
+      "Two or more Races": 2,
+      "Black or African American": 6,
+      "I am Hispanic or Latino": 1
+    },
+    "ageGroups": {}
+  }
+}

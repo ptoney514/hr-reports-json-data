@@ -32,12 +32,17 @@ This document defines the standardized methodology for calculating and analyzing
 ### 1. Response Rate
 **Formula:** `(Total Survey Responses / Total Exits) × 100`
 
+**Total Exits Source:** Calculated from turnover data (see TURNOVER_METHODOLOGY.md)
+- Count unique Empl Num with Term Date in reporting period
+- Exclude HSR, CWS, SUE, TEMP, PRN, NBE from Assignment Category
+- Use faculty/staff split from Faxc Staff column
+
 **Example Q4 FY25:**
 - Total Responses: 18
-- Total Exits: 62
-- Response Rate = (18 / 62) × 100 = **29%**
+- Total Exits: 51 (from turnover data, excluding HSR/CWS/SUE/TEMP/PRN/NBE)
+- Response Rate = (18 / 51) × 100 = **35.3%**
 
-**Display Format:** "29% (18 of 62 exits)"
+**Display Format:** "35.3% (18 of 51 exits)"
 
 ### 2. Would Recommend Rate (Satisfaction)
 **Formula:** `(Positive Responses / Total Who Answered Question) × 100`
@@ -245,15 +250,25 @@ qoqChange = ((currentValue - previousValue) / previousValue) * 100;
 avgSatisfaction = (sum of all category scores) / (number of categories);
 ```
 
+## Integration with Turnover Data
+
+Exit survey response rates should be calculated using actual turnover counts from HR system data:
+1. Process turnover data using methodology in TURNOVER_METHODOLOGY.md
+2. Match survey collection period with turnover reporting period
+3. Use unique employee count (excluding TEMPS) as denominator
+4. Compare HR Term Reason 2 with employee-reported exit reasons
+
 ## Notes on Q4 FY25 Specific Calculations
 
-The Q4 FY25 dashboard shows these specific values:
-- **62 total exits** (down 22.5% from Q1's 80 exits)
-- **18 survey responses** (29% response rate)
+Based on actual turnover data from HR system (excluding HSR/CWS/SUE/TEMP/PRN/NBE):
+- **51 total exits in Q4** (regular employees only)
+- **18 survey responses** (35.3% actual response rate)
 - **83.3% recommendation rate** (15 of 18 positive)
 - **22.2% reported concerns** (4 of 18)
 - **Lowest satisfaction:** Career Development at 2.8/5.0
 - **Highest satisfaction:** Benefits at 3.6/5.0
+
+Note: Excluding student and temporary categories provides accurate representation of regular employee turnover.
 
 These calculations serve as the model for all future quarters.
 

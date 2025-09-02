@@ -157,9 +157,15 @@ source-metrics/
 5. See `EXIT_SURVEY_METHODOLOGY.md` for calculation methods
 
 ### 📈 Key Metrics Documents
-- **Exit Survey Methodology**: `/EXIT_SURVEY_METHODOLOGY.md` - Calculation formulas
+- **Exit Survey Methodology**: `/EXIT_SURVEY_METHODOLOGY.md` - Exit survey calculation formulas and standards
+- **Turnover Methodology**: `/TURNOVER_METHODOLOGY.md` - Turnover data processing and calculations
 - **Data Import Guide**: `/source-metrics/templates/DATA_IMPORT_GUIDE.md` - Format requirements
 - **Source Metrics README**: `/source-metrics/README.md` - Complete folder guide
+
+### 📊 Data Processing Scripts
+- **Turnover Processing**: `/scripts/processTurnoverData.js` - Extracts and analyzes termination data from Excel
+- **Excel Inspection**: `/scripts/inspectExcelData.js` - Debug tool for Excel file structure
+- **Sheet Inspector**: `/scripts/inspectAllSheets.js` - Reviews all sheets in Excel workbook
 
 ## Important Reminders
 
