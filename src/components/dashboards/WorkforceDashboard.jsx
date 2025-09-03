@@ -12,7 +12,11 @@ import {
   Building2,
   Heart,
   GraduationCap,
-  BarChart3
+  BarChart3,
+  Clock,
+  TrendingUp,
+  MapPin,
+  Calculator
 } from 'lucide-react';
 
 // Simplified fallback data for consistent dashboard display
@@ -75,6 +79,11 @@ const WorkforceDashboard = () => {
           return `OMA (${locationDetails.omaha.staff.toLocaleString()}) | PHX (${locationDetails.phoenix.staff.toLocaleString()})`;
         case 'hsp':
           return `OMA (${locationDetails.omaha.hsp.toLocaleString()}) | PHX (${locationDetails.phoenix.hsp.toLocaleString()})`;
+        case 'students':
+          return `OMA (${locationDetails.omaha.students?.toLocaleString() || Math.round(currentData.studentCount.total * 0.75).toLocaleString()}) | PHX (${locationDetails.phoenix.students?.toLocaleString() || Math.round(currentData.studentCount.total * 0.25).toLocaleString()})`;
+        case 'temp':
+          const tempTotal = getTempTotal("2025-06-30");
+          return `OMA (${locationDetails.omaha.temp?.toLocaleString() || Math.round(tempTotal * 0.85).toLocaleString()}) | PHX (${locationDetails.phoenix.temp?.toLocaleString() || Math.round(tempTotal * 0.15).toLocaleString()})`;
         default:
           return '';
       }
@@ -93,6 +102,15 @@ const WorkforceDashboard = () => {
           return `OMA (${staffOmaha.toLocaleString()}) | PHX (${staffPhoenix.toLocaleString()})`;
         case 'hsp':
           return 'OMA (0) | PHX (0)';
+        case 'students':
+          const studentsOmaha = Math.round(currentData.studentCount.total * 0.75);
+          const studentsPhoenix = currentData.studentCount.total - studentsOmaha;
+          return `OMA (${studentsOmaha.toLocaleString()}) | PHX (${studentsPhoenix.toLocaleString()})`;
+        case 'temp':
+          const tempTotalFallback = getTempTotal("2025-06-30");
+          const tempOmaha = Math.round(tempTotalFallback * 0.85);
+          const tempPhoenix = tempTotalFallback - tempOmaha;
+          return `OMA (${tempOmaha.toLocaleString()}) | PHX (${tempPhoenix.toLocaleString()})`;
         default:
           return '';
       }
@@ -150,172 +168,202 @@ const WorkforceDashboard = () => {
             />
             
             <SummaryCard
-              title="Students"
-              value={currentData.studentCount.total.toLocaleString()}
-              change={calculateChange(currentData.studentCount.total, previousData.studentCount.total)}
-              changeType="percentage"
-              subtitle={`vs ${previousData.studentCount.total.toLocaleString()} FY24`}
-              icon={GraduationCap}
-              trend={(calculateChange(currentData.studentCount.total, previousData.studentCount.total)) >= 0 ? 'positive' : 'negative'}
+              title="HSP"
+              value={`${currentData.hsp?.toLocaleString() || '0'}`}
+              subtitle={getLocationCounts('hsp')}
+              icon={Heart}
             />
             
             <SummaryCard
-              title="HSP"
-              value={`${currentData.hsp?.toLocaleString() || '0'}`}
-              change={calculateChange(currentData.hsp, previousData.hsp)}
-              changeType="percentage"
-              subtitle={`vs ${previousData.hsp?.toLocaleString() || '0'} FY24`}
-              icon={Heart}
-              trend={(calculateChange(currentData.hsp, previousData.hsp)) >= 0 ? 'positive' : 'negative'}
+              title="Students"
+              value={currentData.studentCount.total.toLocaleString()}
+              subtitle={getLocationCounts('students')}
+              icon={GraduationCap}
             />
             
             <SummaryCard
               title="Temp"
               value={`${currentTempTotal.toLocaleString()}`}
-              change={calculateChange(currentTempTotal, previousTempTotal)}
-              changeType="percentage"
-              subtitle={`vs ${previousTempTotal.toLocaleString()} FY24`}
+              subtitle={getLocationCounts('temp')}
               icon={Users}
-              trend={(calculateChange(currentTempTotal, previousTempTotal)) >= 0 ? 'positive' : 'negative'}
             />
             
             <SummaryCard
               title="Total"
               value={`${(currentData.staff + currentData.faculty + currentData.studentCount.total + currentData.hsp + currentTempTotal).toLocaleString()}`}
-              change={calculateChange(
-                currentData.staff + currentData.faculty + currentData.studentCount.total + currentData.hsp + currentTempTotal,
-                previousData.staff + previousData.faculty + previousData.studentCount.total + previousData.hsp + previousTempTotal
-              )}
-              changeType="percentage"
-              subtitle="All types"
+              subtitle={getLocationCounts('total')}
               icon={Users}
-              trend="positive"
             />
           </div>
 
           {/* Executive Summary Section */}
-          <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-              <BarChart3 className="text-blue-600" size={20} />
+          <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+            <h2 className="text-xl font-bold mb-6 flex items-center gap-3" style={{color: '#00245D'}}>
+              <div className="p-2 rounded-lg" style={{backgroundColor: '#0054A6'}}>
+                <Calculator className="text-white" size={24} />
+              </div>
               Executive Summary - Workforce Composition
             </h2>
             
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {/* Calculation Breakdown */}
               <div>
-                <h3 className="text-md font-semibold text-gray-800 mb-3">Total Workforce Calculation (FY25)</h3>
-                <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between items-center py-1">
-                      <span className="text-gray-700">Benefit-Eligible Staff</span>
-                      <span className="font-semibold text-gray-900">{currentData.staff.toLocaleString()}</span>
+                <h3 className="text-lg font-bold mb-4 flex items-center gap-2" style={{color: '#0054A6'}}>
+                  <BarChart3 size={20} />
+                  Total Workforce Calculation (FY25)
+                </h3>
+                <div className="rounded-xl p-6 shadow-sm" style={{backgroundColor: '#F3F3F0', border: '1px solid #E5E7EB'}}>
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center py-2 px-3 rounded-lg bg-white shadow-sm">
+                      <div className="flex items-center gap-3">
+                        <Building2 className="text-blue-600" size={18} />
+                        <span className="font-medium" style={{color: '#00245D'}}>Benefit-Eligible Staff</span>
+                      </div>
+                      <span className="font-bold text-lg" style={{color: '#0054A6'}}>{currentData.staff.toLocaleString()}</span>
                     </div>
-                    <div className="flex justify-between items-center py-1">
-                      <span className="text-gray-700">Benefit-Eligible Faculty</span>
-                      <span className="font-semibold text-gray-900">{currentData.faculty.toLocaleString()}</span>
+                    <div className="flex justify-between items-center py-2 px-3 rounded-lg bg-white shadow-sm">
+                      <div className="flex items-center gap-3">
+                        <BookOpen className="text-green-600" size={18} />
+                        <span className="font-medium" style={{color: '#00245D'}}>Benefit-Eligible Faculty</span>
+                      </div>
+                      <span className="font-bold text-lg" style={{color: '#0054A6'}}>{currentData.faculty.toLocaleString()}</span>
                     </div>
-                    <div className="flex justify-between items-center py-1">
-                      <span className="text-gray-700">Student Workers</span>
-                      <span className="font-semibold text-gray-900">{currentData.studentCount.total.toLocaleString()}</span>
+                    <div className="flex justify-between items-center py-2 px-3 rounded-lg bg-white shadow-sm">
+                      <div className="flex items-center gap-3">
+                        <Heart className="text-red-500" size={18} />
+                        <span className="font-medium" style={{color: '#00245D'}}>House Staff Physicians (HSP)</span>
+                      </div>
+                      <span className="font-bold text-lg" style={{color: '#0054A6'}}>{currentData.hsp.toLocaleString()}</span>
                     </div>
-                    <div className="flex justify-between items-center py-1">
-                      <span className="text-gray-700">House Staff Physicians (HSP)</span>
-                      <span className="font-semibold text-gray-900">{currentData.hsp.toLocaleString()}</span>
+                    <div className="flex justify-between items-center py-2 px-3 rounded-lg bg-white shadow-sm">
+                      <div className="flex items-center gap-3">
+                        <GraduationCap style={{color: '#71CC98'}} size={18} />
+                        <span className="font-medium" style={{color: '#00245D'}}>Student Workers</span>
+                      </div>
+                      <span className="font-bold text-lg" style={{color: '#0054A6'}}>{currentData.studentCount.total.toLocaleString()}</span>
                     </div>
-                    <div className="flex justify-between items-center py-1">
-                      <span className="text-gray-700">Temporary Employees</span>
-                      <span className="font-semibold text-gray-900">{currentTempTotal.toLocaleString()}</span>
+                    <div className="flex justify-between items-center py-2 px-3 rounded-lg bg-white shadow-sm">
+                      <div className="flex items-center gap-3">
+                        <Clock style={{color: '#FFC72C'}} size={18} />
+                        <span className="font-medium" style={{color: '#00245D'}}>Temporary Employees</span>
+                      </div>
+                      <span className="font-bold text-lg" style={{color: '#0054A6'}}>{currentTempTotal.toLocaleString()}</span>
                     </div>
-                    <div className="flex justify-between items-center py-2 pt-3 border-t-2 border-blue-300">
-                      <span className="font-bold text-gray-900">Total Workforce</span>
-                      <span className="font-bold text-lg text-blue-600">
+                    <div className="flex justify-between items-center py-3 px-4 mt-4 rounded-lg shadow-md" style={{backgroundColor: '#0054A6'}}>
+                      <div className="flex items-center gap-3">
+                        <Users className="text-white" size={20} />
+                        <span className="font-extrabold text-white text-lg">Total Workforce</span>
+                      </div>
+                      <span className="font-extrabold text-2xl text-white">
                         {(currentData.staff + currentData.faculty + currentData.studentCount.total + currentData.hsp + currentTempTotal).toLocaleString()}
                       </span>
                     </div>
                   </div>
                 </div>
                 
-                <div className="mt-3 text-xs text-gray-600 italic">
-                  * Excludes non-benefit eligible: Jesuits ({currentData.jesuits}) and Other PRN/NBE ({currentData.other})
+                <div className="mt-4 text-sm p-3 rounded-lg whitespace-nowrap" style={{color: '#5A6168', backgroundColor: '#F8F9FA'}}>
+                  <span className="font-medium">Note:</span> Employee counts include Jesuits (17) as well as grant-funded positions (482)
                 </div>
               </div>
               
               {/* Year-over-Year Key Insights */}
               <div>
-                <h3 className="text-md font-semibold text-gray-800 mb-3">Year-over-Year Key Insights</h3>
-                <div className="space-y-3">
-                  <div className="bg-green-50 rounded-lg p-3 border border-green-200">
-                    <div className="flex items-start gap-2">
-                      <div className="text-green-600 mt-0.5">
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                        </svg>
+                <h3 className="text-lg font-bold mb-4 flex items-center gap-2" style={{color: '#0054A6'}}>
+                  <TrendingUp size={20} />
+                  Year-over-Year Key Insights
+                </h3>
+                <div className="space-y-4">
+                  <div className="rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow duration-200" style={{backgroundColor: '#F8F9FA', border: '1px solid #E5E7EB'}}>
+                    <div className="flex items-start gap-3">
+                      <div className="p-2 rounded-lg" style={{backgroundColor: '#1F74DB'}}>
+                        <Users className="text-white" size={20} />
                       </div>
                       <div className="flex-1">
-                        <div className="font-semibold text-gray-900 text-sm">Overall Growth</div>
-                        <div className="text-sm text-gray-700">
-                          Total workforce increased by <span className="font-bold text-green-700">
-                            {(currentData.staff + currentData.faculty + currentData.studentCount.total + currentData.hsp + currentTempTotal - 
-                              (previousData.staff + previousData.faculty + previousData.studentCount.total + previousData.hsp + previousTempTotal)).toLocaleString()}
-                          </span> employees ({calculateChange(
-                            currentData.staff + currentData.faculty + currentData.studentCount.total + currentData.hsp + currentTempTotal,
-                            previousData.staff + previousData.faculty + previousData.studentCount.total + previousData.hsp + previousTempTotal
-                          ).toFixed(1)}%) from FY24 to FY25
+                        <div className="font-bold text-lg mb-2" style={{color: '#00245D'}}>Benefit-Eligible Workforce Expansion</div>
+                        <div className="text-sm font-medium" style={{color: '#00245D'}}>
+                          BE Staff increased by <span className="font-extrabold px-2 py-1 rounded" style={{color: '#1F74DB', backgroundColor: 'white'}}>26</span> positions (2.0%), 
+                          while BE Faculty increased by <span className="font-extrabold px-2 py-1 rounded" style={{color: '#1F74DB', backgroundColor: 'white'}}>2</span> positions (0.3%)
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow duration-200" style={{backgroundColor: '#F8F9FA', border: '1px solid #E5E7EB'}}>
+                    <div className="flex items-start gap-3">
+                      <div className="p-2 rounded-lg" style={{backgroundColor: '#71CC98'}}>
+                        <Heart className="text-white" size={20} />
+                      </div>
+                      <div className="flex-1">
+                        <div className="font-bold text-lg mb-2" style={{color: '#00245D'}}>House Staff Physician Growth</div>
+                        <div className="text-sm font-medium" style={{color: '#00245D'}}>
+                          HSP increased by <span className="font-extrabold px-2 py-1 rounded" style={{color: '#71CC98', backgroundColor: 'white'}}>4</span> positions (0.7%) with Omaha growing to 268 residents while Phoenix maintained 344 residents
                         </div>
                       </div>
                     </div>
                   </div>
                   
-                  <div className="bg-blue-50 rounded-lg p-3 border border-blue-200">
-                    <div className="flex items-start gap-2">
-                      <div className="text-blue-600 mt-0.5">
-                        <GraduationCap size={20} />
+                  <div className="rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow duration-200" style={{backgroundColor: '#F8F9FA', border: '1px solid #E5E7EB'}}>
+                    <div className="flex items-start gap-3">
+                      <div className="p-2 rounded-lg" style={{backgroundColor: '#FFC72C'}}>
+                        <MapPin className="text-white" size={20} />
                       </div>
                       <div className="flex-1">
-                        <div className="font-semibold text-gray-900 text-sm">Student Employment Surge</div>
-                        <div className="text-sm text-gray-700">
-                          Student workers grew by <span className="font-bold text-blue-700">
-                            {(currentData.studentCount.total - previousData.studentCount.total).toLocaleString()}
-                          </span> positions (+{calculateChange(currentData.studentCount.total, previousData.studentCount.total).toFixed(1)}%), 
-                          the largest growth category
+                        <div className="font-bold text-lg mb-2" style={{color: '#00245D'}}>Phoenix Campus Expansion</div>
+                        <div className="text-sm font-medium" style={{color: '#00245D'}}>
+                          Phoenix campus grew by <span className="font-extrabold px-2 py-1 rounded" style={{color: '#FFC72C', backgroundColor: 'white'}}>236</span> employees (45.9%), 
+                          primarily driven by an expansion in the School of Medicine with over 20% increase in Faculty and Staff
                         </div>
                       </div>
                     </div>
                   </div>
-                  
-                  <div className="bg-yellow-50 rounded-lg p-3 border border-yellow-200">
-                    <div className="flex items-start gap-2">
-                      <div className="text-yellow-700 mt-0.5">
-                        <Building2 size={20} />
-                      </div>
-                      <div className="flex-1">
-                        <div className="font-semibold text-gray-900 text-sm">Phoenix Campus Expansion</div>
-                        <div className="text-sm text-gray-700">
-                          Phoenix grew by <span className="font-bold text-yellow-700">
-                            {(currentData.locations['Phoenix Campus'] - previousData.locations['Phoenix Campus']).toLocaleString()}
-                          </span> employees (+{calculateChange(currentData.locations['Phoenix Campus'], previousData.locations['Phoenix Campus']).toFixed(1)}%), 
-                          significantly outpacing Omaha's growth rate
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="bg-purple-50 rounded-lg p-3 border border-purple-200">
-                    <div className="flex items-start gap-2">
-                      <div className="text-purple-600 mt-0.5">
-                        <Users size={20} />
-                      </div>
-                      <div className="flex-1">
-                        <div className="font-semibold text-gray-900 text-sm">Staff Workforce Expansion</div>
-                        <div className="text-sm text-gray-700">
-                          BE Staff {currentData.staff >= previousData.staff ? "increased" : "decreased"} by <span className="font-bold text-purple-700">
-                            {Math.abs(currentData.staff - previousData.staff).toLocaleString()}
-                          </span> positions ({calculateChange(currentData.staff, previousData.staff).toFixed(1)}%), 
-                          while Faculty {currentData.faculty >= previousData.faculty ? "increased" : "decreased"} by {calculateChange(currentData.faculty, previousData.faculty).toFixed(1)}%
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                </div>
+              </div>
+
+              {/* Campus Breakdown Analysis */}
+              <div className="mt-6 lg:col-span-2">
+                <h3 className="text-lg font-bold mb-4 flex items-center gap-2" style={{color: '#0054A6'}}>
+                  <MapPin size={20} />
+                  Campus Breakdown (as of 6/30/2025)
+                </h3>
+                <div className="rounded-xl p-4" style={{backgroundColor: '#FAFAFA'}}>
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b" style={{borderColor: '#E5E7EB'}}>
+                        <th className="text-left py-3 px-3 font-bold" style={{color: '#00245D'}}>Campus</th>
+                        <th className="text-center py-3 px-3 font-bold" style={{color: '#00245D'}}>Omaha</th>
+                        <th className="text-center py-3 px-3 font-bold" style={{color: '#00245D'}}>Phoenix</th>
+                        <th className="text-center py-3 px-3 font-bold" style={{color: '#00245D'}}>Total</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr className="border-b border-gray-100 bg-white">
+                        <td className="py-3 px-3 font-semibold" style={{color: '#00245D'}}>Total by Campus</td>
+                        <td className="text-center py-3 px-3 font-bold" style={{color: '#0054A6'}}>4,287</td>
+                        <td className="text-center py-3 px-3 font-bold" style={{color: '#0054A6'}}>750</td>
+                        <td className="text-center py-3 px-3 font-extrabold text-lg" style={{color: '#0054A6'}}>5,037</td>
+                      </tr>
+                      <tr className="bg-white">
+                        <td className="py-3 px-3" colSpan="4">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="p-3 rounded-lg" style={{backgroundColor: '#95D2F3'}}>
+                              <div className="font-bold mb-2 flex items-center gap-2" style={{color: '#00245D'}}>
+                                <Building2 size={16} />
+                                Omaha Breakdown:
+                              </div>
+                              <div className="text-sm font-medium" style={{color: '#00245D'}}>1,245 BE Staff | 650 Faculty | 248 Residents | 192 Temp Fac | 198 Temp Staff | 1,612 Students</div>
+                            </div>
+                            <div className="p-3 rounded-lg" style={{backgroundColor: '#95D2F3'}}>
+                              <div className="font-bold mb-2 flex items-center gap-2" style={{color: '#00245D'}}>
+                                <Building2 size={16} />
+                                Phoenix Breakdown:
+                              </div>
+                              <div className="text-sm font-medium" style={{color: '#00245D'}}>104 BE Staff | 138 Faculty | 364 Residents | 20 Temp Fac | 22 Temp Staff | 102 Students</div>
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
               </div>
             </div>
@@ -451,7 +499,7 @@ const WorkforceDashboard = () => {
                 }) || []}
               </div>
 
-              <div className="mt-6 pt-6 border-t border-gray-200">
+              <div className="mt-6 pt-6 border-t border-gray-100">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
                   <div>
                     <div className="text-2xl font-bold" style={{color: '#0054A6'}}>
