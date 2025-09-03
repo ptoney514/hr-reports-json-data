@@ -70,10 +70,10 @@ const RecruitingDashboard = () => {
         <div className="bg-white rounded-lg shadow-sm border p-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <UserPlus style={{color: '#0054A6'}} size={24} />
+              <UserPlus className="text-blue-600" size={24} />
               <div>
-                <h1 className="text-2xl font-serif font-semibold text-gray-900">FY 2025 Recruiting Dashboard - Benefit Eligible</h1>
-                <p className="text-gray-600 text-sm font-sans mt-1">
+                <h1 className="text-2xl font-bold text-gray-900">FY 2025 Recruiting Dashboard - Benefit Eligible</h1>
+                <p className="text-gray-600 text-sm mt-1">
                   Reporting Period: July 1, 2024 - June 30, 2025
                 </p>
               </div>
