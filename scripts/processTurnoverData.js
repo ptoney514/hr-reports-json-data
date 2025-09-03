@@ -8,7 +8,7 @@ const fs = require('fs');
 const path = require('path');
 
 // Configuration
-const INPUT_FILE = path.join(__dirname, '../source-metrics/turnover/fy25/Terms Since 2017 Detail PT.xlsx');
+const INPUT_FILE = path.join(__dirname, '../source-metrics/terms/fy25/Terms Since 2017 Detail PT.xlsx');
 const OUTPUT_FILE = path.join(__dirname, '../src/data/fy25TurnoverData.json');
 
 // FY25 Date Range
@@ -139,9 +139,11 @@ async function processTurnoverData() {
       }
     };
     
-    // Track unique employees
+    // Track unique employees and their classifications
     const uniqueEmployees = new Set();
+    const employeeClassifications = new Map(); // Track faculty/staff per unique employee
     let totalYearsOfService = 0;
+    const employeeYearsOfService = new Map(); // Track years of service per unique employee
     
     // Process each record
     fy25Data.forEach(row => {
@@ -156,9 +158,15 @@ async function processTurnoverData() {
       const facStaff = row['Faxc Staff'] || 'Unknown';
       const isFaculty = facStaff.toLowerCase().includes('fac');
       
-      // Years of service
-      if (row['Hire Date']) {
+      // Store classification for unique employee (only if not already set)
+      if (!employeeClassifications.has(emplNum)) {
+        employeeClassifications.set(emplNum, isFaculty ? 'faculty' : 'staff');
+      }
+      
+      // Years of service (track per unique employee)
+      if (row['Hire Date'] && !employeeYearsOfService.has(emplNum)) {
         const years = calculateYearsOfService(row['Hire Date'], row['Term Date']);
+        employeeYearsOfService.set(emplNum, years);
         totalYearsOfService += years;
         
         // Categorize years of service
@@ -171,15 +179,13 @@ async function processTurnoverData() {
         else analysis.yearsOfService['20+']++;
       }
       
-      // Quarterly breakdown
-      if (quarter) {
+      // Quarterly breakdown - only add unique employees to quarters
+      if (quarter && !analysis.quarterly[quarter].employees.includes(emplNum)) {
         analysis.quarterly[quarter].count++;
         if (isFaculty) {
           analysis.quarterly[quarter].faculty++;
-          analysis.summary.facultyCount++;
         } else {
           analysis.quarterly[quarter].staff++;
-          analysis.summary.staffCount++;
         }
         analysis.quarterly[quarter].employees.push(emplNum);
       }
@@ -214,6 +220,20 @@ async function processTurnoverData() {
     // Update summary
     analysis.summary.totalTerminations = fy25Data.length;
     analysis.summary.uniqueEmployees = uniqueEmployees.size;
+    
+    // Count unique faculty and staff
+    let uniqueFacultyCount = 0;
+    let uniqueStaffCount = 0;
+    employeeClassifications.forEach(classification => {
+      if (classification === 'faculty') {
+        uniqueFacultyCount++;
+      } else {
+        uniqueStaffCount++;
+      }
+    });
+    analysis.summary.facultyCount = uniqueFacultyCount;
+    analysis.summary.staffCount = uniqueStaffCount;
+    
     analysis.summary.averageYearsOfService = uniqueEmployees.size > 0 
       ? Math.round((totalYearsOfService / uniqueEmployees.size) * 10) / 10 
       : 0;
