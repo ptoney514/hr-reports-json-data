@@ -133,6 +133,10 @@ const RecruitingDashboard = () => {
             internalSuccessRate={currentData.staffHiring?.internalSuccessRate || 24.0}
             externalSuccessRate={currentData.staffHiring?.externalSuccessRate || 3.7}
             internalAdvantage={currentData.staffHiring?.internalAdvantage || 6.4}
+            internalApplicants={currentData.staffHiring?.internalApplicants || 225}
+            externalApplicants={currentData.staffHiring?.externalApplicants || 6137}
+            internalHired={currentData.staffHiring?.internalHired || 54}
+            externalHired={currentData.staffHiring?.externalHired || 286}
           />
         </div>
 
@@ -141,6 +145,12 @@ const RecruitingDashboard = () => {
           <HiringCompetitivenessChart
             totalApplications={((currentData.staffHiring?.totalApplications || 6362) + (currentData.facultyHiring?.applications || 1746))}
             totalHired={((currentData.staffHiring?.totalHired || 340) + (currentData.facultyHiring?.hires || 53))}
+            internalApplicants={currentData.staffHiring?.internalApplicants || 225}
+            externalApplicants={currentData.staffHiring?.externalApplicants || 6137}
+            internalHired={currentData.staffHiring?.internalHired || 54}
+            externalHired={currentData.staffHiring?.externalHired || 286}
+            facultyHired={currentData.facultyHiring?.hires || 53}
+            staffHired={currentData.staffHiring?.totalHired || 340}
             internalSuccessRate={currentData.staffHiring?.internalSuccessRate || 24.0}
             externalSuccessRate={currentData.staffHiring?.externalSuccessRate || 3.7}
             overallHireRate={((currentData.staffHiring?.totalHired || 340) + (currentData.facultyHiring?.hires || 53)) / ((currentData.staffHiring?.totalApplications || 6362) + (currentData.facultyHiring?.applications || 1746)) * 100}
