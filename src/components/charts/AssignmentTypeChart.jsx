@@ -33,7 +33,7 @@ const AssignmentTypeChart = memo(({
       .map(assignment => ({
         name: assignment.name || 'Unknown',
         total: assignment.total || 0,
-        percentage: total > 0 ? ((assignment.total || 0) / total * 100) : 0,
+        percentage: assignment.percentage !== undefined ? parseFloat(assignment.percentage) : (total > 0 ? ((assignment.total || 0) / total * 100) : 0),
         icon: assignment.icon || 'briefcase'
       }))
       .sort((a, b) => b.total - a.total); // Sort by total count descending

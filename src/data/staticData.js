@@ -27,16 +27,22 @@ export const WORKFORCE_DATA = {
     },
     locationDetails: {
       omaha: {
-        faculty: 746,
-        staff: 2908,
+        faculty: 646,
+        staff: 1219,
         hsp: 264,
-        temp: 342
+        students: 1549,
+        tempFac: 185,
+        tempStaff: 195,
+        temp: 380
       },
       phoenix: {
-        faculty: 40,
-        staff: 128,
+        faculty: 140,
+        staff: 104,
         hsp: 344,
-        temp: 2
+        students: 58,
+        tempFac: 17,
+        tempStaff: 20,
+        temp: 37
       }
     },
     categories: {
@@ -818,21 +824,27 @@ export const WORKFORCE_DATA = {
     jesuits: 17,
     other: 0,  // NBE and PRN moved to temp
     locations: {
-      "Omaha Campus": 4287,
-      "Phoenix Campus": 750
+      "Omaha Campus": 4287,  // Correct total including all components
+      "Phoenix Campus": 750   // Sum of all Phoenix components
     },
     locationDetails: {
       omaha: {
-        faculty: 730,
-        staff: 3062,
-        hsp: 268,
-        temp: 227
+        faculty: 650,
+        staff: 1245,
+        hsp: 248,
+        students: 1612,
+        tempFac: 192,
+        tempStaff: 198,
+        temp: 390  // tempFac + tempStaff
       },
       phoenix: {
-        faculty: 58,
-        staff: 214,
-        hsp: 344,
-        temp: 134
+        faculty: 138,
+        staff: 104,
+        hsp: 364,
+        students: 102,
+        tempFac: 20,
+        tempStaff: 22,
+        temp: 42  // tempFac + tempStaff
       }
     },
     categories: {
@@ -1159,8 +1171,8 @@ export const WORKFORCE_DATA = {
           },
           {
                 "type": "Temporary",
-                "count": 457,
-                "percentage": "9.1"
+                "count": 574,
+                "percentage": "11.4"
           },
           {
                 "type": "Student Workers",
@@ -1169,13 +1181,13 @@ export const WORKFORCE_DATA = {
           },
           {
                 "type": "Jesuits",
-                "count": 17,
-                "percentage": "0.3"
+                "count": 0,
+                "percentage": "0.0"
           },
           {
                 "type": "Other",
-                "count": 100,
-                "percentage": "2.0"
+                "count": 0,
+                "percentage": "0.0"
           }
     ],
     vacancyRate: 0,

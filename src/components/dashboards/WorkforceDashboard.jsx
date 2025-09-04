@@ -80,10 +80,9 @@ const WorkforceDashboard = () => {
         case 'hsp':
           return `OMA (${locationDetails.omaha.hsp.toLocaleString()}) | PHX (${locationDetails.phoenix.hsp.toLocaleString()})`;
         case 'students':
-          return `OMA (${locationDetails.omaha.students?.toLocaleString() || Math.round(currentData.studentCount.total * 0.75).toLocaleString()}) | PHX (${locationDetails.phoenix.students?.toLocaleString() || Math.round(currentData.studentCount.total * 0.25).toLocaleString()})`;
+          return `OMA (${locationDetails.omaha.students?.toLocaleString()}) | PHX (${locationDetails.phoenix.students?.toLocaleString()})`;
         case 'temp':
-          const tempTotal = getTempTotal("2025-06-30");
-          return `OMA (${locationDetails.omaha.temp?.toLocaleString() || Math.round(tempTotal * 0.85).toLocaleString()}) | PHX (${locationDetails.phoenix.temp?.toLocaleString() || Math.round(tempTotal * 0.15).toLocaleString()})`;
+          return `OMA (${locationDetails.omaha.temp?.toLocaleString()}) | PHX (${locationDetails.phoenix.temp?.toLocaleString()})`;
         default:
           return '';
       }
@@ -296,7 +295,7 @@ const WorkforceDashboard = () => {
                       <div className="flex-1">
                         <div className="font-bold text-lg mb-2" style={{color: '#00245D'}}>House Staff Physician Growth</div>
                         <div className="text-sm font-medium" style={{color: '#00245D'}}>
-                          HSP increased by <span className="font-extrabold px-2 py-1 rounded" style={{color: '#71CC98', backgroundColor: 'white'}}>4</span> positions (0.7%) with Omaha growing to 268 residents while Phoenix maintained 344 residents
+                          HSP count increased by <span className="font-extrabold px-2 py-1 rounded" style={{color: '#71CC98', backgroundColor: 'white'}}>4</span> positions (0.7%) with Omaha growing to 268 HSPs while Phoenix maintained 344 HSPs
                         </div>
                       </div>
                     </div>
@@ -338,9 +337,11 @@ const WorkforceDashboard = () => {
                     <tbody>
                       <tr className="border-b border-gray-100 bg-white">
                         <td className="py-3 px-3 font-semibold" style={{color: '#00245D'}}>Total by Campus</td>
-                        <td className="text-center py-3 px-3 font-bold" style={{color: '#0054A6'}}>4,287</td>
-                        <td className="text-center py-3 px-3 font-bold" style={{color: '#0054A6'}}>750</td>
-                        <td className="text-center py-3 px-3 font-extrabold text-lg" style={{color: '#0054A6'}}>5,037</td>
+                        <td className="text-center py-3 px-3 font-bold" style={{color: '#0054A6'}}>{currentData.locations['Omaha Campus'].toLocaleString()}</td>
+                        <td className="text-center py-3 px-3 font-bold" style={{color: '#0054A6'}}>{currentData.locations['Phoenix Campus'].toLocaleString()}</td>
+                        <td className="text-center py-3 px-3 font-extrabold text-lg" style={{color: '#0054A6'}}>
+                          {(currentData.locations['Omaha Campus'] + currentData.locations['Phoenix Campus']).toLocaleString()}
+                        </td>
                       </tr>
                       <tr className="bg-white">
                         <td className="py-3 px-3" colSpan="4">
@@ -350,14 +351,18 @@ const WorkforceDashboard = () => {
                                 <Building2 size={16} />
                                 Omaha Breakdown:
                               </div>
-                              <div className="text-sm font-medium" style={{color: '#00245D'}}>1,245 BE Staff | 650 Faculty | 248 Residents | 192 Temp Fac | 198 Temp Staff | 1,612 Students</div>
+                              <div className="text-sm font-medium" style={{color: '#00245D'}}>
+                                {currentData.locationDetails.omaha.staff} BE Staff | {currentData.locationDetails.omaha.faculty} Faculty | {currentData.locationDetails.omaha.hsp} House Staff Physicians | {currentData.locationDetails.omaha.tempFac} Temp Fac | {currentData.locationDetails.omaha.tempStaff} Temp Staff | {currentData.locationDetails.omaha.students} Students
+                              </div>
                             </div>
                             <div className="p-3 rounded-lg" style={{backgroundColor: '#95D2F3'}}>
                               <div className="font-bold mb-2 flex items-center gap-2" style={{color: '#00245D'}}>
                                 <Building2 size={16} />
                                 Phoenix Breakdown:
                               </div>
-                              <div className="text-sm font-medium" style={{color: '#00245D'}}>104 BE Staff | 138 Faculty | 364 Residents | 20 Temp Fac | 22 Temp Staff | 102 Students</div>
+                              <div className="text-sm font-medium" style={{color: '#00245D'}}>
+                                {currentData.locationDetails.phoenix.staff} BE Staff | {currentData.locationDetails.phoenix.faculty} Faculty | {currentData.locationDetails.phoenix.hsp} House Staff Physicians | {currentData.locationDetails.phoenix.tempFac} Temp Fac | {currentData.locationDetails.phoenix.tempStaff} Temp Staff | {currentData.locationDetails.phoenix.students} Students
+                              </div>
                             </div>
                           </div>
                         </td>
@@ -380,6 +385,7 @@ const WorkforceDashboard = () => {
                 ).map(item => ({
                   name: item.type,
                   total: item.count,
+                  percentage: (item.count / 5037 * 100).toFixed(1),
                   icon: item.type === 'Student Workers' ? 'student' : 
                         item.type === 'House Staff Physicians' ? 'medical' : 
                         item.type === 'Full-Time' ? 'briefcase' : 'users'
@@ -393,9 +399,8 @@ const WorkforceDashboard = () => {
               <AssignmentTypeChart 
                 title=""
                 data={[
-                  { name: 'Temporary', total: currentData.temp || 457, icon: 'clock' },
-                  { name: 'Jesuits', total: currentData.jesuits || 17, icon: 'cross' },
-                  { name: 'Other (PRN/NBE)', total: currentData.other || 100, icon: 'users' }
+                  { name: 'Temporary (includes PRN/NBE)', total: currentData.temp || 574, percentage: ((currentData.temp || 574) / 5037 * 100).toFixed(1), icon: 'clock' },
+                  { name: 'Jesuits', total: currentData.jesuits || 17, percentage: ((currentData.jesuits || 17) / 5037 * 100).toFixed(1), icon: 'cross' }
                 ]}
                 className="print:h-80 min-h-[420px]"
               />
