@@ -1,8 +1,9 @@
 import React, { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { Users, Building2, TrendingUp, ArrowLeft, Filter, BarChart3, PieChart, Award, MapPin } from 'lucide-react';
-import { getWorkforceData, getAllSchoolOrgData } from '../../data/staticData';
+import { getWorkforceData, getAllSchoolOrgData, getTempTotal } from '../../data/staticData';
 import ChartErrorBoundary from '../ui/ChartErrorBoundary';
+import AssignmentTypeChart from '../charts/AssignmentTypeChart';
 
 const HeadcountDetailsDashboard = () => {
   const [sortBy, setSortBy] = useState('total');
@@ -12,6 +13,9 @@ const HeadcountDetailsDashboard = () => {
   const currentData = getWorkforceData("2025-06-30");
   const previousData = getWorkforceData("2025-03-31");
   const orgData = getAllSchoolOrgData("2025-06-30");
+  
+  // Get corrected temp totals
+  const currentTempTotal = getTempTotal("2025-06-30");
 
   // Calculate percentage change
   const calculateChange = (current, previous) => {
@@ -216,6 +220,103 @@ const HeadcountDetailsDashboard = () => {
             <div className="text-xs text-gray-500">
               {summaryStats.avgSize} avg per org
             </div>
+          </div>
+        </div>
+
+        {/* Campus Breakdown Analysis */}
+        <div className="bg-white rounded-lg shadow-sm border p-6 mb-8">
+          <h2 className="text-lg font-bold mb-4 flex items-center gap-2" style={{color: '#0054A6'}}>
+            <MapPin size={20} />
+            Campus Breakdown (as of 6/30/2025)
+          </h2>
+          <div className="rounded-xl p-4" style={{backgroundColor: '#FAFAFA'}}>
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b" style={{borderColor: '#E5E7EB'}}>
+                  <th className="text-left py-3 px-3 font-bold" style={{color: '#00245D'}}>Campus</th>
+                  <th className="text-center py-3 px-3 font-bold" style={{color: '#00245D'}}>Omaha</th>
+                  <th className="text-center py-3 px-3 font-bold" style={{color: '#00245D'}}>Phoenix</th>
+                  <th className="text-center py-3 px-3 font-bold" style={{color: '#00245D'}}>Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr className="border-b border-gray-100 bg-white">
+                  <td className="py-3 px-3 font-semibold" style={{color: '#00245D'}}>Total by Campus</td>
+                  <td className="text-center py-3 px-3 font-bold" style={{color: '#0054A6'}}>{currentData.locations['Omaha Campus'].toLocaleString()}</td>
+                  <td className="text-center py-3 px-3 font-bold" style={{color: '#0054A6'}}>{currentData.locations['Phoenix Campus'].toLocaleString()}</td>
+                  <td className="text-center py-3 px-3 font-extrabold text-lg" style={{color: '#0054A6'}}>
+                    {(currentData.locations['Omaha Campus'] + currentData.locations['Phoenix Campus']).toLocaleString()}
+                  </td>
+                </tr>
+                <tr className="bg-white">
+                  <td className="py-3 px-3" colSpan="4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="p-3 rounded-lg" style={{backgroundColor: '#95D2F3'}}>
+                        <div className="font-bold mb-2 flex items-center gap-2" style={{color: '#00245D'}}>
+                          <Building2 size={16} />
+                          Omaha Breakdown:
+                        </div>
+                        <div className="text-sm font-medium" style={{color: '#00245D'}}>
+                          {currentData.locationDetails.omaha.staff} BE Staff | {currentData.locationDetails.omaha.faculty} Faculty | {currentData.locationDetails.omaha.hsp} House Staff Physicians | {currentData.locationDetails.omaha.tempFac} Temp Fac | {currentData.locationDetails.omaha.tempStaff} Temp Staff | {currentData.locationDetails.omaha.students} Students
+                        </div>
+                      </div>
+                      <div className="p-3 rounded-lg" style={{backgroundColor: '#95D2F3'}}>
+                        <div className="font-bold mb-2 flex items-center gap-2" style={{color: '#00245D'}}>
+                          <Building2 size={16} />
+                          Phoenix Breakdown:
+                        </div>
+                        <div className="text-sm font-medium" style={{color: '#00245D'}}>
+                          {currentData.locationDetails.phoenix.staff} BE Staff | {currentData.locationDetails.phoenix.faculty} Faculty | {currentData.locationDetails.phoenix.hsp} House Staff Physicians | {currentData.locationDetails.phoenix.tempFac} Temp Fac | {currentData.locationDetails.phoenix.tempStaff} Temp Staff | {currentData.locationDetails.phoenix.students} Students
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Employment Composition by Type */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 print:gap-4 mb-8">
+          {/* Benefit Eligible Employment Types */}
+          <div>
+            <AssignmentTypeChart 
+              title="Employment Composition"
+              data={currentData.assignmentTypes.filter(item => 
+                !['Jesuits', 'Other', 'Temporary'].includes(item.type)
+              ).map(item => ({
+                name: item.type,
+                total: item.count,
+                percentage: parseFloat(item.percentage),
+                icon: item.type === 'Student Workers' ? 'student' : 
+                      item.type === 'House Staff Physicians' ? 'medical' : 
+                      item.type === 'Full-Time' ? 'briefcase' : 'users'
+              }))}
+              className="print:h-80 min-h-[420px]"
+            />
+          </div>
+          
+          {/* Non-Benefit Eligible Employment Types */}
+          <div>
+            <AssignmentTypeChart 
+              title="Additional Employment Categories"
+              data={[
+                { 
+                  name: 'Temporary (includes PRN/NBE)', 
+                  total: currentTempTotal, 
+                  percentage: parseFloat((currentTempTotal / 5037 * 100).toFixed(1)), 
+                  icon: 'clock' 
+                },
+                { 
+                  name: 'Jesuits', 
+                  total: currentData.jesuits || 17, 
+                  percentage: parseFloat(((currentData.jesuits || 17) / 5037 * 100).toFixed(1)), 
+                  icon: 'cross' 
+                }
+              ]}
+              className="print:h-80 min-h-[420px]"
+            />
           </div>
         </div>
 

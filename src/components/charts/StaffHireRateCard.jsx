@@ -70,8 +70,8 @@ const StaffHireRateCard = memo(({
         {/* Competitiveness message */}
         <div className="mt-4 p-3 rounded-lg" style={{backgroundColor: '#F3F3F0'}}>
           <p className="text-sm print:text-black" style={{color: '#00245D'}}>
-            The {displayRate.toFixed(1)}% hire rate demonstrates competitive Taleo positions with 
-            strong candidate quality during FY25. <strong>Taleo applications include staff, temporary, PRN and NBE positions.</strong>
+            The {displayRate.toFixed(1)}% hire rate demonstrates competitive Taleo positions during FY25. 
+            <strong>Taleo applications include staff, temporary, PRN and NBE positions.</strong>
           </p>
         </div>
       </div>

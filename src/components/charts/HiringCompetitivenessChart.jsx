@@ -36,11 +36,11 @@ const HiringCompetitivenessChart = memo(({
       {/* Key Metrics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         {/* Total Applications with breakdown */}
-        <div className="text-center p-4 rounded-lg" style={{backgroundColor: '#F3F3F0'}}>
+        <div className="text-center p-4 rounded-lg border-2" style={{borderColor: '#0054A6', backgroundColor: '#EBF5FF'}}>
           <div className="text-2xl font-bold print:text-black" style={{color: '#0054A6'}}>
             {totalApplications.toLocaleString()}
           </div>
-          <div className="text-sm font-medium print:text-black" style={{color: '#00245D'}}>
+          <div className="text-sm font-medium print:text-black" style={{color: '#374151'}}>
             Total Applications
           </div>
           <div className="text-xs text-gray-600 print:text-black mt-1">
@@ -65,15 +65,15 @@ const HiringCompetitivenessChart = memo(({
         </div>
 
         {/* Competitiveness */}
-        <div className="text-center p-4 rounded-lg border-2" style={{borderColor: '#DC2626', backgroundColor: '#FEF2F2'}}>
-          <div className="flex items-center justify-center gap-1 mb-1">
-            <TrendingDown size={20} style={{color: '#DC2626'}} />
-            <div className="text-2xl font-bold" style={{color: '#DC2626'}}>
-              {applicantsPerPosition}:1
-            </div>
+        <div className="text-center p-4 rounded-lg border-2" style={{borderColor: '#0054A6', backgroundColor: '#EBF5FF'}}>
+          <div className="text-2xl font-bold print:text-black" style={{color: '#0054A6'}}>
+            {applicantsPerPosition}:1
           </div>
-          <div className="text-sm font-medium print:text-black" style={{color: '#00245D'}}>
+          <div className="text-sm font-medium print:text-black" style={{color: '#374151'}}>
             Applicants per Position
+          </div>
+          <div className="text-xs text-gray-600 print:text-black mt-1">
+            {overallHireRate.toFixed(0)}% overall success rate
           </div>
         </div>
       </div>

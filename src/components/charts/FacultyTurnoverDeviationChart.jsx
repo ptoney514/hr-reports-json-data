@@ -79,7 +79,7 @@ const FacultyTurnoverDeviationChart = ({ data = [], title = "Faculty Turnover Ra
       <div className="mb-4">
         <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
         <p className="text-sm text-gray-600 mt-1">
-          Red bars indicate above-average turnover (problem areas) | Green bars indicate below-average turnover
+          Red bars indicate above-average turnover (opportunity areas) | Green bars indicate below-average turnover
         </p>
         <p className="text-xs text-gray-500 mt-1">
           Average Faculty Turnover Rate: {averageRate}%
@@ -218,7 +218,7 @@ const FacultyTurnoverDeviationChart = ({ data = [], title = "Faculty Turnover Ra
           <div>
             <h4 className="text-sm font-semibold text-blue-800 mb-1">Strategic Faculty Insight:</h4>
             <p className="text-xs text-blue-700 leading-relaxed">
-              Faculty turnover patterns show a clear divide between healthcare and non-healthcare schools. The College of Nursing's 
+              Faculty turnover patterns show a clear divide between health science and non-health science colleges & schools. The College of Nursing's 
               13.7% turnover rate (more than double the average) signals critical retention challenges in healthcare education. This 
               pattern, combined with elevated rates in Pharmacy and Dentistry, suggests systemic issues potentially related to clinical 
               workload, competitive market demands, or burnout. Conversely, business and law schools demonstrate exceptional retention, 

@@ -1,0 +1,56 @@
+{
+  "reportDate": "2025-06-30",
+  "source": "New Emp List since FY20 to Q1FY25 1031 PT.xlsx",
+  "totals": {
+    "faculty": 689,
+    "staff": 1448,
+    "combined": 2137
+  },
+  "gender": {
+    "faculty": {
+      "male": 321,
+      "female": 368
+    },
+    "staff": {
+      "male": 534,
+      "female": 914
+    }
+  },
+  "ethnicity": {
+    "faculty": {
+      "White": 536,
+      "Not Disclosed": 52,
+      "Asian": 51,
+      "Black or African American": 18,
+      "Two or More Races": 17,
+      "Hispanic or Latino": 12,
+      "American Indian or Alaska Native": 3
+    },
+    "staff": {
+      "White": 998,
+      "Not Disclosed": 128,
+      "Asian": 105,
+      "Black or African American": 86,
+      "Hispanic or Latino": 63,
+      "Two or More Races": 59,
+      "American Indian or Alaska Native": 6,
+      "Pacific Islander": 3
+    }
+  },
+  "ageBands": {
+    "faculty": {
+      "41-50": 193,
+      "51-60": 165,
+      "61 Plus": 178,
+      "31-40": 143,
+      "20-30": 10
+    },
+    "staff": {
+      "20-30": 236,
+      "31-40": 302,
+      "51-60": 343,
+      "61 Plus": 234,
+      "41-50": 333
+    }
+  }
+}

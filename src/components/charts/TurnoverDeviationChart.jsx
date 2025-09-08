@@ -1,7 +1,7 @@
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, ReferenceLine, LabelList } from 'recharts';
 
-const TurnoverDeviationChart = ({ data = [], title = "Staff Turnover Rate Deviation from Average" }) => {
+const TurnoverDeviationChart = ({ data = [], title = "FY2025 YTD Benefit Eligible Staff Turnover Rate Deviation from Average" }) => {
   // FY25 YTD Turnover data from the image (Staff percentages)
   const departmentTurnoverRates = [
     { name: 'Student Services', rate: 30.9 },
@@ -101,9 +101,9 @@ const TurnoverDeviationChart = ({ data = [], title = "Staff Turnover Rate Deviat
   return (
     <div className="bg-white rounded-lg shadow p-6">
       <div className="mb-4">
-        <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
+        <h3 className="text-xl font-semibold text-gray-900">{title}</h3>
         <p className="text-sm text-gray-600 mt-1">
-          Red bars indicate above-average turnover (problem areas) | Green bars indicate below-average turnover
+          Red bars indicate above-average turnover (opportunity areas) | Green bars indicate below-average turnover
         </p>
         <p className="text-xs text-gray-500 mt-1">
           Average Staff Turnover Rate: {averageRate}%
@@ -242,11 +242,10 @@ const TurnoverDeviationChart = ({ data = [], title = "Staff Turnover Rate Deviat
           <div>
             <h4 className="text-sm font-semibold text-blue-800 mb-1">Strategic Insight:</h4>
             <p className="text-xs text-blue-700 leading-relaxed">
-              The turnover pattern reveals a clear divide: executive and administrative offices demonstrate exceptional retention while 
-              student-facing and healthcare departments experience significant attrition. With 11 departments showing turnover rates above 
+              The turnover pattern reveals a clear divide where executive and administrative offices demonstrate exceptional retention while 
+              student-facing and health science areas experience significant attrition. With 11 departments showing turnover rates above 
               20%, targeted interventions are needed focusing on workload management, compensation review, and career development pathways 
-              in high-turnover areas. The 30.9% turnover in Student Services suggests urgent attention is required to address systemic 
-              issues affecting front-line staff retention.
+              in high-turnover areas.
             </p>
           </div>
         </div>

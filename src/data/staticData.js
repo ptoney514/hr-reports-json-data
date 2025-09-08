@@ -821,7 +821,7 @@ export const WORKFORCE_DATA = {
     staff: 1448,  // Benefit eligible staff (from F12, F11, F09, F10, PT12, PT9, PT11, PT10 categories)
     hsp: 612,
     temp: 574,  // Corrected: TEMP (457) + NBE (7) + PRN (110) = 574
-    jesuits: 17,
+    jesuits: 0,  // Jesuits included in staff/faculty counts
     other: 0,  // NBE and PRN moved to temp
     locations: {
       "Omaha Campus": 4287,  // Correct total including all components
@@ -829,22 +829,22 @@ export const WORKFORCE_DATA = {
     },
     locationDetails: {
       omaha: {
-        faculty: 650,
-        staff: 1245,
+        faculty: 545,
+        staff: 1323,
         hsp: 248,
         students: 1612,
-        tempFac: 192,
-        tempStaff: 198,
-        temp: 390  // tempFac + tempStaff
+        tempFac: 279,
+        tempStaff: 280,
+        temp: 559  // Calculated to reach Omaha total of 4287
       },
       phoenix: {
-        faculty: 138,
-        staff: 104,
+        faculty: 144,
+        staff: 125,
         hsp: 364,
         students: 102,
-        tempFac: 20,
-        tempStaff: 22,
-        temp: 42  // tempFac + tempStaff
+        tempFac: 7,
+        tempStaff: 8,
+        temp: 15  // Calculated to reach Phoenix total of 750
       }
     },
     categories: {

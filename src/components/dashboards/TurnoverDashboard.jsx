@@ -320,7 +320,7 @@ const TurnoverDashboard = () => {
       <div className="mb-6 print:mb-4 chart-container" data-chart-type="stacked-bar">
         <div id="voluntary-involuntary-turnover-chart" data-chart-title="Voluntary/Involuntary Turnover Chart" data-chart-ready="false">
           <VoluntaryInvoluntaryTurnoverChart
-            title="Creighton University Turnover - Voluntary/Involuntary"
+            title="Creighton University Turnover - Voluntary/Involuntary/Retirement"
             subtitle="Fiscal Year Ending June 30, 2025*"
             height={400}
           />
@@ -331,7 +331,7 @@ const TurnoverDashboard = () => {
       <div className="mb-6 print:mb-4 chart-container" data-chart-type="deviation-bar">
         <div id="turnover-deviation-chart" data-chart-title="Staff Turnover Rate Deviation from Average" data-chart-ready="false">
           <TurnoverDeviationChart
-            title="FY2025 YTD Staff Turnover Rate Deviation from Average"
+            title="FY2025 YTD Benefit Eligible Staff Turnover Rate Deviation from Average"
           />
         </div>
       </div>
