@@ -13,7 +13,8 @@ import {
   Calendar,
   FileText,
   Building2,
-  AlertCircle
+  AlertCircle,
+  Database
 } from 'lucide-react';
 import { announceToScreenReader } from '../../utils/accessibilityUtils';
 
@@ -120,6 +121,14 @@ const Navigation = () => {
       path: '/dashboards/exit-survey-fy25',
       icon: BarChart3,
       isActive: isActive('/dashboards/exit-survey-fy25')
+    },
+    {
+      id: 'data-sources',
+      label: 'Data Sources',
+      shortLabel: 'Data',
+      path: '/admin/data-sources',
+      icon: Database,
+      isActive: isActive('/admin/data-sources')
     },
     {
       id: 'admin',

@@ -817,8 +817,8 @@ export const WORKFORCE_DATA = {
       fws: 107
     },
     totalEmployees: 5037,
-    faculty: 788,
-    staff: 1349,  // Corrected: BE staff only (from F12, F11, F09, F10, PT12, PT9, PT11, PT10 categories)
+    faculty: 689,  // Benefit eligible faculty (from F12, F11, F09, F10, PT12, PT9, PT11, PT10 categories)
+    staff: 1448,  // Benefit eligible staff (from F12, F11, F09, F10, PT12, PT9, PT11, PT10 categories)
     hsp: 612,
     temp: 574,  // Corrected: TEMP (457) + NBE (7) + PRN (110) = 574
     jesuits: 17,
@@ -1190,6 +1190,83 @@ export const WORKFORCE_DATA = {
                 "percentage": "0.0"
           }
     ],
+    // Demographic data for Benefit Eligible Employees (as of 6/30/25)
+    // Source: New Emp List since FY20 to Q1FY25 1031 PT.xlsx
+    demographics: {
+      totals: {
+        faculty: 689,
+        staff: 1448,
+        combined: 2137
+      },
+      gender: {
+        faculty: {
+          male: 321,
+          female: 368
+        },
+        staff: {
+          male: 534,
+          female: 914
+        }
+      },
+      ethnicity: {
+        faculty: {
+          'White': 536,
+          'Asian': 51,
+          'Not Disclosed': 45,
+          'Black or African American': 18,
+          'More than one Ethnicity': 13,
+          'Hispanic or Latino': 12,
+          'Not disclosed': 7,
+          'Two or more races': 4,
+          'American Indian or Alaska Native': 3
+        },
+        staff: {
+          'White': 998,
+          'Not Disclosed': 123,
+          'Asian': 105,
+          'Black or African American': 86,
+          'Hispanic or Latino': 63,
+          'More than one Ethnicity': 41,
+          'Two or more races': 18,
+          'American Indian or Alaska Native': 6,
+          'Not disclosed': 5,
+          'Native Hawaiian or other Pacific Islander': 3
+        }
+      },
+      ageBands: {
+        faculty: {
+          '20-30': 10,
+          '31-40': 143,
+          '41-50': 193,
+          '51-60': 165,
+          '61 Plus': 178
+        },
+        staff: {
+          '20-30': 236,
+          '31-40': 302,
+          '41-50': 333,
+          '51-60': 343,
+          '61 Plus': 234
+        }
+      },
+      // Age/Gender breakdown for population pyramid
+      ageGenderBreakdown: {
+        faculty: {
+          '20-30': { male: 7, female: 3 },
+          '31-40': { male: 47, female: 96 },
+          '41-50': { male: 73, female: 120 },
+          '51-60': { male: 83, female: 82 },
+          '61 Plus': { male: 111, female: 67 }
+        },
+        staff: {
+          '20-30': { male: 86, female: 150 },
+          '31-40': { male: 123, female: 179 },
+          '41-50': { male: 116, female: 217 },
+          '51-60': { male: 115, female: 228 },
+          '61 Plus': { male: 94, female: 140 }
+        }
+      }
+    },
     vacancyRate: 0,
     departures: 0,
     netChange: 0
@@ -1264,6 +1341,9 @@ export const TURNOVER_DATA = {
       { school: "Information Technology", rate: 5.6, departures: 11 },
       { school: "Finance & Administration", rate: 9.9, departures: 17 }
     ],
+    // EXTERNAL DATA SOURCE: These rates are from HR PowerPoint slides
+    // Cannot be calculated from raw termination data - see /docs/NON_CALCULABLE_DATA_SOURCES.md
+    // Source images: /source-metrics/hr-slides/fy25/faculty-turnover-by-division-source.png
     facultyTurnoverByDivision: [
       { division: "College of Nursing", rate: 13.7 },
       { division: "Pharmacy & Health Professions", rate: 7.5 },
@@ -1274,6 +1354,9 @@ export const TURNOVER_DATA = {
       { division: "Heider College of Business", rate: 1.6 },
       { division: "Coll of Pro Studies and Cont Ed", rate: 0.0 }
     ],
+    // Turnover by Length of Service data from HR PowerPoint slide
+    // Source: /source-metrics/hr-slides/fy25/turnover-demographics-fy25.md
+    // These values come directly from HR's official FY25 Turnover Demographics presentation
     turnoverByLengthOfService: {
       faculty: [
         { name: "Less Than One", tenure: "< 1 Year", percentage: 13.8, value: 9 },

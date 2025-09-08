@@ -2,10 +2,14 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import SummaryCard from '../ui/SummaryCard';
 import ErrorBoundary from '../ui/ErrorBoundary';
-import LocationDistributionChart from '../charts/LocationDistributionChart';
 import AssignmentTypeChart from '../charts/AssignmentTypeChart';
+import GenderDistributionChart from '../charts/GenderDistributionChart';
+import EthnicityBreakdownChart from '../charts/EthnicityBreakdownChart';
+import AgeDistributionChart from '../charts/AgeDistributionChart';
+import AgeDistributionCurve from '../charts/AgeDistributionCurve';
+import AgeGenderPyramid from '../charts/AgeGenderPyramid';
 import { DataDebugOverlay } from '../ui/DataDebugOverlay';
-import { getWorkforceData, getAllSchoolOrgData, getTempTotal, getBenefitEligibleBreakdown } from '../../data/staticData';
+import { getWorkforceData, getAllSchoolOrgData, getTempTotal } from '../../data/staticData';
 import { 
   Users, 
   BookOpen,
@@ -19,18 +23,6 @@ import {
   Calculator
 } from 'lucide-react';
 
-// Simplified fallback data for consistent dashboard display
-const FALLBACK_DATA = {
-  summary: {
-    totalEmployees: 2847,
-    faculty: 1203,
-    staff: 1644,
-    growth: 2.3,
-    facultyChange: 1.8,
-    staffChange: 2.7,
-    growthRate: 2.3
-  }
-};
 
 const WorkforceDashboard = () => {
   // Year-over-Year comparison data
@@ -47,21 +39,7 @@ const WorkforceDashboard = () => {
     return ((current - previous) / previous * 100);
   };
   
-  // Process static data for display
-  const data = {
-    summary: {
-      totalEmployees: currentData.totalEmployees,
-      faculty: currentData.faculty,
-      staff: currentData.staff,
-      hsp: currentData.hsp,
-      temp: currentTempTotal,
-      growth: calculateChange(currentData.totalEmployees, previousData.totalEmployees),
-      facultyChange: calculateChange(currentData.faculty, previousData.faculty),
-      staffChange: calculateChange(currentData.staff, previousData.staff),
-      hspChange: calculateChange(currentData.hsp, previousData.hsp),
-      tempChange: calculateChange(currentTempTotal, previousTempTotal)
-    }
-  };
+  // Process static data for display - values are used directly from currentData
 
   // Helper function to get location counts from static data
   const getLocationCounts = (metric) => {
@@ -290,12 +268,12 @@ const WorkforceDashboard = () => {
                   <div className="rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow duration-200" style={{backgroundColor: '#F8F9FA', border: '1px solid #E5E7EB'}}>
                     <div className="flex items-start gap-3">
                       <div className="p-2 rounded-lg" style={{backgroundColor: '#71CC98'}}>
-                        <Heart className="text-white" size={20} />
+                        <Building2 className="text-white" size={20} />
                       </div>
                       <div className="flex-1">
-                        <div className="font-bold text-lg mb-2" style={{color: '#00245D'}}>House Staff Physician Growth</div>
+                        <div className="font-bold text-lg mb-2" style={{color: '#00245D'}}>Omaha Breakdown:</div>
                         <div className="text-sm font-medium" style={{color: '#00245D'}}>
-                          HSP count increased by <span className="font-extrabold px-2 py-1 rounded" style={{color: '#71CC98', backgroundColor: 'white'}}>4</span> positions (0.7%) with Omaha growing to 268 HSPs while Phoenix maintained 344 HSPs
+                          {currentData.locationDetails.omaha.staff} BE Staff | {currentData.locationDetails.omaha.faculty} Faculty | {currentData.locationDetails.omaha.hsp} House Staff Physicians | {currentData.locationDetails.omaha.tempFac} Temp Fac | {currentData.locationDetails.omaha.tempStaff} Temp Staff | {currentData.locationDetails.omaha.students} Students
                         </div>
                       </div>
                     </div>
@@ -304,13 +282,12 @@ const WorkforceDashboard = () => {
                   <div className="rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow duration-200" style={{backgroundColor: '#F8F9FA', border: '1px solid #E5E7EB'}}>
                     <div className="flex items-start gap-3">
                       <div className="p-2 rounded-lg" style={{backgroundColor: '#FFC72C'}}>
-                        <MapPin className="text-white" size={20} />
+                        <Building2 className="text-white" size={20} />
                       </div>
                       <div className="flex-1">
-                        <div className="font-bold text-lg mb-2" style={{color: '#00245D'}}>Phoenix Campus Expansion</div>
+                        <div className="font-bold text-lg mb-2" style={{color: '#00245D'}}>Phoenix Breakdown:</div>
                         <div className="text-sm font-medium" style={{color: '#00245D'}}>
-                          Phoenix campus grew by <span className="font-extrabold px-2 py-1 rounded" style={{color: '#FFC72C', backgroundColor: 'white'}}>236</span> employees (45.9%), 
-                          primarily driven by an expansion in the School of Medicine with over 20% increase in Faculty and Staff
+                          {currentData.locationDetails.phoenix.staff} BE Staff | {currentData.locationDetails.phoenix.faculty} Faculty | {currentData.locationDetails.phoenix.hsp} House Staff Physicians | {currentData.locationDetails.phoenix.tempFac} Temp Fac | {currentData.locationDetails.phoenix.tempStaff} Temp Staff | {currentData.locationDetails.phoenix.students} Students
                         </div>
                       </div>
                     </div>
@@ -450,6 +427,42 @@ const WorkforceDashboard = () => {
             </div>
           </div>
 
+          {/* Demographic Analysis Section - Benefit Eligible Employees */}
+          {currentData.demographics && (
+            <div className="mb-6">
+              <h2 className="text-xl font-bold mb-6 flex items-center gap-3" style={{color: '#00245D'}}>
+                <div className="p-2 rounded-lg" style={{backgroundColor: '#0054A6'}}>
+                  <Users className="text-white" size={24} />
+                </div>
+                Benefit Eligible Employee Demographics
+              </h2>
+              
+              {/* Gender Distribution */}
+              <div className="mb-6">
+                <GenderDistributionChart data={currentData.demographics} />
+              </div>
+              
+              {/* Age Distribution - Standard Bar Chart */}
+              <div className="mb-6">
+                <AgeDistributionChart data={currentData.demographics} />
+              </div>
+              
+              {/* Age Distribution - Curve Visualization */}
+              <div className="mb-6">
+                <AgeDistributionCurve data={currentData.demographics} />
+              </div>
+              
+              {/* Age/Gender Population Pyramid */}
+              <div className="mb-6">
+                <AgeGenderPyramid data={currentData.demographics} />
+              </div>
+              
+              {/* Ethnicity Breakdown */}
+              <div className="mb-6">
+                <EthnicityBreakdownChart data={currentData.demographics} />
+              </div>
+            </div>
+          )}
 
           {/* Workforce Analytics Charts - Row 2: Headcount Overview Link */}
           <div className="grid grid-cols-1 gap-6 print:gap-4 mb-6">

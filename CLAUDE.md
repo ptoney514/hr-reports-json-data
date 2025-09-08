@@ -177,6 +177,7 @@ source-metrics/
 - **Data Validation Process**: `/docs/DATA_VALIDATION_PROCESS.md` - Validation methodology and data flow
 - **Data Import Guide**: `/source-metrics/templates/DATA_IMPORT_GUIDE.md` - Format requirements
 - **Source Metrics README**: `/source-metrics/README.md` - Complete folder guide
+- **Non-Calculable Data Sources**: `/docs/NON_CALCULABLE_DATA_SOURCES.md` - External PowerPoint slide data that cannot be calculated from raw data
 
 ### 📊 Data Processing Scripts
 - **Turnover Processing**: `/scripts/processTurnoverData.js` - Extracts and analyzes termination data from Excel
@@ -211,6 +212,21 @@ The system ensures data consistency between turnover metrics and exit survey dat
 - Before committing dashboard changes
 - When validation reports inconsistencies
 - As part of regular data maintenance
+
+## External Data Dependencies
+
+### PowerPoint Slide Data
+Some dashboard visualizations display data from HR PowerPoint slides that cannot be calculated programmatically:
+
+- **Faculty Turnover by Division**: Rates from HR department analysis (see staticData.js comments)
+- **Voluntary/Involuntary Turnover**: Breakdown from HR slides (to be implemented)
+- **Demographic Review**: Multi-year comparisons from HR slides (to be implemented)
+
+When working with this data:
+1. Check `/docs/NON_CALCULABLE_DATA_SOURCES.md` for current values
+2. Save slide images to `/source-metrics/hr-slides/[fiscal-year]/`
+3. Add comments in `staticData.js` marking external data sources
+4. Do NOT attempt to calculate these values from raw data - they use HR's specific methodology
 
 ## Important Reminders
 

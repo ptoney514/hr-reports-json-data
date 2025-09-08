@@ -5,6 +5,8 @@ import FacultyTurnoverByDivisionChart from '../charts/FacultyTurnoverByDivisionC
 import FacultyStaffTurnoverByFYChart from '../charts/FacultyStaffTurnoverByFYChart';
 import TurnoverByLengthOfServiceChart from '../charts/TurnoverByLengthOfServiceChart';
 import VoluntaryInvoluntaryTurnoverChart from '../charts/VoluntaryInvoluntaryTurnoverChart';
+import TurnoverDeviationChart from '../charts/TurnoverDeviationChart';
+import FacultyTurnoverDeviationChart from '../charts/FacultyTurnoverDeviationChart';
 // Quarter filter removed - using fixed reporting period
 import ErrorBoundary from '../ui/ErrorBoundary';
 import PDFExportButton from '../ui/PDFExportButton';
@@ -321,6 +323,24 @@ const TurnoverDashboard = () => {
             title="Creighton University Turnover - Voluntary/Involuntary"
             subtitle="Fiscal Year Ending June 30, 2025*"
             height={400}
+          />
+        </div>
+      </div>
+
+      {/* Staff Turnover Deviation Chart - NEW */}
+      <div className="mb-6 print:mb-4 chart-container" data-chart-type="deviation-bar">
+        <div id="turnover-deviation-chart" data-chart-title="Staff Turnover Rate Deviation from Average" data-chart-ready="false">
+          <TurnoverDeviationChart
+            title="FY2025 YTD Staff Turnover Rate Deviation from Average"
+          />
+        </div>
+      </div>
+
+      {/* Faculty Turnover Deviation Chart - NEW */}
+      <div className="mb-6 print:mb-4 chart-container" data-chart-type="deviation-bar">
+        <div id="faculty-turnover-deviation-chart" data-chart-title="Faculty Turnover Rate Deviation from Average" data-chart-ready="false">
+          <FacultyTurnoverDeviationChart
+            title="FY2025 YTD Faculty Turnover Rate Deviation from Average"
           />
         </div>
       </div>

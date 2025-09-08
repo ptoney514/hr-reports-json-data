@@ -177,6 +177,7 @@ Excel/CSV Sources → Processing Scripts → JSON Data → Static Data → React
 - [x] DATA_MANAGEMENT_GUIDE.md - Process guide
 - [x] EXIT_SURVEY_METHODOLOGY.md - Calculation methods
 - [x] TURNOVER_METHODOLOGY.md - Turnover calculations
+- [x] NON_CALCULABLE_DATA_SOURCES.md - External data dependencies
 
 ### Needed
 - [ ] API documentation
@@ -184,6 +185,24 @@ Excel/CSV Sources → Processing Scripts → JSON Data → Static Data → React
 - [ ] Deployment guide
 - [ ] User manual
 - [ ] Troubleshooting guide
+
+## 📌 External Data Dependencies
+
+### PowerPoint Slide Data (Non-Calculable)
+Some dashboard visualizations display data from HR PowerPoint slides that cannot be calculated from raw data:
+
+- **Faculty Turnover by Division** - Rates from HR analysis slides
+- **Voluntary/Involuntary Turnover** - Breakdown from HR slides  
+- **Demographic Review** - Multi-year comparisons from HR slides
+
+**Source Location**: `/source-metrics/hr-slides/fy25/`  
+**Documentation**: `/docs/NON_CALCULABLE_DATA_SOURCES.md`  
+**Data File**: `/src/data/staticData.js` (see comments for external data markers)
+
+### Update Process for External Data:
+1. Save PowerPoint slide images to `/source-metrics/hr-slides/[fiscal-year]/`
+2. Update values in `staticData.js` with comments noting external source
+3. Document changes in `NON_CALCULABLE_DATA_SOURCES.md`
 
 ## 🔄 Development Workflow
 
