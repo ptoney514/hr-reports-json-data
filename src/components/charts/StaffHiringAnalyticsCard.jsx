@@ -5,6 +5,10 @@ const StaffHiringAnalyticsCard = memo(({
   internalSuccessRate = 24.0,
   externalSuccessRate = 3.7,
   internalAdvantage = 6.4,
+  internalApplicants = 225,
+  externalApplicants = 6137,
+  internalHired = 54,
+  externalHired = 286,
   title = "Taleo Hiring Analytics",
   className = ""
 }) => {
@@ -51,7 +55,7 @@ const StaffHiringAnalyticsCard = memo(({
               Internal Success Rate
             </div>
             <div className="text-xs text-gray-600 print:text-black mt-1">
-              1 in 4 hired
+              {internalHired} of {internalApplicants} hired
             </div>
           </div>
 
@@ -64,7 +68,7 @@ const StaffHiringAnalyticsCard = memo(({
               External Success Rate
             </div>
             <div className="text-xs text-gray-600 print:text-black mt-1">
-              1 in 27 hired
+              {externalHired} of {externalApplicants.toLocaleString()} hired
             </div>
           </div>
         </div>

@@ -3,7 +3,7 @@ import { AlertCircle } from 'lucide-react';
 import ChartErrorBoundary from '../ui/ChartErrorBoundary';
 
 const VoluntaryInvoluntaryTurnoverChart = memo(({ 
-  title = "Creighton University Turnover - Voluntary/Involuntary",
+  title = "Creighton University Turnover - Voluntary/Involuntary/Retirement",
   subtitle = "Fiscal Year Ending June 30, 2025*",
   height = 400,
   className = ""
@@ -11,21 +11,21 @@ const VoluntaryInvoluntaryTurnoverChart = memo(({
   // Static data based on user requirements
   const chartData = useMemo(() => [
     {
-      category: "STAFF EXEMPT",
+      category: "Staff Exempt",
       involuntary: 0.8,
       voluntary: 10.8,
       retire: 1.0,
       total: 12.6
     },
     {
-      category: "STAFF NON-EX",
+      category: "Staff Non-Exempt",
       involuntary: 1.5,
       voluntary: 12.9,
       retire: 0.9,
       total: 15.3
     },
     {
-      category: "FACULTY",
+      category: "Faculty",
       involuntary: 0.3,
       voluntary: 3.3,
       retire: 2.5,
@@ -102,7 +102,7 @@ const VoluntaryInvoluntaryTurnoverChart = memo(({
               className="w-4 h-4 rounded"
               style={{ backgroundColor: colors.retire }}
             />
-            <span className="text-sm font-medium text-gray-700 print:text-black">Retire</span>
+            <span className="text-sm font-medium text-gray-700 print:text-black">Retirement</span>
           </div>
         </div>
 
@@ -189,7 +189,7 @@ const VoluntaryInvoluntaryTurnoverChart = memo(({
                         backgroundColor: colors.retire,
                         minWidth: item.retire > 0 ? '36px' : '0px'
                       }}
-                      title={`Retire: ${item.retire}%`}
+                      title={`Retirement: ${item.retire}%`}
                       role="button"
                       tabIndex="0"
                       aria-label={`Retirement turnover: ${item.retire} percent`}

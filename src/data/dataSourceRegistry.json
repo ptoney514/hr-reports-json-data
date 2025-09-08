@@ -1,0 +1,178 @@
+{
+  "sources": [
+    {
+      "id": "terms-fy25-detail",
+      "name": "Terms Since 2017 Detail PT.xlsx",
+      "type": "excel",
+      "category": "turnover",
+      "path": "source-metrics/terms/fy25/Terms Since 2017 Detail PT.xlsx",
+      "description": "Employee termination details since 2017 with comprehensive data",
+      "currentVersion": "1.0.0",
+      "lastModified": "2025-09-02T23:45:42.335Z",
+      "lastRefreshed": null,
+      "lastHash": "927b00d626442da4bfe5fef72eb356031e10c3af1161b4de7bc436a95573a50b",
+      "status": "pending",
+      "dataOutputs": [
+        "src/data/fy25TurnoverData.json",
+        "src/data/staticData.js (turnover sections)"
+      ],
+      "refreshFrequency": "quarterly",
+      "owner": "HR Analytics Team",
+      "notes": "Primary source for all turnover metrics and exit analysis",
+      "lastScanned": "2025-09-07T22:46:23.676Z",
+      "fileSize": 2572909
+    },
+    {
+      "id": "exit-survey-q1-fy25",
+      "name": "Employee Exit FY25_Q1.pdf",
+      "type": "pdf",
+      "category": "exit-surveys",
+      "path": "source-metrics/exit-surveys/fy25/Employee Exit FY25_Q1.pdf",
+      "description": "Q1 FY25 exit survey report with satisfaction ratings",
+      "currentVersion": "1.0.0",
+      "lastModified": "2025-09-03T01:47:42.342Z",
+      "lastRefreshed": null,
+      "lastHash": "7ccdddbeef89f3107f6d78c25a386fbb3d688220ac7e1b389afe3395936a294b",
+      "status": "pending",
+      "dataOutputs": [
+        "src/data/staticData.js (Q1 exit survey data)"
+      ],
+      "refreshFrequency": "quarterly",
+      "owner": "HR Survey Team",
+      "notes": "Contains satisfaction scores and exit reasons for Q1",
+      "lastScanned": "2025-09-07T22:46:23.676Z",
+      "fileSize": 233817
+    },
+    {
+      "id": "exit-survey-q2-fy25",
+      "name": "Employee Exit FY25_Q2.pdf",
+      "type": "pdf",
+      "category": "exit-surveys",
+      "path": "source-metrics/exit-surveys/fy25/Employee Exit FY25_Q2.pdf",
+      "description": "Q2 FY25 exit survey report with satisfaction ratings",
+      "currentVersion": "1.0.0",
+      "lastModified": "2025-09-03T01:47:42.343Z",
+      "lastRefreshed": null,
+      "lastHash": "5e35975c6a62f7fa4efe8976eb68240881880b6bfa369694c723b138bd83cc23",
+      "status": "pending",
+      "dataOutputs": [
+        "src/data/staticData.js (Q2 exit survey data)"
+      ],
+      "refreshFrequency": "quarterly",
+      "owner": "HR Survey Team",
+      "notes": "Contains satisfaction scores and exit reasons for Q2",
+      "lastScanned": "2025-09-07T22:46:23.677Z",
+      "fileSize": 213620
+    },
+    {
+      "id": "exit-survey-q3-fy25",
+      "name": "Employee Exit FY25_Q3.pdf",
+      "type": "pdf",
+      "category": "exit-surveys",
+      "path": "source-metrics/exit-surveys/fy25/Employee Exit FY25_Q3.pdf",
+      "description": "Q3 FY25 exit survey report with satisfaction ratings",
+      "currentVersion": "1.0.0",
+      "lastModified": "2025-09-03T01:47:42.345Z",
+      "lastRefreshed": null,
+      "lastHash": "c5b001ad5b5c95f30632735aa778ea1efbff40571ff7a7a12f0ae8e470febf1c",
+      "status": "pending",
+      "dataOutputs": [
+        "src/data/staticData.js (Q3 exit survey data)"
+      ],
+      "refreshFrequency": "quarterly",
+      "owner": "HR Survey Team",
+      "notes": "Contains satisfaction scores and exit reasons for Q3",
+      "lastScanned": "2025-09-07T22:46:23.677Z",
+      "fileSize": 252945
+    },
+    {
+      "id": "exit-survey-q4-fy25",
+      "name": "Employee Exit FY25_Q4.pdf",
+      "type": "pdf",
+      "category": "exit-surveys",
+      "path": "source-metrics/exit-surveys/fy25/Employee Exit FY25_Q4.pdf",
+      "description": "Q4 FY25 exit survey report with satisfaction ratings",
+      "currentVersion": "1.0.0",
+      "lastModified": "2025-09-03T01:47:42.347Z",
+      "lastRefreshed": null,
+      "lastHash": "dc0010c025f3166649b6337c14cdc9bf876eea6905876be991c2ed34798cb61b",
+      "status": "pending",
+      "dataOutputs": [
+        "src/data/staticData.js (Q4 exit survey data)"
+      ],
+      "refreshFrequency": "quarterly",
+      "owner": "HR Survey Team",
+      "notes": "Contains satisfaction scores and exit reasons for Q4",
+      "lastScanned": "2025-09-07T22:46:23.678Z",
+      "fileSize": 214960
+    },
+    {
+      "id": "hr-slides-fy25",
+      "name": "FY25 HR Presentation Slides",
+      "type": "powerpoint",
+      "category": "hr-slides",
+      "path": "source-metrics/hr-slides/fy25/",
+      "description": "HR presentation slides with faculty turnover by division and other metrics",
+      "currentVersion": "1.0.0",
+      "lastModified": "2025-09-04T12:31:32.240Z",
+      "lastRefreshed": null,
+      "lastHash": null,
+      "status": "pending",
+      "dataOutputs": [
+        "src/data/staticData.js (faculty turnover by division)"
+      ],
+      "refreshFrequency": "annual",
+      "owner": "HR Leadership",
+      "notes": "Contains pre-calculated metrics that cannot be derived from raw data",
+      "lastScanned": "2025-09-07T22:46:23.679Z",
+      "fileSize": 128
+    },
+    {
+      "id": "workforce-headcount-fy25",
+      "name": "New Emp List since FY20 to Q1FY25 1031 PT.xlsx",
+      "type": "excel",
+      "category": "workforce",
+      "path": "source-metrics/workforce-headcount/New Emp List since FY20 to Q1FY25 1031 PT.xlsx",
+      "description": "Comprehensive employee headcount data from FY20 to Q1 FY25 with demographics and locations",
+      "currentVersion": "1.0.0",
+      "lastModified": "2025-09-07T22:42:39.886Z",
+      "lastRefreshed": null,
+      "lastHash": "fffa1b90bf2605da9d823ee0178dcb8edc3753c84d1f4055d2fa1fa85295a6a4",
+      "status": "pending",
+      "dataOutputs": [
+        "src/data/workforceData.json",
+        "src/data/staticData.js (workforce sections)"
+      ],
+      "refreshFrequency": "monthly",
+      "owner": "HR Analytics Team",
+      "notes": "Primary source for workforce dashboard metrics, headcount trends, and demographic analysis",
+      "lastScanned": "2025-09-07T22:46:23.699Z",
+      "fileSize": 27436300
+    }
+  ],
+  "metadata": {
+    "lastScan": "2025-09-07T22:46:23.699Z",
+    "totalSources": 7,
+    "categories": {
+      "turnover": 1,
+      "exit-surveys": 4,
+      "hr-slides": 1,
+      "workforce": 1
+    },
+    "refreshSchedule": {
+      "monthly": [
+        "workforce-headcount-fy25"
+      ],
+      "quarterly": [
+        "terms-fy25-detail",
+        "exit-survey-q1-fy25",
+        "exit-survey-q2-fy25",
+        "exit-survey-q3-fy25",
+        "exit-survey-q4-fy25"
+      ],
+      "annual": [
+        "hr-slides-fy25"
+      ]
+    }
+  }
+}

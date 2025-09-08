@@ -2,10 +2,13 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import SummaryCard from '../ui/SummaryCard';
 import ErrorBoundary from '../ui/ErrorBoundary';
-import LocationDistributionChart from '../charts/LocationDistributionChart';
-import AssignmentTypeChart from '../charts/AssignmentTypeChart';
+import GenderDistributionChart from '../charts/GenderDistributionChart';
+import EthnicityBreakdownChart from '../charts/EthnicityBreakdownChart';
+import AgeDistributionChart from '../charts/AgeDistributionChart';
+import AgeDistributionCurve from '../charts/AgeDistributionCurve';
+import AgeGenderPyramid from '../charts/AgeGenderPyramid';
 import { DataDebugOverlay } from '../ui/DataDebugOverlay';
-import { getWorkforceData, getAllSchoolOrgData, getTempTotal, getBenefitEligibleBreakdown } from '../../data/staticData';
+import { getWorkforceData, getAllSchoolOrgData, getTempTotal } from '../../data/staticData';
 import { 
   Users, 
   BookOpen,
@@ -19,18 +22,6 @@ import {
   Calculator
 } from 'lucide-react';
 
-// Simplified fallback data for consistent dashboard display
-const FALLBACK_DATA = {
-  summary: {
-    totalEmployees: 2847,
-    faculty: 1203,
-    staff: 1644,
-    growth: 2.3,
-    facultyChange: 1.8,
-    staffChange: 2.7,
-    growthRate: 2.3
-  }
-};
 
 const WorkforceDashboard = () => {
   // Year-over-Year comparison data
@@ -47,21 +38,7 @@ const WorkforceDashboard = () => {
     return ((current - previous) / previous * 100);
   };
   
-  // Process static data for display
-  const data = {
-    summary: {
-      totalEmployees: currentData.totalEmployees,
-      faculty: currentData.faculty,
-      staff: currentData.staff,
-      hsp: currentData.hsp,
-      temp: currentTempTotal,
-      growth: calculateChange(currentData.totalEmployees, previousData.totalEmployees),
-      facultyChange: calculateChange(currentData.faculty, previousData.faculty),
-      staffChange: calculateChange(currentData.staff, previousData.staff),
-      hspChange: calculateChange(currentData.hsp, previousData.hsp),
-      tempChange: calculateChange(currentTempTotal, previousTempTotal)
-    }
-  };
+  // Process static data for display - values are used directly from currentData
 
   // Helper function to get location counts from static data
   const getLocationCounts = (metric) => {
@@ -80,10 +57,9 @@ const WorkforceDashboard = () => {
         case 'hsp':
           return `OMA (${locationDetails.omaha.hsp.toLocaleString()}) | PHX (${locationDetails.phoenix.hsp.toLocaleString()})`;
         case 'students':
-          return `OMA (${locationDetails.omaha.students?.toLocaleString() || Math.round(currentData.studentCount.total * 0.75).toLocaleString()}) | PHX (${locationDetails.phoenix.students?.toLocaleString() || Math.round(currentData.studentCount.total * 0.25).toLocaleString()})`;
+          return `OMA (${locationDetails.omaha.students?.toLocaleString()}) | PHX (${locationDetails.phoenix.students?.toLocaleString()})`;
         case 'temp':
-          const tempTotal = getTempTotal("2025-06-30");
-          return `OMA (${locationDetails.omaha.temp?.toLocaleString() || Math.round(tempTotal * 0.85).toLocaleString()}) | PHX (${locationDetails.phoenix.temp?.toLocaleString() || Math.round(tempTotal * 0.15).toLocaleString()})`;
+          return `OMA (${locationDetails.omaha.temp?.toLocaleString()}) | PHX (${locationDetails.phoenix.temp?.toLocaleString()})`;
         default:
           return '';
       }
@@ -150,21 +126,15 @@ const WorkforceDashboard = () => {
             <SummaryCard
               title="BE Staff"
               value={`${currentData.staff?.toLocaleString() || '0'}`}
-              change={calculateChange(currentData.staff, previousData.staff)}
-              changeType="percentage"
-              subtitle={`vs ${previousData.staff?.toLocaleString() || '0'} FY24`}
+              subtitle={getLocationCounts('staff')}
               icon={Building2}
-              trend={(calculateChange(currentData.staff, previousData.staff)) >= 0 ? 'positive' : 'negative'}
             />
             
             <SummaryCard
               title="BE Faculty"
               value={`${currentData.faculty?.toLocaleString() || '0'}`}
-              change={calculateChange(currentData.faculty, previousData.faculty)}
-              changeType="percentage"
-              subtitle={`vs ${previousData.faculty?.toLocaleString() || '0'} FY24`}
+              subtitle={getLocationCounts('faculty')}
               icon={BookOpen}
-              trend={(calculateChange(currentData.faculty, previousData.faculty)) >= 0 ? 'positive' : 'negative'}
             />
             
             <SummaryCard
@@ -291,12 +261,12 @@ const WorkforceDashboard = () => {
                   <div className="rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow duration-200" style={{backgroundColor: '#F8F9FA', border: '1px solid #E5E7EB'}}>
                     <div className="flex items-start gap-3">
                       <div className="p-2 rounded-lg" style={{backgroundColor: '#71CC98'}}>
-                        <Heart className="text-white" size={20} />
+                        <Building2 className="text-white" size={20} />
                       </div>
                       <div className="flex-1">
-                        <div className="font-bold text-lg mb-2" style={{color: '#00245D'}}>House Staff Physician Growth</div>
+                        <div className="font-bold text-lg mb-2" style={{color: '#00245D'}}>Omaha Breakdown:</div>
                         <div className="text-sm font-medium" style={{color: '#00245D'}}>
-                          HSP increased by <span className="font-extrabold px-2 py-1 rounded" style={{color: '#71CC98', backgroundColor: 'white'}}>4</span> positions (0.7%) with Omaha growing to 268 residents while Phoenix maintained 344 residents
+                          {currentData.locationDetails.omaha.staff} BE Staff | {currentData.locationDetails.omaha.faculty} Faculty | {currentData.locationDetails.omaha.hsp} House Staff Physicians | {currentData.locationDetails.omaha.tempFac} Temp Fac | {currentData.locationDetails.omaha.tempStaff} Temp Staff | {currentData.locationDetails.omaha.students} Students
                         </div>
                       </div>
                     </div>
@@ -305,13 +275,12 @@ const WorkforceDashboard = () => {
                   <div className="rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow duration-200" style={{backgroundColor: '#F8F9FA', border: '1px solid #E5E7EB'}}>
                     <div className="flex items-start gap-3">
                       <div className="p-2 rounded-lg" style={{backgroundColor: '#FFC72C'}}>
-                        <MapPin className="text-white" size={20} />
+                        <Building2 className="text-white" size={20} />
                       </div>
                       <div className="flex-1">
-                        <div className="font-bold text-lg mb-2" style={{color: '#00245D'}}>Phoenix Campus Expansion</div>
+                        <div className="font-bold text-lg mb-2" style={{color: '#00245D'}}>Phoenix Breakdown:</div>
                         <div className="text-sm font-medium" style={{color: '#00245D'}}>
-                          Phoenix campus grew by <span className="font-extrabold px-2 py-1 rounded" style={{color: '#FFC72C', backgroundColor: 'white'}}>236</span> employees (45.9%), 
-                          primarily driven by an expansion in the School of Medicine with over 20% increase in Faculty and Staff
+                          {currentData.locationDetails.phoenix.staff} BE Staff | {currentData.locationDetails.phoenix.faculty} Faculty | {currentData.locationDetails.phoenix.hsp} House Staff Physicians | {currentData.locationDetails.phoenix.tempFac} Temp Fac | {currentData.locationDetails.phoenix.tempStaff} Temp Staff | {currentData.locationDetails.phoenix.students} Students
                         </div>
                       </div>
                     </div>
@@ -319,88 +288,9 @@ const WorkforceDashboard = () => {
                 </div>
               </div>
 
-              {/* Campus Breakdown Analysis */}
-              <div className="mt-6 lg:col-span-2">
-                <h3 className="text-lg font-bold mb-4 flex items-center gap-2" style={{color: '#0054A6'}}>
-                  <MapPin size={20} />
-                  Campus Breakdown (as of 6/30/2025)
-                </h3>
-                <div className="rounded-xl p-4" style={{backgroundColor: '#FAFAFA'}}>
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="border-b" style={{borderColor: '#E5E7EB'}}>
-                        <th className="text-left py-3 px-3 font-bold" style={{color: '#00245D'}}>Campus</th>
-                        <th className="text-center py-3 px-3 font-bold" style={{color: '#00245D'}}>Omaha</th>
-                        <th className="text-center py-3 px-3 font-bold" style={{color: '#00245D'}}>Phoenix</th>
-                        <th className="text-center py-3 px-3 font-bold" style={{color: '#00245D'}}>Total</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr className="border-b border-gray-100 bg-white">
-                        <td className="py-3 px-3 font-semibold" style={{color: '#00245D'}}>Total by Campus</td>
-                        <td className="text-center py-3 px-3 font-bold" style={{color: '#0054A6'}}>4,287</td>
-                        <td className="text-center py-3 px-3 font-bold" style={{color: '#0054A6'}}>750</td>
-                        <td className="text-center py-3 px-3 font-extrabold text-lg" style={{color: '#0054A6'}}>5,037</td>
-                      </tr>
-                      <tr className="bg-white">
-                        <td className="py-3 px-3" colSpan="4">
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="p-3 rounded-lg" style={{backgroundColor: '#95D2F3'}}>
-                              <div className="font-bold mb-2 flex items-center gap-2" style={{color: '#00245D'}}>
-                                <Building2 size={16} />
-                                Omaha Breakdown:
-                              </div>
-                              <div className="text-sm font-medium" style={{color: '#00245D'}}>1,245 BE Staff | 650 Faculty | 248 Residents | 192 Temp Fac | 198 Temp Staff | 1,612 Students</div>
-                            </div>
-                            <div className="p-3 rounded-lg" style={{backgroundColor: '#95D2F3'}}>
-                              <div className="font-bold mb-2 flex items-center gap-2" style={{color: '#00245D'}}>
-                                <Building2 size={16} />
-                                Phoenix Breakdown:
-                              </div>
-                              <div className="text-sm font-medium" style={{color: '#00245D'}}>104 BE Staff | 138 Faculty | 364 Residents | 20 Temp Fac | 22 Temp Staff | 102 Students</div>
-                            </div>
-                          </div>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
             </div>
           </div>
 
-          {/* Workforce Analytics Charts - Row 1: Assignment Type and Non-Benefit Eligible */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 print:gap-4 mb-6">
-            {/* Assignment Type Chart */}
-            <div>
-              <AssignmentTypeChart 
-                title=""
-                data={currentData.assignmentTypes.filter(item => 
-                  !['Jesuits', 'Other', 'Temporary'].includes(item.type)
-                ).map(item => ({
-                  name: item.type,
-                  total: item.count,
-                  icon: item.type === 'Student Workers' ? 'student' : 
-                        item.type === 'House Staff Physicians' ? 'medical' : 
-                        item.type === 'Full-Time' ? 'briefcase' : 'users'
-                }))}
-                className="print:h-80 min-h-[420px]"
-              />
-            </div>
-            
-            {/* Non-Benefit Eligible Chart */}
-            <div>
-              <AssignmentTypeChart 
-                title=""
-                data={[
-                  { name: 'Temporary', total: currentData.temp || 457, icon: 'clock' },
-                  { name: 'Jesuits', total: currentData.jesuits || 17, icon: 'cross' },
-                  { name: 'Other (PRN/NBE)', total: currentData.other || 100, icon: 'users' }
-                ]}
-                className="print:h-80 min-h-[420px]"
-              />
-            </div>
-          </div>
 
           {/* Category Breakdown Table - Year-over-Year Comparison */}
           <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
@@ -445,8 +335,44 @@ const WorkforceDashboard = () => {
             </div>
           </div>
 
+          {/* Demographic Analysis Section - Benefit Eligible Employees */}
+          {currentData.demographics && (
+            <div className="mb-6">
+              <h2 className="text-xl font-bold mb-6 flex items-center gap-3" style={{color: '#00245D'}}>
+                <div className="p-2 rounded-lg" style={{backgroundColor: '#0054A6'}}>
+                  <Users className="text-white" size={24} />
+                </div>
+                Benefit Eligible Employee Demographics
+              </h2>
+              
+              {/* Gender Distribution */}
+              <div className="mb-6">
+                <GenderDistributionChart data={currentData.demographics} />
+              </div>
+              
+              {/* Age Distribution - Standard Bar Chart */}
+              <div className="mb-6">
+                <AgeDistributionChart data={currentData.demographics} />
+              </div>
+              
+              {/* Age Distribution - Curve Visualization */}
+              <div className="mb-6">
+                <AgeDistributionCurve data={currentData.demographics} />
+              </div>
+              
+              {/* Age/Gender Population Pyramid */}
+              <div className="mb-6">
+                <AgeGenderPyramid data={currentData.demographics} />
+              </div>
+              
+              {/* Ethnicity Breakdown */}
+              <div className="mb-6">
+                <EthnicityBreakdownChart data={currentData.demographics} />
+              </div>
+            </div>
+          )}
 
-          {/* Workforce Analytics Charts - Row 2: Headcount Overview Link */}
+          {/* Headcount Overview Link */}
           <div className="grid grid-cols-1 gap-6 print:gap-4 mb-6">
             {/* Headcount Details Summary Card */}
             <div className="bg-white rounded-lg shadow-sm border p-8">

@@ -1,0 +1,84 @@
+{
+  "entries": [
+    {
+      "sourceId": "hr-slides-fy25",
+      "timestamp": "2025-09-07T22:46:23.679Z",
+      "action": "scan",
+      "changes": [
+        "Initial scan completed"
+      ],
+      "hash": "undefined...",
+      "fileSize": 128
+    },
+    {
+      "sourceId": "workforce-headcount-fy25",
+      "timestamp": "2025-09-07T22:46:23.699Z",
+      "action": "scan",
+      "changes": [
+        "Initial scan completed"
+      ],
+      "hash": "fffa1b90bf26...",
+      "fileSize": 27436300
+    },
+    {
+      "sourceId": "terms-fy25-detail",
+      "timestamp": "2025-09-07T22:27:45.618Z",
+      "action": "scan",
+      "changes": [
+        "Initial scan completed"
+      ],
+      "hash": "927b00d62644...",
+      "fileSize": 2572909
+    },
+    {
+      "sourceId": "exit-survey-q1-fy25",
+      "timestamp": "2025-09-07T22:27:45.618Z",
+      "action": "scan",
+      "changes": [
+        "Initial scan completed"
+      ],
+      "hash": "7ccdddbeef89...",
+      "fileSize": 233817
+    },
+    {
+      "sourceId": "exit-survey-q2-fy25",
+      "timestamp": "2025-09-07T22:27:45.619Z",
+      "action": "scan",
+      "changes": [
+        "Initial scan completed"
+      ],
+      "hash": "5e35975c6a62...",
+      "fileSize": 213620
+    },
+    {
+      "sourceId": "exit-survey-q3-fy25",
+      "timestamp": "2025-09-07T22:27:45.619Z",
+      "action": "scan",
+      "changes": [
+        "Initial scan completed"
+      ],
+      "hash": "c5b001ad5b5c...",
+      "fileSize": 252945
+    },
+    {
+      "sourceId": "exit-survey-q4-fy25",
+      "timestamp": "2025-09-07T22:27:45.620Z",
+      "action": "scan",
+      "changes": [
+        "Initial scan completed"
+      ],
+      "hash": "dc0010c025f3...",
+      "fileSize": 214960
+    },
+    {
+      "sourceId": "hr-slides-fy25",
+      "timestamp": "2025-09-07T22:27:45.621Z",
+      "action": "scan",
+      "changes": [
+        "Initial scan completed"
+      ],
+      "hash": "undefined...",
+      "fileSize": 128
+    }
+  ]
+}

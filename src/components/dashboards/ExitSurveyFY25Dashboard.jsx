@@ -308,7 +308,7 @@ const ExitSurveyFY25Dashboard = () => {
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle size={16} className="text-green-600 mt-0.5" />
-                    <span><strong>{fy25Metrics.overallResponseRate}% overall response rate</strong> to exit surveys ({fy25Metrics.totalSurveyResponses} of {fy25Metrics.uniqueEmployees})</span>
+                    <span><strong>{fy25Metrics.overallResponseRate}% overall response rate</strong> to exit surveys of faculty and staff ({fy25Metrics.totalSurveyResponses} of {fy25Metrics.uniqueEmployees})</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle size={16} className="text-green-600 mt-0.5" />
@@ -330,15 +330,11 @@ const ExitSurveyFY25Dashboard = () => {
                 <ul className="space-y-3 text-sm">
                   <li className="flex items-start gap-2">
                     <XCircle size={16} className="text-red-600 mt-0.5" />
-                    <span><strong>Career development crisis:</strong> Lowest satisfaction (2.5/5.0 average)</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <XCircle size={16} className="text-red-600 mt-0.5" />
-                    <span><strong>Conduct concerns rising:</strong> 15% → 22% from Q1 to Q4</span>
+                    <span><strong>Career development concerns:</strong> Lowest satisfaction (2.5/5.0 average)</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <AlertCircle size={16} className="text-yellow-600 mt-0.5" />
-                    <span><strong>Top HR reasons:</strong> Resigned ({turnoverData?.termReasonPercentages?.Resigned || 50}%), Retirement ({turnoverData?.termReasonPercentages?.Retirement || 12}%), End Assignment ({turnoverData?.termReasonPercentages?.['End Assignment'] || 10}%)</span>
+                    <span><strong>Top reasons:</strong> Resigned ({turnoverData?.termReasonPercentages?.Resigned || 50}%), Retirement ({turnoverData?.termReasonPercentages?.Retirement || 12}%), End Assignment ({turnoverData?.termReasonPercentages?.['End Assignment'] || 10}%)</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <AlertCircle size={16} className="text-yellow-600 mt-0.5" />
@@ -957,12 +953,6 @@ const ExitSurveyFY25Dashboard = () => {
                     </div>
                   ))}
                 </div>
-                <div className="mt-4 p-4 bg-red-50 rounded-lg border border-red-200">
-                  <p className="text-sm text-red-800">
-                    <strong>Concern:</strong> Workplace conduct issues increased from 15% (Q1) to 22% (Q4), 
-                    requiring immediate leadership attention.
-                  </p>
-                </div>
               </div>
             </div>
           </div>
@@ -973,7 +963,7 @@ const ExitSurveyFY25Dashboard = () => {
           <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-lg border p-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
               <Target style={{color: '#2E7D32'}} size={24} />
-              FY26 Strategic Recommendations
+              FY26 Short-Term Recommendations
             </h2>
             
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -985,10 +975,6 @@ const ExitSurveyFY25Dashboard = () => {
                   <h3 className="font-semibold text-gray-900">Immediate Actions</h3>
                 </div>
                 <ul className="space-y-2 text-sm text-gray-700">
-                  <li className="flex items-start gap-2">
-                    <CheckCircle size={14} className="text-red-600 mt-0.5" />
-                    <span>Launch anonymous workplace climate survey</span>
-                  </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle size={14} className="text-red-600 mt-0.5" />
                     <span>Investigate departments with high Q4 exits</span>
@@ -1014,7 +1000,7 @@ const ExitSurveyFY25Dashboard = () => {
                 <ul className="space-y-2 text-sm text-gray-700">
                   <li className="flex items-start gap-2">
                     <CheckCircle size={14} className="text-yellow-600 mt-0.5" />
-                    <span>Implement supervisor training program</span>
+                    <span>Encourage manager/supervisor upskilling</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle size={14} className="text-yellow-600 mt-0.5" />
@@ -1051,41 +1037,7 @@ const ExitSurveyFY25Dashboard = () => {
                     <CheckCircle size={14} className="text-green-600 mt-0.5" />
                     <span>Lift all satisfaction scores above 3.5/5.0</span>
                   </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle size={14} className="text-green-600 mt-0.5" />
-                    <span>Reduce conduct concerns below 10%</span>
-                  </li>
                 </ul>
-              </div>
-            </div>
-
-            <div className="mt-8 p-6 bg-white rounded-lg">
-              <h3 className="font-semibold text-gray-900 mb-3">Success Metrics Dashboard</h3>
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="text-center p-3 bg-gray-50 rounded">
-                  <div className="text-xs text-gray-600">Current</div>
-                  <div className="text-2xl font-bold text-gray-900">{fy25Metrics.uniqueEmployees}</div>
-                  <div className="text-xs text-green-600">Target: {Math.round(fy25Metrics.uniqueEmployees * 0.85)}</div>
-                  <div className="text-xs text-gray-500">Terminations</div>
-                </div>
-                <div className="text-center p-3 bg-gray-50 rounded">
-                  <div className="text-xs text-gray-600">Current</div>
-                  <div className="text-2xl font-bold text-gray-900">{fy25Metrics.overallResponseRate}%</div>
-                  <div className="text-xs text-green-600">Target: 50%</div>
-                  <div className="text-xs text-gray-500">Response Rate</div>
-                </div>
-                <div className="text-center p-3 bg-gray-50 rounded">
-                  <div className="text-xs text-gray-600">Current</div>
-                  <div className="text-2xl font-bold text-gray-900">2.5</div>
-                  <div className="text-xs text-green-600">Target: 3.5</div>
-                  <div className="text-xs text-gray-500">Career Dev Score</div>
-                </div>
-                <div className="text-center p-3 bg-gray-50 rounded">
-                  <div className="text-xs text-gray-600">Current</div>
-                  <div className="text-2xl font-bold text-gray-900">18.5%</div>
-                  <div className="text-xs text-green-600">Target: &lt;10%</div>
-                  <div className="text-xs text-gray-500">Conduct Concerns</div>
-                </div>
               </div>
             </div>
           </div>

@@ -1,10 +1,15 @@
 import React, { memo } from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Target, TrendingDown } from 'lucide-react';
 
 const HiringCompetitivenessChart = memo(({ 
   totalApplications = 7860,
   totalHired = 340,
+  internalApplicants = 225,
+  externalApplicants = 6137,
+  internalHired = 54,
+  externalHired = 286,
+  facultyHired = 53,
+  staffHired = 340,
   internalSuccessRate = 24.0,
   externalSuccessRate = 3.7,
   overallHireRate = 4.3,
@@ -13,44 +18,6 @@ const HiringCompetitivenessChart = memo(({
 }) => {
   // Calculate competitiveness metrics
   const applicantsPerPosition = Math.round(totalApplications / totalHired);
-  
-  // Data for the bar chart
-  const competitivenessData = [
-    {
-      category: 'Internal Candidates',
-      rate: internalSuccessRate,
-      color: '#10B981',
-      description: '1 in 4 hired'
-    },
-    {
-      category: 'External Candidates',
-      rate: externalSuccessRate,
-      color: '#6B7280',
-      description: '1 in 27 hired'
-    },
-    {
-      category: 'Overall Rate',
-      rate: overallHireRate,
-      color: '#0054A6',
-      description: `${applicantsPerPosition} applicants per position`
-    }
-  ];
-
-  const CustomTooltip = ({ active, payload, label }) => {
-    if (active && payload && payload.length) {
-      const data = payload[0].payload;
-      return (
-        <div className="bg-white p-3 rounded-lg shadow-lg border">
-          <p className="font-medium">{data.category}</p>
-          <p className="text-sm" style={{color: data.color}}>
-            Success Rate: {data.rate}%
-          </p>
-          <p className="text-xs text-gray-600">{data.description}</p>
-        </div>
-      );
-    }
-    return null;
-  };
 
   return (
     <div className={`bg-white print:bg-white p-6 print:p-4 rounded-lg shadow-sm border print:border-gray ${className}`}>
@@ -68,17 +35,20 @@ const HiringCompetitivenessChart = memo(({
 
       {/* Key Metrics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        {/* Total Applications */}
-        <div className="text-center p-4 rounded-lg" style={{backgroundColor: '#F3F3F0'}}>
+        {/* Total Applications with breakdown */}
+        <div className="text-center p-4 rounded-lg border-2" style={{borderColor: '#0054A6', backgroundColor: '#EBF5FF'}}>
           <div className="text-2xl font-bold print:text-black" style={{color: '#0054A6'}}>
             {totalApplications.toLocaleString()}
           </div>
-          <div className="text-sm font-medium print:text-black" style={{color: '#00245D'}}>
+          <div className="text-sm font-medium print:text-black" style={{color: '#374151'}}>
             Total Applications
+          </div>
+          <div className="text-xs text-gray-600 print:text-black mt-1">
+            Internal: {internalApplicants} | External: {externalApplicants.toLocaleString()}
           </div>
         </div>
 
-        {/* Total Hired */}
+        {/* Total Hired with breakdown */}
         <div className="text-center p-4 rounded-lg" style={{backgroundColor: '#F3F3F0'}}>
           <div className="text-2xl font-bold" style={{color: '#10B981'}}>
             {totalHired.toLocaleString()}
@@ -86,18 +56,24 @@ const HiringCompetitivenessChart = memo(({
           <div className="text-sm font-medium print:text-black" style={{color: '#00245D'}}>
             Total Hired
           </div>
+          <div className="text-xs text-gray-600 print:text-black mt-1">
+            Internal: {internalHired} | External: {externalHired}
+          </div>
+          <div className="text-xs text-gray-600 print:text-black">
+            Faculty: {facultyHired} | Staff: {staffHired}
+          </div>
         </div>
 
         {/* Competitiveness */}
-        <div className="text-center p-4 rounded-lg border-2" style={{borderColor: '#DC2626', backgroundColor: '#FEF2F2'}}>
-          <div className="flex items-center justify-center gap-1 mb-1">
-            <TrendingDown size={20} style={{color: '#DC2626'}} />
-            <div className="text-2xl font-bold" style={{color: '#DC2626'}}>
-              {applicantsPerPosition}:1
-            </div>
+        <div className="text-center p-4 rounded-lg border-2" style={{borderColor: '#0054A6', backgroundColor: '#EBF5FF'}}>
+          <div className="text-2xl font-bold print:text-black" style={{color: '#0054A6'}}>
+            {applicantsPerPosition}:1
           </div>
-          <div className="text-sm font-medium print:text-black" style={{color: '#00245D'}}>
+          <div className="text-sm font-medium print:text-black" style={{color: '#374151'}}>
             Applicants per Position
+          </div>
+          <div className="text-xs text-gray-600 print:text-black mt-1">
+            {overallHireRate.toFixed(0)}% overall success rate
           </div>
         </div>
       </div>
