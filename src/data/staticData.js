@@ -15,9 +15,9 @@ export const WORKFORCE_DATA = {
       fws: 77
     },
     totalEmployees: 4774,
-    faculty: 786,
-    staff: 1323,  // Corrected: BE staff only (from F12, F11, F09, F10, PT12, PT9, PT11, PT10 categories)
-    hsp: 608,
+    faculty: 678,  // FY24 BE Faculty total (from audit)
+    staff: 1431,  // FY24 BE Staff total (from audit)
+    hsp: 608,  // FY24 HSP total (from audit)
     temp: 566,  // Corrected: TEMP (447) + NBE (14) + PRN (105) = 566
     jesuits: 17,
     other: 0,  // NBE and PRN moved to temp
@@ -27,19 +27,19 @@ export const WORKFORCE_DATA = {
     },
     locationDetails: {
       omaha: {
-        faculty: 646,
-        staff: 1219,
-        hsp: 264,
-        students: 1549,
+        faculty: 638,  // FY24 Omaha faculty (estimated based on FY25 ratio)
+        staff: 1327,  // FY24 Omaha staff (estimated based on FY25 ratio)
+        hsp: 244,     // FY24 Omaha HSP (40% of 608)
+        students: 1118, // FY24 Omaha students estimate (75% of 1491)
         tempFac: 185,
         tempStaff: 195,
         temp: 380
       },
       phoenix: {
-        faculty: 140,
-        staff: 104,
-        hsp: 344,
-        students: 58,
+        faculty: 40,   // FY24 Phoenix faculty (same as FY25)
+        staff: 104,    // FY24 Phoenix staff (same as FY25)
+        hsp: 364,      // FY24 Phoenix HSP (60% of 608)
+        students: 373, // FY24 Phoenix students estimate (25% of 1491)
         tempFac: 17,
         tempStaff: 20,
         temp: 37
@@ -817,9 +817,9 @@ export const WORKFORCE_DATA = {
       fws: 107
     },
     totalEmployees: 5037,
-    faculty: 689,  // Benefit eligible faculty (from F12, F11, F09, F10, PT12, PT9, PT11, PT10 categories)
-    staff: 1448,  // Benefit eligible staff (from F12, F11, F09, F10, PT12, PT9, PT11, PT10 categories)
-    hsp: 612,
+    faculty: 689,  // FY25 BE Faculty: 649 (Omaha) + 40 (Phoenix) = 689
+    staff: 1448,  // FY25 BE Staff total
+    hsp: 612,     // FY25 HSP: 248 (Omaha) + 364 (Phoenix) = 612
     temp: 574,  // Corrected: TEMP (457) + NBE (7) + PRN (110) = 574
     jesuits: 17,
     other: 0,  // NBE and PRN moved to temp
@@ -829,18 +829,18 @@ export const WORKFORCE_DATA = {
     },
     locationDetails: {
       omaha: {
-        faculty: 650,
-        staff: 1245,
-        hsp: 248,
+        faculty: 649,  // FY25 Omaha BE Faculty from Audit
+        staff: 1344,   // FY25 Omaha BE Staff (1448 total - 104 Phoenix)
+        hsp: 248,      // FY25 Omaha HSP from Audit
         students: 1612,
         tempFac: 192,
         tempStaff: 198,
         temp: 390  // tempFac + tempStaff
       },
       phoenix: {
-        faculty: 138,
-        staff: 104,
-        hsp: 364,
+        faculty: 40,   // FY25 Phoenix BE Faculty from Audit
+        staff: 104,    // FY25 Phoenix BE Staff
+        hsp: 364,      // FY25 Phoenix HSP from Audit
         students: 102,
         tempFac: 20,
         tempStaff: 22,
