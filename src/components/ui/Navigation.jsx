@@ -15,7 +15,8 @@ import {
   Building2,
   AlertCircle,
   Database,
-  Award
+  Award,
+  ClipboardCheck
 } from 'lucide-react';
 import { announceToScreenReader } from '../../utils/accessibilityUtils';
 
@@ -130,6 +131,14 @@ const Navigation = () => {
       path: '/dashboards/accomplishments',
       icon: Award,
       isActive: isActive('/dashboards/accomplishments')
+    },
+    {
+      id: 'workforce-audit',
+      label: 'Workforce Audit',
+      shortLabel: 'Audit',
+      path: '/dashboards/workforce-audit',
+      icon: ClipboardCheck,
+      isActive: isActive('/dashboards/workforce-audit')
     },
     {
       id: 'data-sources',
