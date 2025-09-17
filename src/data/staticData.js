@@ -831,7 +831,7 @@ export const WORKFORCE_DATA = {
       omaha: {
         faculty: 649,  // FY25 Omaha BE Faculty from Audit
         staff: 1344,   // FY25 Omaha BE Staff (1448 total - 104 Phoenix)
-        hsp: 248,      // FY25 Omaha HSP from Audit
+        hsp: 268,      // FY25 Omaha HSP - Updated from source data analysis
         students: 1612,
         tempFac: 279,
         tempStaff: 280,
@@ -840,7 +840,7 @@ export const WORKFORCE_DATA = {
       phoenix: {
         faculty: 40,   // FY25 Phoenix BE Faculty from Audit
         staff: 104,    // FY25 Phoenix BE Staff
-        hsp: 364,      // FY25 Phoenix HSP from Audit
+        hsp: 344,      // FY25 Phoenix HSP - Updated from source data analysis
         students: 102,
         tempFac: 7,
         tempStaff: 8,

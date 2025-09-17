@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   RefreshCw, 
   AlertCircle, 
@@ -8,469 +8,505 @@ import {
   Calendar,
   History,
   Search,
-  ChevronDown,
-  ChevronRight,
-  ExternalLink,
+  Download,
+  Upload,
+  FileText,
   AlertTriangle,
-  X
+  Activity,
+  Zap,
+  HardDrive,
+  X,
+  ChevronRight,
+  FolderOpen,
+  FileSpreadsheet
 } from 'lucide-react';
-import dataSourceRegistry from '../../data/dataSourceRegistry.json';
-import {
-  getFileStatus,
-  formatDate,
-  getFileTypeIcon,
-  getDaysSinceRefresh,
-  getRefreshFrequencyLabel,
-  isRefreshRecommended,
-  groupSourcesByCategory
-  // getCategoryStats // Commented out - will use later
-} from '../../utils/dataSourceMonitor';
+import { useDataSync } from '../../hooks/useDataSync';
+import { formatDistanceToNow } from 'date-fns';
 
 const DataSourceAdmin = () => {
-  const [sources, setSources] = useState(dataSourceRegistry.sources || []);
+  const {
+    syncStatus,
+    syncSource,
+    syncAll,
+    checkModified,
+    clearCache,
+    getCachedData,
+    isInitialized
+  } = useDataSync();
+
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [expandedSources, setExpandedSources] = useState(new Set());
-  const [refreshHistory, setRefreshHistory] = useState([]);
-  const [showHistoryModal, setShowHistoryModal] = useState(false);
   const [selectedSource, setSelectedSource] = useState(null);
-  const [isRefreshing, setIsRefreshing] = useState(false);
-  const [lastScanTime, setLastScanTime] = useState(dataSourceRegistry.metadata?.lastScan);
+  const [showHistoryModal, setShowHistoryModal] = useState(false);
+  const [syncingSource, setSyncingSource] = useState(null);
 
-  // Filter sources based on search and category
-  const filteredSources = sources.filter(source => {
-    const matchesSearch = source.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          source.description.toLowerCase().includes(searchTerm.toLowerCase());
+  // Auto-check for modifications every 30 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (!syncStatus.inProgress) {
+        checkModified();
+      }
+    }, 30000);
+
+    return () => clearInterval(interval);
+  }, [checkModified, syncStatus.inProgress]);
+
+  // Filter sources
+  const filteredSources = Object.entries(syncStatus.sources || {}).filter(([key, source]) => {
+    const matchesSearch = source.name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                          key.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === 'all' || source.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
 
-  // Group sources by category
-  const groupedSources = groupSourcesByCategory(filteredSources);
-  // const categoryStats = getCategoryStats(sources); // Commented out - will use later
-
-  // Toggle source expansion
-  const toggleSourceExpansion = (sourceId) => {
-    const newExpanded = new Set(expandedSources);
-    if (newExpanded.has(sourceId)) {
-      newExpanded.delete(sourceId);
-    } else {
-      newExpanded.add(sourceId);
-    }
-    setExpandedSources(newExpanded);
+  // Get statistics
+  const stats = {
+    total: Object.keys(syncStatus.sources || {}).length,
+    synced: Object.values(syncStatus.sources || {}).filter(s => s.status === 'synced').length,
+    pending: Object.values(syncStatus.sources || {}).filter(s => s.status === 'pending').length,
+    errors: syncStatus.errors?.length || 0
   };
 
-  // Handle individual source refresh
-  const handleRefreshSource = async (sourceId) => {
-    setIsRefreshing(true);
+  // Handle individual source sync
+  const handleSyncSource = async (sourceKey) => {
+    setSyncingSource(sourceKey);
     try {
-      // Simulate refresh process
-      console.log(`Refreshing source: ${sourceId}`);
-      
-      // Update source status
-      const updatedSources = sources.map(source => {
-        if (source.id === sourceId) {
-          return {
-            ...source,
-            lastRefreshed: new Date().toISOString(),
-            status: 'up-to-date'
-          };
-        }
-        return source;
-      });
-      
-      setSources(updatedSources);
-      
-      // Add to refresh history
-      const historyEntry = {
-        sourceId,
-        timestamp: new Date().toISOString(),
-        action: 'manual-refresh',
-        changes: [],
-        user: 'Admin'
-      };
-      
-      setRefreshHistory([historyEntry, ...refreshHistory]);
-      
+      await syncSource(sourceKey);
     } catch (error) {
-      console.error('Error refreshing source:', error);
+      console.error(`Failed to sync ${sourceKey}:`, error);
     } finally {
-      setIsRefreshing(false);
+      setSyncingSource(null);
     }
   };
 
-  // Handle bulk refresh
-  const handleBulkRefresh = async () => {
-    const sourcesToRefresh = sources.filter(isRefreshRecommended);
-    if (sourcesToRefresh.length === 0) {
-      alert('No sources need refreshing');
-      return;
-    }
-    
-    setIsRefreshing(true);
+  // Handle sync all
+  const handleSyncAll = async () => {
     try {
-      for (const source of sourcesToRefresh) {
-        await handleRefreshSource(source.id);
-      }
-    } finally {
-      setIsRefreshing(false);
-    }
-  };
-
-  // Scan for file changes
-  const handleScanFiles = async () => {
-    setIsRefreshing(true);
-    try {
-      console.log('Scanning source files for changes...');
-      
-      // Update last scan time
-      setLastScanTime(new Date().toISOString());
-      
-      // In production, this would call a backend API to scan files
-      // For now, we'll simulate the process
-      const updatedSources = sources.map(source => ({
-        ...source,
-        lastModified: new Date().toISOString()
-      }));
-      
-      setSources(updatedSources);
-      
+      await syncAll();
     } catch (error) {
-      console.error('Error scanning files:', error);
-    } finally {
-      setIsRefreshing(false);
+      console.error('Failed to sync all sources:', error);
     }
   };
 
-  // Show refresh history modal
-  const showHistory = (source) => {
-    setSelectedSource(source);
-    setShowHistoryModal(true);
+  // Get source icon
+  const getSourceIcon = (source) => {
+    switch (source.type) {
+      case 'excel':
+        return <FileSpreadsheet className="w-5 h-5 text-green-600" />;
+      case 'csv':
+        return <FileText className="w-5 h-5 text-blue-600" />;
+      case 'directory':
+        return <FolderOpen className="w-5 h-5 text-purple-600" />;
+      default:
+        return <Database className="w-5 h-5 text-gray-600" />;
+    }
   };
 
-  // Get status badge component
-  const StatusBadge = ({ source }) => {
-    const status = getFileStatus(source);
-    const icons = {
-      'up-to-date': <CheckCircle size={16} />,
-      'changed': <AlertCircle size={16} />,
-      'refresh-due': <Clock size={16} />,
-      'never-refreshed': <AlertTriangle size={16} />,
-      'pending-scan': <Clock size={16} />
-    };
-    
-    const colors = {
-      'green': 'bg-green-100 text-green-800 border-green-200',
-      'orange': 'bg-orange-100 text-orange-800 border-orange-200',
-      'yellow': 'bg-yellow-100 text-yellow-800 border-yellow-200',
-      'gray': 'bg-gray-100 text-gray-800 border-gray-200'
-    };
-    
+  // Get status badge
+  const getStatusBadge = (status) => {
+    switch (status) {
+      case 'synced':
+        return (
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+            <CheckCircle className="w-3 h-3 mr-1" />
+            Synced
+          </span>
+        );
+      case 'pending':
+        return (
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+            <Clock className="w-3 h-3 mr-1" />
+            Pending
+          </span>
+        );
+      case 'error':
+        return (
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+            <AlertTriangle className="w-3 h-3 mr-1" />
+            Error
+          </span>
+        );
+      default:
+        return (
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+            Unknown
+          </span>
+        );
+    }
+  };
+
+  if (!isInitialized) {
     return (
-      <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium border ${colors[status.color]}`}>
-        {icons[status.status]}
-        {status.label}
-      </span>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <RefreshCw className="w-8 h-8 text-blue-600 animate-spin mx-auto mb-4" />
+          <p className="text-gray-600">Initializing data sync service...</p>
+        </div>
+      </div>
     );
-  };
-
-  // Get overview statistics
-  const getOverviewStats = () => {
-    const total = sources.length;
-    const upToDate = sources.filter(s => getFileStatus(s).status === 'up-to-date').length;
-    const needsRefresh = sources.filter(isRefreshRecommended).length;
-    const neverRefreshed = sources.filter(s => !s.lastRefreshed).length;
-    
-    return { total, upToDate, needsRefresh, neverRefreshed };
-  };
-
-  const stats = getOverviewStats();
+  }
 
   return (
-    <div className="p-6 max-w-full">
-      {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">Data Source Management</h1>
-        <p className="text-gray-600">Track and manage source data files with version control and refresh history</p>
-      </div>
-
-      {/* Overview Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <div className="bg-white rounded-lg shadow p-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Total Sources</p>
-              <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
-            </div>
-            <Database className="text-blue-500" size={32} />
-          </div>
-        </div>
-        
-        <div className="bg-white rounded-lg shadow p-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Up to Date</p>
-              <p className="text-2xl font-bold text-green-600">{stats.upToDate}</p>
-            </div>
-            <CheckCircle className="text-green-500" size={32} />
-          </div>
-        </div>
-        
-        <div className="bg-white rounded-lg shadow p-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Needs Refresh</p>
-              <p className="text-2xl font-bold text-orange-600">{stats.needsRefresh}</p>
-            </div>
-            <AlertCircle className="text-orange-500" size={32} />
-          </div>
-        </div>
-        
-        <div className="bg-white rounded-lg shadow p-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Last Scan</p>
-              <p className="text-sm font-semibold text-gray-900">
-                {lastScanTime ? formatDate(lastScanTime).split(',')[0] : 'Never'}
-              </p>
-            </div>
-            <Clock className="text-gray-500" size={32} />
-          </div>
-        </div>
-      </div>
-
-      {/* Action Bar */}
-      <div className="bg-white rounded-lg shadow p-4 mb-6">
-        <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
-          <div className="flex flex-col md:flex-row gap-3 flex-1">
-            {/* Search */}
-            <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-              <input
-                type="text"
-                placeholder="Search sources..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="max-w-7xl mx-auto px-4">
+        {/* Header */}
+        <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <Database className="text-blue-600 w-8 h-8" />
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">Data Source Management</h1>
+                <p className="text-gray-600">Hybrid Smart Cache System - Real-time sync with source files</p>
+              </div>
             </div>
             
-            {/* Category Filter */}
+            <div className="flex gap-3">
+              <button
+                onClick={() => checkModified()}
+                className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                disabled={syncStatus.inProgress}
+              >
+                <Activity className="w-4 h-4 mr-2" />
+                Check Modified
+              </button>
+              
+              <button
+                onClick={handleSyncAll}
+                className="inline-flex items-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={syncStatus.inProgress}
+              >
+                {syncStatus.inProgress ? (
+                  <>
+                    <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                    Syncing...
+                  </>
+                ) : (
+                  <>
+                    <RefreshCw className="w-4 h-4 mr-2" />
+                    Sync All Sources
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+
+          {/* Real-time Status Bar */}
+          {syncStatus.inProgress && (
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mt-4">
+              <div className="flex items-center">
+                <RefreshCw className="w-4 h-4 text-blue-600 animate-spin mr-2" />
+                <span className="text-sm text-blue-700">
+                  Syncing {syncStatus.currentSource || 'data sources'}...
+                </span>
+              </div>
+              <div className="mt-2 bg-blue-200 rounded-full h-2">
+                <div 
+                  className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                  style={{ width: `${(syncStatus.syncedSources / syncStatus.totalSources) * 100}%` }}
+                />
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Statistics Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+          <div className="bg-white rounded-lg shadow-sm border p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Total Sources</p>
+                <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
+              </div>
+              <Database className="w-8 h-8 text-blue-600 opacity-20" />
+            </div>
+          </div>
+
+          <div className="bg-white rounded-lg shadow-sm border p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Up to Date</p>
+                <p className="text-2xl font-bold text-green-600">{stats.synced}</p>
+              </div>
+              <CheckCircle className="w-8 h-8 text-green-600 opacity-20" />
+            </div>
+          </div>
+
+          <div className="bg-white rounded-lg shadow-sm border p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Needs Refresh</p>
+                <p className="text-2xl font-bold text-yellow-600">{stats.pending}</p>
+              </div>
+              <AlertTriangle className="w-8 h-8 text-yellow-600 opacity-20" />
+            </div>
+          </div>
+
+          <div className="bg-white rounded-lg shadow-sm border p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Last Sync</p>
+                <p className="text-lg font-semibold text-gray-900">
+                  {syncStatus.lastSync 
+                    ? formatDistanceToNow(new Date(syncStatus.lastSync), { addSuffix: true })
+                    : 'Never'}
+                </p>
+              </div>
+              <Clock className="w-8 h-8 text-gray-600 opacity-20" />
+            </div>
+          </div>
+        </div>
+
+        {/* Filters */}
+        <div className="bg-white rounded-lg shadow-sm border p-4 mb-6">
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex-1">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <input
+                  type="text"
+                  placeholder="Search sources..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+            </div>
+            
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
             >
               <option value="all">All Categories</option>
               <option value="workforce">Workforce</option>
               <option value="turnover">Turnover</option>
-              <option value="exit-surveys">Exit Surveys</option>
-              <option value="hr-slides">HR Slides</option>
+              <option value="surveys">Exit Surveys</option>
             </select>
           </div>
-          
-          {/* Action Buttons */}
-          <div className="flex gap-2">
-            <button
-              onClick={handleScanFiles}
-              disabled={isRefreshing}
-              className="flex items-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <Search size={16} />
-              Scan Files
-            </button>
-            
-            <button
-              onClick={handleBulkRefresh}
-              disabled={isRefreshing || stats.needsRefresh === 0}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <RefreshCw size={16} className={isRefreshing ? 'animate-spin' : ''} />
-              Bulk Refresh ({stats.needsRefresh})
-            </button>
-          </div>
         </div>
-      </div>
 
-      {/* Sources List by Category */}
-      <div className="space-y-6">
-        {Object.entries(groupedSources).map(([category, categorySources]) => (
-          <div key={category} className="bg-white rounded-lg shadow">
-            <div className="px-6 py-4 border-b border-gray-200">
-              <h2 className="text-lg font-semibold text-gray-900 capitalize">
-                {category.replace('-', ' ')} ({categorySources.length})
-              </h2>
-            </div>
-            
-            <div className="divide-y divide-gray-200">
-              {categorySources.map(source => {
-                const isExpanded = expandedSources.has(source.id);
-                const daysSince = getDaysSinceRefresh(source.lastRefreshed);
-                
-                return (
-                  <div key={source.id} className="p-6">
-                    {/* Main Source Row */}
-                    <div className="flex items-start justify-between">
+        {/* Data Sources Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+          {filteredSources.map(([key, source]) => {
+            const cachedData = getCachedData(key);
+            const hasData = cachedData !== null;
+            const isExpanded = expandedSources.has(key);
+            const isSyncing = syncingSource === key || (syncStatus.inProgress && syncStatus.currentSource === key);
+
+            return (
+              <div key={key} className="bg-white rounded-lg shadow-sm border hover:shadow-md transition-shadow">
+                <div className="p-4">
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex items-start gap-3">
+                      {getSourceIcon(source)}
                       <div className="flex-1">
-                        <div className="flex items-start gap-3">
-                          <button
-                            onClick={() => toggleSourceExpansion(source.id)}
-                            className="mt-1 text-gray-500 hover:text-gray-700"
-                          >
-                            {isExpanded ? <ChevronDown size={20} /> : <ChevronRight size={20} />}
-                          </button>
-                          
-                          <div className="flex-1">
-                            <div className="flex items-center gap-3 mb-2">
-                              <span className="text-2xl">{getFileTypeIcon(source.type)}</span>
-                              <h3 className="text-base font-semibold text-gray-900">{source.name}</h3>
-                              <StatusBadge source={source} />
-                              <span className="text-xs text-gray-500">v{source.currentVersion}</span>
-                            </div>
-                            
-                            <p className="text-sm text-gray-600 mb-2">{source.description}</p>
-                            
-                            <div className="flex flex-wrap gap-4 text-xs text-gray-500">
-                              <span className="flex items-center gap-1">
-                                <Calendar size={14} />
-                                Last Refreshed: {formatDate(source.lastRefreshed)}
-                                {daysSince !== null && ` (${daysSince} days ago)`}
-                              </span>
-                              <span className="flex items-center gap-1">
-                                <Clock size={14} />
-                                Frequency: {getRefreshFrequencyLabel(source.refreshFrequency)}
-                              </span>
-                              <span>Owner: {source.owner}</span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      {/* Actions */}
-                      <div className="flex gap-2 ml-4">
-                        <button
-                          onClick={() => showHistory(source)}
-                          className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg"
-                          title="View History"
-                        >
-                          <History size={18} />
-                        </button>
-                        <button
-                          onClick={() => handleRefreshSource(source.id)}
-                          disabled={isRefreshing}
-                          className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg disabled:opacity-50"
-                          title="Refresh Source"
-                        >
-                          <RefreshCw size={18} className={isRefreshing ? 'animate-spin' : ''} />
-                        </button>
+                        <h3 className="font-semibold text-gray-900">{source.name}</h3>
+                        <p className="text-sm text-gray-600 mt-1">{source.path}</p>
                       </div>
                     </div>
+                    {getStatusBadge(source.status)}
+                  </div>
+
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Type:</span>
+                      <span className="font-medium">{source.type?.toUpperCase()}</span>
+                    </div>
                     
-                    {/* Expanded Details */}
-                    {isExpanded && (
-                      <div className="mt-4 ml-8 p-4 bg-gray-50 rounded-lg">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div>
-                            <h4 className="text-sm font-semibold text-gray-700 mb-2">File Information</h4>
-                            <div className="space-y-1 text-sm">
-                              <div className="flex justify-between">
-                                <span className="text-gray-600">Path:</span>
-                                <span className="font-mono text-xs text-gray-900">{source.path}</span>
-                              </div>
-                              <div className="flex justify-between">
-                                <span className="text-gray-600">Last Modified:</span>
-                                <span className="text-gray-900">{formatDate(source.lastModified)}</span>
-                              </div>
-                              <div className="flex justify-between">
-                                <span className="text-gray-600">File Hash:</span>
-                                <span className="font-mono text-xs text-gray-900">
-                                  {source.lastHash ? source.lastHash.substring(0, 12) + '...' : 'Not calculated'}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                          
-                          <div>
-                            <h4 className="text-sm font-semibold text-gray-700 mb-2">Data Outputs</h4>
-                            <div className="space-y-1">
-                              {source.dataOutputs.map((output, idx) => (
-                                <div key={idx} className="text-sm text-gray-600 flex items-center gap-1">
-                                  <ExternalLink size={12} />
-                                  <span className="font-mono text-xs">{output}</span>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        </div>
-                        
-                        {source.notes && (
-                          <div className="mt-4">
-                            <h4 className="text-sm font-semibold text-gray-700 mb-1">Notes</h4>
-                            <p className="text-sm text-gray-600">{source.notes}</p>
-                          </div>
-                        )}
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Last Sync:</span>
+                      <span className="font-medium">
+                        {source.lastSync 
+                          ? formatDistanceToNow(new Date(source.lastSync), { addSuffix: true })
+                          : 'Never'}
+                      </span>
+                    </div>
+
+                    {hasData && (
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Cached Records:</span>
+                        <span className="font-medium">
+                          {Array.isArray(cachedData) 
+                            ? cachedData.length 
+                            : Object.keys(cachedData).length}
+                        </span>
                       </div>
                     )}
                   </div>
-                );
-              })}
+
+                  <div className="flex gap-2 mt-4">
+                    <button
+                      onClick={() => handleSyncSource(key)}
+                      disabled={isSyncing}
+                      className="flex-1 inline-flex items-center justify-center px-3 py-1.5 border border-gray-300 text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {isSyncing ? (
+                        <>
+                          <RefreshCw className="w-4 h-4 mr-1 animate-spin" />
+                          Syncing...
+                        </>
+                      ) : (
+                        <>
+                          <Zap className="w-4 h-4 mr-1" />
+                          Quick Sync
+                        </>
+                      )}
+                    </button>
+                    
+                    <button
+                      onClick={() => {
+                        setSelectedSource(key);
+                        setShowHistoryModal(true);
+                      }}
+                      className="inline-flex items-center px-3 py-1.5 border border-gray-300 text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50"
+                    >
+                      <History className="w-4 h-4" />
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        const newExpanded = new Set(expandedSources);
+                        if (isExpanded) {
+                          newExpanded.delete(key);
+                        } else {
+                          newExpanded.add(key);
+                        }
+                        setExpandedSources(newExpanded);
+                      }}
+                      className="inline-flex items-center px-3 py-1.5 border border-gray-300 text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50"
+                    >
+                      <ChevronRight className={`w-4 h-4 transform transition-transform ${isExpanded ? 'rotate-90' : ''}`} />
+                    </button>
+                  </div>
+
+                  {/* Expanded Details */}
+                  {isExpanded && hasData && (
+                    <div className="mt-4 pt-4 border-t border-gray-200">
+                      <div className="text-xs text-gray-600 space-y-1">
+                        <div className="flex justify-between">
+                          <span>Cache Size:</span>
+                          <span className="font-medium">
+                            {(JSON.stringify(cachedData).length / 1024).toFixed(2)} KB
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>File Modified:</span>
+                          <span className="font-medium">
+                            {source.lastModified || 'Unknown'}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Error Display */}
+                  {source.status === 'error' && syncStatus.errors?.find(e => e.source === key) && (
+                    <div className="mt-3 p-2 bg-red-50 border border-red-200 rounded text-xs text-red-700">
+                      <AlertCircle className="w-3 h-3 inline mr-1" />
+                      {syncStatus.errors.find(e => e.source === key)?.error}
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Sync History */}
+        {syncStatus.history?.length > 0 && (
+          <div className="mt-8 bg-white rounded-lg shadow-sm border p-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">Recent Sync Activity</h2>
+            <div className="space-y-2">
+              {syncStatus.history.slice(-5).reverse().map((entry, index) => (
+                <div key={index} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
+                  <div className="flex items-center gap-3">
+                    <CheckCircle className="w-4 h-4 text-green-500" />
+                    <span className="text-sm font-medium">{entry.source}</span>
+                    <span className="text-sm text-gray-600">
+                      {entry.recordsProcessed} records
+                    </span>
+                  </div>
+                  <span className="text-xs text-gray-500">
+                    {formatDistanceToNow(new Date(entry.timestamp), { addSuffix: true })}
+                  </span>
+                </div>
+              ))}
             </div>
           </div>
-        ))}
-      </div>
+        )}
 
-      {/* History Modal */}
-      {showHistoryModal && selectedSource && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[80vh] overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-200">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-gray-900">
-                  Refresh History: {selectedSource.name}
-                </h3>
-                <button
-                  onClick={() => setShowHistoryModal(false)}
-                  className="text-gray-500 hover:text-gray-700"
-                >
-                  <X size={20} />
-                </button>
+        {/* History Modal */}
+        {showHistoryModal && selectedSource && (
+          <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-96 overflow-hidden">
+              <div className="p-4 border-b border-gray-200">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-semibold">
+                    Sync History - {syncStatus.sources[selectedSource]?.name}
+                  </h3>
+                  <button
+                    onClick={() => {
+                      setShowHistoryModal(false);
+                      setSelectedSource(null);
+                    }}
+                    className="text-gray-400 hover:text-gray-600"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+              
+              <div className="p-4 overflow-y-auto max-h-80">
+                {syncStatus.history?.filter(h => h.source === selectedSource).length > 0 ? (
+                  <div className="space-y-2">
+                    {syncStatus.history
+                      .filter(h => h.source === selectedSource)
+                      .reverse()
+                      .map((entry, index) => (
+                        <div key={index} className="flex items-center justify-between py-2 border-b border-gray-100">
+                          <div className="flex items-center gap-3">
+                            <CheckCircle className="w-4 h-4 text-green-500" />
+                            <div>
+                              <p className="text-sm font-medium">
+                                {entry.recordsProcessed} records processed
+                              </p>
+                              <p className="text-xs text-gray-500">
+                                Status: {entry.status}
+                              </p>
+                            </div>
+                          </div>
+                          <span className="text-xs text-gray-500">
+                            {new Date(entry.timestamp).toLocaleString()}
+                          </span>
+                        </div>
+                      ))}
+                  </div>
+                ) : (
+                  <p className="text-gray-500 text-center py-8">
+                    No sync history available for this source
+                  </p>
+                )}
               </div>
             </div>
-            
-            <div className="p-6 overflow-y-auto max-h-[60vh]">
-              {refreshHistory.filter(h => h.sourceId === selectedSource.id).length > 0 ? (
-                <div className="space-y-4">
-                  {refreshHistory
-                    .filter(h => h.sourceId === selectedSource.id)
-                    .map((entry, idx) => (
-                      <div key={idx} className="border-l-4 border-blue-500 pl-4">
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="text-sm font-semibold text-gray-900">
-                            {entry.action === 'manual-refresh' ? 'Manual Refresh' : 'Auto Refresh'}
-                          </span>
-                          <span className="text-xs text-gray-500">{formatDate(entry.timestamp)}</span>
-                        </div>
-                        <p className="text-sm text-gray-600">Initiated by: {entry.user}</p>
-                        {entry.changes && entry.changes.length > 0 && (
-                          <div className="mt-2">
-                            <p className="text-xs font-semibold text-gray-700">Changes:</p>
-                            <ul className="text-xs text-gray-600 mt-1">
-                              {entry.changes.map((change, i) => (
-                                <li key={i}>• {change}</li>
-                              ))}
-                            </ul>
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                </div>
-              ) : (
-                <p className="text-gray-500 text-center py-8">No refresh history available</p>
-              )}
-            </div>
           </div>
+        )}
+
+        {/* Cache Management */}
+        <div className="mt-6 flex justify-end">
+          <button
+            onClick={() => {
+              if (window.confirm('Clear all cached data? This will require re-syncing all sources.')) {
+                clearCache();
+              }
+            }}
+            className="inline-flex items-center px-4 py-2 text-sm font-medium text-red-600 hover:text-red-700"
+          >
+            <HardDrive className="w-4 h-4 mr-2" />
+            Clear Cache
+          </button>
         </div>
-      )}
+      </div>
     </div>
   );
 };
