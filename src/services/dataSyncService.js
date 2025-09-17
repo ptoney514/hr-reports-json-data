@@ -1,6 +1,8 @@
 // Data sync service - handles synchronization between source files and cached JSON
 // Note: For initial implementation, we'll use static data and add real file processing later
 
+import fileMonitorService, { initializeFileMonitor } from './fileMonitorService';
+
 // Data source configuration
 const DATA_SOURCES = {
   workforce: {
@@ -330,6 +332,25 @@ const dataSyncService = new DataSyncService();
 
 // Auto-sync on app start
 export const initializeDataSync = async () => {
+  // Initialize file monitor
+  const fileMonitor = initializeFileMonitor();
+  
+  // Subscribe to file changes
+  fileMonitor.subscribe((event) => {
+    if (event.event === 'file-changed') {
+      console.log('File changed:', event.data.path);
+      // Trigger sync for the changed source
+      Object.entries(DATA_SOURCES).forEach(([key, source]) => {
+        if (source.path === event.data.path) {
+          dataSyncService.syncDataSource(key);
+        }
+      });
+    }
+  });
+  
+  // Start monitoring with 10 second intervals
+  fileMonitor.startMonitoring(10000);
+  
   // Check for modified sources on startup
   const modified = await dataSyncService.checkAndSyncModified();
   

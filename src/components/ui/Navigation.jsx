@@ -19,6 +19,7 @@ import {
   ClipboardCheck
 } from 'lucide-react';
 import { announceToScreenReader } from '../../utils/accessibilityUtils';
+import SyncStatusIndicator from './SyncStatusIndicator';
 
 const Navigation = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -219,6 +220,11 @@ const Navigation = () => {
               );
             })}
           </div>
+          
+          {/* Sync Status Indicator - Bottom of sidebar */}
+          <div className="p-2 border-t border-gray-200">
+            <SyncStatusIndicator className="text-xs" />
+          </div>
         </div>
       </nav>
 
@@ -233,6 +239,9 @@ const Navigation = () => {
             <BarChart3 size={24} />
             <span className="text-xl font-bold">TrioReports</span>
           </Link>
+          
+          {/* Sync Status - Mobile */}
+          <SyncStatusIndicator className="hidden sm:flex text-xs" />
 
           {/* Mobile menu button */}
           <div>
