@@ -9,14 +9,12 @@ import {
   X,
   UserPlus,
   MessageSquare,
-  Settings,
   Calendar,
   FileText,
   Building2,
   AlertCircle,
   Database,
-  Award,
-  ClipboardCheck
+  Shield
 } from 'lucide-react';
 import { announceToScreenReader } from '../../utils/accessibilityUtils';
 
@@ -45,22 +43,6 @@ const Navigation = () => {
       isActive: isActive('/dashboards/workforce')
     },
     {
-      id: 'headcount-details',
-      label: 'Headcount Details',
-      shortLabel: 'Head',
-      path: '/dashboards/headcount-details',
-      icon: Building2,
-      isActive: isActive('/dashboards/headcount-details')
-    },
-    {
-      id: 'headcount-report',
-      label: 'Headcount Report',
-      shortLabel: 'Report',
-      path: '/dashboards/headcount-report',
-      icon: BarChart3,
-      isActive: isActive('/dashboards/headcount-report')
-    },
-    {
       id: 'turnover',
       label: 'Turnover Dashboard',
       shortLabel: 'Turn',
@@ -77,68 +59,20 @@ const Navigation = () => {
       isActive: isActive('/dashboards/recruiting')
     },
     {
-      id: 'exit-survey',
-      label: 'Exit Survey Overview',
-      shortLabel: 'Exit',
-      path: '/dashboards/exit-survey',
-      icon: MessageSquare,
-      isActive: isActive('/dashboards/exit-survey')
-    },
-    {
-      id: 'exit-survey-q1',
-      label: 'Q1 FY25 Exit Analysis',
-      shortLabel: 'Q1 FY25',
-      path: '/dashboards/exit-survey-q1',
-      icon: Calendar,
-      isActive: isActive('/dashboards/exit-survey-q1')
-    },
-    {
-      id: 'exit-survey-q2',
-      label: 'Q2 FY25 Exit Analysis',
-      shortLabel: 'Q2 FY25',
-      path: '/dashboards/exit-survey-q2',
-      icon: Calendar,
-      isActive: isActive('/dashboards/exit-survey-q2')
-    },
-    {
-      id: 'exit-survey-q3',
-      label: 'Q3 FY25 Critical Issues',
-      shortLabel: 'Q3 FY25',
-      path: '/dashboards/exit-survey-q3',
-      icon: AlertCircle,
-      isActive: isActive('/dashboards/exit-survey-q3')
-    },
-    {
-      id: 'exit-survey-q4',
-      label: 'Q4 FY25 Survey Insights',
-      shortLabel: 'Q4 FY25',
-      path: '/dashboards/exit-survey-q4',
-      icon: FileText,
-      isActive: isActive('/dashboards/exit-survey-q4')
-    },
-    {
       id: 'exit-survey-fy25',
-      label: 'FY25 Complete Analysis',
-      shortLabel: 'FY25',
+      label: 'FY25 Exit Survey Analysis',
+      shortLabel: 'Exit Survey',
       path: '/dashboards/exit-survey-fy25',
-      icon: BarChart3,
+      icon: MessageSquare,
       isActive: isActive('/dashboards/exit-survey-fy25')
     },
     {
-      id: 'accomplishments',
-      label: 'FY25 Accomplishments',
-      shortLabel: 'Achieve',
-      path: '/dashboards/accomplishments',
-      icon: Award,
-      isActive: isActive('/dashboards/accomplishments')
-    },
-    {
-      id: 'workforce-audit',
-      label: 'Workforce Audit',
-      shortLabel: 'Audit',
-      path: '/dashboards/workforce-audit',
-      icon: ClipboardCheck,
-      isActive: isActive('/dashboards/workforce-audit')
+      id: 'data-validation',
+      label: 'Data Validation',
+      shortLabel: 'Valid',
+      path: '/admin/data-validation',
+      icon: Shield,
+      isActive: isActive('/admin/data-validation')
     },
     {
       id: 'data-sources',
@@ -147,14 +81,6 @@ const Navigation = () => {
       path: '/admin/data-sources',
       icon: Database,
       isActive: isActive('/admin/data-sources')
-    },
-    {
-      id: 'admin',
-      label: 'Settings',
-      shortLabel: 'Set',
-      path: '/admin',
-      icon: Settings,
-      isActive: isActive('/admin')
     }
   ];
 
@@ -187,10 +113,10 @@ const Navigation = () => {
             <Link 
               to="/dashboards" 
               className="flex flex-col items-center gap-1 text-blue-700 hover:text-blue-800 transition-colors"
-              aria-label="TrioReports Home"
+              aria-label="HR Reports Home"
             >
               <BarChart3 size={24} />
-              <span className="text-xs font-bold">Trio</span>
+              <span className="text-xs font-bold">HR</span>
             </Link>
           </div>
 
@@ -231,7 +157,7 @@ const Navigation = () => {
             className="flex items-center gap-2 text-blue-700 hover:text-blue-800 transition-colors"
           >
             <BarChart3 size={24} />
-            <span className="text-xl font-bold">TrioReports</span>
+            <span className="text-xl font-bold">HR Reports</span>
           </Link>
 
           {/* Mobile menu button */}

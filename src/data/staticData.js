@@ -812,9 +812,9 @@ export const WORKFORCE_DATA = {
       total: 0
     },
     studentCount: {
-      total: 1714,
-      studentWorker: 1607,
-      fws: 107
+      total: 1714,  // SUE + CWS from Excel pivot: 1604 Omaha + 110 Phoenix
+      studentWorker: 1607,  // SUE category
+      fws: 107  // CWS category
     },
     totalEmployees: 5037,
     faculty: 689,  // FY25 BE Faculty: 649 (Omaha) + 40 (Phoenix) = 689
@@ -832,19 +832,19 @@ export const WORKFORCE_DATA = {
         faculty: 649,  // FY25 Omaha BE Faculty from Audit
         staff: 1344,   // FY25 Omaha BE Staff (1448 total - 104 Phoenix)
         hsp: 268,      // FY25 Omaha HSP - Updated from source data analysis
-        students: 1612,
-        tempFac: 279,
-        tempStaff: 280,
-        temp: 559  // Calculated to reach Omaha total of 4287
+        students: 1604,  // SUE + CWS from Excel pivot table
+        tempFac: 211,
+        tempStaff: 211,
+        temp: 422  // Adjusted to maintain Omaha total of 4287
       },
       phoenix: {
         faculty: 40,   // FY25 Phoenix BE Faculty from Audit
         staff: 104,    // FY25 Phoenix BE Staff
         hsp: 344,      // FY25 Phoenix HSP - Updated from source data analysis
-        students: 102,
-        tempFac: 7,
-        tempStaff: 8,
-        temp: 15  // Calculated to reach Phoenix total of 750
+        students: 110,  // SUE + CWS from Excel pivot table
+        tempFac: 76,
+        tempStaff: 76,
+        temp: 152  // Adjusted to maintain Phoenix total of 750
       }
     },
     categories: {

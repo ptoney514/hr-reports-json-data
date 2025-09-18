@@ -12,17 +12,11 @@ const DashboardIndex = lazy(() => import('./components/dashboards/DashboardIndex
 const TurnoverDashboard = lazy(() => import('./components/dashboards/TurnoverDashboard'));
 // Testing components removed - using static data approach
 const RecruitingDashboard = lazy(() => import('./components/dashboards/RecruitingDashboard'));
-const ExitSurveyOverview = lazy(() => import('./components/dashboards/ExitSurveyOverview'));
-const ExitSurveyQ1Dashboard = lazy(() => import('./components/dashboards/ExitSurveyQ1Dashboard'));
-const ExitSurveyQ2Dashboard = lazy(() => import('./components/dashboards/ExitSurveyQ2Dashboard'));
-const ExitSurveyQ3Dashboard = lazy(() => import('./components/dashboards/ExitSurveyQ3Dashboard'));
-const ExitSurveyQ4Dashboard = lazy(() => import('./components/dashboards/ExitSurveyQ4Dashboard'));
 const ExitSurveyFY25Dashboard = lazy(() => import('./components/dashboards/ExitSurveyFY25Dashboard'));
 const WorkforceDashboard = lazy(() => import('./components/dashboards/WorkforceDashboard'));
-const HeadcountDetailsDashboard = lazy(() => import('./components/dashboards/HeadcountDetailsDashboard'));
-const HeadcountReport = lazy(() => import('./components/dashboards/HeadcountReport'));
 const DataSourceAdmin = lazy(() => import('./components/dashboards/DataSourceAdmin'));
 const AccomplishmentsOverview = lazy(() => import('./components/dashboards/AccomplishmentsOverview'));
+const DataValidation = lazy(() => import('./components/dashboards/DataValidation'));
 // WorkforceAudit temporarily disabled - papaparse dependency issue
 // const WorkforceAudit = lazy(() => import('./components/dashboards/WorkforceAudit'));
 // AdminDashboard removed - using static data now
@@ -114,15 +108,8 @@ function App() {
               {/* Dashboard Routes */}
               <Route path="/dashboards" element={<DashboardIndex />} />
               <Route path="/dashboards/workforce" element={<WorkforceDashboard />} />
-              <Route path="/dashboards/headcount-details" element={<HeadcountDetailsDashboard />} />
-              <Route path="/dashboards/headcount-report" element={<HeadcountReport />} />
               <Route path="/dashboards/turnover" element={<TurnoverDashboard />} />
               <Route path="/dashboards/recruiting" element={<RecruitingDashboard />} />
-              <Route path="/dashboards/exit-survey" element={<ExitSurveyOverview />} />
-              <Route path="/dashboards/exit-survey-q1" element={<ExitSurveyQ1Dashboard />} />
-              <Route path="/dashboards/exit-survey-q2" element={<ExitSurveyQ2Dashboard />} />
-              <Route path="/dashboards/exit-survey-q3" element={<ExitSurveyQ3Dashboard />} />
-              <Route path="/dashboards/exit-survey-q4" element={<ExitSurveyQ4Dashboard />} />
               <Route path="/dashboards/exit-survey-fy25" element={<ExitSurveyFY25Dashboard />} />
               <Route path="/dashboards/accomplishments" element={<AccomplishmentsOverview />} />
               {/* Workforce Audit temporarily disabled - papaparse dependency issue */}
@@ -132,6 +119,7 @@ function App() {
               
               
               {/* Admin Dashboard Routes */}
+              <Route path="/admin/data-validation" element={<DataValidation />} />
               <Route path="/admin/data-sources" element={<DataSourceAdmin />} />
               {/* AdminDashboard route removed - using static data */}
               

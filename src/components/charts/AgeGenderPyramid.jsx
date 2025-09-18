@@ -194,58 +194,6 @@ const AgeGenderPyramid = ({ data }) => {
         </div>
       </div>
 
-      {/* Data Table for Accessibility */}
-      <div className="mt-6 border-t pt-4">
-        <table className="w-full text-xs">
-          <caption className="sr-only">Age and gender distribution data table</caption>
-          <thead>
-            <tr className="border-b">
-              <th className="text-left py-2">Age Band</th>
-              <th className="text-center py-2" colSpan="3">Faculty</th>
-              <th className="text-center py-2" colSpan="3">Staff</th>
-            </tr>
-            <tr className="border-b text-gray-600">
-              <th></th>
-              <th className="text-center py-1">Male</th>
-              <th className="text-center py-1">Female</th>
-              <th className="text-center py-1">Total</th>
-              <th className="text-center py-1">Male</th>
-              <th className="text-center py-1">Female</th>
-              <th className="text-center py-1">Total</th>
-            </tr>
-          </thead>
-          <tbody>
-            {['20-30', '31-40', '41-50', '51-60', '61 Plus'].map(band => {
-              const facultyBand = data.ageGenderBreakdown.faculty[band];
-              const staffBand = data.ageGenderBreakdown.staff[band];
-              return (
-                <tr key={band} className="border-b">
-                  <td className="py-2">{band}</td>
-                  <td className="text-center py-2">{facultyBand?.male || 0}</td>
-                  <td className="text-center py-2">{facultyBand?.female || 0}</td>
-                  <td className="text-center py-2 font-semibold">
-                    {(facultyBand?.male || 0) + (facultyBand?.female || 0)}
-                  </td>
-                  <td className="text-center py-2">{staffBand?.male || 0}</td>
-                  <td className="text-center py-2">{staffBand?.female || 0}</td>
-                  <td className="text-center py-2 font-semibold">
-                    {(staffBand?.male || 0) + (staffBand?.female || 0)}
-                  </td>
-                </tr>
-              );
-            })}
-            <tr className="font-semibold">
-              <td className="py-2">Total</td>
-              <td className="text-center py-2">{facultyMaleTotal}</td>
-              <td className="text-center py-2">{facultyFemaleTotal}</td>
-              <td className="text-center py-2">{data.totals.faculty}</td>
-              <td className="text-center py-2">{staffMaleTotal}</td>
-              <td className="text-center py-2">{staffFemaleTotal}</td>
-              <td className="text-center py-2">{data.totals.staff}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
     </div>
   );
 };
