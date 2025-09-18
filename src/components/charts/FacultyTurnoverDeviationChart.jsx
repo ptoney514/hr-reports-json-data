@@ -180,7 +180,7 @@ const FacultyTurnoverDeviationChart = ({ data = [], title = "Faculty Turnover Ra
                 <li>• College of Nursing leads at 13.7% (7.4% above average)</li>
                 <li>• Pharmacy & Health Professions at 7.5% (1.2% above average)</li>
                 <li>• School of Dentistry at 6.9% (0.6% above average)</li>
-                <li>• Healthcare-related schools showing highest attrition</li>
+                <li>• Health science schools showing highest attrition</li>
               </ul>
             </div>
           </div>
@@ -200,7 +200,7 @@ const FacultyTurnoverDeviationChart = ({ data = [], title = "Faculty Turnover Ra
                 <li>• Professional Studies shows 0% turnover (exceptional)</li>
                 <li>• Business School at 1.6% (4.7% below average)</li>
                 <li>• Law School maintaining 3.7% (2.6% below average)</li>
-                <li>• Non-healthcare schools demonstrate better retention</li>
+                <li>• Non-health science schools demonstrate better retention</li>
               </ul>
             </div>
           </div>
@@ -219,7 +219,7 @@ const FacultyTurnoverDeviationChart = ({ data = [], title = "Faculty Turnover Ra
             <h4 className="text-sm font-semibold text-blue-800 mb-1">Strategic Faculty Insight:</h4>
             <p className="text-xs text-blue-700 leading-relaxed">
               Faculty turnover patterns show a clear divide between health science and non-health science colleges & schools. The College of Nursing's 
-              13.7% turnover rate (more than double the average) signals critical retention challenges in healthcare education. This 
+              13.7% turnover rate (more than double the average) signals critical retention challenges in health science education. This 
               pattern, combined with elevated rates in Pharmacy and Dentistry, suggests systemic issues potentially related to clinical 
               workload, competitive market demands, or burnout. Conversely, business and law schools demonstrate exceptional retention, 
               indicating successful faculty support models that could be replicated in struggling departments.

@@ -1,459 +1,341 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { 
-  Users, 
-  TrendingDown, 
-  UserCheck,
-  ClipboardList,
-  Building,
-  ArrowRight,
-  Clock,
-  TrendingUp,
-  AlertTriangle,
-  CheckCircle,
+  Users,
+  BookOpen,
+  Briefcase,
+  Sparkles,
+  Trophy,
+  Zap,
+  CheckCircle2,
+  GraduationCap,
+  Shield,
+  Gift,
   BarChart3,
-  Calendar,
-  Target,
-  Activity
+  Activity,
+  FileText,
+  Share2,
+  Printer,
+  Eye
 } from 'lucide-react';
-import { WORKFORCE_DATA, TURNOVER_DATA, RECRUITING_DATA, EXIT_SURVEY_DATA } from '../../data/staticData';
 
 const DashboardIndex = () => {
-  const [currentTime, setCurrentTime] = useState(new Date());
-
-  // Update current time every minute
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 60000);
-
-    return () => clearInterval(timer);
-  }, []);
-
-  // Get latest data from each dataset
-  const latestWorkforce = WORKFORCE_DATA["2025-06-30"];
-  const latestTurnover = TURNOVER_DATA["2025-06-30"];
-  const latestRecruiting = RECRUITING_DATA["2025-06-30"];
-  
-  // Calculate FY25 exit survey metrics
-  const fy25Quarters = ["2024-09-30", "2024-12-31", "2025-03-31", "2025-06-30"];
-  let totalFY25Responses = 0;
-  let totalFY25Exits = 0;
-  let totalSatisfactionSum = 0;
-  let totalWouldRecommend = 0;
-  
-  fy25Quarters.forEach(quarter => {
-    if (EXIT_SURVEY_DATA[quarter]) {
-      totalFY25Responses += EXIT_SURVEY_DATA[quarter].totalResponses;
-      totalFY25Exits += EXIT_SURVEY_DATA[quarter].totalExits;
-      totalSatisfactionSum += EXIT_SURVEY_DATA[quarter].overallSatisfaction * EXIT_SURVEY_DATA[quarter].totalResponses;
-      totalWouldRecommend += EXIT_SURVEY_DATA[quarter].wouldRecommendCount.positive;
-    }
-  });
-  
-  const fy25ResponseRate = totalFY25Exits > 0 ? ((totalFY25Responses / totalFY25Exits) * 100).toFixed(1) : 0;
-  const fy25AvgSatisfaction = totalFY25Responses > 0 ? (totalSatisfactionSum / totalFY25Responses).toFixed(1) : 0;
-  const fy25WouldRecommend = totalFY25Responses > 0 ? ((totalWouldRecommend / totalFY25Responses) * 100).toFixed(1) : 0;
-
-  const dashboardCards = [
-    {
-      id: 'workforce',
-      title: 'Workforce Dashboard',
-      description: 'Real-time headcount and demographic insights',
-      path: '/dashboards/workforce',
-      icon: Users,
-      color: 'bg-blue-600',
-      borderColor: 'border-blue-200',
-      stats: [
-        { label: 'Total Employees', value: latestWorkforce?.totalEmployees?.toLocaleString() || '5,037' },
-        { label: 'Faculty', value: latestWorkforce?.faculty || '689' },
-        { label: 'Staff', value: latestWorkforce?.staff?.toLocaleString() || '1,448' },
-        { label: 'Omaha / Phoenix', value: '4,287 / 750' }
-      ]
+  // Key metrics with more detail
+  const keyMetrics = [
+    { 
+      label: "On-Demand Courses", 
+      value: "660", 
+      subtitle: "Available across the learning library",
+      icon: BookOpen
     },
-    {
-      id: 'turnover',
-      title: 'Turnover Dashboard',
-      description: 'Employee retention and departure analytics',
-      path: '/dashboards/turnover',
-      icon: TrendingDown,
-      color: 'bg-orange-600',
-      borderColor: 'border-orange-200',
-      stats: [
-        { label: 'Annual Rate', value: `${latestTurnover?.totalTurnoverRate || 8.1}%` },
-        { label: 'Voluntary', value: `${latestTurnover?.voluntaryTurnover || 5.8}%` },
-        { label: 'Involuntary', value: `${latestTurnover?.involuntaryTurnover || 2.1}%` },
-        { label: 'Q4 FY25 Exits', value: '51' }
-      ]
+    { 
+      label: "Live Trainings since Nov '22", 
+      value: "236", 
+      subtitle: "Scaled via myLearning",
+      icon: Activity
     },
-    {
-      id: 'recruiting',
-      title: 'Recruiting Dashboard',
-      description: 'Hiring metrics and talent acquisition',
-      path: '/dashboards/recruiting',
-      icon: UserCheck,
-      color: 'bg-green-600',
-      borderColor: 'border-green-200',
-      stats: [
-        { label: 'Open Positions', value: latestRecruiting?.openPositions || '140+' },
-        { label: 'Time to Fill', value: `${latestRecruiting?.timeToFill || 42} days` },
-        { label: 'Offer Acceptance', value: `${latestRecruiting?.offerAcceptanceRate || 79.2}%` },
-        { label: 'Internal Applications', value: '18' }
-      ]
+    { 
+      label: "Compliance Journey", 
+      value: "90%+", 
+      subtitle: "Faculty & staff completion",
+      icon: Shield
     },
-    {
-      id: 'exit-survey',
-      title: 'Exit Survey Analysis',
-      description: 'FY25 employee feedback and insights',
-      path: '/dashboards/exit-survey-fy25',
-      icon: ClipboardList,
-      color: 'bg-purple-600',
-      borderColor: 'border-purple-200',
-      stats: [
-        { label: 'FY25 Response Rate', value: `${fy25ResponseRate}%` },
-        { label: 'Overall Satisfaction', value: `${fy25AvgSatisfaction}/5.0` },
-        { label: 'Would Recommend', value: `${fy25WouldRecommend}%` },
-        { label: 'Total Responses', value: totalFY25Responses }
-      ]
-    },
-    {
-      id: 'headcount',
-      title: 'Headcount Details',
-      description: 'Department and school distribution',
-      path: '/dashboards/headcount-details',
-      icon: Building,
-      color: 'bg-indigo-600',
-      borderColor: 'border-indigo-200',
-      stats: [
-        { label: 'Largest School', value: 'Medicine (817)' },
-        { label: 'Largest Dept', value: 'Phoenix Alliance (345)' },
-        { label: 'Total Departments', value: '100+' },
-        { label: 'Schools/Colleges', value: '12' }
-      ]
+    { 
+      label: "Total Reward Statements", 
+      value: "2,066", 
+      subtitle: "Delivered with zero data quality issues",
+      icon: FileText
     }
   ];
 
-  const keyMetrics = [
+  const compensationMetrics = {
+    completed: 90,
+    remaining: 10,
+    details: [
+      { label: "Positions Evaluated", value: "1,268", subtitle: "Faculty & staff employees" },
+      { label: "Market Adjustments", value: "729", subtitle: "Faculty & staff" },
+      { label: "Staff Positions Reviewed", value: "326", subtitle: "Phases 3 & 4" },
+      { label: "Employees Affected", value: "384", subtitle: "Across those positions" }
+    ]
+  };
+
+  const pillars = [
     {
-      title: 'Total Workforce',
-      value: latestWorkforce?.totalEmployees?.toLocaleString() || '5,037',
-      change: '+263',
-      trend: 'up',
+      title: "Learning & Development",
+      icon: GraduationCap,
+      color: "blue",
+      description: "University Annual Compliance Journey, achieved 90%+ completion rate amongst faculty and staff.",
+      highlights: [
+        "Scaled myLearning infrastructure to support university-wide development; 660 on-demand courses and 236 live trainings since Nov 2022.",
+        "Expanded Monthly Manager Briefings for added guidance to new and current leaders."
+      ]
+    },
+    {
+      title: "Total Rewards",
+      icon: Gift,
+      color: "purple",
+      description: "Benefit enhancements including new voluntary offerings, Medicare Advocacy Service, and expanded mental health resources.",
+      highlights: [
+        "Well-Being programming with the re-introduction of a well-being incentive.",
+        "Completed Staff - Phases 3 & 4 of the multi-year compensation review; 326 positions reviewed (384 employees); plus 85 employees across 75 positions received adjustments."
+      ]
+    },
+    {
+      title: "Employee Experience",
       icon: Users,
-      color: 'blue'
-    },
-    {
-      title: 'Turnover Rate',
-      value: `${latestTurnover?.totalTurnoverRate || 8.1}%`,
-      change: '-0.2%',
-      trend: 'down',
-      icon: TrendingDown,
-      color: 'green'
-    },
-    {
-      title: 'Exit Survey Response',
-      value: `${fy25ResponseRate}%`,
-      change: '+5.1%',
-      trend: 'up',
-      icon: ClipboardList,
-      color: 'purple'
-    },
-    {
-      title: 'Open Positions',
-      value: latestRecruiting?.openPositions || '140+',
-      change: '+55',
-      trend: 'up',
-      icon: Target,
-      color: 'orange'
+      color: "green",
+      description: "Rebranded the Companions in Mission Recognition Program and celebrated Service Awards.",
+      highlights: [
+        "Belong Events fostering community and inclusion.",
+        "Launched a new 90-day onboarding survey to capture new-hire feedback and improve the first-year experience."
+      ]
     }
   ];
 
   return (
-    <div className="bg-gray-50 min-h-screen">
-      {/* Page Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg">
-        <div className="max-w-7xl mx-auto px-4 py-8">
+    <div className="min-h-screen bg-gray-50">
+      {/* Header Section */}
+      <div className="bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2">
+                <Briefcase className="h-5 w-5 text-gray-700" />
+                <span className="text-sm font-medium text-gray-900">Office of Human Resources</span>
+              </div>
+              <span className="text-sm text-gray-500">Fiscal Year 2025 Highlights</span>
+            </div>
+            <div className="flex items-center space-x-3">
+              <button className="p-2 text-gray-500 hover:text-gray-700 transition-colors">
+                <Share2 className="h-5 w-5" />
+              </button>
+              <button className="p-2 text-gray-500 hover:text-gray-700 transition-colors">
+                <Printer className="h-5 w-5" />
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Hero Section */}
+      <div className="relative bg-gray-900 overflow-hidden">
+        {/* Background Image with Overlay */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{ 
+            backgroundImage: 'url("/images/hero-bg.jpg")',
+            filter: 'brightness(0.4) contrast(1.1)'
+          }}
+        ></div>
+        
+        {/* Dark Overlay for better text readability */}
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-900/80 via-gray-900/70 to-gray-900/80"></div>
+        
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+          <div className="max-w-3xl">
+            <div className="inline-flex items-center px-3 py-1 rounded-full bg-white/10 backdrop-blur-sm mb-6">
+              <span className="text-xs font-semibold text-white">FY2025 Wins</span>
+            </div>
+            
+            <h1 className="text-5xl font-bold text-white mb-6 leading-tight">
+              Advancing Our Mission with<br />
+              Meaningful HR Impact
+            </h1>
+            
+            <p className="text-lg text-gray-300 leading-relaxed">
+              "During Fiscal Year 2025, the Office of Human Resources achieved significant milestones, 
+              all of which contribute to the University Lighting The Way Strategic Plan and the advancement 
+              of Creighton's mission and alignment and enhancement of key support structures."
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Key Metrics Grid */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {keyMetrics.map((metric, index) => {
+            const Icon = metric.icon;
+            return (
+              <div key={index} className="bg-white rounded-xl p-6 border border-gray-200 hover:shadow-lg transition-shadow">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="p-2 bg-gray-50 rounded-lg">
+                    <Icon className="h-5 w-5 text-gray-700" />
+                  </div>
+                </div>
+                <div className="text-sm text-gray-600 mb-2">{metric.label}</div>
+                <div className="text-3xl font-bold text-gray-900 mb-1">{metric.value}</div>
+                <div className="text-xs text-gray-500">{metric.subtitle}</div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+
+      {/* Highlights by Strategic Pillar */}
+      <div id="highlights" className="bg-white py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Highlights by Strategic Pillar</h2>
+            <p className="text-lg text-gray-600">
+              A snapshot of the work that elevated learning, total rewards, and the employee experience.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {pillars.map((pillar, index) => {
+              const Icon = pillar.icon;
+              return (
+                <div key={index} className="group">
+                  <div className="bg-gray-50 rounded-xl overflow-hidden hover:shadow-xl transition-all duration-300">
+                    {/* Card header with background image or gradient */}
+                    <div className="h-48 relative overflow-hidden">
+                      {/* Background images for cards */}
+                      {pillar.title === 'Learning & Development' ? (
+                        <>
+                          <div 
+                            className="absolute inset-0 bg-cover bg-center"
+                            style={{ 
+                              backgroundImage: 'url("/images/never-stop-learning-3258944_1280.jpg")',
+                            }}
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-blue-900/80 via-blue-800/60 to-blue-700/40"></div>
+                        </>
+                      ) : pillar.title === 'Total Rewards' ? (
+                        <>
+                          <div 
+                            className="absolute inset-0 bg-cover bg-center"
+                            style={{ 
+                              backgroundImage: 'url("/images/total-reward-bg.jpg")',
+                            }}
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-purple-900/80 via-purple-800/60 to-purple-700/40"></div>
+                        </>
+                      ) : (
+                        <>
+                          <div 
+                            className="absolute inset-0 bg-cover bg-center"
+                            style={{ 
+                              backgroundImage: 'url("/images/employee-experience.jpg")',
+                            }}
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-green-900/80 via-green-800/60 to-green-700/40"></div>
+                        </>
+                      )}
+                      <div className="absolute bottom-4 left-4 flex items-center space-x-2 z-10">
+                        <div className="p-2 bg-white/20 backdrop-blur-sm rounded-lg">
+                          <Icon className="h-5 w-5 text-white" />
+                        </div>
+                        <span className="text-white font-semibold">{pillar.title}</span>
+                      </div>
+                    </div>
+                    
+                    <div className="p-6">
+                      <p className="text-sm text-gray-700 mb-4 leading-relaxed">
+                        {pillar.description}
+                      </p>
+                      
+                      <div className="space-y-3">
+                        {pillar.highlights.map((highlight, hIndex) => (
+                          <div key={hIndex} className="flex items-start">
+                            <CheckCircle2 className="h-4 w-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
+                            <span className="text-xs text-gray-600 leading-relaxed">{highlight}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      {/* People-Centered Progress */}
+      <div className="bg-gray-50 py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
-              <h1 className="text-4xl font-bold mb-2">
-                HR Analytics Dashboard
-              </h1>
-              <p className="text-blue-100 text-lg">
-                Comprehensive workforce analytics and organizational insights
+              <h2 className="text-3xl font-bold text-gray-900 mb-6">People-Centered Progress</h2>
+              <p className="text-lg text-gray-600 mb-8 leading-relaxed">
+                From compliance and capability building to meaningful rewards and recognition, the outcomes this 
+                year reflect a commitment to clarity, care, and continuous improvement. These accomplishments 
+                align with the University's Lighting The Way Strategic Plan and strengthen the systems that help our 
+                people thrive.
               </p>
-              <div className="flex items-center gap-2 mt-3 text-sm text-blue-100">
-                <Clock size={16} />
-                <span>Real-time data from all HR systems</span>
+              
+              <div className="bg-white rounded-xl p-6 border border-gray-200">
+                <div className="flex items-start space-x-4">
+                  <div className="p-3 bg-blue-50 rounded-lg">
+                    <Users className="h-6 w-6 text-blue-600" />
+                  </div>
+                  <div>
+                    <div className="font-semibold text-gray-900 mb-2">HR Partnerships Team</div>
+                    <p className="text-sm text-gray-600 leading-relaxed">
+                      Building capacity across colleges and divisions
+                    </p>
+                    <p className="text-xs text-gray-500 mt-3 italic">
+                      "We set a clear path and delivered—with measurable impact in learning, wellness, 
+                      compensation, and belonging."
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
-            <div className="text-right">
-              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
-                <p className="text-sm text-blue-100 mb-1">
-                  Creighton University
-                </p>
-                <p className="text-lg font-semibold">
-                  {currentTime.toLocaleDateString()}
-                </p>
-                <p className="text-sm text-blue-100">
-                  {currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                </p>
+            
+            <div>
+              {/* Visual element - could be an image */}
+              <div className="bg-gradient-to-br from-blue-100 to-indigo-100 rounded-2xl h-96 flex items-center justify-center">
+                <div className="text-center">
+                  <Trophy className="h-20 w-20 text-indigo-600 mx-auto mb-4" />
+                  <p className="text-lg font-semibold text-gray-800">Excellence in HR Innovation</p>
+                  <p className="text-sm text-gray-600 mt-2">FY2025 Achievements</p>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        {/* Key Metrics Overview */}
-        <div className="mb-8">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Key Metrics Overview</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {keyMetrics.map((metric, index) => {
-              const IconComponent = metric.icon;
-              const colorClasses = {
-                blue: { bg: 'bg-blue-100', icon: 'text-blue-600', trend: 'text-green-600' },
-                green: { bg: 'bg-green-100', icon: 'text-green-600', trend: 'text-green-600' },
-                purple: { bg: 'bg-purple-100', icon: 'text-purple-600', trend: 'text-green-600' },
-                orange: { bg: 'bg-orange-100', icon: 'text-orange-600', trend: 'text-orange-600' }
-              };
-              const colors = colorClasses[metric.color];
-              
-              return (
-                <div key={index} className="bg-white p-4 rounded-lg shadow-sm border hover:shadow-md transition-shadow">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className={`p-2 rounded-lg ${colors.bg} ${colors.icon}`}>
-                      <IconComponent size={20} />
-                    </div>
-                    {metric.trend === 'up' ? (
-                      <TrendingUp className={colors.trend} size={16} />
-                    ) : (
-                      <TrendingDown className="text-green-600" size={16} />
-                    )}
-                  </div>
-                  <div className="text-2xl font-bold text-gray-900 mb-1">
-                    {metric.value}
-                  </div>
-                  <div className="text-sm font-medium text-gray-700 mb-1">
-                    {metric.title}
-                  </div>
-                  <div className={`text-xs ${colors.trend}`}>
-                    {metric.change} from last quarter
-                  </div>
-                </div>
-              );
-            })}
+      {/* Thank You Section */}
+      <div className="bg-white py-16 border-t border-gray-200">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">
+            Thank you to our faculty, staff, and partners
+          </h2>
+          <p className="text-lg text-gray-600 mb-8">
+            Together, we're building a better employee experience and stronger outcomes for our community.
+          </p>
+          
+          <div className="flex items-center justify-center space-x-4">
+            <Link 
+              to="/dashboards/exit-survey-fy25"
+              className="inline-flex items-center px-6 py-3 bg-gray-900 text-white font-semibold rounded-lg hover:bg-gray-800 transition-colors"
+            >
+              <BarChart3 className="h-5 w-5 mr-2" />
+              Review Filters
+            </Link>
+            <Link 
+              to="/dashboards/workforce"
+              className="inline-flex items-center px-6 py-3 bg-white text-gray-900 font-semibold rounded-lg hover:bg-gray-50 transition-colors border border-gray-300"
+            >
+              See Metrics
+            </Link>
           </div>
         </div>
+      </div>
 
-        {/* Dashboard Cards */}
-        <div className="mb-8">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Dashboard Overview</h2>
-          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-            {dashboardCards.map((dashboard) => {
-              const IconComponent = dashboard.icon;
-              return (
-                <div key={dashboard.id} className={`bg-white rounded-xl shadow-sm border-2 ${dashboard.borderColor} hover:shadow-lg transition-all duration-200 transform hover:-translate-y-1`}>
-                  <div className="p-6">
-                    {/* Header */}
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center gap-3">
-                        <div className={`p-3 ${dashboard.color} rounded-lg shadow-sm`}>
-                          <IconComponent className="text-white" size={24} />
-                        </div>
-                        <div>
-                          <h3 className="text-xl font-semibold text-gray-900">
-                            {dashboard.title}
-                          </h3>
-                        </div>
-                      </div>
-                      <CheckCircle className="text-green-500" size={16} />
-                    </div>
-
-                    {/* Description */}
-                    <p className="text-gray-600 mb-4 text-sm">
-                      {dashboard.description}
-                    </p>
-
-                    {/* Stats */}
-                    <div className="space-y-2 mb-4">
-                      {dashboard.stats.map((stat, index) => (
-                        <div key={index} className="flex justify-between items-center p-2 rounded-lg bg-gray-50">
-                          <span className="text-sm text-gray-600">{stat.label}</span>
-                          <span className="text-sm font-semibold text-gray-900">{stat.value}</span>
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* Action Button */}
-                    <Link
-                      to={dashboard.path}
-                      className={`w-full flex items-center justify-center gap-2 px-4 py-3 ${dashboard.color} hover:opacity-90 text-white rounded-lg transition-all duration-200 font-medium shadow-sm hover:shadow-md`}
-                    >
-                      View Dashboard
-                      <ArrowRight size={16} />
-                    </Link>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Bottom Information Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Recent Activity */}
-          <div className="bg-white p-6 rounded-lg shadow-sm border">
-            <div className="flex items-center gap-2 mb-4">
-              <Activity className="text-blue-600" size={20} />
-              <h3 className="text-lg font-semibold text-gray-900">
-                Recent Activity
-              </h3>
-            </div>
-            <div className="space-y-3">
-              <div className="flex items-start gap-3 p-3 rounded-lg bg-blue-50">
-                <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
-                <div>
-                  <p className="text-sm font-medium text-gray-900">
-                    Q4 FY25 Exit Survey Complete
-                  </p>
-                  <p className="text-xs text-gray-500 mt-1">
-                    51 exits processed, 18 responses collected
-                  </p>
-                  <p className="text-xs text-blue-600 mt-1">June 30, 2025</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3 p-3 rounded-lg bg-green-50">
-                <div className="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
-                <div>
-                  <p className="text-sm font-medium text-gray-900">
-                    FY25 Workforce Report
-                  </p>
-                  <p className="text-xs text-gray-500 mt-1">
-                    Total headcount increased to 5,037
-                  </p>
-                  <p className="text-xs text-green-600 mt-1">June 30, 2025</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3 p-3 rounded-lg bg-orange-50">
-                <div className="w-2 h-2 bg-orange-500 rounded-full mt-2"></div>
-                <div>
-                  <p className="text-sm font-medium text-gray-900">
-                    Recruiting Update
-                  </p>
-                  <p className="text-xs text-gray-500 mt-1">
-                    140+ open positions across all departments
-                  </p>
-                  <p className="text-xs text-orange-600 mt-1">Ongoing</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Data Coverage */}
-          <div className="bg-white p-6 rounded-lg shadow-sm border">
-            <div className="flex items-center gap-2 mb-4">
-              <Calendar className="text-green-600" size={20} />
-              <h3 className="text-lg font-semibold text-gray-900">
-                Data Coverage
-              </h3>
-            </div>
-            <div className="space-y-3">
-              <div className="flex items-center justify-between p-2 rounded-lg bg-gray-50">
-                <div className="flex items-center gap-3">
-                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <span className="text-sm font-medium">Workforce Data</span>
-                </div>
-                <span className="text-xs text-green-600">FY24-FY25</span>
-              </div>
-              <div className="flex items-center justify-between p-2 rounded-lg bg-gray-50">
-                <div className="flex items-center gap-3">
-                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <span className="text-sm font-medium">Turnover Data</span>
-                </div>
-                <span className="text-xs text-green-600">Q1-Q4 FY25</span>
-              </div>
-              <div className="flex items-center justify-between p-2 rounded-lg bg-gray-50">
-                <div className="flex items-center gap-3">
-                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <span className="text-sm font-medium">Exit Surveys</span>
-                </div>
-                <span className="text-xs text-green-600">Q1-Q4 FY25</span>
-              </div>
-              <div className="flex items-center justify-between p-2 rounded-lg bg-gray-50">
-                <div className="flex items-center gap-3">
-                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <span className="text-sm font-medium">Recruiting Data</span>
-                </div>
-                <span className="text-xs text-green-600">FY24-FY25</span>
-              </div>
-            </div>
-            <div className="mt-4 p-3 bg-blue-50 rounded-lg">
-              <p className="text-xs text-blue-700 font-medium">Latest Update</p>
-              <p className="text-xs text-blue-600 mt-1">All dashboards current through June 30, 2025</p>
-            </div>
-          </div>
-
-          {/* Quick Links */}
-          <div className="bg-white p-6 rounded-lg shadow-sm border">
-            <div className="flex items-center gap-2 mb-4">
-              <BarChart3 className="text-purple-600" size={20} />
-              <h3 className="text-lg font-semibold text-gray-900">
-                Quick Access
-              </h3>
-            </div>
-            <div className="space-y-3">
-              <Link to="/dashboards/exit-survey-fy25" className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 transition-colors">
-                <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
-                  <ClipboardList className="text-purple-600" size={16} />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-900">
-                    FY25 Exit Survey Report
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    Complete year analysis
-                  </p>
-                </div>
-              </Link>
-              <Link to="/dashboards/headcount-report" className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 transition-colors">
-                <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <Users className="text-blue-600" size={16} />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-900">
-                    Headcount Report
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    Detailed breakdown
-                  </p>
-                </div>
-              </Link>
-              <Link to="/dashboards/accomplishments" className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 transition-colors">
-                <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
-                  <Target className="text-green-600" size={16} />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-900">
-                    FY25 Accomplishments
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    Year in review
-                  </p>
-                </div>
-              </Link>
-              <Link to="/admin/data-sources" className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 transition-colors">
-                <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
-                  <Activity className="text-orange-600" size={16} />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-900">
-                    Data Source Admin
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    Manage data updates
-                  </p>
-                </div>
-              </Link>
+      {/* Footer */}
+      <div className="bg-gray-50 py-6 border-t border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between text-sm text-gray-600">
+            <div>© FY2025 Office of Human Resources</div>
+            <div className="flex items-center space-x-6">
+              <Link to="/dashboards" className="hover:text-gray-900 transition-colors">Accessibility</Link>
+              <Link to="/dashboards" className="hover:text-gray-900 transition-colors">Privacy</Link>
+              <Link to="/dashboards" className="hover:text-gray-900 transition-colors">Contact</Link>
             </div>
           </div>
         </div>

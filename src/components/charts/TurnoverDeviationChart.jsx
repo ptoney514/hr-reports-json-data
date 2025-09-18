@@ -203,8 +203,8 @@ const TurnoverDeviationChart = ({ data = [], title = "FY2025 YTD Benefit Eligibl
               <ul className="text-xs text-red-700 space-y-1">
                 <li>• Student Services leads at 30.9% (17.3% above average)</li>
                 <li>• Professional & Continuing Ed at 26.1% (12.5% above average)</li>
-                <li>• Healthcare divisions showing 19-26% turnover rates</li>
-                <li>• Pattern: Student-facing and healthcare roles most affected</li>
+                <li>• Health science areas showing 19-26% turnover rates</li>
+                <li>• Pattern: Student-facing and health science areas most affected</li>
               </ul>
             </div>
           </div>
