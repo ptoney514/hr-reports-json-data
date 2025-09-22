@@ -143,9 +143,9 @@ const DashboardIndex = () => {
             </h1>
             
             <p className="text-lg text-gray-300 leading-relaxed">
-              "During Fiscal Year 2025, the Office of Human Resources achieved significant milestones, 
-              all of which contribute to the University Lighting The Way Strategic Plan and the advancement 
-              of Creighton's mission and alignment and enhancement of key support structures."
+              During Fiscal Year 2025, the Office of Human Resources achieved significant milestones, 
+              supporting the advancement of Creighton's mission for alignment and enhancement of key 
+              support structures and workforce skill development.
             </p>
           </div>
         </div>
@@ -173,17 +173,8 @@ const DashboardIndex = () => {
       </div>
 
 
-      {/* Header Style Examples Section - TEMPORARY FOR REVIEW */}
-      <div className="bg-gray-100 py-12 border-y-4 border-orange-500">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-white rounded-lg p-6 mb-6">
-            <h2 className="text-2xl font-bold text-red-600 mb-4">⚠️ HEADER STYLE OPTIONS - Choose Your Preferred Style</h2>
-            <p className="text-gray-600 mb-2">Below are different header styles to replace the image-based headers. Please review and let me know which style you prefer.</p>
-          </div>
-        </div>
-      </div>
 
-      {/* Highlights by Strategic Pillar - WITH MULTIPLE STYLE OPTIONS */}
+      {/* Highlights by Strategic Pillar */}
       <div id="highlights" className="bg-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-12">
@@ -191,10 +182,9 @@ const DashboardIndex = () => {
             <p className="text-lg text-gray-600 mb-8">
               A snapshot of the work that elevated learning, total rewards, and the employee experience.
             </p>
+          </div>
             
-            {/* Style Option 1: Icon-based minimalist headers */}
-            <div className="mb-12">
-              <h3 className="text-xl font-bold text-gray-800 mb-6 bg-yellow-100 p-2 rounded">Style 1: Icon-Based Minimalist</h3>
+          <div>
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {pillars.map((pillar, index) => {
                   const Icon = pillar.icon;
@@ -214,7 +204,6 @@ const DashboardIndex = () => {
                             </div>
                             <div>
                               <h3 className="text-lg font-bold text-gray-900">{pillar.title}</h3>
-                              <p className="text-sm text-gray-500">Strategic Pillar</p>
                             </div>
                           </div>
                         </div>
@@ -238,223 +227,6 @@ const DashboardIndex = () => {
                   );
                 })}
               </div>
-            </div>
-
-            {/* Style Option 2: Gradient bars with stats */}
-            <div className="mb-12">
-              <h3 className="text-xl font-bold text-gray-800 mb-6 bg-yellow-100 p-2 rounded">Style 2: Modern Gradient Headers</h3>
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {pillars.map((pillar, index) => {
-                  const Icon = pillar.icon;
-                  const gradients = {
-                    'blue': 'from-blue-600 via-blue-500 to-indigo-600',
-                    'purple': 'from-purple-600 via-purple-500 to-pink-600',
-                    'green': 'from-emerald-600 via-green-500 to-teal-600'
-                  };
-                  return (
-                    <div key={index} className="group">
-                      <div className="bg-white rounded-xl overflow-hidden hover:shadow-xl transition-all duration-300">
-                        {/* Gradient header */}
-                        <div className={`h-32 bg-gradient-to-br ${gradients[pillar.color]} relative`}>
-                          <div className="absolute inset-0 bg-black/10"></div>
-                          <div className="absolute bottom-4 left-4 right-4">
-                            <div className="flex items-center space-x-3">
-                              <div className="p-2 bg-white/20 backdrop-blur-sm rounded-lg">
-                                <Icon className="h-6 w-6 text-white" />
-                              </div>
-                              <h3 className="text-white font-bold text-lg">{pillar.title}</h3>
-                            </div>
-                          </div>
-                        </div>
-                        
-                        <div className="p-6">
-                          <p className="text-sm text-gray-700 mb-4 leading-relaxed">
-                            {pillar.description}
-                          </p>
-                          
-                          <div className="space-y-3">
-                            {pillar.highlights.map((highlight, hIndex) => (
-                              <div key={hIndex} className="flex items-start">
-                                <CheckCircle2 className="h-4 w-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                                <span className="text-xs text-gray-600 leading-relaxed">{highlight}</span>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Style Option 3: Flat design with accent borders */}
-            <div className="mb-12">
-              <h3 className="text-xl font-bold text-gray-800 mb-6 bg-yellow-100 p-2 rounded">Style 3: Clean Flat Design</h3>
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {pillars.map((pillar, index) => {
-                  const Icon = pillar.icon;
-                  const borderColors = {
-                    'blue': 'border-blue-500',
-                    'purple': 'border-purple-500',
-                    'green': 'border-emerald-500'
-                  };
-                  const bgColors = {
-                    'blue': 'bg-blue-50',
-                    'purple': 'bg-purple-50',
-                    'green': 'bg-emerald-50'
-                  };
-                  const textColors = {
-                    'blue': 'text-blue-700',
-                    'purple': 'text-purple-700',
-                    'green': 'text-emerald-700'
-                  };
-                  return (
-                    <div key={index} className="group">
-                      <div className={`bg-white rounded-xl border-t-4 ${borderColors[pillar.color]} overflow-hidden hover:shadow-xl transition-all duration-300`}>
-                        {/* Clean header */}
-                        <div className={`${bgColors[pillar.color]} p-6`}>
-                          <div className="flex items-center justify-between">
-                            <h3 className={`font-bold text-lg ${textColors[pillar.color]}`}>{pillar.title}</h3>
-                            <Icon className={`h-6 w-6 ${textColors[pillar.color]}`} />
-                          </div>
-                        </div>
-                        
-                        <div className="p-6">
-                          <p className="text-sm text-gray-700 mb-4 leading-relaxed">
-                            {pillar.description}
-                          </p>
-                          
-                          <div className="space-y-3">
-                            {pillar.highlights.map((highlight, hIndex) => (
-                              <div key={hIndex} className="flex items-start">
-                                <CheckCircle2 className="h-4 w-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                                <span className="text-xs text-gray-600 leading-relaxed">{highlight}</span>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Style Option 4: Centered icon with divider */}
-            <div className="mb-12">
-              <h3 className="text-xl font-bold text-gray-800 mb-6 bg-yellow-100 p-2 rounded">Style 4: Centered Icon Design</h3>
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {pillars.map((pillar, index) => {
-                  const Icon = pillar.icon;
-                  const iconColors = {
-                    'blue': 'text-blue-600 bg-blue-100',
-                    'purple': 'text-purple-600 bg-purple-100',
-                    'green': 'text-emerald-600 bg-emerald-100'
-                  };
-                  return (
-                    <div key={index} className="group">
-                      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-xl transition-all duration-300">
-                        {/* Centered icon header */}
-                        <div className="pt-8 pb-6 text-center border-b border-gray-100">
-                          <div className={`inline-flex p-4 rounded-full ${iconColors[pillar.color]} mb-3`}>
-                            <Icon className="h-8 w-8" />
-                          </div>
-                          <h3 className="text-lg font-bold text-gray-900">{pillar.title}</h3>
-                        </div>
-                        
-                        <div className="p-6">
-                          <p className="text-sm text-gray-700 mb-4 leading-relaxed">
-                            {pillar.description}
-                          </p>
-                          
-                          <div className="space-y-3">
-                            {pillar.highlights.map((highlight, hIndex) => (
-                              <div key={hIndex} className="flex items-start">
-                                <CheckCircle2 className="h-4 w-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                                <span className="text-xs text-gray-600 leading-relaxed">{highlight}</span>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-
-          {/* ORIGINAL STYLE - Currently Hidden */}
-          <div className="hidden">
-            <h3 className="text-xl font-bold text-gray-800 mb-6">Original Style (with images)</h3>
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              {pillars.map((pillar, index) => {
-                const Icon = pillar.icon;
-                return (
-                  <div key={index} className="group">
-                    <div className="bg-gray-50 rounded-xl overflow-hidden hover:shadow-xl transition-all duration-300">
-                      {/* Card header with background image or gradient */}
-                      <div className="h-48 relative overflow-hidden">
-                        {/* Background images for cards */}
-                        {pillar.title === 'Learning & Development' ? (
-                          <>
-                            <div 
-                              className="absolute inset-0 bg-cover bg-center"
-                              style={{ 
-                                backgroundImage: 'url("/images/never-stop-learning-3258944_1280.jpg")',
-                              }}
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-blue-900/80 via-blue-800/60 to-blue-700/40"></div>
-                          </>
-                        ) : pillar.title === 'Total Rewards' ? (
-                          <>
-                            <div 
-                              className="absolute inset-0 bg-cover bg-center"
-                              style={{ 
-                                backgroundImage: 'url("/images/total-reward-bg.jpg")',
-                              }}
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-purple-900/80 via-purple-800/60 to-purple-700/40"></div>
-                          </>
-                        ) : (
-                          <>
-                            <div 
-                              className="absolute inset-0 bg-cover bg-center"
-                              style={{ 
-                                backgroundImage: 'url("/images/employee-experience.jpg")',
-                              }}
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-green-900/80 via-green-800/60 to-green-700/40"></div>
-                          </>
-                        )}
-                        <div className="absolute bottom-4 left-4 flex items-center space-x-2 z-10">
-                          <div className="p-2 bg-white/20 backdrop-blur-sm rounded-lg">
-                            <Icon className="h-5 w-5 text-white" />
-                          </div>
-                          <span className="text-white font-semibold">{pillar.title}</span>
-                        </div>
-                      </div>
-                    
-                      <div className="p-6">
-                        <p className="text-sm text-gray-700 mb-4 leading-relaxed">
-                          {pillar.description}
-                        </p>
-                        
-                        <div className="space-y-3">
-                          {pillar.highlights.map((highlight, hIndex) => (
-                            <div key={hIndex} className="flex items-start">
-                              <CheckCircle2 className="h-4 w-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                              <span className="text-xs text-gray-600 leading-relaxed">{highlight}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
           </div>
         </div>
       </div>
