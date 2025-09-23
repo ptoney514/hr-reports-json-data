@@ -184,7 +184,7 @@ const TurnoverDeviationChart = ({ data = [], title = "FY2025 YTD Benefit Eligibl
         </div>
         <div className="flex items-center gap-2">
           <div className="w-4 h-4 bg-red-600 rounded"></div>
-          <span className="text-gray-600">Above Average (Higher Attrition)</span>
+          <span className="text-gray-600">Above Average (Higher Turnover)</span>
         </div>
       </div>
 
@@ -242,9 +242,9 @@ const TurnoverDeviationChart = ({ data = [], title = "FY2025 YTD Benefit Eligibl
           <div>
             <h4 className="text-sm font-semibold text-blue-800 mb-1">Strategic Insight:</h4>
             <p className="text-xs text-blue-700 leading-relaxed">
-              The turnover pattern reveals a clear divide where executive and administrative offices demonstrate exceptional retention while 
-              student-facing and health science areas experience significant attrition. With 11 departments showing turnover rates above 
-              20%, targeted interventions are needed focusing on workload management, compensation review, and career development pathways 
+              The turnover pattern reveals a divide where executive and administrative offices demonstrate exceptional retention while 
+              some student-facing and health science areas experience significant attrition. With 11 departments showing turnover rates above 
+              20%, targeted interventions could include heightened focus on workload management, compensation review, and career development pathways 
               in high-turnover areas.
             </p>
           </div>

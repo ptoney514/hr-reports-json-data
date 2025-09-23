@@ -164,14 +164,26 @@ const TurnoverByLengthOfServiceChart = memo(({
             </h4>
             <div className="text-sm print:text-black leading-relaxed" 
                  style={{color: '#0054A6'}}> {/* Creighton Blue */}
-              <p>
-                Turnover rates show{' '}
-                <strong>{pieData.length > 0 ? `${pieData[0].percentage.toFixed(1)}%` : 'N/A'}</strong>{' '}
-                of {employeeType.toLowerCase()} with{' '}
-                <strong>{pieData.length > 0 ? pieData[0].name.toLowerCase() : 'shorter tenure'}</strong> departed,{' '}
-                while only <strong>{pieData.length > 1 ? `${pieData[pieData.length - 1].percentage.toFixed(1)}%` : 'N/A'}</strong>{' '}
-                of those with <strong>20+ years</strong> left.
-              </p>
+              {employeeType === 'Staff' ? (
+                <p>
+                  Turnover rates show <strong>29.8%</strong> of staff with{' '}
+                  <strong>less than one year</strong> departed, followed by{' '}
+                  <strong>14.2%</strong> with <strong>1 to 5 years</strong> of service.{' '}
+                  This pattern emphasizes the critical importance of robust onboarding{' '}
+                  programs and support systems to acclimate our newest hires. Focusing{' '}
+                  on the first-year employee experience could significantly improve{' '}
+                  retention.
+                </p>
+              ) : (
+                <p>
+                  Turnover rates show{' '}
+                  <strong>{pieData.length > 0 ? `${pieData[0].percentage.toFixed(1)}%` : 'N/A'}</strong>{' '}
+                  of {employeeType.toLowerCase()} with{' '}
+                  <strong>{pieData.length > 0 ? pieData[0].name.toLowerCase() : 'shorter tenure'}</strong> departed,{' '}
+                  while only <strong>{pieData.length > 1 ? `${pieData[pieData.length - 1].percentage.toFixed(1)}%` : 'N/A'}</strong>{' '}
+                  of those with <strong>20+ years</strong> left.
+                </p>
+              )}
             </div>
           </div>
         </div>

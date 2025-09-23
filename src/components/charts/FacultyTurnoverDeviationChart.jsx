@@ -160,7 +160,7 @@ const FacultyTurnoverDeviationChart = ({ data = [], title = "Faculty Turnover Ra
         </div>
         <div className="flex items-center gap-2">
           <div className="w-4 h-4 bg-red-600 rounded"></div>
-          <span className="text-gray-600">Above Average (Higher Attrition)</span>
+          <span className="text-gray-600">Above Average (Higher Turnover)</span>
         </div>
       </div>
 
@@ -218,11 +218,11 @@ const FacultyTurnoverDeviationChart = ({ data = [], title = "Faculty Turnover Ra
           <div>
             <h4 className="text-sm font-semibold text-blue-800 mb-1">Strategic Faculty Insight:</h4>
             <p className="text-xs text-blue-700 leading-relaxed">
-              Faculty turnover patterns show a clear divide between health science and non-health science colleges & schools. The College of Nursing's 
-              13.7% turnover rate (more than double the average) signals critical retention challenges in health science education. This 
-              pattern, combined with elevated rates in Pharmacy and Dentistry, suggests systemic issues potentially related to clinical 
+              Faculty turnover patterns show a divide between health science and non-health science colleges & schools. The College of Nursing's 
+              13.7% turnover rate (more than double the average) signals retention challenges in health science education. This 
+              pattern, combined with elevated rates in Pharmacy and Dentistry, suggests issues potentially related to clinical 
               workload, competitive market demands, or burnout. Conversely, business and law schools demonstrate exceptional retention, 
-              indicating successful faculty support models that could be replicated in struggling departments.
+              indicating successful faculty support models that could be replicated.
             </p>
           </div>
         </div>

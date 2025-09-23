@@ -260,7 +260,7 @@ const ExitSurveyFY25Dashboard = () => {
               <div className="flex items-center gap-4">
                 <FileText style={{color: '#0054A6'}} size={32} />
                 <div>
-                  <h1 className="text-3xl font-bold text-gray-900">FY25 Complete Exit Analysis Report</h1>
+                  <h1 className="text-3xl font-bold text-gray-900">FY25 Exit Analysis Report</h1>
                   <p className="text-gray-600 text-lg mt-2">
                     Comprehensive Turnover & Exit Survey Analysis • July 2024 - June 2025
                   </p>
@@ -963,39 +963,13 @@ const ExitSurveyFY25Dashboard = () => {
           <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-lg border p-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
               <Target style={{color: '#2E7D32'}} size={24} />
-              FY26 Short-Term Recommendations
+              FY26 Recommendations
             </h2>
             
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div className="bg-white p-6 rounded-lg shadow-sm">
                 <div className="flex items-center gap-2 mb-4">
-                  <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
-                    <span className="text-lg font-bold text-red-600">1</span>
-                  </div>
-                  <h3 className="font-semibold text-gray-900">Immediate Actions</h3>
-                </div>
-                <ul className="space-y-2 text-sm text-gray-700">
-                  <li className="flex items-start gap-2">
-                    <CheckCircle size={14} className="text-red-600 mt-0.5" />
-                    <span>Investigate departments with high Q4 exits</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle size={14} className="text-red-600 mt-0.5" />
-                    <span>Strengthen conduct reporting mechanisms</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle size={14} className="text-red-600 mt-0.5" />
-                    <span>Address Q1 termination spike ({turnoverData?.quarterly?.Q1?.count || 79} exits)</span>
-                  </li>
-                </ul>
-              </div>
-
-              <div className="bg-white p-6 rounded-lg shadow-sm">
-                <div className="flex items-center gap-2 mb-4">
-                  <div className="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center">
-                    <span className="text-lg font-bold text-yellow-600">2</span>
-                  </div>
-                  <h3 className="font-semibold text-gray-900">90-Day Initiatives</h3>
+                  <h3 className="font-semibold text-gray-900">Short Term Initiatives</h3>
                 </div>
                 <ul className="space-y-2 text-sm text-gray-700">
                   <li className="flex items-start gap-2">
@@ -1019,9 +993,6 @@ const ExitSurveyFY25Dashboard = () => {
 
               <div className="bg-white p-6 rounded-lg shadow-sm">
                 <div className="flex items-center gap-2 mb-4">
-                  <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                    <span className="text-lg font-bold text-green-600">3</span>
-                  </div>
                   <h3 className="font-semibold text-gray-900">FY26 Goals</h3>
                 </div>
                 <ul className="space-y-2 text-sm text-gray-700">

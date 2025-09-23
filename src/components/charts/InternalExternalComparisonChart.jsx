@@ -166,35 +166,6 @@ const InternalExternalComparisonChart = memo(({
         </div>
       </div>
 
-      {/* Success Rate Bar Chart */}
-      <div className="mt-6">
-        <h4 className="text-md font-semibold mb-4 print:text-black" style={{color: '#00245D'}}>
-          Success Rates Comparison
-        </h4>
-        <ResponsiveContainer width="100%" height={200}>
-          <BarChart data={successRateData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis 
-              dataKey="category" 
-              tick={{ fontSize: 12 }}
-              interval={0}
-              angle={-45}
-              textAnchor="end"
-              height={80}
-            />
-            <YAxis 
-              label={{ value: 'Success Rate (%)', angle: -90, position: 'insideLeft' }}
-              tick={{ fontSize: 12 }}
-            />
-            <Tooltip 
-              formatter={(value) => [`${value}%`, 'Success Rate']}
-              labelFormatter={(label) => label}
-            />
-            <Bar dataKey="rate" fill="#0054A6" />
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
-
       {/* Key Insight */}
       <div className="mt-4 p-3 rounded-lg" style={{backgroundColor: '#F3F3F0'}}>
         <p className="text-sm print:text-black" style={{color: '#00245D'}}>

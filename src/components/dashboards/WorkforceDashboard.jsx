@@ -195,9 +195,10 @@ const WorkforceDashboard = () => {
                       <Building2 className="text-white" size={20} />
                     </div>
                     <div className="flex-1">
-                      <div className="font-bold text-lg mb-2" style={{color: '#00245D'}}>Omaha Breakdown:</div>
+                      <div className="font-bold text-lg mb-2" style={{color: '#00245D'}}>Omaha Campus Growth</div>
                       <div className="text-sm font-medium" style={{color: '#00245D'}}>
-                        {currentData.locationDetails.omaha.staff} BE Staff | {currentData.locationDetails.omaha.faculty} Faculty | {currentData.locationDetails.omaha.hsp} House Staff Physicians | {currentData.locationDetails.omaha.tempFac} Temp Fac | {currentData.locationDetails.omaha.tempStaff} Temp Staff | {currentData.locationDetails.omaha.students} Students
+                        BE Staff increased by <span className="font-extrabold px-2 py-1 rounded" style={{color: '#71CC98', backgroundColor: 'white'}}>17</span> positions (1.3%), 
+                        while BE Faculty increased by <span className="font-extrabold px-2 py-1 rounded" style={{color: '#71CC98', backgroundColor: 'white'}}>11</span> positions (1.7%)
                       </div>
                     </div>
                   </div>
@@ -209,9 +210,9 @@ const WorkforceDashboard = () => {
                       <Building2 className="text-white" size={20} />
                     </div>
                     <div className="flex-1">
-                      <div className="font-bold text-lg mb-2" style={{color: '#00245D'}}>Phoenix Breakdown:</div>
+                      <div className="font-bold text-lg mb-2" style={{color: '#00245D'}}>Phoenix Campus Stability</div>
                       <div className="text-sm font-medium" style={{color: '#00245D'}}>
-                        {currentData.locationDetails.phoenix.staff} BE Staff | {currentData.locationDetails.phoenix.faculty} Faculty | {currentData.locationDetails.phoenix.hsp} House Staff Physicians | {currentData.locationDetails.phoenix.tempFac} Temp Fac | {currentData.locationDetails.phoenix.tempStaff} Temp Staff | {currentData.locationDetails.phoenix.students} Students
+                        BE Staff and BE Faculty remained unchanged from prior year
                       </div>
                     </div>
                   </div>

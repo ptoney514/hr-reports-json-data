@@ -4,6 +4,7 @@ import { getExitSurveyData } from '../../data/staticData';
 import FY2025ExitComparison from '../charts/FY2025ExitComparison';
 import FY2025LessonsLearnedPanel from '../panels/FY2025LessonsLearnedPanel';
 import FY2026PlanningMatrix from '../planning/FY2026PlanningMatrix';
+import FY2026Recommendations from '../planning/FY2026Recommendations';
 import DepartmentExitAnalysis from '../charts/DepartmentExitAnalysis';
 
 const ExitSurveyDashboard = () => {
@@ -230,6 +231,11 @@ const ExitSurveyDashboard = () => {
         {/* Lessons Learned Panel */}
         <div className="mb-8">
           <FY2025LessonsLearnedPanel />
+        </div>
+
+        {/* FY2026 Recommendations */}
+        <div className="mb-8">
+          <FY2026Recommendations />
         </div>
 
         {/* FY2026 Planning Matrix */}

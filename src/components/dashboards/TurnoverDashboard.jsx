@@ -7,6 +7,7 @@ import TurnoverByLengthOfServiceChart from '../charts/TurnoverByLengthOfServiceC
 import VoluntaryInvoluntaryTurnoverChart from '../charts/VoluntaryInvoluntaryTurnoverChart';
 import TurnoverDeviationChart from '../charts/TurnoverDeviationChart';
 import FacultyTurnoverDeviationChart from '../charts/FacultyTurnoverDeviationChart';
+import FacultyRetirementAnalysis from '../charts/FacultyRetirementAnalysis';
 // Quarter filter removed - using fixed reporting period
 import ErrorBoundary from '../ui/ErrorBoundary';
 import PDFExportButton from '../ui/PDFExportButton';
@@ -389,6 +390,16 @@ const TurnoverDashboard = () => {
               height={400}
             />
           </div>
+        </div>
+      </div>
+
+      {/* Faculty Retirement Analysis - Added at the bottom */}
+      <div className="mb-6 print:mb-4 chart-container" data-chart-type="retirement-analysis">
+        <div id="faculty-retirement-analysis-chart" data-chart-title="Faculty Retirement Analysis" data-chart-ready="false">
+          <FacultyRetirementAnalysis
+            title="Faculty Retirement Analysis"
+            height={400}
+          />
         </div>
       </div>
 
