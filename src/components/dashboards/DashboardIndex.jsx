@@ -61,23 +61,15 @@ const DashboardIndex = () => {
 
   const pillars = [
     {
-      title: "Learning & Development",
-      icon: GraduationCap,
-      color: "blue",
-      description: "University Annual Compliance Journey, achieved 90%+ completion rate amongst faculty and staff.",
-      highlights: [
-        "Scaled myLearning infrastructure to support university-wide development; 660 on-demand courses and 236 live trainings since Nov 2022.",
-        "Expanded Monthly Manager Briefings for added guidance to new and current leaders."
-      ]
-    },
-    {
       title: "Total Rewards",
       icon: Gift,
       color: "purple",
       description: "Benefit enhancements including new voluntary offerings, Medicare Advocacy Service, and expanded mental health resources.",
       highlights: [
-        "Well-Being programming with the re-introduction of a well-being incentive.",
-        "Completed Staff - Phases 3 & 4 of the multi-year compensation review; 326 positions reviewed (384 employees); plus 85 employees across 75 positions received adjustments."
+        "Delivered 2,066 Total Reward Statements to benefit eligible faculty and staff reflecting the university's commitment and strategies to attract and retain employees.",
+        "Successful outcomes of the multi-year Total Rewards compensation review: 1268 total positions representing 1873 faculty and staff have been evaluated; 729 faculty and staff have or will receive market adjustments resulting from the review.",
+        "Processed 1933 merit increases.",
+        "Well-Being programming with the re-introduction of a well-being incentive."
       ]
     },
     {
@@ -86,8 +78,21 @@ const DashboardIndex = () => {
       color: "green",
       description: "Rebranded the Companions in Mission Recognition Program and celebrated Service Awards.",
       highlights: [
+        "Demonstrating upward mobility through learning opportunities, internal promotions and transfers.",
+        "Heightened engagement and collaboration with campus partners to boost sense of community through Well-Being programming efforts that bring together collective efforts of Mission & Ministry, Belonging & Inclusion, Rec & Wellness, Creighton Engage, Creighton Therapy & Wellness, the Lifestyle Medicine Clinic and Sustainability supporting dozens of wellness events and activities for Creighton faculty & staff.",
         "Belong Events fostering community and inclusion.",
         "Launched a new 90-day onboarding survey to capture new-hire feedback and improve the first-year experience."
+      ]
+    },
+    {
+      title: "Learning & Development",
+      icon: GraduationCap,
+      color: "blue",
+      description: "University Annual Compliance Journey, achieved 90%+ completion rate amongst faculty and staff.",
+      highlights: [
+        "Scaled myLearning infrastructure to support university-wide development; 660 on-demand courses and 236 live trainings since Nov 2022.",
+        "Boosting real-time engagement and skill building across the university; added in discounts to lifelong learning opportunities for employees.",
+        "Expanded Monthly Manager Briefings for added guidance to new and current leaders."
       ]
     }
   ];
@@ -144,8 +149,9 @@ const DashboardIndex = () => {
             
             <p className="text-lg text-gray-300 leading-relaxed">
               During Fiscal Year 2025, the Office of Human Resources achieved significant milestones, 
-              supporting the advancement of Creighton's mission for alignment and enhancement of key 
-              support structures and workforce skill development.
+              supporting Creighton's advancement of alignment and enhancement of key 
+              support structures and workforce skill development. We are fueled by the university's 
+              mission and are committed to exemplifying Creighton's Core Jesuit Values in all that we do.
             </p>
           </div>
         </div>
