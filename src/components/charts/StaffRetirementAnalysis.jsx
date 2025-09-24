@@ -1,39 +1,30 @@
-import React, { memo, useMemo } from 'react';
+import React, { memo } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { TrendingUp, Users, Calendar } from 'lucide-react';
+import { Users } from 'lucide-react';
 import ChartErrorBoundary from '../ui/ChartErrorBoundary';
 
-const FacultyRetirementAnalysis = memo(({ 
-  title = "Faculty Retirement Analysis",
+const StaffRetirementAnalysis = memo(({ 
+  title = "Staff Retirement Analysis",
   height = 400,
   className = ""
 }) => {
   // Static data based on the image provided
   const retirementData = {
     averageData: [
-      { year: '2019', avgAge: 71.4, avgLOS: 31.9 },
-      { year: '2020', avgAge: 69.3, avgLOS: 28.2 },
-      { year: '2021', avgAge: 66.5, avgLOS: 26.7 },
-      { year: '2022', avgAge: 67.6, avgLOS: 30.5 },
-      { year: '2023', avgAge: 70.9, avgLOS: 28.5 },
-      { year: '2024', avgAge: 69.3, avgLOS: 28.1 },
-      { year: '2025', avgAge: 69.4, avgLOS: 26.7 }
+      { year: '2019', avgAge: 63.7, avgLOS: 21.7 },
+      { year: '2020', avgAge: 64.8, avgLOS: 23.3 },
+      { year: '2021', avgAge: 66.5, avgLOS: 23.3 },
+      { year: '2022', avgAge: 64.8, avgLOS: 22.6 },
+      { year: '2023', avgAge: 65.4, avgLOS: 21.7 },
+      { year: '2024', avgAge: 67.1, avgLOS: 24.5 },
+      { year: '2025', avgAge: 68.1, avgLOS: 21.5 }
     ],
     retirementDistribution: [
-      { name: 'Under 69', value: 85.9, color: '#0054A6' },
-      { name: 'Over 69', value: 7.8, color: '#FFC627' },
+      { name: 'Under', value: 85.9, color: '#0054A6' },
+      { name: 'Over', value: 7.8, color: '#FFC627' },
       { name: 'Three-Year', value: 2.6, color: '#95D2F3' },
-      { name: 'Two-Year', value: 2.0, color: '#00245D' },
-      { name: 'One-Year', value: 1.7, color: '#1F74DB' }
-    ],
-    schoolBreakdown: [
-      { school: 'College of Arts & Sciences', count: 14 },
-      { school: 'School of Dentistry', count: 11 },
-      { school: 'School of Medicine', count: 10 },
-      { school: 'School of Pharmacy & Health Professions', count: 6 },
-      { school: 'Heider College of Business', count: 5 },
-      { school: 'School of Law', count: 5 },
-      { school: 'College of Nursing', count: 3 }
+      { name: 'Two-Year', value: 2.0, color: '#FF6B35' },
+      { name: 'One-Year', value: 1.7, color: '#00245D' }
     ]
   };
 
@@ -58,7 +49,7 @@ const FacultyRetirementAnalysis = memo(({
 
   // Custom label for pie chart
   const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, value, index }) => {
-    if (value < 2) return null; // Don't show labels for very small slices
+    if (value < 2) return null;
     
     const RADIAN = Math.PI / 180;
     const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
@@ -82,15 +73,15 @@ const FacultyRetirementAnalysis = memo(({
 
   return (
     <ChartErrorBoundary
-      chartType="Faculty Retirement Analysis"
+      chartType="Staff Retirement Analysis"
       title={title}
       height={height}
       className={className}
       onRetry={() => window.location.reload()}
     >
       <div 
-        id="faculty-retirement-analysis"
-        data-chart-id="faculty-retirement-analysis"
+        id="staff-retirement-analysis"
+        data-chart-id="staff-retirement-analysis"
         data-chart-title={title}
         className={`bg-white print:bg-white p-6 print:p-4 rounded-lg shadow-sm border print:border-gray ${className}`}
       >
@@ -105,10 +96,10 @@ const FacultyRetirementAnalysis = memo(({
         {/* Two Column Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           
-          {/* Left Column - Line Chart */}
+          {/* Left Column - Line Chart with Data Table */}
           <div className="border rounded-lg p-4" style={{ borderColor: '#E6E6E6' }}>
             <h4 className="text-sm font-semibold mb-3" style={{color: '#00245D'}}>
-              Faculty Retirees - Average Age and Length of Service
+              Staff Retirees - Average Age and Length of Service
             </h4>
             <ResponsiveContainer width="100%" height={250}>
               <LineChart data={retirementData.averageData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
@@ -184,7 +175,7 @@ const FacultyRetirementAnalysis = memo(({
           {/* Right Column - Pie Chart */}
           <div className="border rounded-lg p-4" style={{ borderColor: '#E6E6E6' }}>
             <h4 className="text-sm font-semibold mb-3" style={{color: '#00245D'}}>
-              Faculty over or nearing retirement by year
+              Staff over or nearing retirement by year
             </h4>
             <ResponsiveContainer width="100%" height={250}>
               <PieChart>
@@ -227,30 +218,15 @@ const FacultyRetirementAnalysis = memo(({
             <li className="flex items-start gap-2">
               <span className="mt-1">•</span>
               <span>
-                Last year, the average age of a faculty member who retires is 69 with nearly 28 years. 
-                In three of the prior 6 years, the average age has been over 70, but a downward trend was 
-                experienced the two years post pandemic.
+                The average age of a staff member who retires is 66 with nearly 23 years of service 
+                based on 6-year average.
               </span>
             </li>
             <li className="flex items-start gap-2">
               <span className="mt-1">•</span>
               <span>
-                Currently 7.8% (or 54 faculty members) are over this threshold, with around an additional 
-                2% joining that cohort each year.
-              </span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="mt-1">•</span>
-              <span>
-                The numbers by school currently at or past the age metric are College of Arts & Sciences 14, 
-                School of Dentistry 11, School of Medicine 10, School of Pharmacy & Health Professionals 6, 
-                Heider College of Business and the School of Law 5 each, College of Nursing with 3.
-              </span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="mt-1">•</span>
-              <span>
-                An additional 43 faculty (6%) members will reach the age metric in the next three years.
+                Currently nearly 7.5% (or 108 staff members) of staff are over this threshold, with 
+                around 1% to 2% joining that cohort each year.
               </span>
             </li>
           </ul>
@@ -259,7 +235,7 @@ const FacultyRetirementAnalysis = memo(({
         {/* Footer Note */}
         <div className="mt-4 pt-3 border-t border-gray-200">
           <p className="text-xs text-gray-600 italic">
-            <strong>Note:</strong> Data reflects faculty retirement patterns and projections based on current demographics.
+            <strong>Note:</strong> Data reflects staff retirement patterns and projections based on current demographics.
           </p>
         </div>
       </div>
@@ -267,4 +243,4 @@ const FacultyRetirementAnalysis = memo(({
   );
 });
 
-export default FacultyRetirementAnalysis;
+export default StaffRetirementAnalysis;

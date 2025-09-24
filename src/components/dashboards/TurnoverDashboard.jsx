@@ -8,6 +8,8 @@ import VoluntaryInvoluntaryTurnoverChart from '../charts/VoluntaryInvoluntaryTur
 import TurnoverDeviationChart from '../charts/TurnoverDeviationChart';
 import FacultyTurnoverDeviationChart from '../charts/FacultyTurnoverDeviationChart';
 import FacultyRetirementAnalysis from '../charts/FacultyRetirementAnalysis';
+import StaffRetirementAnalysis from '../charts/StaffRetirementAnalysis';
+import RetirementsByFiscalYear from '../charts/RetirementsByFiscalYear';
 // Quarter filter removed - using fixed reporting period
 import ErrorBoundary from '../ui/ErrorBoundary';
 import PDFExportButton from '../ui/PDFExportButton';
@@ -226,7 +228,7 @@ const TurnoverDashboard = () => {
                     <div>
                       <h1 className="text-2xl font-bold text-gray-900">Turnover Dashboard - Benefit Eligible</h1>
                       <p className="text-gray-600 text-sm mt-1">
-                        Period Ending: June 30, 2025
+                        Reporting Period: 6/30/2024 - 6/30/2025
                       </p>
                     </div>
                   </div>
@@ -239,13 +241,13 @@ const TurnoverDashboard = () => {
                       title="Export PDF"
                       customHeader={{
                         title: "Employee Turnover Analytics - FY 2025",
-                        subtitle: "Period Ending: June 30, 2025"
+                        subtitle: "Reporting Period: 6/30/2024 - 6/30/2025"
                       }}
                     />
                   </div>
                 </div>
               </div>
-          </div>
+            </div>
 
           {/* Data Coverage Information Note */}
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 print:bg-white print:border-gray-300">
@@ -399,6 +401,26 @@ const TurnoverDashboard = () => {
           <FacultyRetirementAnalysis
             title="Faculty Retirement Analysis"
             height={400}
+          />
+        </div>
+      </div>
+
+      {/* Staff Retirement Analysis - Added after Faculty */}
+      <div className="mb-6 print:mb-4 chart-container" data-chart-type="retirement-analysis">
+        <div id="staff-retirement-analysis-chart" data-chart-title="Staff Retirement Analysis" data-chart-ready="false">
+          <StaffRetirementAnalysis
+            title="Staff Retirement Analysis"
+            height={400}
+          />
+        </div>
+      </div>
+
+      {/* Retirements by Fiscal Year - Added after Staff Retirement Analysis */}
+      <div className="mb-6 print:mb-4 chart-container" data-chart-type="line-chart">
+        <div id="retirements-by-fiscal-year-chart" data-chart-title="Retirements by Fiscal Year" data-chart-ready="false">
+          <RetirementsByFiscalYear
+            title="Retirements by Fiscal Year"
+            height={350}
           />
         </div>
       </div>
