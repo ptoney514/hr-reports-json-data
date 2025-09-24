@@ -220,7 +220,7 @@ const WorkforceDashboard = () => {
               </div>
               
               <div className="mt-4 text-sm p-3 rounded-lg" style={{color: '#5A6168', backgroundColor: '#F8F9FA'}}>
-                <span className="font-medium">Note:</span> Employee counts include Jesuits (17) as well as grant-funded positions (482)
+                <span className="font-medium">Note:</span> Employee counts include Jesuits (17) as well as positions that are all or partially grant/donor funded (144 staff, 85 faculty and 48 temp). Please reference the additional slides which provide a breakdown of employees by state.
               </div>
             </div>
           </div>
