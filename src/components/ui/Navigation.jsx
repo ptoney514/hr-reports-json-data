@@ -14,7 +14,8 @@ import {
   Building2,
   AlertCircle,
   Database,
-  Shield
+  Shield,
+  Target
 } from 'lucide-react';
 import { announceToScreenReader } from '../../utils/accessibilityUtils';
 import SyncStatusIndicator from './SyncStatusIndicator';
@@ -66,6 +67,14 @@ const Navigation = () => {
       path: '/dashboards/exit-survey-fy25',
       icon: MessageSquare,
       isActive: isActive('/dashboards/exit-survey-fy25')
+    },
+    {
+      id: 'fy26-priorities',
+      label: 'FY26 Priorities',
+      shortLabel: 'FY26',
+      path: '/dashboards/fy26-priorities',
+      icon: Target,
+      isActive: isActive('/dashboards/fy26-priorities')
     },
     {
       id: 'data-validation',

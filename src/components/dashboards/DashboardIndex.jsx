@@ -68,7 +68,7 @@ const DashboardIndex = () => {
       highlights: [
         "Delivered 2,066 Total Reward Statements to benefit eligible faculty and staff reflecting the university's commitment and strategies to attract and retain employees.",
         "Successful outcomes of the multi-year Total Rewards compensation review: 1268 total positions representing 1873 faculty and staff have been evaluated; 729 faculty and staff have or will receive market adjustments resulting from the review.",
-        "Processed 1933 merit increases."
+        "Processed 1933 merit increases to help recognize the important contributions and work being done by our colleagues."
       ]
     },
     {
@@ -136,17 +136,17 @@ const DashboardIndex = () => {
         <div className="absolute inset-0 bg-gradient-to-br from-gray-900/80 via-gray-900/70 to-gray-900/80"></div>
         
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-          <div className="max-w-3xl">
+          <div>
             <div className="inline-flex items-center px-3 py-1 rounded-full bg-white/10 backdrop-blur-sm mb-6">
               <span className="text-xs font-semibold text-white">FY2025 Wins</span>
             </div>
             
-            <h1 className="text-5xl font-bold text-white mb-6 leading-tight">
+            <h1 className="text-5xl font-bold text-white mb-6 leading-tight max-w-3xl">
               Advancing Our Mission with<br />
               Meaningful HR Impact
             </h1>
             
-            <p className="text-lg text-gray-300 leading-relaxed">
+            <p className="text-lg text-gray-300 leading-relaxed max-w-5xl">
               During Fiscal Year 2025, the Office of Human Resources achieved significant milestones, 
               supporting Creighton's advancement of alignment and enhancement of key 
               support structures and workforce skill development. We are fueled by the university's 
