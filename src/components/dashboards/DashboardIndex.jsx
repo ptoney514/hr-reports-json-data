@@ -64,7 +64,7 @@ const DashboardIndex = () => {
       title: "Total Rewards",
       icon: Gift,
       color: "purple",
-      description: "Benefit enhancements including new voluntary offerings, expanded mental health and well-being resources, and a new Medicare Advocacy Service.",
+      description: "Implemented compensation adjustments and benefit enhancements including new voluntary offerings, expanded mental health and well-being resources, and a new Medicare Advocacy Service.",
       highlights: [
         "Delivered 2,066 Total Reward Statements to benefit eligible faculty and staff reflecting the university's commitment and strategies to attract and retain employees.",
         "Successful outcomes of the multi-year Total Rewards compensation review: 1268 total positions representing 1873 faculty and staff have been evaluated; 729 faculty and staff have or will receive market adjustments resulting from the review.",
@@ -77,7 +77,6 @@ const DashboardIndex = () => {
       color: "green",
       description: "Sharing a sense of community and providing upward mobility opportunities through learning, well-being and internal promotions.",
       highlights: [
-        "Demonstrating upward mobility through learning opportunities, internal promotions and transfers.",
         "Heightened engagement and collaboration with campus partners to boost sense of community through Well-Being programming efforts that bring together collective efforts of Mission & Ministry, Belonging & Inclusion, Rec & Wellness, Creighton Engage, Creighton Therapy & Wellness, the Lifestyle Medicine Clinic and Sustainability supporting dozens of wellness events and activities for Creighton faculty & staff.",
         "Rebranded the Companions in Mission Recognition Program and celebrated Service Awards.",
         "Launched a new 90-day onboarding survey to capture new-hire feedback and improve the first-year experience."
@@ -87,7 +86,7 @@ const DashboardIndex = () => {
       title: "Learning & Development",
       icon: GraduationCap,
       color: "blue",
-      description: "University Annual Compliance Journey, achieved 90%+ completion rate amongst faculty and staff.",
+      description: "Launched the University-wide Annual Compliance Journey, achieving a 90%+ completion rate amongst faculty and staff.",
       highlights: [
         "Scaled myLearning infrastructure to support university-wide development; 660 on-demand courses and 236 live trainings since Nov 2022.",
         "Boosting real-time engagement and skill building across the university; added in discounts to lifelong learning opportunities for employees.",

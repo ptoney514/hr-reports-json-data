@@ -31,9 +31,9 @@ const FY26Priorities = () => {
       title: "Upskilling Offerings",
       icon: GraduationCap,
       color: "green",
-      description: "Continue to invest in our staff development with more learning and development opportunities",
+      description: "Remain invested and continue to build capacity in our employee development.",
       initiatives: [
-        "Amplification of myLearning (Bridge) for scalable, notable infrastructure to support learning and development across the university",
+        "Ongoing amplification of myLearning (Bridge) for scalable, notable offerings to support relevant learning and development across the university.",
         "Monthly Manager Briefing series with ongoing access to more training and guidance available on a variety of topics as an added layer of knowledge and resources to further support their role as leaders"
       ]
     },
