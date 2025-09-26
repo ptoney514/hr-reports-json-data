@@ -21,10 +21,10 @@ const FY26Priorities = () => {
       title: "Oracle Optimization",
       icon: Wrench,
       color: "blue",
-      description: "Part of our ongoing effort to better support faculty and staff with modern tools that simplify processes and improve access to important information.",
+      description: "Part of our ongoing effort to better support faculty and staff with modern tools that simplify processes and improve access to important information. Success outcomes to include:",
       initiatives: [
         "A streamlined and upgraded myHR site for a modern, integrated solution from hiring to retiring.",
-        "This comprehensive upgrade is designed to enhance both the candidate and employee experience by introducing new features and functionality within the core HR modules. While the overall structure of the myHR site on myCreighton will undergo minimal changes, improvements will include streamlined processes, user-friendly automation, and expanded self-service and manager capabilities—each aligned with the University's strategic workforce goals."
+        "Improving reporting and workforce planning; Expanding self service capabilities; Supporting University data governance strategy"
       ]
     },
     {

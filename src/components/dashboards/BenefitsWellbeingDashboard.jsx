@@ -63,58 +63,149 @@ const BenefitsWellbeingDashboard = () => {
         </div>
 
         <div className="px-8 py-12 max-w-7xl mx-auto">
-          {/* Hero Metric - Modern Asymmetric Layout */}
-          <div className="grid grid-cols-12 gap-8 mb-16">
-            <div className="col-span-5">
-              <div className="bg-white rounded-3xl p-10 h-full flex flex-col justify-center relative overflow-hidden">
-                <div className="absolute -right-20 -top-20 w-40 h-40 rounded-full opacity-5"
-                     style={{ backgroundColor: colors.primary }}></div>
-                <span className="text-sm font-medium mb-3 block" style={{ color: colors.primary }}>
-                  TOTAL COST OPTIMIZATION
-                </span>
-                <div className="text-6xl font-bold mb-4" style={{ color: colors.dark }}>
-                  $3M
-                </div>
-                <p className="text-lg font-light" style={{ color: '#6B7280' }}>
-                  Strategic savings achieved through negotiations and program optimization
-                </p>
-                <div className="mt-6 inline-flex items-center gap-2 text-sm font-medium"
-                     style={{ color: colors.green }}>
-                  <TrendingUp className="w-4 h-4" />
-                  Since FY 2024-25
-                </div>
+          {/* Strategic Cost Reduction Initiative - Hero Section */}
+          <div className="mb-16">
+            <div className="bg-gradient-to-r from-white to-blue-50 rounded-3xl p-12 relative overflow-hidden shadow-lg border border-blue-100">
+              {/* Background Pattern */}
+              <div className="absolute inset-0 opacity-5">
+                <div className="absolute -right-20 -top-20 w-96 h-96 rounded-full" style={{ backgroundColor: colors.primary }}></div>
+                <div className="absolute -left-20 bottom-0 w-80 h-80 rounded-full" style={{ backgroundColor: colors.softBlue }}></div>
               </div>
-            </div>
-
-            <div className="col-span-7">
-              <div className="bg-white rounded-3xl p-10 h-full">
-                <h3 className="text-xl font-medium mb-8" style={{ color: colors.dark }}>
-                  Savings Breakdown
-                </h3>
-                <div className="space-y-6">
-                  {[
-                    { label: 'Medical Administration', value: 800, color: colors.primary },
-                    { label: 'Pharmacy Contracting', value: 750, color: colors.softBlue },
-                    { label: 'Policy Negotiations', value: 650, color: colors.green },
-                    { label: 'Wellness Programs', value: 500, color: colors.yellow },
-                    { label: 'UHC Credits Growth', value: 300, color: colors.warmGray }
-                  ].map((item, index) => (
-                    <div key={index} className="group">
-                      <div className="flex justify-between items-center mb-2">
-                        <span className="font-light" style={{ color: '#6B7280' }}>{item.label}</span>
-                        <span className="font-semibold" style={{ color: colors.dark }}>${item.value}K</span>
+              
+              {/* Content */}
+              <div className="relative z-10">
+                <div className="grid grid-cols-12 gap-12">
+                  {/* Left: Main Metric */}
+                  <div className="col-span-5">
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="p-3 rounded-xl bg-white shadow-sm">
+                        <DollarSign className="w-6 h-6" style={{ color: colors.green }} />
                       </div>
-                      <div className="h-2 rounded-full overflow-hidden bg-gray-100">
-                        <div 
-                          className="h-full rounded-full transition-all duration-700 group-hover:opacity-80"
-                          style={{ 
-                            width: `${(item.value / 800) * 100}%`,
-                            backgroundColor: item.color
-                          }}
-                        />
+                      <span className="text-sm font-bold uppercase tracking-wider" style={{ color: colors.primary }}>
+                        Strategic Cost Reduction
+                      </span>
+                    </div>
+                    
+                    <div className="mb-6">
+                      <div className="flex items-baseline gap-3">
+                        <span className="text-7xl font-bold bg-gradient-to-r text-transparent bg-clip-text"
+                              style={{ backgroundImage: `linear-gradient(135deg, ${colors.primary} 0%, ${colors.green} 100%)` }}>
+                          $3M
+                        </span>
+                        <span className="text-2xl font-light" style={{ color: colors.dark }}>saved</span>
+                      </div>
+                      <div className="mt-3 flex items-center gap-2">
+                        <TrendingUp className="w-5 h-5" style={{ color: colors.green }} />
+                        <span className="text-lg font-medium" style={{ color: colors.green }}>Since FY 2024-25</span>
                       </div>
                     </div>
-                  ))}
+                    
+                    <p className="text-lg leading-relaxed mb-6" style={{ color: '#4B5563' }}>
+                      Significant cost reductions achieved through strategic negotiations across medical administration, pharmacy contracting, global policy negotiations, and wellness vendor programming.
+                    </p>
+                    
+                    <div className="bg-white rounded-xl p-4 shadow-sm">
+                      <div className="flex items-center gap-3">
+                        <Zap className="w-5 h-5" style={{ color: colors.yellow }} />
+                        <span className="font-semibold" style={{ color: colors.dark }}>Key Achievement</span>
+                      </div>
+                      <p className="mt-2 text-sm" style={{ color: '#6B7280' }}>
+                        These savings are being used to offset cost increases and fund new benefit enhancements
+                      </p>
+                    </div>
+                  </div>
+                  
+                  {/* Right: UHC Success Story */}
+                  <div className="col-span-6 flex justify-end">
+                    <div className="bg-gradient-to-r rounded-xl p-6 text-white w-full max-w-lg"
+                         style={{ background: `linear-gradient(135deg, ${colors.primary} 0%, ${colors.softBlue} 100%)` }}>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <div className="flex items-center gap-2 mb-2">
+                            <Award className="w-5 h-5" />
+                            <span className="font-semibold">UHC Wellness Credits Success Story</span>
+                          </div>
+                          <p className="text-sm opacity-90">
+                            Negotiated from $30K (2023) → $60K (2024) → $150K (2025-2027)
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-3xl font-bold">500%</div>
+                          <div className="text-xs opacity-75">increase</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Cost Optimization Breakdown - Below */}
+                <div className="mt-12">
+                  <h3 className="text-xl font-semibold mb-6" style={{ color: colors.dark }}>
+                    Cost Optimization Breakdown
+                  </h3>
+                  
+                  <div className="grid grid-cols-2 gap-6">
+                    {[
+                      { 
+                        label: 'Medical Administration', 
+                        value: '$900K+',
+                        percentage: 30,
+                        description: 'Administrative efficiencies and process improvements',
+                        icon: Briefcase,
+                        color: colors.primary 
+                      },
+                      { 
+                        label: 'Pharmacy Contracting & Rebates', 
+                        value: '$850K+',
+                        percentage: 28,
+                        description: 'Enhanced rebate programs and contracting negotiations',
+                        icon: Activity,
+                        color: colors.softBlue 
+                      },
+                      { 
+                        label: 'Global Policy Negotiations', 
+                        value: '$750K+',
+                        percentage: 25,
+                        description: 'Strategic global policy and carrier negotiations',
+                        icon: Layers,
+                        color: colors.green 
+                      },
+                      { 
+                        label: 'Wellness Vendor Programming', 
+                        value: '$500K+',
+                        percentage: 17,
+                        description: 'Optimized wellness programs and vendor partnerships',
+                        icon: Heart,
+                        color: colors.yellow 
+                      }
+                    ].map((item, index) => (
+                      <div key={index} className="bg-white rounded-xl p-4 hover:shadow-md transition-all">
+                        <div className="flex items-start gap-4">
+                          <div className="p-2 rounded-lg" style={{ backgroundColor: `${item.color}15` }}>
+                            <item.icon className="w-5 h-5" style={{ color: item.color }} />
+                          </div>
+                          <div className="flex-1">
+                            <div className="flex justify-between items-start mb-2">
+                              <div>
+                                <span className="font-semibold" style={{ color: colors.dark }}>{item.label}</span>
+                                <p className="text-xs mt-1" style={{ color: '#9CA3AF' }}>{item.description}</p>
+                              </div>
+                              <span className="font-bold text-lg" style={{ color: item.color }}>{item.value}</span>
+                            </div>
+                            <div className="h-2 rounded-full overflow-hidden bg-gray-100">
+                              <div 
+                                className="h-full rounded-full transition-all duration-700"
+                                style={{ 
+                                  width: `${item.percentage}%`,
+                                  backgroundColor: item.color
+                                }}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
@@ -208,7 +299,36 @@ const BenefitsWellbeingDashboard = () => {
               Enhanced Benefits for 2025
             </h2>
             
-            <div className="grid grid-cols-3 gap-6">
+            <div className="grid grid-cols-4 gap-6">
+              {/* Navigate Partnership */}
+              <div className="group">
+                <div className="bg-white rounded-2xl p-8 h-full border-2 transition-all hover:shadow-lg"
+                     style={{ borderColor: 'transparent' }}
+                     onMouseEnter={(e) => e.currentTarget.style.borderColor = colors.green}
+                     onMouseLeave={(e) => e.currentTarget.style.borderColor = 'transparent'}>
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="p-2 rounded-lg" style={{ backgroundColor: `${colors.green}15` }}>
+                      <HeartHandshake className="w-5 h-5" style={{ color: colors.green }} />
+                    </div>
+                    <span className="font-medium" style={{ color: colors.dark }}>Navigate Partnership</span>
+                  </div>
+                  <ul className="space-y-3">
+                    <li className="flex items-start gap-2">
+                      <div className="w-1.5 h-1.5 rounded-full mt-2" style={{ backgroundColor: colors.green }}></div>
+                      <span className="text-sm" style={{ color: '#6B7280' }}>New well-being provider for 2025</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <div className="w-1.5 h-1.5 rounded-full mt-2" style={{ backgroundColor: colors.green }}></div>
+                      <span className="text-sm" style={{ color: '#6B7280' }}>Selected through comprehensive RFP</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <div className="w-1.5 h-1.5 rounded-full mt-2" style={{ backgroundColor: colors.green }}></div>
+                      <span className="text-sm" style={{ color: '#6B7280' }}>Incentive framework reintroduced</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+              
               {/* Mental Health */}
               <div className="group">
                 <div className="bg-white rounded-2xl p-8 h-full border-2 transition-all hover:shadow-lg"
@@ -219,12 +339,12 @@ const BenefitsWellbeingDashboard = () => {
                     <div className="p-2 rounded-lg" style={{ backgroundColor: `${colors.green}15` }}>
                       <Brain className="w-5 h-5" style={{ color: colors.green }} />
                     </div>
-                    <span className="font-medium" style={{ color: colors.dark }}>Mental Health</span>
+                    <span className="font-medium" style={{ color: colors.dark }}>Mental Health Resources</span>
                   </div>
                   <ul className="space-y-3">
                     <li className="flex items-start gap-2">
                       <div className="w-1.5 h-1.5 rounded-full mt-2" style={{ backgroundColor: colors.green }}></div>
-                      <span className="text-sm" style={{ color: '#6B7280' }}>Expanded Magellan EAP</span>
+                      <span className="text-sm" style={{ color: '#6B7280' }}>Expanded Magellan EAP offerings</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <div className="w-1.5 h-1.5 rounded-full mt-2" style={{ backgroundColor: colors.green }}></div>
@@ -304,18 +424,11 @@ const BenefitsWellbeingDashboard = () => {
                  style={{ background: `linear-gradient(135deg, ${colors.warmGray}20 0%, white 100%)` }}>
               <div className="grid grid-cols-12 gap-8 items-center">
                 <div className="col-span-8">
-                  <div className="flex items-center gap-3 mb-4">
-                    <Briefcase className="w-6 h-6" style={{ color: colors.primary }} />
-                    <span className="text-sm font-medium uppercase tracking-wider" style={{ color: colors.primary }}>
-                      RETIREMENT PLANNING
-                    </span>
-                  </div>
                   <h3 className="text-3xl font-semibold mb-4" style={{ color: colors.dark }}>
                     Enhanced Communication Strategy
                   </h3>
                   <p className="text-lg font-light" style={{ color: '#6B7280' }}>
-                    Strengthening communication efforts with The Retirement Plan of Creighton.
-                    Projection statements sent to targeted audiences to drive education and participation.
+                    Strengthening communication efforts for all benefits, including leveraging the intranet for easily accessible information for all programs, distribution of the total reward statements and retirement plan statements to drive education and participation.
                   </p>
                 </div>
                 <div className="col-span-4 text-center">
@@ -333,23 +446,6 @@ const BenefitsWellbeingDashboard = () => {
             </div>
           </div>
 
-          {/* Quick Stats - Modern Minimal */}
-          <div className="grid grid-cols-4 gap-4 mb-12">
-            {[
-              { icon: Heart, label: 'Navigate Partner', value: 'New 2025', color: colors.green },
-              { icon: DollarSign, label: 'Cost Savings', value: '$3M', color: colors.primary },
-              { icon: Brain, label: 'Mental Health Tools', value: '3', color: colors.softBlue },
-              { icon: Shield, label: 'New Benefits', value: '4', color: colors.yellow }
-            ].map((stat, index) => (
-              <div key={index} className="text-center">
-                <div className="inline-flex flex-col items-center">
-                  <stat.icon className="w-8 h-8 mb-3" style={{ color: stat.color }} />
-                  <div className="text-2xl font-bold mb-1" style={{ color: colors.dark }}>{stat.value}</div>
-                  <div className="text-xs font-light" style={{ color: '#6B7280' }}>{stat.label}</div>
-                </div>
-              </div>
-            ))}
-          </div>
 
           {/* Bottom Navigation */}
           <div className="flex justify-between items-center mt-16 pt-8 border-t" style={{ borderColor: '#E5E7EB' }}>

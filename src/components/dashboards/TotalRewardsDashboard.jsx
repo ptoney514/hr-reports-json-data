@@ -74,6 +74,36 @@ const TotalRewardsDashboard = () => {
         </div>
 
         <div className="p-8 max-w-7xl mx-auto">
+          {/* Strategic Focus Card - Similar to Benefits & Wellbeing */}
+          <div className="mb-12">
+            <div className="rounded-3xl p-10 relative overflow-hidden"
+                 style={{ background: 'linear-gradient(135deg, #D7D2CB20 0%, white 100%)' }}>
+              <div className="grid grid-cols-12 gap-8 items-center">
+                <div className="col-span-8">
+                  <h3 className="text-3xl font-semibold mb-4" style={{ color: '#00245D' }}>
+                    Strategic Focus
+                  </h3>
+                  <p className="text-lg font-light" style={{ color: '#6B7280' }}>
+                    Competitive benefits, rewards and programs is an ongoing area of focus for the University.
+                    Our comprehensive strategy ensures we attract and retain top talent through market-aligned compensation
+                    and meaningful total rewards offerings.
+                  </p>
+                </div>
+                <div className="col-span-4 text-center">
+                  <div className="inline-flex flex-col items-center">
+                    <div className="w-24 h-24 rounded-full flex items-center justify-center mb-4"
+                         style={{ backgroundColor: '#4366D0' }}>
+                      <TrendingUp className="w-10 h-10 text-white" />
+                    </div>
+                    <span className="text-sm font-medium" style={{ color: '#4366D0' }}>
+                      Leading the Way
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* Key Achievements Section */}
           <div className="bg-white rounded-2xl border p-8 mb-12" style={{ borderColor: '#D7D2CB' }}>
             <h2 className="text-3xl font-bold text-center mb-8" style={{ color: '#00245D' }}>FY2025 Total Rewards Impact</h2>
@@ -439,10 +469,9 @@ const TotalRewardsDashboard = () => {
             <div className="text-center">
               <div className="inline-block">
                 <div className="text-5xl font-bold mb-2" style={{ color: '#4366D0' }}>255</div>
-                <div className="text-lg font-medium mb-2" style={{ color: '#00245D' }}>Job Descriptions Standardized</div>
-                <div className="text-sm" style={{ color: '#5F7FC3' }}>Successfully moved into our online Job Architect library</div>
-                <div className="mt-4 px-6 py-2 rounded-full inline-block" style={{ backgroundColor: '#B5D2F3' }}>
-                  <span className="font-medium" style={{ color: '#00245D' }}>Creating consistency and clarity across the organization</span>
+                <div className="text-lg font-medium mb-3" style={{ color: '#00245D' }}>Job Descriptions Standardized</div>
+                <div className="mt-4 px-8 py-3 rounded-full inline-block max-w-5xl" style={{ backgroundColor: '#B5D2F3' }}>
+                  <span className="font-medium" style={{ color: '#00245D' }}>This effort sets a foundation for more seamless updates to job descriptions, which were historically stored in a manually updated environment. This will allow the university to better track the various requirements across roles for compliance management.</span>
                 </div>
               </div>
             </div>
