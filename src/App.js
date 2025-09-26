@@ -18,6 +18,7 @@ const DataSourceAdmin = lazy(() => import('./components/dashboards/DataSourceAdm
 const AccomplishmentsOverview = lazy(() => import('./components/dashboards/AccomplishmentsOverview'));
 const DataValidation = lazy(() => import('./components/dashboards/DataValidation'));
 const FY26Priorities = lazy(() => import('./components/dashboards/FY26Priorities'));
+const LearningDevelopmentDashboard = lazy(() => import('./components/dashboards/LearningDevelopmentDashboard'));
 // WorkforceAudit temporarily disabled - papaparse dependency issue
 // const WorkforceAudit = lazy(() => import('./components/dashboards/WorkforceAudit'));
 // AdminDashboard removed - using static data now
@@ -114,6 +115,7 @@ function App() {
               <Route path="/dashboards/exit-survey-fy25" element={<ExitSurveyFY25Dashboard />} />
               <Route path="/dashboards/accomplishments" element={<AccomplishmentsOverview />} />
               <Route path="/dashboards/fy26-priorities" element={<FY26Priorities />} />
+              <Route path="/dashboards/learning-development" element={<LearningDevelopmentDashboard />} />
               {/* Workforce Audit temporarily disabled - papaparse dependency issue */}
               {/* <Route path="/dashboards/workforce-audit" element={<WorkforceAudit />} /> */}
               

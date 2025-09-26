@@ -9,13 +9,10 @@ import {
   X,
   UserPlus,
   MessageSquare,
-  Calendar,
-  FileText,
-  Building2,
-  AlertCircle,
   Database,
   Shield,
-  Target
+  Target,
+  GraduationCap
 } from 'lucide-react';
 import { announceToScreenReader } from '../../utils/accessibilityUtils';
 import SyncStatusIndicator from './SyncStatusIndicator';
@@ -75,6 +72,14 @@ const Navigation = () => {
       path: '/dashboards/fy26-priorities',
       icon: Target,
       isActive: isActive('/dashboards/fy26-priorities')
+    },
+    {
+      id: 'learning-development',
+      label: 'Learning & Development',
+      shortLabel: 'L&D',
+      path: '/dashboards/learning-development',
+      icon: GraduationCap,
+      isActive: isActive('/dashboards/learning-development')
     },
     {
       id: 'data-validation',
