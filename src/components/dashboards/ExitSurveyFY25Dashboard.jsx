@@ -982,11 +982,7 @@ const ExitSurveyFY25Dashboard = () => {
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle size={14} className="text-yellow-600 mt-0.5" />
-                    <span>Improve exit survey response to 40%+</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle size={14} className="text-yellow-600 mt-0.5" />
-                    <span>Establish retention task force</span>
+                    <span>Continue to grow exit survey response participation</span>
                   </li>
                 </ul>
               </div>
@@ -998,15 +994,7 @@ const ExitSurveyFY25Dashboard = () => {
                 <ul className="space-y-2 text-sm text-gray-700">
                   <li className="flex items-start gap-2">
                     <CheckCircle size={14} className="text-green-600 mt-0.5" />
-                    <span>Reduce total terminations by 15%</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle size={14} className="text-green-600 mt-0.5" />
-                    <span>Achieve 50%+ survey response rate</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle size={14} className="text-green-600 mt-0.5" />
-                    <span>Lift all satisfaction scores above 3.5/5.0</span>
+                    <span>Continue to grow exit survey response participation beyond final FY25 rates.</span>
                   </li>
                 </ul>
               </div>
