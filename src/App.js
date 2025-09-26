@@ -19,6 +19,8 @@ const AccomplishmentsOverview = lazy(() => import('./components/dashboards/Accom
 const DataValidation = lazy(() => import('./components/dashboards/DataValidation'));
 const FY26Priorities = lazy(() => import('./components/dashboards/FY26Priorities'));
 const LearningDevelopmentDashboard = lazy(() => import('./components/dashboards/LearningDevelopmentDashboard'));
+const TotalRewardsDashboard = lazy(() => import('./components/dashboards/TotalRewardsDashboard'));
+const BenefitsWellbeingDashboard = lazy(() => import('./components/dashboards/BenefitsWellbeingDashboard'));
 // WorkforceAudit temporarily disabled - papaparse dependency issue
 // const WorkforceAudit = lazy(() => import('./components/dashboards/WorkforceAudit'));
 // AdminDashboard removed - using static data now
@@ -116,6 +118,8 @@ function App() {
               <Route path="/dashboards/accomplishments" element={<AccomplishmentsOverview />} />
               <Route path="/dashboards/fy26-priorities" element={<FY26Priorities />} />
               <Route path="/dashboards/learning-development" element={<LearningDevelopmentDashboard />} />
+              <Route path="/dashboards/total-rewards" element={<TotalRewardsDashboard />} />
+              <Route path="/dashboards/benefits-wellbeing" element={<BenefitsWellbeingDashboard />} />
               {/* Workforce Audit temporarily disabled - papaparse dependency issue */}
               {/* <Route path="/dashboards/workforce-audit" element={<WorkforceAudit />} /> */}
               

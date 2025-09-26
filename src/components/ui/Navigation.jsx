@@ -12,7 +12,9 @@ import {
   Database,
   Shield,
   Target,
-  GraduationCap
+  GraduationCap,
+  DollarSign,
+  Heart
 } from 'lucide-react';
 import { announceToScreenReader } from '../../utils/accessibilityUtils';
 import SyncStatusIndicator from './SyncStatusIndicator';
@@ -80,6 +82,22 @@ const Navigation = () => {
       path: '/dashboards/learning-development',
       icon: GraduationCap,
       isActive: isActive('/dashboards/learning-development')
+    },
+    {
+      id: 'total-rewards',
+      label: 'Total Rewards',
+      shortLabel: 'Rewards',
+      path: '/dashboards/total-rewards',
+      icon: DollarSign,
+      isActive: isActive('/dashboards/total-rewards')
+    },
+    {
+      id: 'benefits-wellbeing',
+      label: 'Benefits & Well-being',
+      shortLabel: 'Benefits',
+      path: '/dashboards/benefits-wellbeing',
+      icon: Heart,
+      isActive: isActive('/dashboards/benefits-wellbeing')
     },
     {
       id: 'data-validation',
