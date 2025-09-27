@@ -76,7 +76,7 @@ const BenefitsWellbeingDashboard = () => {
               <div className="relative z-10">
                 <div className="grid grid-cols-12 gap-12">
                   {/* Left: Main Metric */}
-                  <div className="col-span-5">
+                  <div className="col-span-6">
                     <div className="flex items-center gap-3 mb-4">
                       <div className="p-3 rounded-xl bg-white shadow-sm">
                         <DollarSign className="w-6 h-6" style={{ color: colors.green }} />
@@ -92,7 +92,6 @@ const BenefitsWellbeingDashboard = () => {
                               style={{ backgroundImage: `linear-gradient(135deg, ${colors.primary} 0%, ${colors.green} 100%)` }}>
                           $3M
                         </span>
-                        <span className="text-2xl font-light" style={{ color: colors.dark }}>saved</span>
                       </div>
                       <div className="mt-3 flex items-center gap-2">
                         <TrendingUp className="w-5 h-5" style={{ color: colors.green }} />
@@ -101,7 +100,7 @@ const BenefitsWellbeingDashboard = () => {
                     </div>
                     
                     <p className="text-lg leading-relaxed mb-6" style={{ color: '#4B5563' }}>
-                      Significant cost reductions achieved through strategic negotiations across medical administration, pharmacy contracting, global policy negotiations, and wellness vendor programming.
+                      Significant cost reductions achieved through negotiations across medical administration, pharmacy contracting, global policy changes and wellness vendor programming to help offset increase in costs and added cost for benefit enhancements.
                     </p>
                     
                     <div className="bg-white rounded-xl p-4 shadow-sm">
@@ -116,7 +115,7 @@ const BenefitsWellbeingDashboard = () => {
                   </div>
                   
                   {/* Right: UHC Success Story */}
-                  <div className="col-span-6 flex justify-end">
+                  <div className="col-span-5 flex justify-end">
                     <div className="bg-gradient-to-r rounded-xl p-6 text-white w-full max-w-lg"
                          style={{ background: `linear-gradient(135deg, ${colors.primary} 0%, ${colors.softBlue} 100%)` }}>
                       <div className="flex items-center justify-between">

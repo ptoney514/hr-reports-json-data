@@ -75,7 +75,7 @@ const DashboardIndex = () => {
       title: "Employee Experience",
       icon: Users,
       color: "green",
-      description: "Consistently improving turnover and achieving positive results with recruiting as we share a sense of community and providing upward mobility opportunities through learning, well-being and internal promotions.",
+      description: "Continued improved turnover and achievement of positive results with recruiting efforts as we provided upward mobility opportunities and a shared sense of community.",
       highlights: [
         "Heightened engagement and collaboration with campus partners to boost sense of community through Well-Being programming efforts that bring together collective efforts of Mission & Ministry, Belonging & Inclusion, Rec & Wellness, Creighton Engage, Creighton Therapy & Wellness, the Lifestyle Medicine Clinic and Sustainability supporting dozens of wellness events and activities for Creighton faculty & staff.",
         "Rebranded the Companions in Mission Recognition Program and celebrated Service Awards.",

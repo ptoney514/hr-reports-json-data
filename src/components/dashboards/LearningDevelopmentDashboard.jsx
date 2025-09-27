@@ -127,9 +127,9 @@ const LearningDevelopmentDashboard = () => {
                   <h3 className="text-xl font-bold" style={{ color: '#00245D' }}>Compliance Excellence</h3>
                 </div>
                 <p className="mb-3" style={{ color: '#00245D' }}>
-                  Our University Annual Compliance Journey achieved{' '}
-                  <span className="font-bold" style={{ color: '#FFC72C' }}>8 comprehensive modules</span> covering
-                  federal and state requirements, demonstrating collective commitment to excellence.
+                  3,314 learners were assigned the Annual Compliance Journey, which covered{' '}
+                  8 essential modules. The university achieved a{' '}
+                  <span className="font-bold" style={{ color: '#FFC72C' }}>90%+ completion rate</span>.
                 </p>
                 <p className="text-sm italic" style={{ color: '#5F7FC3' }}>
                   "Setting the standard for university-wide compliance participation."

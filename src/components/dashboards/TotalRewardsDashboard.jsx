@@ -217,29 +217,29 @@ const TotalRewardsDashboard = () => {
                     <Users className="w-7 h-7 text-white" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold" style={{ color: '#00245D' }}>Positions Reviewed</h3>
+                    <h3 className="text-xl font-bold" style={{ color: '#00245D' }}>Compensation Review</h3>
                     <div className="flex items-center gap-2 mt-1">
                       <CheckCircle className="w-4 h-4" style={{ color: '#7FCC93' }} />
-                      <span className="text-sm font-medium" style={{ color: '#7FCC93' }}>Comprehensive Analysis</span>
+                      <span className="text-sm font-medium" style={{ color: '#7FCC93' }}>Multi-Year Outcomes</span>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div className="space-y-4">
-                <div>
-                  <div className="flex justify-between items-baseline mb-2">
-                    <span className="font-medium" style={{ color: '#00245D' }}>Total Positions</span>
+              <div className="space-y-3">
+                <div className="pb-2 border-b" style={{ borderColor: '#D7D2CB' }}>
+                  <div className="flex items-baseline gap-2">
                     <span className="text-2xl font-bold" style={{ color: '#00245D' }}>1,268</span>
+                    <span className="text-sm" style={{ color: '#6B7280' }}>Positions Evaluated</span>
                   </div>
-                  <div className="flex justify-between items-baseline mb-2">
-                    <span className="text-sm" style={{ color: '#5F7FC3' }}>Employees Impacted</span>
-                    <span className="text-lg font-bold" style={{ color: '#7FCC93' }}>1,873</span>
+                  <p className="text-xs mt-1" style={{ color: '#5F7FC3' }}>Representing 1,873 faculty & staff</p>
+                </div>
+                <div>
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-2xl font-bold" style={{ color: '#7FCC93' }}>729</span>
+                    <span className="text-sm" style={{ color: '#6B7280' }}>Market Adjustments</span>
                   </div>
-                  <div className="flex justify-between items-baseline">
-                    <span className="text-sm" style={{ color: '#5F7FC3' }}>Market Adjustments</span>
-                    <span className="text-lg font-bold" style={{ color: '#7FCC93' }}>729</span>
-                  </div>
+                  <p className="text-xs mt-1" style={{ color: '#5F7FC3' }}>Faculty & staff receiving adjustments</p>
                 </div>
               </div>
             </div>
