@@ -124,35 +124,35 @@ const WorkforceDashboard = () => {
           {/* Summary Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-6 gap-3 print:gap-2 mb-6 print:mb-4">
             <SummaryCard
-              title="BE Staff"
+              title="Staff"
               value={`${currentData.staff?.toLocaleString() || '0'}`}
               subtitle={getLocationCounts('staff')}
               icon={Building2}
             />
             
             <SummaryCard
-              title="BE Faculty"
+              title="Faculty"
               value={`${currentData.faculty?.toLocaleString() || '0'}`}
               subtitle={getLocationCounts('faculty')}
               icon={BookOpen}
             />
             
             <SummaryCard
-              title="HSP"
+              title="House Staff Physician"
               value={`${currentData.hsp?.toLocaleString() || '0'}`}
               subtitle={getLocationCounts('hsp')}
               icon={Heart}
             />
             
             <SummaryCard
-              title="Students"
+              title="Student Employee"
               value={currentData.studentCount.total.toLocaleString()}
               subtitle={getLocationCounts('students')}
               icon={GraduationCap}
             />
             
             <SummaryCard
-              title="Temp"
+              title="Not Benefit Eligible"
               value={`${currentTempTotal.toLocaleString()}`}
               subtitle={getLocationCounts('temp')}
               icon={Users}
@@ -182,8 +182,8 @@ const WorkforceDashboard = () => {
                     <div className="flex-1">
                       <div className="font-bold text-lg mb-2" style={{color: '#00245D'}}>Benefit-Eligible Workforce Expansion</div>
                       <div className="text-sm font-medium" style={{color: '#00245D'}}>
-                        BE Staff increased by <span className="font-extrabold px-2 py-1 rounded" style={{color: '#1F74DB', backgroundColor: 'white'}}>26</span> positions (2.0%), 
-                        while BE Faculty increased by <span className="font-extrabold px-2 py-1 rounded" style={{color: '#1F74DB', backgroundColor: 'white'}}>2</span> positions (0.3%)
+                        Staff increased by <span className="font-extrabold px-2 py-1 rounded" style={{color: '#1F74DB', backgroundColor: 'white'}}>26</span> positions (2.0%),
+                        while Faculty increased by <span className="font-extrabold px-2 py-1 rounded" style={{color: '#1F74DB', backgroundColor: 'white'}}>2</span> positions (0.3%)
                       </div>
                     </div>
                   </div>
@@ -197,8 +197,8 @@ const WorkforceDashboard = () => {
                     <div className="flex-1">
                       <div className="font-bold text-lg mb-2" style={{color: '#00245D'}}>Omaha Campus Growth</div>
                       <div className="text-sm font-medium" style={{color: '#00245D'}}>
-                        BE Staff increased by <span className="font-extrabold px-2 py-1 rounded" style={{color: '#71CC98', backgroundColor: 'white'}}>17</span> positions (1.3%), 
-                        while BE Faculty increased by <span className="font-extrabold px-2 py-1 rounded" style={{color: '#71CC98', backgroundColor: 'white'}}>11</span> positions (1.7%)
+                        Staff increased by <span className="font-extrabold px-2 py-1 rounded" style={{color: '#71CC98', backgroundColor: 'white'}}>17</span> positions (1.3%),
+                        while Faculty increased by <span className="font-extrabold px-2 py-1 rounded" style={{color: '#71CC98', backgroundColor: 'white'}}>11</span> positions (1.7%)
                       </div>
                     </div>
                   </div>
@@ -212,7 +212,7 @@ const WorkforceDashboard = () => {
                     <div className="flex-1">
                       <div className="font-bold text-lg mb-2" style={{color: '#00245D'}}>Phoenix Campus Stability</div>
                       <div className="text-sm font-medium" style={{color: '#00245D'}}>
-                        BE Staff and BE Faculty remained unchanged from prior year
+                        Staff and Faculty remained unchanged from prior year
                       </div>
                     </div>
                   </div>
@@ -220,7 +220,7 @@ const WorkforceDashboard = () => {
               </div>
               
               <div className="mt-4 text-sm p-3 rounded-lg" style={{color: '#5A6168', backgroundColor: '#F8F9FA'}}>
-                <span className="font-medium">Note:</span> Employee counts include Jesuits (17) as well as positions that are all or partially grant/donor funded (144 staff, 85 faculty and 48 temp). Please reference the additional slides which provide a breakdown of employees by state.
+                <span className="font-medium">Note:</span> Employee counts include Jesuits (17) as well as positions that are all or partially grant/donor funded (144 staff, 85 faculty and 48 temp). Student Employees are not benefit eligible. Please reference the additional slides which provide a breakdown of employees by state.
               </div>
             </div>
           </div>
