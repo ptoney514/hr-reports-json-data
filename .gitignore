@@ -76,3 +76,8 @@ jspm_packages/
 
 # Backup files
 backup/
+
+# Screenshots and test images
+*.png
+*.jpg
+playwright-screenshot.js

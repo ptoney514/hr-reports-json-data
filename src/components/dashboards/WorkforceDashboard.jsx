@@ -124,35 +124,35 @@ const WorkforceDashboard = () => {
           {/* Summary Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-6 gap-3 print:gap-2 mb-6 print:mb-4">
             <SummaryCard
-              title="Staff"
+              title="Benefit Eligible Staff"
               value={`${currentData.staff?.toLocaleString() || '0'}`}
               subtitle={getLocationCounts('staff')}
               icon={Building2}
             />
             
             <SummaryCard
-              title="Faculty"
+              title="Benefit Eligible Faculty"
               value={`${currentData.faculty?.toLocaleString() || '0'}`}
               subtitle={getLocationCounts('faculty')}
               icon={BookOpen}
             />
             
             <SummaryCard
-              title="House Staff Physician"
+              title="Benefit Eligible House Staff Physicians"
               value={`${currentData.hsp?.toLocaleString() || '0'}`}
               subtitle={getLocationCounts('hsp')}
               icon={Heart}
             />
             
             <SummaryCard
-              title="Student Employee"
+              title="Student Workers"
               value={currentData.studentCount.total.toLocaleString()}
               subtitle={getLocationCounts('students')}
               icon={GraduationCap}
             />
             
             <SummaryCard
-              title="Not Benefit Eligible"
+              title="Non-Benefit Eligible Employees"
               value={`${currentTempTotal.toLocaleString()}`}
               subtitle={getLocationCounts('temp')}
               icon={Users}
