@@ -218,7 +218,7 @@ const TurnoverRatesTable = ({ data, title = "Turnover Rates by Category", classN
 
         {/* Footer note */}
         <div className="mt-4 text-xs text-gray-500 print:text-black">
-          * Higher Ed Average based on CUPA data | FY 2025 annualized through Q2
+          * Higher Ed Average based on CUPA data
         </div>
       </div>
     </div>

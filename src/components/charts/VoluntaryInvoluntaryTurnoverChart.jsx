@@ -231,12 +231,6 @@ const VoluntaryInvoluntaryTurnoverChart = memo(({
           ))}
         </div>
 
-        {/* Footer */}
-        <div className="mt-6 pt-4 border-t border-gray-100 print:border-gray-400">
-          <p className="text-xs text-gray-500 print:text-black text-center">
-            * Data represents benefit-eligible employees only
-          </p>
-        </div>
       </div>
     </ChartErrorBoundary>
   );

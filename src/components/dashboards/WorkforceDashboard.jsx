@@ -122,42 +122,42 @@ const WorkforceDashboard = () => {
           </div>
 
           {/* Summary Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-6 gap-3 print:gap-2 mb-6 print:mb-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 print:gap-2 mb-6 print:mb-4 max-w-5xl">
             <SummaryCard
               title="Benefit Eligible Staff"
               value={`${currentData.staff?.toLocaleString() || '0'}`}
               subtitle={getLocationCounts('staff')}
               icon={Building2}
             />
-            
+
             <SummaryCard
               title="Benefit Eligible Faculty"
               value={`${currentData.faculty?.toLocaleString() || '0'}`}
               subtitle={getLocationCounts('faculty')}
               icon={BookOpen}
             />
-            
+
             <SummaryCard
               title="Benefit Eligible House Staff Physicians"
               value={`${currentData.hsp?.toLocaleString() || '0'}`}
               subtitle={getLocationCounts('hsp')}
               icon={Heart}
             />
-            
+
             <SummaryCard
               title="Student Workers"
               value={currentData.studentCount.total.toLocaleString()}
               subtitle={getLocationCounts('students')}
               icon={GraduationCap}
             />
-            
+
             <SummaryCard
               title="Non-Benefit Eligible Employees"
               value={`${currentTempTotal.toLocaleString()}`}
               subtitle={getLocationCounts('temp')}
               icon={Users}
             />
-            
+
             <SummaryCard
               title="Total"
               value={`${(currentData.staff + currentData.faculty + currentData.studentCount.total + currentData.hsp + currentTempTotal).toLocaleString()}`}
@@ -168,46 +168,46 @@ const WorkforceDashboard = () => {
 
           {/* Year-over-Year Key Insights */}
           <div className="mb-6">
-            <div className="bg-white rounded-lg shadow-sm p-6 max-w-2xl">
+            <div className="bg-white rounded-lg shadow-sm p-6 max-w-4xl">
               <h3 className="text-lg font-bold mb-4 flex items-center gap-2" style={{color: '#0054A6'}}>
                 <TrendingUp size={20} />
                 Year-over-Year Key Insights
               </h3>
               <div className="space-y-4">
                 <div className="rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow duration-200" style={{backgroundColor: '#F8F9FA', border: '1px solid #E5E7EB'}}>
-                  <div className="flex items-start gap-3">
-                    <div className="p-2 rounded-lg" style={{backgroundColor: '#1F74DB'}}>
-                      <Users className="text-white" size={20} />
+                  <div className="flex items-center gap-3">
+                    <div className="p-2.5 rounded-lg flex-shrink-0" style={{backgroundColor: '#1F74DB'}}>
+                      <Users className="text-white" size={24} />
                     </div>
                     <div className="flex-1">
                       <div className="font-bold text-lg mb-2" style={{color: '#00245D'}}>Benefit-Eligible Workforce Expansion</div>
                       <div className="text-sm font-medium" style={{color: '#00245D'}}>
-                        Staff increased by <span className="font-extrabold px-2 py-1 rounded" style={{color: '#1F74DB', backgroundColor: 'white'}}>26</span> positions (2.0%),
-                        while Faculty increased by <span className="font-extrabold px-2 py-1 rounded" style={{color: '#1F74DB', backgroundColor: 'white'}}>2</span> positions (0.3%)
+                        Staff increased by <span className="font-extrabold" style={{color: '#1F74DB'}}>26</span> positions (2.0%),
+                        while Faculty increased by <span className="font-extrabold" style={{color: '#1F74DB'}}>2</span> positions (0.3%)
                       </div>
                     </div>
                   </div>
                 </div>
 
                 <div className="rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow duration-200" style={{backgroundColor: '#F8F9FA', border: '1px solid #E5E7EB'}}>
-                  <div className="flex items-start gap-3">
-                    <div className="p-2 rounded-lg" style={{backgroundColor: '#71CC98'}}>
-                      <Building2 className="text-white" size={20} />
+                  <div className="flex items-center gap-3">
+                    <div className="p-2.5 rounded-lg flex-shrink-0" style={{backgroundColor: '#71CC98'}}>
+                      <Building2 className="text-white" size={24} />
                     </div>
                     <div className="flex-1">
                       <div className="font-bold text-lg mb-2" style={{color: '#00245D'}}>Omaha Campus Growth</div>
                       <div className="text-sm font-medium" style={{color: '#00245D'}}>
-                        Staff increased by <span className="font-extrabold px-2 py-1 rounded" style={{color: '#71CC98', backgroundColor: 'white'}}>17</span> positions (1.3%),
-                        while Faculty increased by <span className="font-extrabold px-2 py-1 rounded" style={{color: '#71CC98', backgroundColor: 'white'}}>11</span> positions (1.7%)
+                        Staff increased by <span className="font-extrabold" style={{color: '#71CC98'}}>17</span> positions (1.3%),
+                        while Faculty increased by <span className="font-extrabold" style={{color: '#71CC98'}}>11</span> positions (1.7%)
                       </div>
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow duration-200" style={{backgroundColor: '#F8F9FA', border: '1px solid #E5E7EB'}}>
-                  <div className="flex items-start gap-3">
-                    <div className="p-2 rounded-lg" style={{backgroundColor: '#FFC72C'}}>
-                      <Building2 className="text-white" size={20} />
+                  <div className="flex items-center gap-3">
+                    <div className="p-2.5 rounded-lg flex-shrink-0" style={{backgroundColor: '#FFC72C'}}>
+                      <Building2 className="text-white" size={24} />
                     </div>
                     <div className="flex-1">
                       <div className="font-bold text-lg mb-2" style={{color: '#00245D'}}>Phoenix Campus Stability</div>
