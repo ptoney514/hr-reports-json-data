@@ -76,8 +76,53 @@ npm run data:update     # Complete data workflow
 - Improving visualization responsiveness
 - Enhancing user experience and navigation
 
+## Pull Request Requirements
+
+**CRITICAL**: Always use pr-prep agent before creating PRs
+- Run: "Use pr-prep agent to verify I'm ready for a PR"
+- DO NOT create PR until pr-prep gives ✅ all checks passed
+- See [PR_WORKFLOW.md](PR_WORKFLOW.md) for complete process
+
+## Available Sub-Agents
+
+The project has 18 specialized agents in `.claude/agents/`:
+
+### Quality & Review Agents
+- **pr-prep** (⭐ Use before EVERY PR): Pre-PR quality checks, prevents CI failures
+- **code-reviewer**: Code quality analysis and best practices review
+- **accessibility-guardian**: WCAG 2.1 AA compliance verification
+- **stack-reviewer**: React/TypeScript application code review
+- **test-runner**: Testing and quality assurance specialist
+
+### Product & Strategy Agents
+- **product-manager**: PRDs, roadmaps, user stories, prioritization (RICE, MoSCoW)
+- **product-operations**: Growth experiments, A/B testing, analytics, event tracking, GTM plans
+- **technical-architect**: System design, architecture review, scalability analysis
+- **data-analytics-engineer**: BI solutions, data pipelines, HR analytics
+
+### Development Agents
+- **react-optimizer**: React Hook dependencies, performance optimization
+- **fullstack-refactoring-specialist**: Error reduction, code quality improvement
+- **chart-debugger**: Recharts visualization debugging
+- **data-transformer**: Excel/CSV imports, data format conversions
+- **json-master**: JSON data management and validation
+- **ui-ux-designer**: UI/UX design guidance and accessibility
+
+### Legacy/Migration Agents
+- **firebase-remover**: Firebase to JSON migration (legacy)
+- **pdf-generator**: PDF report generation
+
+### How to Use Agents
+
+**Automatic:** Claude Code recognizes tasks matching agent expertise
+**Explicit:** Request specific agent: "Use pr-prep to check if I'm ready for PR"
+**Proactive:** Some agents activate automatically (pr-prep before PRs, code-reviewer after writing code)
+
 ## Key Documentation
 - **PROJECT_STATUS.md** - Current project state and progress
 - **WORKFLOW_GUIDE.md** - Development procedures and standards
+- **PR_WORKFLOW.md** - Pull request process and quality checklist
 - **TECHNICAL_DEBT.md** - Known issues and improvements
 - **ERROR_LOG.md** - Common errors and solutions
+- **TECHNICAL_ARCHITECTURE_REVIEW.md** - Comprehensive architecture assessment (B+ grade)
+- **PRODUCT_OPERATIONS_ASSESSMENT.md** - Product ops evaluation and growth experiments

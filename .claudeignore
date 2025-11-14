@@ -1,0 +1,93 @@
+# .claudeignore - Optimize Claude Code Performance
+# Exclude files/directories that don't need to be analyzed
+
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build outputs
+build/
+dist/
+*.tsbuildinfo
+*.map
+
+# Testing coverage
+coverage/
+.nyc_output/
+
+# Large data files (Claude doesn't need these for code analysis)
+source-metrics/*.xlsx
+source-metrics/*.xls
+source-metrics/*.csv
+
+# Cache directories
+.cache/
+.parcel-cache/
+.npm/
+.eslintcache
+.stylelintcache
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE files (keep .vscode for settings)
+.idea/
+*.swp
+*.swo
+*~
+
+# Environment files (may contain secrets)
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Git files
+.git/
+.gitattributes
+
+# Large image assets (Claude can see them via Read tool when needed)
+# Optimize: These are the 93MB files identified by Tech Architect
+public/creighton-*.png
+public/logo*.png
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Package manager locks (keep package.json, ignore locks for context size)
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Documentation that's not code-relevant
+# Keep CLAUDE.md, PROJECT_STATUS.md, WORKFLOW_GUIDE.md
+# But ignore large generated docs
+CHANGELOG.md
+
+# Firebase migration remnants (identified as dead code by Tech Architect)
+# These can be reviewed but don't need constant context
+**/firebase-*.js
+**/pocketbase-*.js
+
+# Test snapshots (can be regenerated)
+**/__snapshots__/
+
+# Storybook static builds
+storybook-static/
