@@ -85,7 +85,7 @@ npm run data:update     # Complete data workflow
 
 ## Available Sub-Agents
 
-The project has 18 specialized agents in `.claude/agents/`:
+The project has 17 specialized agents in `.claude/agents/`:
 
 ### Quality & Review Agents
 - **pr-prep** (⭐ Use before EVERY PR): Pre-PR quality checks, prevents CI failures
@@ -96,7 +96,6 @@ The project has 18 specialized agents in `.claude/agents/`:
 
 ### Product & Strategy Agents
 - **product-manager**: PRDs, roadmaps, user stories, prioritization (RICE, MoSCoW)
-- **product-operations**: Growth experiments, A/B testing, analytics, event tracking, GTM plans
 - **technical-architect**: System design, architecture review, scalability analysis
 - **data-analytics-engineer**: BI solutions, data pipelines, HR analytics
 
@@ -124,5 +123,4 @@ The project has 18 specialized agents in `.claude/agents/`:
 - **PR_WORKFLOW.md** - Pull request process and quality checklist
 - **TECHNICAL_DEBT.md** - Known issues and improvements
 - **ERROR_LOG.md** - Common errors and solutions
-- **TECHNICAL_ARCHITECTURE_REVIEW.md** - Comprehensive architecture assessment (B+ grade)
-- **PRODUCT_OPERATIONS_ASSESSMENT.md** - Product ops evaluation and growth experiments
+- **docs/assessments/TECHNICAL_ARCHITECTURE_REVIEW.md** - Comprehensive architecture assessment (B+ grade)
