@@ -123,10 +123,10 @@ const DashboardIndex = () => {
       {/* Hero Section */}
       <div className="relative bg-gray-900 overflow-hidden">
         {/* Background Image with Overlay */}
-        <div 
+        <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{ 
-            backgroundImage: 'url("/images/hero-bg.jpg")',
+          style={{
+            backgroundImage: 'url("/images/hero-bg.webp")',
             filter: 'brightness(0.4) contrast(1.1)'
           }}
         ></div>
