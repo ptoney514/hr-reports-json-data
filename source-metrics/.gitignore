@@ -1,28 +1,46 @@
-# Ignore actual data files but keep folder structure
-*/fy*/*.csv
-*/fy*/*.xlsx
-*/fy*/*.xls
-*/fy*/*.json
+# ==============================================================================
+# RAW DATA PROTECTION (Contains PII - NEVER commit)
+# ==============================================================================
 
-# Keep processed data private
-processed-data/*
-!processed-data/.gitkeep
+# Block ALL files in raw/ folders (Excel, CSV from Oracle HCM)
+*/raw/**/*
+!*/raw/**/.gitkeep
 
-# Allow templates
-!templates/*.csv
-!templates/*.xlsx
-
-# Keep README files
-!README.md
-!*/README.md
-
-# Ignore any files with PII indicators
+# Additional PII protection patterns
 *_pii.*
 *_private.*
 *_confidential.*
 *.bak
 *.tmp
 
-# Ignore large data dumps
+# ==============================================================================
+# CLEANED DATA (Safe to commit - PII removed)
+# ==============================================================================
+
+# Allow cleaned JSON files
+!*/cleaned/**/*.json
+!*/cleaned/**/*.md
+
+# ==============================================================================
+# DOCUMENTATION & TEMPLATES
+# ==============================================================================
+
+# Allow README files
+!README.md
+!*/README.md
+!**/README.md
+
+# Allow templates
+!templates/*.csv
+!templates/*.xlsx
+!templates/*.md
+
+# ==============================================================================
+# LEGACY PATTERNS (from old structure)
+# ==============================================================================
+
+# Keep for backwards compatibility
+processed-data/*
+!processed-data/.gitkeep
 raw-exports/*/*
 !raw-exports/*/.gitkeep
