@@ -1,0 +1,24 @@
+{
+  "reportingDate": "2024-09-29",
+  "totalEmployees": 120675,
+  "faculty": 49480,
+  "staff": 2070,
+  "hsp": 0,
+  "temp": 12477,
+  "students": 44417,
+  "jesuits": 0,
+  "other": 12231,
+  "locations": {
+    "Omaha Campus": 110371,
+    "Phoenix Campus": 10184
+  },
+  "categories": {
+    "faculty": 49480,
+    "student": 44417,
+    "temp": 9169,
+    "other": 12231,
+    "staff": 2070,
+    "nbe": 2030,
+    "prn": 1278
+  }
+}
