@@ -1959,3 +1959,108 @@ export const getBenefitEligibleBreakdown = (date = "2025-06-30") => {
     total: beTotal
   };
 };
+
+// ============================================================================
+// FISCAL PERIODS CONFIGURATION
+// For Quarterly Report Dashboard and Data Import
+// ============================================================================
+
+/**
+ * Fiscal Period Metadata
+ * Creighton University Fiscal Year: July 1 - June 30
+ * - Q1: July - September (ends Sept 30)
+ * - Q2: October - December (ends Dec 31)
+ * - Q3: January - March (ends Mar 31)
+ * - Q4: April - June (ends Jun 30)
+ */
+export const FISCAL_PERIODS = {
+  "FY25_Q1": {
+    fiscalYear: "FY25",
+    quarter: "Q1",
+    label: "Q1 FY25",
+    startDate: "2024-07-01",
+    endDate: "2024-09-30",
+    reportDate: "2024-09-30",
+    displayName: "July - September 2024",
+    hasData: true
+  },
+  "FY25_Q2": {
+    fiscalYear: "FY25",
+    quarter: "Q2",
+    label: "Q2 FY25",
+    startDate: "2024-10-01",
+    endDate: "2024-12-31",
+    reportDate: "2024-12-31",
+    displayName: "October - December 2024",
+    hasData: true
+  },
+  "FY25_Q3": {
+    fiscalYear: "FY25",
+    quarter: "Q3",
+    label: "Q3 FY25",
+    startDate: "2025-01-01",
+    endDate: "2025-03-31",
+    reportDate: "2025-03-31",
+    displayName: "January - March 2025",
+    hasData: true
+  },
+  "FY25_Q4": {
+    fiscalYear: "FY25",
+    quarter: "Q4",
+    label: "Q4 FY25",
+    startDate: "2025-04-01",
+    endDate: "2025-06-30",
+    reportDate: "2025-06-30",
+    displayName: "April - June 2025",
+    hasData: true
+  }
+};
+
+/**
+ * Get all available fiscal quarters (only those with valid data)
+ * @returns {Array} Array of quarters with hasData: true
+ */
+export const getAvailableQuarters = () => {
+  return Object.entries(FISCAL_PERIODS)
+    .filter(([_, period]) => period.hasData)
+    .map(([key, period]) => ({
+      value: key,
+      label: period.label,
+      displayName: period.displayName,
+      reportDate: period.reportDate
+    }))
+    .sort((a, b) => b.value.localeCompare(a.value)); // Sort newest first
+};
+
+/**
+ * Get the most recent quarter with valid data
+ * @returns {string} Quarter key (e.g., "FY25_Q4")
+ */
+export const getMostRecentQuarter = () => {
+  const available = getAvailableQuarters();
+  return available.length > 0 ? available[0].value : null;
+};
+
+/**
+ * Get the previous quarter for QoQ comparison
+ * @param {string} fiscalQuarter - Current quarter key (e.g., "FY25_Q4")
+ * @returns {string|null} Previous quarter key or null if first quarter
+ */
+export const getPreviousQuarter = (fiscalQuarter) => {
+  const quarters = Object.keys(FISCAL_PERIODS).sort();
+  const currentIndex = quarters.indexOf(fiscalQuarter);
+
+  if (currentIndex <= 0) return null;
+
+  const previousKey = quarters[currentIndex - 1];
+  return FISCAL_PERIODS[previousKey]?.hasData ? previousKey : null;
+};
+
+/**
+ * Get fiscal period metadata
+ * @param {string} fiscalQuarter - Quarter key (e.g., "FY25_Q4")
+ * @returns {Object|null} Period metadata or null if not found
+ */
+export const getFiscalPeriod = (fiscalQuarter) => {
+  return FISCAL_PERIODS[fiscalQuarter] || null;
+};
