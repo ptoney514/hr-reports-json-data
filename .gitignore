@@ -48,6 +48,11 @@ logs
 *.log
 
 # Runtime data
+
+# Data import pipeline - ignore large cleaned data files
+# Keep summaries and audit trails for documentation
+source-metrics/**/cleaned/**/*_cleaned.json
+source-metrics/**/raw/**/*
 pids
 *.pid
 *.seed
