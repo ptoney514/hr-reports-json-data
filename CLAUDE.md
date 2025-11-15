@@ -85,13 +85,12 @@ npm run data:update     # Complete data workflow
 
 ## Available Sub-Agents
 
-The project has 17 specialized agents in `.claude/agents/`:
+The project has 12 specialized agents in `.claude/agents/`:
 
 ### Quality & Review Agents
 - **pr-prep** (⭐ Use before EVERY PR): Pre-PR quality checks, prevents CI failures
 - **code-reviewer**: Code quality analysis and best practices review
 - **accessibility-guardian**: WCAG 2.1 AA compliance verification
-- **stack-reviewer**: React/TypeScript application code review
 - **test-runner**: Testing and quality assurance specialist
 
 ### Product & Strategy Agents
@@ -101,15 +100,10 @@ The project has 17 specialized agents in `.claude/agents/`:
 
 ### Development Agents
 - **react-optimizer**: React Hook dependencies, performance optimization
-- **fullstack-refactoring-specialist**: Error reduction, code quality improvement
 - **chart-debugger**: Recharts visualization debugging
 - **data-transformer**: Excel/CSV imports, data format conversions
 - **json-master**: JSON data management and validation
 - **ui-ux-designer**: UI/UX design guidance and accessibility
-
-### Legacy/Migration Agents
-- **firebase-remover**: Firebase to JSON migration (legacy)
-- **pdf-generator**: PDF report generation
 
 ### How to Use Agents
 
