@@ -17,8 +17,9 @@
 # CLEANED DATA (Safe to commit - PII removed)
 # ==============================================================================
 
-# Allow cleaned JSON files
-!*/cleaned/**/*.json
+# Allow cleaned JSON summaries and audit trails ONLY
+# Large *_cleaned.json files (50MB+) are blocked in root .gitignore
+!*/cleaned/**/*_summary.json
 !*/cleaned/**/*.md
 
 # ==============================================================================

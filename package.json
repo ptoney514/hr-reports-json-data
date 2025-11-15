@@ -50,7 +50,15 @@
     "workforce:process": "node scripts/processWorkforceData.js",
     "workforce:sync": "node scripts/syncWorkforceToStaticData.js",
     "workforce:validate": "node scripts/validateWorkforceConsistency.js",
-    "workforce:update": "npm run workforce:process && npm run workforce:sync && npm run workforce:validate"
+    "workforce:update": "npm run workforce:process && npm run workforce:sync && npm run workforce:validate",
+    "clean:workforce": "node scripts/clean-workforce-data.js",
+    "clean:terminations": "node scripts/clean-terminations-data.js",
+    "clean:exit-surveys": "node scripts/clean-exit-surveys-data.js",
+    "import:workforce": "node scripts/data-import.js workforce",
+    "import:terminations": "node scripts/data-import.js terminations",
+    "import:exit-surveys": "node scripts/data-import.js exit-surveys",
+    "import:wizard": "node scripts/data-wizard-interactive.js",
+    "validate:all": "node scripts/validate-all-sources.js"
   },
   "eslintConfig": {
     "extends": [
