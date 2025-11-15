@@ -1,6 +1,6 @@
 # HR Reports Project
 
-A comprehensive React-based dashboard application for I-9 compliance health monitoring and HR analytics. Features multiple dashboards, comprehensive testing infrastructure, WCAG 2.1 AA accessibility compliance, JSON-based data architecture, and enterprise-level performance optimization.
+A comprehensive React-based dashboard application for I-9 compliance health monitoring and HR analytics. Features multiple dashboards, comprehensive testing infrastructure, WCAG 2.1 AA accessibility compliance, JSON-based data architecture, automated data import pipeline, and enterprise-level performance optimization.
 
 ## 🚀 Quick Start
 
@@ -19,8 +19,19 @@ npm start
 # Navigate to: http://localhost:3000
 ```
 
-**Access the Enhanced Workforce Dashboard:**
-- URL: http://localhost:3000/dashboards/enhanced-workforce
+**📖 Need help getting started?** See **[QUICK_START.md](QUICK_START.md)** for the complete guide including:
+- Running dashboards
+- Using the interactive data import wizard
+- Common workflows
+- Troubleshooting
+
+**🎯 Import data in 2 minutes:** `npm run import:wizard`
+
+**Access Dashboards:**
+- **Dashboard Index:** http://localhost:3000/dashboards
+- **Workforce Dashboard:** http://localhost:3000/dashboards/workforce
+- **Exit Survey FY25:** http://localhost:3000/dashboards/exit-survey-fy25
+- **Turnover Dashboard:** http://localhost:3000/dashboards/turnover
 
 ## 🛠️ Development Setup
 
@@ -64,6 +75,7 @@ npm run analyze
 
 ## 📋 Available Commands
 
+### Dashboard Commands
 ```bash
 # Development
 npm start              # Start development server (port 3000)
@@ -80,6 +92,25 @@ npm run optimize       # Build and analyze
 # Shortcuts
 npm run dev            # Alias for npm start
 ```
+
+### Data Import Commands (New!)
+```bash
+# Interactive Wizard (Recommended)
+npm run import:wizard        # Guided import process
+
+# Clean Data (Remove PII, Validate)
+npm run clean:workforce      # Clean workforce Excel files
+npm run clean:terminations   # Clean terminations data
+
+# Validate Data
+npm run validate:all         # Cross-source validation
+
+# Advanced (Manual Import)
+node scripts/data-import.js workforce file.xlsx --quarter FY25_Q2
+node scripts/merge-to-static-data.js workforce --date 2024-12-31 --input summary.json
+```
+
+**💡 Tip:** Use `npm run import:wizard` for the easiest data import experience!
 
 ## 🔧 When to Rebuild Docker
 
