@@ -76,6 +76,42 @@ npm run data:update     # Complete data workflow
 - Improving visualization responsiveness
 - Enhancing user experience and navigation
 
+## Project Management & Workflow
+
+### GitHub Issues - Single Source of Truth for Roadmap
+**All planned work, features, and bugs are tracked in GitHub Issues:**
+- View all issues: https://github.com/ptoney514/hr-reports-json-data/issues
+- Issues organized by priority labels: `p0`, `p1`, `p2`, `priority: high/medium/low`
+- Issues categorized by type: `enhancement`, `bug`, `technical-debt`, `performance`, `testing`
+
+### Workflow: GitHub Issues ↔ PROJECT_STATUS.md
+
+**GitHub Issues = Roadmap & Backlog** (What to do)
+- All future work and planned features
+- Prioritized backlog (P0 → P1 → P2)
+- Bug tracking and technical debt
+- Long-term planning and milestones
+
+**PROJECT_STATUS.md = Current Sprint** (What's happening now)
+- Active sprint work (currently in progress)
+- Recent accomplishments (last 2-4 weeks)
+- Immediate next session goals
+- Quick reference for current status
+
+**Sync Process:**
+1. **Sprint Planning**: Select issues from GitHub → Add to PROJECT_STATUS.md "In Progress"
+2. **During Work**: Update GitHub issue comments + PROJECT_STATUS.md progress
+3. **Sprint Complete**: Close GitHub issues → Move to PROJECT_STATUS.md "Completed Features"
+4. **Weekly**: Groom GitHub backlog, re-prioritize, update estimates
+
+**Quick Commands:**
+```bash
+gh issue list --label "p0"              # View P0 critical tasks
+gh issue list --label "priority: high"  # View high priority items
+gh issue create --title "..." --body "..." --label "p1,enhancement"  # Create new issue
+gh issue close 7 --comment "Completed"  # Close finished issue
+```
+
 ## Pull Request Requirements
 
 **CRITICAL**: Always use pr-prep agent before creating PRs

@@ -82,32 +82,38 @@
   - postcss: 8.5.6 (latest stable)
   - @testing-library/user-event: 14.6.1 (updated previously)
 
-## Pending/Backlog 📋
+## Roadmap & Backlog 📋
 
-### High Priority
-- Real-time data refresh capability
-- Enhanced mobile responsive layouts
-- Export functionality for all dashboards
-- Performance optimization for large datasets
+**All planned work is tracked in [GitHub Issues](https://github.com/ptoney514/hr-reports-json-data/issues)**
 
-### Medium Priority
-- Historical data comparison (3+ years)
-- Department comparison tools
-- Custom date range selection
-- Advanced filtering options
+### Quick Links
+- [P0 Critical Tasks](https://github.com/ptoney514/hr-reports-json-data/labels/p0) - Address immediately
+- [P1 High Priority](https://github.com/ptoney514/hr-reports-json-data/labels/p1) - This quarter
+- [P2 Medium Priority](https://github.com/ptoney514/hr-reports-json-data/labels/p2) - Next quarter
+- [All Enhancement Requests](https://github.com/ptoney514/hr-reports-json-data/labels/enhancement)
+- [Performance Issues](https://github.com/ptoney514/hr-reports-json-data/labels/performance)
+- [Technical Debt](https://github.com/ptoney514/hr-reports-json-data/labels/technical-debt)
 
-### Low Priority
-- Dark mode theme support
-- Dashboard customization per user
-- Email alerts for data anomalies
+### Current Roadmap Summary (25 Issues Created)
+- **P0 Critical**: 3 issues (4 hours) - ✅ All complete!
+- **P1 High**: 4 issues (2-3 weeks) - Next sprint
+- **P2 Medium**: 4 issues (1-4 weeks) - Future quarters
+- **High Priority Features**: 4 issues
+- **Medium Priority Features**: 4 issues
+- **Low Priority Features**: 3 issues
+- **Bugs**: 3 issues
+
+**View full roadmap**: `gh issue list` or visit [GitHub Issues](https://github.com/ptoney514/hr-reports-json-data/issues)
 
 ## Known Issues 🐛
 
-### Active Bugs
-- **P2**: ESLint warnings in multiple components (unused variables)
-- **P3**: Console deprecation warnings from webpack dev server
-- **P3**: Chart legends overlap on mobile devices
-- **P3**: Print layout cuts off some chart labels
+**All bugs tracked in [GitHub Issues](https://github.com/ptoney514/hr-reports-json-data/labels/bug)**
+
+### Active Bugs (Tracked in GitHub)
+- [#10](https://github.com/ptoney514/hr-reports-json-data/issues/10) - P1: ESLint warnings (30+ unused variables)
+- [#29](https://github.com/ptoney514/hr-reports-json-data/issues/29) - P3: Console deprecation warnings from webpack dev server
+- [#30](https://github.com/ptoney514/hr-reports-json-data/issues/30) - P3: Chart legends overlap on mobile devices
+- [#31](https://github.com/ptoney514/hr-reports-json-data/issues/31) - P3: Print layout cuts off some chart labels
 
 ### Recently Fixed
 - ✅ Q4 FY25 exit count mismatch resolved

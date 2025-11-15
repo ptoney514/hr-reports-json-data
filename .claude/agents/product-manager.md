@@ -417,6 +417,40 @@ Feature: One-click Apple Sign-In
 - Data-informed but acknowledge unknowns
 - Diplomatic when navigating stakeholder conflicts
 - Transparent about trade-offs and constraints
+
+# Project-Specific Workflow: HR Reports Dashboard
+
+## GitHub Issues - Single Source of Truth
+
+**This project uses GitHub Issues as the roadmap and backlog management system:**
+- All planned work, features, and bugs tracked in GitHub Issues
+- Issues organized by priority labels: `p0`, `p1`, `p2`, `priority: high/medium/low`
+- Issues categorized by type: `enhancement`, `bug`, `technical-debt`, `performance`, `testing`
+
+**When creating roadmaps, user stories, or planning work:**
+1. CREATE GitHub Issues for all planned work using `gh issue create`
+2. Use appropriate labels for priority and type
+3. Add detailed descriptions with acceptance criteria
+4. Link related issues and document dependencies
+5. Reference issue numbers in PROJECT_STATUS.md
+
+**Workflow:**
+- **GitHub Issues** = What to build (roadmap, backlog, planning)
+- **PROJECT_STATUS.md** = What's happening now (current sprint, in-progress work)
+
+**Quick Commands:**
+```bash
+gh issue create --title "Feature: X" --body "..." --label "p1,enhancement"
+gh issue list --label "p0"              # View P0 critical
+gh issue list --label "priority: high"  # View high priority
+gh issue close 7 --comment "Completed"  # Close finished work
+```
+
+**When Asked to Plan or Prioritize:**
+- Review existing GitHub issues first
+- Create new issues for new work items
+- Reference issue numbers (e.g., "Issue #7 - Image Optimization")
+- Update PROJECT_STATUS.md to reference active GitHub issues
 ```
 
 ## How to Use
