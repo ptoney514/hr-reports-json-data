@@ -10,13 +10,13 @@
     "@testing-library/user-event": "^14.6.1",
     "ajv": "^8.17.1",
     "csv-parse": "^6.1.0",
-    "date-fns": "^3.6.0",
+    "date-fns": "^4.1.0",
     "file-saver": "^2.0.5",
     "html2canvas": "^1.4.1",
     "jspdf": "^3.0.1",
     "jspdf-autotable": "^5.0.2",
     "lodash": "^4.17.21",
-    "lucide-react": "^0.523.0",
+    "lucide-react": "^0.553.0",
     "papaparse": "^5.5.3",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
@@ -25,7 +25,7 @@
     "react-to-print": "^3.1.0",
     "recharts": "^3.0.0",
     "reselect": "^5.1.1",
-    "web-vitals": "^2.1.4",
+    "web-vitals": "^5.1.0",
     "xlsx": "^0.18.5"
   },
   "scripts": {
@@ -91,7 +91,7 @@
     "postcss": "^8.5.6",
     "sharp": "^0.34.5",
     "tailwindcss": "^3.4.17",
-    "typescript": "^4.9.5",
+    "typescript": "^5.9.3",
     "webpack-bundle-analyzer": "^4.10.2"
   }
 }
