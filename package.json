@@ -10,7 +10,6 @@
     "@testing-library/user-event": "^14.6.1",
     "ajv": "^8.17.1",
     "csv-parse": "^6.1.0",
-    "csv-parser": "^3.2.0",
     "date-fns": "^3.6.0",
     "file-saver": "^2.0.5",
     "html2canvas": "^1.4.1",
