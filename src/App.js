@@ -21,6 +21,12 @@ const FY26Priorities = lazy(() => import('./components/dashboards/FY26Priorities
 const LearningDevelopmentDashboard = lazy(() => import('./components/dashboards/LearningDevelopmentDashboard'));
 const TotalRewardsDashboard = lazy(() => import('./components/dashboards/TotalRewardsDashboard'));
 const BenefitsWellbeingDashboard = lazy(() => import('./components/dashboards/BenefitsWellbeingDashboard'));
+// Quarterly Exit Survey Reports
+const ExitSurveyQ1Dashboard = lazy(() => import('./components/dashboards/ExitSurveyQ1FY26Dashboard'));
+const ExitSurveyQ2Dashboard = lazy(() => import('./components/dashboards/ExitSurveyQ2Dashboard'));
+const ExitSurveyQ3Dashboard = lazy(() => import('./components/dashboards/ExitSurveyQ3Dashboard'));
+const ExitSurveyQ4Dashboard = lazy(() => import('./components/dashboards/ExitSurveyQ4Dashboard'));
+const ExitSurveyOverview = lazy(() => import('./components/dashboards/ExitSurveyOverview'));
 // WorkforceAudit temporarily disabled - papaparse dependency issue
 // const WorkforceAudit = lazy(() => import('./components/dashboards/WorkforceAudit'));
 // AdminDashboard removed - using static data now
@@ -122,7 +128,14 @@ function App() {
               <Route path="/dashboards/benefits-wellbeing" element={<BenefitsWellbeingDashboard />} />
               {/* Workforce Audit temporarily disabled - papaparse dependency issue */}
               {/* <Route path="/dashboards/workforce-audit" element={<WorkforceAudit />} /> */}
-              
+
+              {/* Quarterly Exit Survey Reports */}
+              <Route path="/dashboards/exit-survey-overview" element={<ExitSurveyOverview />} />
+              <Route path="/dashboards/exit-survey-q1" element={<ExitSurveyQ1Dashboard />} />
+              <Route path="/dashboards/exit-survey-q2" element={<ExitSurveyQ2Dashboard />} />
+              <Route path="/dashboards/exit-survey-q3" element={<ExitSurveyQ3Dashboard />} />
+              <Route path="/dashboards/exit-survey-q4" element={<ExitSurveyQ4Dashboard />} />
+
               {/* Testing routes removed - using static data approach */}
               
               

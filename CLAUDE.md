@@ -121,7 +121,7 @@ gh issue close 7 --comment "Completed"  # Close finished issue
 
 ## Available Sub-Agents
 
-The project has 12 specialized agents in `.claude/agents/`:
+The project has 13 specialized agents in `.claude/agents/`:
 
 ### Quality & Review Agents
 - **pr-prep** (⭐ Use before EVERY PR): Pre-PR quality checks, prevents CI failures
@@ -140,6 +140,7 @@ The project has 12 specialized agents in `.claude/agents/`:
 - **data-transformer**: Excel/CSV imports, data format conversions
 - **json-master**: JSON data management and validation
 - **ui-ux-designer**: UI/UX design guidance and accessibility
+- **design-system-builder**: Brand identity, mood boards, color palettes, typography, Figma design systems
 
 ### How to Use Agents
 

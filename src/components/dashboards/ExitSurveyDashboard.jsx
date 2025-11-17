@@ -6,6 +6,7 @@ import FY2025LessonsLearnedPanel from '../panels/FY2025LessonsLearnedPanel';
 import FY2026PlanningMatrix from '../planning/FY2026PlanningMatrix';
 import FY2026Recommendations from '../planning/FY2026Recommendations';
 import DepartmentExitAnalysis from '../charts/DepartmentExitAnalysis';
+import DepartmentResponseRates from '../charts/DepartmentResponseRates';
 
 const ExitSurveyDashboard = () => {
   // Get FY2025 data for summary metrics
@@ -152,7 +153,7 @@ const ExitSurveyDashboard = () => {
               <p className="text-gray-600 text-sm mb-6">
                 Based on {q4Data.totalResponses} survey responses from {q4Data.totalExits} exits in Q4 FY2025
               </p>
-              
+
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* Exit Reasons Chart */}
                 <div className="space-y-4">
@@ -161,8 +162,8 @@ const ExitSurveyDashboard = () => {
                     return (
                       <div key={index} className="flex items-center justify-between py-3 border-b border-gray-100 last:border-0">
                         <div className="flex items-center gap-3 flex-1">
-                          <span 
-                            className="w-4 h-4 rounded-full flex-shrink-0" 
+                          <span
+                            className="w-4 h-4 rounded-full flex-shrink-0"
                             style={{ backgroundColor: colors[index % colors.length] }}
                           ></span>
                           <span className="text-sm font-medium text-gray-800 min-w-0 flex-1">
@@ -171,11 +172,11 @@ const ExitSurveyDashboard = () => {
                         </div>
                         <div className="flex items-center gap-3 ml-4">
                           <div className="w-24 bg-gray-200 rounded-full h-3">
-                            <div 
-                              className="h-3 rounded-full transition-all duration-300" 
-                              style={{ 
-                                width: `${reason.percentage}%`, 
-                                backgroundColor: colors[index % colors.length] 
+                            <div
+                              className="h-3 rounded-full transition-all duration-300"
+                              style={{
+                                width: `${reason.percentage}%`,
+                                backgroundColor: colors[index % colors.length]
                               }}
                             ></div>
                           </div>
@@ -222,6 +223,16 @@ const ExitSurveyDashboard = () => {
             </div>
           </div>
         )}
+
+        {/* School/Department Response Rates */}
+        <div className="mb-8">
+          <DepartmentResponseRates
+            reportingDate="2025-06-30"
+            layout="both"
+            sortBy="responseRate"
+            height={450}
+          />
+        </div>
 
         {/* Department Analysis */}
         <div className="mb-8">

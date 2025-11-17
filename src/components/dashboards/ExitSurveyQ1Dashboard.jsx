@@ -1,10 +1,10 @@
 import React from 'react';
-import { BarChart, Bar, LineChart, Line, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, Line, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { TrendingUp, UserX, FileText, AlertCircle } from 'lucide-react';
 import { getExitSurveyData } from '../../data/staticData';
 
 const ExitSurveyQ1Dashboard = () => {
-  const surveyData = getExitSurveyData("2024-09-30");
+  const surveyData = getExitSurveyData("2025-09-30"); // Q1 FY26
 
   const satisfactionData = [
     { category: 'Management Support', score: surveyData.satisfactionRatings.managementSupport, target: 3.5 },
@@ -26,7 +26,7 @@ const ExitSurveyQ1Dashboard = () => {
   };
 
   const quarterlyTrendData = [
-    { quarter: 'Q1 FY25', exits: 79, responses: 25, rate: 31.6 }
+    { quarter: 'Q1 FY26', exits: surveyData.totalExits || 15, responses: surveyData.totalResponses, rate: surveyData.responseRate || 0 }
   ];
 
   return (
@@ -36,8 +36,8 @@ const ExitSurveyQ1Dashboard = () => {
         <div className="flex items-center">
           <TrendingUp className="h-6 w-6 text-blue-400 mr-3" />
           <div>
-            <h1 className="text-2xl font-bold text-blue-800">Q1 FY25 Exit Survey Analysis - Program Launch</h1>
-            <p className="text-blue-600 mt-1">First quarter of exit survey data collection establishing baseline metrics</p>
+            <h1 className="text-2xl font-bold text-blue-800">Q1 FY26 Exit Survey Analysis - First Quarter Results</h1>
+            <p className="text-blue-600 mt-1">Fiscal Year 2026 Q1 exit survey data and insights (July - September 2025)</p>
           </div>
         </div>
       </div>
@@ -48,8 +48,8 @@ const ExitSurveyQ1Dashboard = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Total Exits</p>
-              <p className="text-2xl font-bold text-gray-900">{surveyData.totalExits}</p>
-              <p className="text-xs text-gray-500 mt-1">Q1 FY25</p>
+              <p className="text-2xl font-bold text-gray-900">{surveyData.totalExits || 'TBD'}</p>
+              <p className="text-xs text-gray-500 mt-1">Q1 FY26 (pending termination data)</p>
             </div>
             <UserX className="h-8 w-8 text-gray-400" />
           </div>
@@ -59,8 +59,8 @@ const ExitSurveyQ1Dashboard = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Response Rate</p>
-              <p className="text-2xl font-bold text-blue-600">{surveyData.responseRate}%</p>
-              <p className="text-xs text-gray-500 mt-1">{surveyData.totalResponses} of {surveyData.totalExits}</p>
+              <p className="text-2xl font-bold text-blue-600">{surveyData.responseRate ? `${surveyData.responseRate}%` : 'TBD'}</p>
+              <p className="text-xs text-gray-500 mt-1">{surveyData.totalResponses} responses{surveyData.totalExits ? ` of ${surveyData.totalExits}` : ''}</p>
             </div>
             <FileText className="h-8 w-8 text-blue-400" />
           </div>
@@ -96,19 +96,17 @@ const ExitSurveyQ1Dashboard = () => {
           <div>
             <h4 className="font-semibold text-yellow-700 mb-2">Primary Concerns:</h4>
             <ul className="list-disc list-inside text-yellow-600 space-y-1 text-sm">
-              <li>Career advancement top exit reason (28%)</li>
-              <li>79 exits indicate high turnover rate</li>
-              <li>Career development satisfaction low (2.7/5.0)</li>
-              <li>20% reported workplace concerns</li>
+              {surveyData.keyInsights.areasOfConcern.map((concern, index) => (
+                <li key={index}>{concern}</li>
+              ))}
             </ul>
           </div>
           <div>
             <h4 className="font-semibold text-green-700 mb-2">Positive Indicators:</h4>
             <ul className="list-disc list-inside text-green-600 space-y-1 text-sm">
-              <li>Exit survey program successfully launched</li>
-              <li>64% would recommend as employer</li>
-              <li>Benefits satisfaction strong (3.5/5.0)</li>
-              <li>31.6% response rate for first quarter</li>
+              {surveyData.keyInsights.positiveFeedback.map((feedback, index) => (
+                <li key={index}>{feedback}</li>
+              ))}
             </ul>
           </div>
         </div>
