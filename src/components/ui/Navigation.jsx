@@ -1,9 +1,9 @@
 import React, { useState, useCallback } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { 
-  BarChart3, 
-  Users, 
-  TrendingDown, 
+import {
+  BarChart3,
+  Users,
+  TrendingDown,
   Home,
   Menu,
   X,
@@ -14,17 +14,25 @@ import {
   Target,
   GraduationCap,
   DollarSign,
-  Heart
+  Heart,
+  ChevronDown,
+  ChevronRight,
+  FileText
 } from 'lucide-react';
 import { announceToScreenReader } from '../../utils/accessibilityUtils';
 import SyncStatusIndicator from './SyncStatusIndicator';
 
 const Navigation = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isQuarterlyReportsExpanded, setIsQuarterlyReportsExpanded] = useState(false);
   const location = useLocation();
 
   // Check if current path is active
   const isActive = (path) => location.pathname === path;
+
+  // Check if any quarterly report is active
+  const isQuarterlyReportActive = location.pathname.includes('/dashboards/exit-survey-q') ||
+                                  location.pathname.includes('/dashboards/exit-survey-overview');
 
   const navigationItems = [
     {
@@ -117,6 +125,40 @@ const Navigation = () => {
     }
   ];
 
+  // Quarterly Reports submenu items
+  const quarterlyReportItems = [
+    {
+      id: 'exit-survey-overview',
+      label: 'FY25 Overview',
+      path: '/dashboards/exit-survey-overview',
+      isActive: isActive('/dashboards/exit-survey-overview')
+    },
+    {
+      id: 'exit-survey-q1',
+      label: 'Q1 FY25',
+      path: '/dashboards/exit-survey-q1',
+      isActive: isActive('/dashboards/exit-survey-q1')
+    },
+    {
+      id: 'exit-survey-q2',
+      label: 'Q2 FY25',
+      path: '/dashboards/exit-survey-q2',
+      isActive: isActive('/dashboards/exit-survey-q2')
+    },
+    {
+      id: 'exit-survey-q3',
+      label: 'Q3 FY25',
+      path: '/dashboards/exit-survey-q3',
+      isActive: isActive('/dashboards/exit-survey-q3')
+    },
+    {
+      id: 'exit-survey-q4',
+      label: 'Q4 FY25',
+      path: '/dashboards/exit-survey-q4',
+      isActive: isActive('/dashboards/exit-survey-q4')
+    }
+  ];
+
 
   const toggleMobileMenu = useCallback(() => {
     const newState = !isMobileMenuOpen;
@@ -133,6 +175,12 @@ const Navigation = () => {
     setIsMobileMenuOpen(false);
     announceToScreenReader('Mobile menu closed');
   }, []);
+
+  const toggleQuarterlyReports = useCallback(() => {
+    const newState = !isQuarterlyReportsExpanded;
+    setIsQuarterlyReportsExpanded(newState);
+    announceToScreenReader(newState ? 'Quarterly Reports expanded' : 'Quarterly Reports collapsed');
+  }, [isQuarterlyReportsExpanded]);
 
 
 
@@ -154,10 +202,10 @@ const Navigation = () => {
           </div>
 
           {/* Navigation Items - Icon with abbreviated labels */}
-          <div className="flex-1 py-4 px-2 space-y-1">
+          <div className="flex-1 py-4 px-2 space-y-1 overflow-y-auto">
             {navigationItems.map((item) => {
               const IconComponent = item.icon;
-              
+
               return (
                 <Link
                   key={item.id}
@@ -177,6 +225,26 @@ const Navigation = () => {
                 </Link>
               );
             })}
+
+            {/* Quarterly Reports - Desktop Dropdown/Link */}
+            <div className="pt-2 border-t border-gray-200">
+              <Link
+                to="/dashboards/exit-survey-overview"
+                onClick={() => announceToScreenReader('Navigating to Quarterly Reports')}
+                aria-label="Quarterly Reports"
+                title="Quarterly Reports"
+                className={`flex flex-col items-center gap-1 px-2 py-2 rounded-lg transition-colors focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none ${
+                  isQuarterlyReportActive
+                    ? 'bg-blue-50 text-blue-700'
+                    : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
+                }`}
+              >
+                <FileText size={20} />
+                <span className="text-xs text-center leading-tight break-words max-w-full">
+                  Q Rpts
+                </span>
+              </Link>
+            </div>
           </div>
           
           {/* Sync Status Indicator - Bottom of sidebar */}
@@ -232,7 +300,7 @@ const Navigation = () => {
               <div className="flex-1 py-6 px-4 space-y-2 overflow-y-auto">
                 {navigationItems.map((item) => {
                   const IconComponent = item.icon;
-                  
+
                   return (
                     <Link
                       key={item.id}
@@ -249,6 +317,50 @@ const Navigation = () => {
                     </Link>
                   );
                 })}
+
+                {/* Quarterly Reports Section */}
+                <div className="pt-2 border-t border-gray-200">
+                  <button
+                    onClick={toggleQuarterlyReports}
+                    aria-expanded={isQuarterlyReportsExpanded}
+                    className={`w-full flex items-center justify-between gap-3 px-3 py-3 rounded-lg text-sm font-medium transition-colors ${
+                      isQuarterlyReportActive
+                        ? 'bg-blue-50 text-blue-700'
+                        : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <FileText size={20} />
+                      <span>Quarterly Reports</span>
+                    </div>
+                    {isQuarterlyReportsExpanded ? (
+                      <ChevronDown size={16} />
+                    ) : (
+                      <ChevronRight size={16} />
+                    )}
+                  </button>
+
+                  {/* Quarterly Report Subitems */}
+                  {isQuarterlyReportsExpanded && (
+                    <div className="mt-1 ml-4 space-y-1">
+                      {quarterlyReportItems.map((report) => (
+                        <Link
+                          key={report.id}
+                          to={report.path}
+                          onClick={closeMobileMenu}
+                          className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors ${
+                            report.isActive
+                              ? 'bg-blue-50 text-blue-700 font-medium'
+                              : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                          }`}
+                        >
+                          <div className="w-1.5 h-1.5 rounded-full bg-current opacity-50" />
+                          {report.label}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>

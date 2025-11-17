@@ -1695,12 +1695,14 @@ export const EXIT_SURVEY_DATA = {
     }
   },
   // Q4 FY25 - Actual June 30, 2025 data from PDF
+  // TODO: Review FY25 Q1-Q3 termination counts for accuracy
   "2025-06-30": {
     reportingDate: "6/30/25",
     quarter: "Q4 FY25",
-    responseRate: 35.3, // 18 of 51 exits (corrected from turnover data)
+    responseRate: 29.0, // Corrected: 18 of 62 benefit-eligible exits (was 35.3%)
     totalResponses: 18,
-    totalExits: 51,
+    totalExits: 62, // Corrected from cleaned termination data (was 51)
+
     overallSatisfaction: 3.4,
     wouldRecommend: 83.3, // 15 of 18 respondents
     wouldRecommendCount: { positive: 15, total: 18 },
@@ -1755,15 +1757,106 @@ export const EXIT_SURVEY_DATA = {
         "Develop strategies to improve exit survey participation"
       ]
     }
+  },
+  // Q1 FY26 - First quarter of fiscal year 2026
+  "2025-09-30": {
+    reportingDate: "9/30/25",
+    quarter: "Q1 FY26",
+    responseRate: 22.4,
+    totalResponses: 15,
+    totalExits: 67,
+    overallSatisfaction: 3.3,
+    wouldRecommend: 80,
+    wouldRecommendCount: {
+      positive: 12,
+      total: 15
+    },
+    concernsReported: {
+      percentage: 20,
+      count: 3,
+      total: 15,
+      description: "reported workplace concerns"
+    },
+    departureReasons: [
+      { reason: "Other", count: 3, percentage: 20 },
+      { reason: "Dissatisfied with direct supervisor", count: 2, percentage: 13.3 },
+      { reason: "Pursue other career or education", count: 1, percentage: 6.7 },
+      { reason: "Job was not as expected", count: 1, percentage: 6.7 },
+      { reason: "Lack of career advancement opportunities", count: 1, percentage: 6.7 },
+      { reason: "Family/Personal reasons", count: 1, percentage: 6.7 },
+      { reason: "Unsatisfactory salary/pay", count: 1, percentage: 6.7 },
+      { reason: "Dissatisfied with University leadership", count: 1, percentage: 6.7 },
+      { reason: "Relocation", count: 1, percentage: 6.7 },
+      { reason: "Unrealistic job expectations/workload/hours", count: 1, percentage: 6.7 },
+      { reason: "Retirement", count: 1, percentage: 6.7 },
+      { reason: "Remote/Hybrid option not available for position", count: 1, percentage: 6.7 }
+    ],
+    contributingReasons: [
+      { reason: "Unsatisfactory salary/pay", count: 6, percentage: 40 },
+      { reason: "Unrealistic job expectations/workload/hours", count: 5, percentage: 33.3 },
+      { reason: "Dissatisfied with direct supervisor", count: 5, percentage: 33.3 },
+      { reason: "Lack of work-life balance", count: 4, percentage: 26.7 },
+      { reason: "University culture", count: 4, percentage: 26.7 },
+      { reason: "Lack of flexibility", count: 4, percentage: 26.7 },
+      { reason: "Lack of career advancement opportunities", count: 3, percentage: 20 },
+      { reason: "Job was not as expected", count: 3, percentage: 20 },
+      { reason: "Dissatisfied with University leadership", count: 3, percentage: 20 },
+      { reason: "Remote/Hybrid option not available for position", count: 3, percentage: 20 },
+      { reason: "Pursue other career or education", count: 2, percentage: 13.3 },
+      { reason: "Commute/Lack of transportation", count: 1, percentage: 6.7 },
+      { reason: "Leaving the workforce", count: 1, percentage: 6.7 },
+      { reason: "Other", count: 1, percentage: 6.7 }
+    ],
+    departmentExits: [
+      // Updated with actual Q1 FY26 benefit-eligible termination counts
+      { department: "Pharmacy & Health Professions", exits: 19, responses: 0, responseRate: "0%" },
+      { department: "School of Medicine", exits: 10, responses: 3, responseRate: "30%" },
+      { department: "Student Life", exits: 5, responses: 3, responseRate: "60%" },
+      { department: "School of Dentistry", exits: 5, responses: 3, responseRate: "60%" },
+      { department: "Facilities", exits: 5, responses: 0, responseRate: "0%" },
+      { department: "Athletics", exits: 4, responses: 1, responseRate: "25%" },
+      { department: "University Relations", exits: 2, responses: 2, responseRate: "100%" }, // Includes Univ Relations (1) + Univ Communications (1)
+      { department: "Other Departments", exits: 16, responses: 3, responseRate: "19%" }, // Provost (1), VPIT (2), plus others with 0 responses
+      // Note: VPIT shows 2 survey responses but only 1 BE termination - data quality issue (likely includes TEMP worker)
+    ],
+    satisfactionRatings: {
+      jobSatisfaction: 3.2,
+      managementSupport: 3.4,
+      careerDevelopment: 3,
+      workLifeBalance: 3,
+      compensation: 3.2,
+      benefits: 3.8
+    },
+    keyInsights: {
+      areasOfConcern: [
+        "20% reported workplace concerns (3 of 15)",
+        "20% would NOT recommend Creighton as employer",
+        "Other is top departure reason (20%)",
+        "Early data - full analysis pending additional quarters"
+      ],
+      positiveFeedback: [
+        "80% would recommend Creighton as employer",
+        "New exit survey process successfully implemented in Q1",
+        "8 departments represented in responses",
+        "Baseline data established for FY26 tracking"
+      ],
+      actionItems: [
+        "Monitor response rates - target 50%+ in subsequent quarters",
+        "Address top departure reason: Other",
+        "Investigate workplace culture concerns",
+        "Develop quarterly comparison analysis as more data becomes available"
+      ]
+    }
   }
 };
 
-// Available reporting dates - All FY25 quarters
+// Available reporting dates - All FY25 quarters + Q1 FY26
 export const AVAILABLE_DATES = [
   { value: "2024-09-30", label: "9/30/24 (Q1 FY25)", status: "complete" },
   { value: "2024-12-31", label: "12/31/24 (Q2 FY25)", status: "complete" },
   { value: "2025-03-31", label: "3/31/25 (Q3 FY25)", status: "complete" },
-  { value: "2025-06-30", label: "6/30/25 (Q4 FY25)", status: "complete" }
+  { value: "2025-06-30", label: "6/30/25 (Q4 FY25)", status: "complete" },
+  { value: "2025-09-30", label: "9/30/25 (Q1 FY26)", status: "complete" }
 ];
 
 // Helper functions for accessing data
