@@ -1,6 +1,7 @@
 import React from 'react';
 import { TrendingDown, Users, UserCheck, Briefcase, BarChart3, Clock, Calendar, PieChart } from 'lucide-react';
 import { PieChart as RechartsPie, Pie, Cell, ResponsiveContainer, Label } from 'recharts';
+import { getQuarterlyTurnoverData } from '../../data/staticData';
 
 /**
  * Q1 FY26 Terminations & Turnover Dashboard
@@ -10,44 +11,12 @@ import { PieChart as RechartsPie, Pie, Cell, ResponsiveContainer, Label } from '
  * Follows universal quarterly report patterns for consistency
  */
 const TurnoverQ1FY26Dashboard = () => {
-  // Q1 FY26 Termination Data (Benefit Eligible Only)
-  const terminationData = {
-    total: {
-      count: 86,
-      oma: 78,
-      phx: 8
-    },
-    faculty: {
-      count: 21,
-      oma: 20,
-      phx: 1
-    },
-    staff: {
-      count: 41,
-      oma: 39,
-      phx: 2
-    }
-  };
+  // Load Q1 FY26 data dynamically from staticData.js
+  const data = getQuarterlyTurnoverData("2025-09-30");
 
-  // Turnover by Employee Group (Termination Type Breakdown)
-  const employeeGroupData = [
-    {
-      group: 'Benefit Eligible Faculty',
-      total: 21,
-      voluntary: 4,
-      endOfAssignment: 7,
-      retirement: 9,
-      involuntary: 1
-    },
-    {
-      group: 'Benefit Eligible Staff',
-      total: 41,
-      voluntary: 18,
-      endOfAssignment: 3,
-      retirement: 4,
-      involuntary: 16
-    }
-  ];
+  // Extract data for easier access
+  const terminationData = data.summary;
+  const employeeGroupData = data.terminationTypesByGroup;
 
   // Termination type colors
   const terminationColors = {
@@ -57,16 +26,8 @@ const TurnoverQ1FY26Dashboard = () => {
     involuntary: '#EF4444'       // Red
   };
 
-  // Years of Service at Termination - Combined Faculty & Staff
-  const yearsOfServiceData = [
-    { range: '<1 Year', faculty: 2, staff: 12 },
-    { range: '1-3 Years', faculty: 8, staff: 14 },
-    { range: '3-5 Years', faculty: 1, staff: 5 },
-    { range: '5-10 Years', faculty: 4, staff: 6 },
-    { range: '10-15 Years', faculty: 2, staff: 1 },
-    { range: '15-20 Years', faculty: 3, staff: 1 },
-    { range: '20+ Years', faculty: 6, staff: 2 }
-  ].map(item => ({
+  // Years of Service at Termination - Load from data
+  const yearsOfServiceData = data.yearsOfService.map(item => ({
     ...item,
     total: item.faculty + item.staff
   }));
@@ -78,15 +39,8 @@ const TurnoverQ1FY26Dashboard = () => {
   const yAxisMax = Math.ceil(maxYearsTotal / 5) * 5;
   const yAxisSteps = Array.from({ length: (yAxisMax / 5) + 1 }, (_, i) => i * 5);
 
-  // Turnover by Age - Benefit Eligible Faculty & Staff
-  const ageGroupData = [
-    { range: '<25', faculty: 1, staff: 7 },
-    { range: '25-34', faculty: 4, staff: 25 },
-    { range: '35-44', faculty: 3, staff: 11 },
-    { range: '45-54', faculty: 2, staff: 8 },
-    { range: '55-64', faculty: 3, staff: 4 },
-    { range: '65+', faculty: 8, staff: 7 }
-  ].map(item => ({
+  // Turnover by Age - Load from data
+  const ageGroupData = data.ageGroups.map(item => ({
     ...item,
     total: item.faculty + item.staff
   }));
@@ -96,18 +50,10 @@ const TurnoverQ1FY26Dashboard = () => {
   const ageAxisMax = Math.ceil(maxAgeTotal / 5) * 5;
   const ageAxisSteps = Array.from({ length: (ageAxisMax / 5) + 1 }, (_, i) => i * 5);
 
-  // Termination Types for <1 Year Tenure
-  const earlyTenureData = [
-    { name: 'Voluntary', value: 7, percentage: 70.0, color: '#3B82F6' },
-    { name: 'End of Assignment', value: 3, percentage: 30.0, color: '#F59E0B' }
-  ];
-  const earlyTenureTotal = earlyTenureData.reduce((sum, item) => sum + item.value, 0);
-
-  // Employee Category for <1 Year Tenure (Faculty vs Staff)
-  const earlyTenureCategoryData = [
-    { name: 'Staff', value: 8, percentage: 80.0, color: '#3B82F6' },
-    { name: 'Faculty', value: 2, percentage: 20.0, color: '#10B981' }
-  ];
+  // Early Turnover Data - Load from data
+  const earlyTenureData = data.earlyTurnover.byTerminationType;
+  const earlyTenureTotal = data.earlyTurnover.total;
+  const earlyTenureCategoryData = data.earlyTurnover.byEmployeeCategory;
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
@@ -121,10 +67,10 @@ const TurnoverQ1FY26Dashboard = () => {
                 <TrendingDown style={{color: '#0054A6'}} size={32} />
                 <div>
                   <h1 className="text-3xl font-bold text-gray-900">
-                    Q1 FY26 Terminations & Turnover Report
+                    {data.quarter} Terminations & Turnover Report
                   </h1>
                   <p className="text-gray-600 text-lg mt-2">
-                    Quarterly Termination Analysis • July 2025 - September 2025
+                    Quarterly Termination Analysis • {data.fiscalPeriod}
                   </p>
                   <p className="text-gray-500 text-sm mt-1">
                     Employee terminations, turnover rates, and workforce trends
@@ -135,7 +81,7 @@ const TurnoverQ1FY26Dashboard = () => {
                 <div className="text-5xl font-bold" style={{color: '#0054A6'}}>
                   {terminationData.total.count}
                 </div>
-                <div className="text-sm text-gray-600 font-medium">Total Q1 FY26 Terminations</div>
+                <div className="text-sm text-gray-600 font-medium">Total {data.quarter} Terminations</div>
                 <div className="text-xs text-gray-500 mt-1">
                   Faculty: {terminationData.faculty.count} | Staff: {terminationData.staff.count}
                 </div>
@@ -412,7 +358,7 @@ const TurnoverQ1FY26Dashboard = () => {
 
           {/* Data Note */}
           <div className="text-xs text-gray-600 mt-4 bg-blue-50 p-3 rounded border border-blue-200 text-center">
-            <span className="font-semibold">Note:</span> Displays years of service at termination for {terminationData.faculty.count} faculty and {terminationData.staff.count} staff terminations in Q1 FY26.
+            <span className="font-semibold">Note:</span> Displays years of service at termination for {terminationData.faculty.count} faculty and {terminationData.staff.count} staff terminations in {data.quarter}.
           </div>
         </div>
 
@@ -502,7 +448,7 @@ const TurnoverQ1FY26Dashboard = () => {
 
           {/* Data Note */}
           <div className="text-xs text-gray-600 mt-4 bg-blue-50 p-3 rounded border border-blue-200 text-center">
-            <span className="font-semibold">Note:</span> Displays age distribution at termination for {terminationData.faculty.count} faculty and {terminationData.staff.count} benefit-eligible staff terminations in Q1 FY26.
+            <span className="font-semibold">Note:</span> Displays age distribution at termination for {terminationData.faculty.count} faculty and {terminationData.staff.count} benefit-eligible staff terminations in {data.quarter}.
           </div>
         </div>
 
@@ -618,7 +564,7 @@ const TurnoverQ1FY26Dashboard = () => {
 
             {/* Section Data Note */}
             <div className="text-xs text-gray-600 mt-6 bg-blue-50 p-3 rounded border border-blue-200 text-center">
-              <span className="font-semibold">Note:</span> Early turnover analysis focuses on {earlyTenureTotal} benefit-eligible employees who left within their first year of service in Q1 FY26.
+              <span className="font-semibold">Note:</span> Early turnover analysis focuses on {earlyTenureTotal} benefit-eligible employees who left within their first year of service in {data.quarter}.
             </div>
           </div>
         </div>

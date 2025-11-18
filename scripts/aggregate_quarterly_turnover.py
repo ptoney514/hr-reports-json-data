@@ -39,12 +39,18 @@ def load_termination_data():
     return df
 
 def filter_benefit_eligible(df):
-    """Filter to benefit-eligible employees only (Faculty, Staff Exempt, Staff Non-Exempt)"""
-    benefit_eligible = df[df['Employee_Category'].isin([
-        'Faculty',
-        'Staff Exempt',
-        'Staff Non-Exempt'
-    ])].copy()
+    """Filter to benefit-eligible employees only (F/PT regular employees)"""
+    # IMPORTANT: Use Assignment Category as single source of truth
+    # Reference: TERMINATION_METHODOLOGY.md Section 4 (Benefit Eligibility)
+    # NOTE: Jesuits ARE INCLUDED - their assignment category determines eligibility, not benefit program
+    BENEFIT_ELIGIBLE_CODES = [
+        'F12', 'F11', 'F10', 'FT9',    # Full-time regular employees
+        'PT12', 'PT11', 'PT10', 'PT9'  # Part-time regular employees
+    ]
+
+    benefit_eligible = df[
+        df['Assignment_Category'].isin(BENEFIT_ELIGIBLE_CODES)
+    ].copy()
 
     print(f"\nBenefit-Eligible Terminations: {len(benefit_eligible)}")
     print(benefit_eligible['Employee_Category'].value_counts())

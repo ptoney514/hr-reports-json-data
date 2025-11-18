@@ -1522,9 +1522,9 @@ export const EXIT_SURVEY_DATA = {
   "2024-09-30": {
     reportingDate: "9/30/24",
     quarter: "Q1 FY25",
-    responseRate: 31.6, // 25 of 79 exits
+    responseRate: 31.6, // 25 of 79 exits (includes Jesuits per data owner)
     totalResponses: 25,
-    totalExits: 79,
+    totalExits: 79, // Assignment Category filter only
     overallSatisfaction: 3.1,
     wouldRecommend: 64.0, // 16 of 25 respondents
     wouldRecommendCount: { positive: 16, total: 25 },
@@ -1580,9 +1580,9 @@ export const EXIT_SURVEY_DATA = {
   "2024-12-31": {
     reportingDate: "12/31/24",
     quarter: "Q2 FY25",
-    responseRate: 34.2, // 26 of 76 exits
+    responseRate: 68.4, // 26 of 38 benefit-eligible exits (Assignment Category filter)
     totalResponses: 26,
-    totalExits: 76,
+    totalExits: 38, // Corrected with Assignment Category filter
     overallSatisfaction: 3.0,
     wouldRecommend: 57.7, // 15 of 26 respondents
     wouldRecommendCount: { positive: 15, total: 26 },
@@ -1639,9 +1639,9 @@ export const EXIT_SURVEY_DATA = {
   "2025-03-31": {
     reportingDate: "3/31/25",
     quarter: "Q3 FY25",
-    totalExits: 52,
+    totalExits: 51, // Assignment Category filter
     totalResponses: 20,
-    responseRate: 38.5,
+    responseRate: 39.2, // 20 of 51 benefit-eligible exits
     overallSatisfaction: 2.8,
     wouldRecommend: 45,
     wouldRecommendCount: { positive: 9, total: 20 },
@@ -1699,9 +1699,9 @@ export const EXIT_SURVEY_DATA = {
   "2025-06-30": {
     reportingDate: "6/30/25",
     quarter: "Q4 FY25",
-    responseRate: 29.0, // Corrected: 18 of 62 benefit-eligible exits (was 35.3%)
+    responseRate: 35.3, // Corrected: 18 of 51 benefit-eligible exits (Assignment Category filter)
     totalResponses: 18,
-    totalExits: 62, // Corrected from cleaned termination data (was 51)
+    totalExits: 51, // Corrected with Assignment Category filter
 
     overallSatisfaction: 3.4,
     wouldRecommend: 83.3, // 15 of 18 respondents
@@ -1762,9 +1762,9 @@ export const EXIT_SURVEY_DATA = {
   "2025-09-30": {
     reportingDate: "9/30/25",
     quarter: "Q1 FY26",
-    responseRate: 22.4,
+    responseRate: 20.5,
     totalResponses: 15,
-    totalExits: 67,
+    totalExits: 73,
     overallSatisfaction: 3.3,
     wouldRecommend: 80,
     wouldRecommendCount: {
@@ -1862,23 +1862,116 @@ export const EXIT_SURVEY_DATA = {
 export const QUARTERLY_TURNOVER_TRENDS = {
   // Overall turnover counts by quarter (all terminations)
   // Last 5 quarters: Q1 FY25 → Q1 FY26
+  // IMPORTANT: Only includes BENEFIT-ELIGIBLE employees (Assignment Category F/PT regular)
+  // NOTE: Jesuits with F/PT assignments ARE INCLUDED per data owner guidance
   overallTurnover: [
-    { quarter: "Q1 FY25", faculty: 9, staff: 94 },
-    { quarter: "Q2 FY25", faculty: 9, staff: 40 },
-    { quarter: "Q3 FY25", faculty: 12, staff: 57 },
-    { quarter: "Q4 FY25", faculty: 27, staff: 59 },
-    { quarter: "Q1 FY26", faculty: 8, staff: 83 }
+    { quarter: "Q1 FY25", faculty: 5, staff: 74 },
+    { quarter: "Q2 FY25", faculty: 4, staff: 34 },
+    { quarter: "Q3 FY25", faculty: 8, staff: 43 },
+    { quarter: "Q4 FY25", faculty: 10, staff: 41 },
+    { quarter: "Q1 FY26", faculty: 4, staff: 69 }
   ],
 
   // Early turnover counts by quarter (<1 year tenure only)
   // Last 5 quarters: Q1 FY25 → Q1 FY26
+  // IMPORTANT: Only includes BENEFIT-ELIGIBLE employees
   earlyTurnover: [
-    { quarter: "Q1 FY25", faculty: 2, staff: 30 },
-    { quarter: "Q2 FY25", faculty: 2, staff: 16 },
-    { quarter: "Q3 FY25", faculty: 2, staff: 15 },
-    { quarter: "Q4 FY25", faculty: 2, staff: 8 },
-    { quarter: "Q1 FY26", faculty: 1, staff: 22 }
+    { quarter: "Q1 FY25", faculty: 1, staff: 19 },
+    { quarter: "Q2 FY25", faculty: 1, staff: 13 },
+    { quarter: "Q3 FY25", faculty: 1, staff: 9 },
+    { quarter: "Q4 FY25", faculty: 1, staff: 5 },
+    { quarter: "Q1 FY26", faculty: 0, staff: 18 }
   ]
+};
+
+// ============================================================================
+// QUARTERLY TURNOVER DATA (Detailed by Quarter)
+// Detailed termination data for quarterly turnover dashboards
+// ============================================================================
+// Source: source-metrics/terminations/cleaned/FY25_Q4/terminations_cleaned.csv
+// Generated: 2025-11-17 via scripts/extract_q1_fy26_details.py
+// Pattern: Follows same structure as EXIT_SURVEY_DATA with date-based keys
+
+export const QUARTERLY_TURNOVER_DATA = {
+  // Q1 FY26 - July-September 2025
+  "2025-09-30": {
+    reportingDate: "9/30/25",
+    quarter: "Q1 FY26",
+    fiscalPeriod: "July 2025 - September 2025",
+    summary: {
+      total: {
+        count: 73,
+        oma: 68,
+        phx: 5
+      },
+      faculty: {
+        count: 4,
+        oma: 4,
+        phx: 0
+      },
+      staffExempt: {
+        count: 39,
+        oma: 38,
+        phx: 1
+      },
+      staffNonExempt: {
+        count: 30,
+        oma: 26,
+        phx: 4
+      },
+      staff: {
+        count: 69,
+        oma: 64,
+        phx: 5
+      }
+    },
+    terminationTypesByGroup: [
+      {
+        group: "Benefit Eligible Faculty",
+        total: 4,
+        voluntary: 2,
+        involuntary: 0,
+        retirement: 2,
+        endOfAssignment: 0
+      },
+      {
+        group: "Benefit Eligible Staff",
+        total: 69,
+        voluntary: 47,
+        involuntary: 3,
+        retirement: 7,
+        endOfAssignment: 12
+      }
+    ],
+    yearsOfService: [
+      { range: "<1 Year", faculty: 0, staff: 17 },
+      { range: "1-3 Years", faculty: 1, staff: 30 },
+      { range: "3-5 Years", faculty: 1, staff: 11 },
+      { range: "5-10 Years", faculty: 0, staff: 6 },
+      { range: "10-15 Years", faculty: 0, staff: 3 },
+      { range: "15-20 Years", faculty: 0, staff: 0 },
+      { range: "20+ Years", faculty: 2, staff: 2 }
+    ],
+    ageGroups: [
+      { range: "<25", faculty: 0, staff: 10 },
+      { range: "25-34", faculty: 1, staff: 29 },
+      { range: "35-44", faculty: 0, staff: 13 },
+      { range: "45-54", faculty: 1, staff: 5 },
+      { range: "55-64", faculty: 0, staff: 7 },
+      { range: "65+", faculty: 2, staff: 5 }
+    ],
+    earlyTurnover: {
+      total: 17,
+      byTerminationType: [
+        { name: "Voluntary", value: 14, percentage: 82.4, color: "#3B82F6" },
+        { name: "End of Assignment", value: 1, percentage: 5.9, color: "#F59E0B" },
+        { name: "Involuntary", value: 2, percentage: 11.8, color: "#EF4444" }
+      ],
+      byEmployeeCategory: [
+        { name: "Staff", value: 17, percentage: 100.0, color: "#3B82F6" }
+      ]
+    }
+  }
 };
 
 // Available reporting dates - All FY25 quarters + Q1 FY26
@@ -1905,6 +1998,10 @@ export const getRecruitingData = (date = "2025-06-30") => {
 
 export const getExitSurveyData = (date = "2025-06-30") => {
   return EXIT_SURVEY_DATA[date] || EXIT_SURVEY_DATA["2025-06-30"];
+};
+
+export const getQuarterlyTurnoverData = (date = "2025-09-30") => {
+  return QUARTERLY_TURNOVER_DATA[date] || QUARTERLY_TURNOVER_DATA["2025-09-30"];
 };
 
 export const getTop15SchoolOrgData = (date = "2025-06-30") => {
