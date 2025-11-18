@@ -1850,6 +1850,37 @@ export const EXIT_SURVEY_DATA = {
   }
 };
 
+// ============================================================================
+// QUARTERLY TURNOVER TRENDS DATA
+// Historical turnover data for benefit-eligible employees (16 quarters)
+// ============================================================================
+// Source: source-metrics/terminations/cleaned/FY25_Q4/terminations_cleaned.csv
+// Generated: 2025-11-17 via scripts/aggregate_quarterly_turnover.py
+// Categories: Faculty, Staff Exempt, Staff Non-Exempt
+// Time Period: Q2 FY22 → Q1 FY26 (16 quarters)
+
+export const QUARTERLY_TURNOVER_TRENDS = {
+  // Overall turnover counts by quarter (all terminations)
+  // Last 5 quarters: Q1 FY25 → Q1 FY26
+  overallTurnover: [
+    { quarter: "Q1 FY25", faculty: 9, staff: 94 },
+    { quarter: "Q2 FY25", faculty: 9, staff: 40 },
+    { quarter: "Q3 FY25", faculty: 12, staff: 57 },
+    { quarter: "Q4 FY25", faculty: 27, staff: 59 },
+    { quarter: "Q1 FY26", faculty: 8, staff: 83 }
+  ],
+
+  // Early turnover counts by quarter (<1 year tenure only)
+  // Last 5 quarters: Q1 FY25 → Q1 FY26
+  earlyTurnover: [
+    { quarter: "Q1 FY25", faculty: 2, staff: 30 },
+    { quarter: "Q2 FY25", faculty: 2, staff: 16 },
+    { quarter: "Q3 FY25", faculty: 2, staff: 15 },
+    { quarter: "Q4 FY25", faculty: 2, staff: 8 },
+    { quarter: "Q1 FY26", faculty: 1, staff: 22 }
+  ]
+};
+
 // Available reporting dates - All FY25 quarters + Q1 FY26
 export const AVAILABLE_DATES = [
   { value: "2024-09-30", label: "9/30/24 (Q1 FY25)", status: "complete" },

@@ -17,7 +17,8 @@ import {
   Heart,
   ChevronDown,
   ChevronRight,
-  FileText
+  FileText,
+  LineChart
 } from 'lucide-react';
 import { announceToScreenReader } from '../../utils/accessibilityUtils';
 import SyncStatusIndicator from './SyncStatusIndicator';
@@ -116,10 +117,26 @@ const Navigation = () => {
     {
       id: 'exit-survey-q1-fy26',
       label: 'Q1 FY26 Exit Survey',
-      shortLabel: 'Q1 FY26',
+      shortLabel: 'Q1 Exit',
       path: '/dashboards/exit-survey-q1',
       icon: FileText,
       isActive: isActive('/dashboards/exit-survey-q1')
+    },
+    {
+      id: 'turnover-q1-fy26',
+      label: 'Q1 FY26 Turnover',
+      shortLabel: 'Q1 Turn',
+      path: '/dashboards/turnover-q1',
+      icon: TrendingDown,
+      isActive: isActive('/dashboards/turnover-q1')
+    },
+    {
+      id: 'turnover-trends',
+      label: 'Turnover Trends (16 Qtrs)',
+      shortLabel: 'Trends',
+      path: '/dashboards/turnover-trends',
+      icon: LineChart,
+      isActive: isActive('/dashboards/turnover-trends')
     }
   ];
 

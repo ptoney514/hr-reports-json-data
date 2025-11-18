@@ -4,9 +4,10 @@ import { getExitSurveyData } from '../../data/staticData';
 
 /**
  * Q1 FY26 Exit Survey Dashboard
- * Displays quarterly exit survey analysis following the Exit Survey Design System
+ * Displays quarterly exit survey analysis following the Quarterly Reports Design System
  *
- * Design System Reference: docs/EXIT_SURVEY_DESIGN_SYSTEM.md
+ * Design System Reference: docs/QUARTERLY_REPORTS_DESIGN_SYSTEM.md
+ * Exit Survey Patterns: docs/EXIT_SURVEY_DESIGN_SYSTEM.md
  * Wireframe Reference: docs/wireframes/exit-survey-q1-fy26-wireframe.html
  */
 const ExitSurveyQ1FY26Dashboard = () => {
