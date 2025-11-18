@@ -151,7 +151,7 @@ const TurnoverQ1FY26Dashboard = () => {
           <div className="relative" style={{ height: '360px' }}>
             {/* Y-axis with horizontal grid lines */}
             <div className="absolute left-0 top-0 bottom-0 w-12 flex flex-col justify-between text-xs text-gray-500">
-              {[50, 45, 40, 35, 30, 25, 20, 15, 10, 5, 0].map((step, index) => (
+              {[90, 80, 70, 60, 50, 40, 30, 20, 10, 0].map((step, index) => (
                 <div key={index} className="relative">
                   <span className="absolute -left-2 -top-2">{step}</span>
                 </div>
@@ -160,11 +160,11 @@ const TurnoverQ1FY26Dashboard = () => {
 
             {/* Horizontal grid lines */}
             <div className="absolute left-12 right-0 top-0 bottom-0">
-              {[0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50].map((step, index) => (
+              {[0, 10, 20, 30, 40, 50, 60, 70, 80, 90].map((step, index) => (
                 <div
                   key={index}
                   className="absolute left-0 right-0 border-t border-gray-200"
-                  style={{ bottom: `${(step / 50) * 100}%` }}
+                  style={{ bottom: `${(step / 90) * 100}%` }}
                 />
               ))}
             </div>
@@ -172,11 +172,11 @@ const TurnoverQ1FY26Dashboard = () => {
             {/* Vertical Stacked Bar Chart */}
             <div className="absolute left-12 right-0 bottom-0 flex items-end justify-center gap-16" style={{ height: '320px' }}>
               {employeeGroupData.map((group, index) => {
-                // Calculate heights in pixels based on 50 max scale
-                const voluntaryPx = (group.voluntary / 50) * 320;
-                const endOfAssignmentPx = (group.endOfAssignment / 50) * 320;
-                const retirementPx = (group.retirement / 50) * 320;
-                const involuntaryPx = (group.involuntary / 50) * 320;
+                // Calculate heights in pixels based on 90 max scale
+                const voluntaryPx = (group.voluntary / 90) * 320;
+                const endOfAssignmentPx = (group.endOfAssignment / 90) * 320;
+                const retirementPx = (group.retirement / 90) * 320;
+                const involuntaryPx = (group.involuntary / 90) * 320;
 
                 return (
                   <div key={index} className="flex flex-col items-center" style={{ width: '200px' }}>
@@ -195,7 +195,7 @@ const TurnoverQ1FY26Dashboard = () => {
                           backgroundColor: terminationColors.voluntary
                         }}
                       >
-                        {group.voluntary >= 2 && group.voluntary}
+                        {group.voluntary >= 4 && group.voluntary}
                       </div>
 
                       {/* End of Assignment */}
@@ -206,7 +206,7 @@ const TurnoverQ1FY26Dashboard = () => {
                           backgroundColor: terminationColors.endOfAssignment
                         }}
                       >
-                        {group.endOfAssignment >= 2 && group.endOfAssignment}
+                        {group.endOfAssignment >= 4 && group.endOfAssignment}
                       </div>
 
                       {/* Retirement */}
@@ -217,7 +217,7 @@ const TurnoverQ1FY26Dashboard = () => {
                           backgroundColor: terminationColors.retirement
                         }}
                       >
-                        {group.retirement >= 2 && group.retirement}
+                        {group.retirement >= 4 && group.retirement}
                       </div>
 
                       {/* Involuntary (top) */}
@@ -228,7 +228,7 @@ const TurnoverQ1FY26Dashboard = () => {
                           backgroundColor: terminationColors.involuntary
                         }}
                       >
-                        {group.involuntary >= 2 && group.involuntary}
+                        {group.involuntary >= 4 && group.involuntary}
                       </div>
                     </div>
 

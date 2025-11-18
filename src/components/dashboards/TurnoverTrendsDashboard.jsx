@@ -5,7 +5,7 @@ import { QUARTERLY_TURNOVER_TRENDS } from '../../data/staticData';
 
 /**
  * Turnover Trends Dashboard
- * Historical turnover analysis over last 5 quarters
+ * Historical turnover analysis from Q1 FY23 to Q1 FY26 (13 quarters)
  * Shows overall turnover and early turnover (<1 year) trends
  * Benefit-eligible employees only: Faculty and Staff
  *
@@ -37,7 +37,7 @@ const TurnoverTrendsDashboard = () => {
                   Turnover Trends Analysis
                 </h1>
                 <p className="text-gray-600 text-lg mt-2">
-                  Historical Turnover Patterns • Q1 FY25 - Q1 FY26
+                  Historical Turnover Patterns • Q1 FY23 - Q1 FY26
                 </p>
                 <p className="text-gray-500 text-sm mt-1">
                   Benefit-eligible employees: Faculty and Staff
@@ -50,7 +50,7 @@ const TurnoverTrendsDashboard = () => {
         {/* Turnover Trends Over Time Chart */}
         <div className="bg-white rounded-2xl border p-8 mb-8" style={{ borderColor: colors.grid }}>
           <h2 className="text-2xl font-bold mb-6" style={{ color: colors.text }}>
-            Turnover Trends Over Time (Last 5 Quarters)
+            Overall Turnover Trends (Q1 FY23 - Q1 FY26)
           </h2>
           <ResponsiveContainer width="100%" height={350}>
             <LineChart data={overallTurnover} margin={{ top: 40, right: 30, left: 20, bottom: 20 }}>
@@ -113,7 +113,7 @@ const TurnoverTrendsDashboard = () => {
           <div className="text-center mt-4 rounded-lg p-3" style={{ backgroundColor: '#B5D2F3' }}>
             <span className="text-sm" style={{ color: '#5F7FC3' }}>Note: </span>
             <span className="text-sm" style={{ color: colors.text }}>
-              Overall turnover includes all benefit-eligible terminations (voluntary, involuntary, retirement, end of assignment) across 5 quarters.
+              Overall turnover includes all benefit-eligible terminations (voluntary, involuntary, retirement, end of assignment) from Q1 FY23 through Q1 FY26. Provides complete fiscal year comparisons for FY23, FY24, and FY25.
             </span>
           </div>
         </div>
@@ -121,7 +121,7 @@ const TurnoverTrendsDashboard = () => {
         {/* Early Turnover Trends Chart */}
         <div className="bg-white rounded-2xl border p-8 mb-8" style={{ borderColor: colors.grid }}>
           <h2 className="text-2xl font-bold mb-6" style={{ color: colors.text }}>
-            Early Turnover Trends (&lt;1 Year Tenure, Last 5 Quarters)
+            Early Turnover Trends (&lt;1 Year Tenure, Q1 FY23 - Q1 FY26)
           </h2>
           <ResponsiveContainer width="100%" height={350}>
             <LineChart data={earlyTurnover} margin={{ top: 40, right: 30, left: 20, bottom: 20 }}>

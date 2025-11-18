@@ -132,7 +132,7 @@ const Navigation = () => {
     },
     {
       id: 'turnover-trends',
-      label: 'Turnover Trends (16 Qtrs)',
+      label: 'Turnover Trends (Since Q1 FY23)',
       shortLabel: 'Trends',
       path: '/dashboards/turnover-trends',
       icon: LineChart,

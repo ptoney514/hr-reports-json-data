@@ -1861,10 +1861,18 @@ export const EXIT_SURVEY_DATA = {
 
 export const QUARTERLY_TURNOVER_TRENDS = {
   // Overall turnover counts by quarter (all terminations)
-  // Last 5 quarters: Q1 FY25 → Q1 FY26
+  // Time Range: Q1 FY23 → Q1 FY26 (13 quarters - complete FY23, FY24, FY25, start of FY26)
   // IMPORTANT: Only includes BENEFIT-ELIGIBLE employees (Assignment Category F/PT regular)
   // NOTE: Jesuits with F/PT assignments ARE INCLUDED per data owner guidance
   overallTurnover: [
+    { quarter: "Q1 FY23", faculty: 10, staff: 88 },
+    { quarter: "Q2 FY23", faculty: 5, staff: 55 },
+    { quarter: "Q3 FY23", faculty: 3, staff: 53 },
+    { quarter: "Q4 FY23", faculty: 10, staff: 67 },
+    { quarter: "Q1 FY24", faculty: 4, staff: 72 },
+    { quarter: "Q2 FY24", faculty: 6, staff: 41 },
+    { quarter: "Q3 FY24", faculty: 3, staff: 50 },
+    { quarter: "Q4 FY24", faculty: 24, staff: 59 },
     { quarter: "Q1 FY25", faculty: 5, staff: 74 },
     { quarter: "Q2 FY25", faculty: 4, staff: 34 },
     { quarter: "Q3 FY25", faculty: 8, staff: 43 },
@@ -1873,14 +1881,22 @@ export const QUARTERLY_TURNOVER_TRENDS = {
   ],
 
   // Early turnover counts by quarter (<1 year tenure only)
-  // Last 5 quarters: Q1 FY25 → Q1 FY26
+  // Time Range: Q1 FY23 → Q1 FY26 (13 quarters)
   // IMPORTANT: Only includes BENEFIT-ELIGIBLE employees
   earlyTurnover: [
+    { quarter: "Q1 FY23", faculty: 0, staff: 19 },
+    { quarter: "Q2 FY23", faculty: 1, staff: 14 },
+    { quarter: "Q3 FY23", faculty: 1, staff: 16 },
+    { quarter: "Q4 FY23", faculty: 1, staff: 14 },
+    { quarter: "Q1 FY24", faculty: 2, staff: 15 },
+    { quarter: "Q2 FY24", faculty: 0, staff: 11 },
+    { quarter: "Q3 FY24", faculty: 0, staff: 14 },
+    { quarter: "Q4 FY24", faculty: 4, staff: 16 },
     { quarter: "Q1 FY25", faculty: 1, staff: 19 },
     { quarter: "Q2 FY25", faculty: 1, staff: 13 },
     { quarter: "Q3 FY25", faculty: 1, staff: 9 },
-    { quarter: "Q4 FY25", faculty: 1, staff: 5 },
-    { quarter: "Q1 FY26", faculty: 0, staff: 18 }
+    { quarter: "Q4 FY25", faculty: 0, staff: 5 },
+    { quarter: "Q1 FY26", faculty: 0, staff: 17 }
   ]
 };
 
