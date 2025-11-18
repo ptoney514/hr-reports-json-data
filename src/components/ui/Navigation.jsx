@@ -135,7 +135,7 @@ const Navigation = () => {
     },
     {
       id: 'exit-survey-q1',
-      label: 'Q1 FY25',
+      label: 'Q1 FY26',
       path: '/dashboards/exit-survey-q1',
       isActive: isActive('/dashboards/exit-survey-q1')
     },
