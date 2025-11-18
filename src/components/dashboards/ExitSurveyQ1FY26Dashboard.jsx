@@ -246,7 +246,7 @@ const ExitSurveyQ1FY26Dashboard = () => {
                   ))}
                   <li className="flex items-start gap-2">
                     <div className="w-2 h-2 rounded-full bg-blue-600 mt-2"></div>
-                    <span><strong>Diverse reasons</strong> - {surveyData.departureReasons.length - 2} additional unique departure factors cited</span>
+                    <span><strong>Distinct reasons</strong> - {surveyData.departureReasons.length - 2} additional unique departure factors cited</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <div className="w-2 h-2 rounded-full bg-blue-600 mt-2"></div>
