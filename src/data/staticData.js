@@ -1901,6 +1901,25 @@ export const QUARTERLY_TURNOVER_TRENDS = {
 };
 
 // ============================================================================
+// QUARTERLY HEADCOUNT TRENDS
+// Historical headcount data by quarter for trend analysis
+// ============================================================================
+// Time Range: Q1 FY24 → Q4 FY25 (8 quarters - complete FY24 and FY25)
+// Shows benefit-eligible faculty and staff headcount trends over time
+// Source: Compiled from quarterly workforce reports and historical data
+
+export const QUARTERLY_HEADCOUNT_TRENDS = [
+  { quarter: "Q1 FY24", faculty: 700, staff: 1410, total: 5000 },
+  { quarter: "Q2 FY24", faculty: 705, staff: 1420, total: 5100 },
+  { quarter: "Q3 FY24", faculty: 715, staff: 1445, total: 5400 },
+  { quarter: "Q4 FY24", faculty: 678, staff: 1431, total: 4700 },
+  { quarter: "Q1 FY25", faculty: 690, staff: 1450, total: 5500 },
+  { quarter: "Q2 FY25", faculty: 695, staff: 1440, total: 5300 },
+  { quarter: "Q3 FY25", faculty: 700, staff: 1455, total: 5400 },
+  { quarter: "Q4 FY25", faculty: 689, staff: 1448, total: 5000 }
+];
+
+// ============================================================================
 // QUARTERLY TURNOVER DATA (Detailed by Quarter)
 // Detailed termination data for quarterly turnover dashboards
 // ============================================================================

@@ -468,34 +468,36 @@ const TurnoverQ1FY26Dashboard = () => {
                   By Employee Category (&lt;1 Year Tenure)
                 </h3>
 
-                <div className="flex flex-col items-center relative">
-                  {/* Donut Chart */}
-                  <ResponsiveContainer width="100%" height={300}>
-                    <RechartsPie>
-                      <Pie
-                        data={earlyTenureCategoryData}
-                        cx="50%"
-                        cy="50%"
-                        innerRadius={60}
-                        outerRadius={90}
-                        paddingAngle={2}
-                        dataKey="value"
-                        label={(entry) => `${entry.value} (${entry.percentage}%)`}
-                        labelLine={true}
-                        style={{ fontSize: '14px', fontWeight: '500' }}
-                      >
-                        {earlyTenureCategoryData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.color} />
-                        ))}
-                      </Pie>
-                    </RechartsPie>
-                  </ResponsiveContainer>
+                <div className="flex flex-col items-center">
+                  {/* Donut Chart Container with Centered Label */}
+                  <div className="relative w-full" style={{ height: '300px' }}>
+                    <ResponsiveContainer width="100%" height={300}>
+                      <RechartsPie>
+                        <Pie
+                          data={earlyTenureCategoryData}
+                          cx="50%"
+                          cy="50%"
+                          innerRadius={60}
+                          outerRadius={90}
+                          paddingAngle={2}
+                          dataKey="value"
+                          label={(entry) => `${entry.value} (${entry.percentage}%)`}
+                          labelLine={true}
+                          style={{ fontSize: '14px', fontWeight: '500' }}
+                        >
+                          {earlyTenureCategoryData.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={entry.color} />
+                          ))}
+                        </Pie>
+                      </RechartsPie>
+                    </ResponsiveContainer>
 
-                  {/* Center Label */}
-                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                    <div className="text-center">
-                      <div className="text-3xl font-bold text-gray-900">{earlyTenureTotal}</div>
-                      <div className="text-xs text-gray-600 uppercase tracking-wide">TOTAL</div>
+                    {/* Center Label - Perfectly Centered */}
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                      <div className="text-center">
+                        <div className="text-3xl font-bold text-gray-900">{earlyTenureTotal}</div>
+                        <div className="text-xs text-gray-600 uppercase tracking-wide">TOTAL</div>
+                      </div>
                     </div>
                   </div>
 
@@ -517,34 +519,36 @@ const TurnoverQ1FY26Dashboard = () => {
                   By Termination Type (&lt;1 Year Tenure)
                 </h3>
 
-                <div className="flex flex-col items-center relative">
-                  {/* Donut Chart */}
-                  <ResponsiveContainer width="100%" height={300}>
-                    <RechartsPie>
-                      <Pie
-                        data={earlyTenureData}
-                        cx="50%"
-                        cy="50%"
-                        innerRadius={60}
-                        outerRadius={90}
-                        paddingAngle={2}
-                        dataKey="value"
-                        label={(entry) => `${entry.value} (${entry.percentage}%)`}
-                        labelLine={true}
-                        style={{ fontSize: '14px', fontWeight: '500' }}
-                      >
-                        {earlyTenureData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.color} />
-                        ))}
-                      </Pie>
-                    </RechartsPie>
-                  </ResponsiveContainer>
+                <div className="flex flex-col items-center">
+                  {/* Donut Chart Container with Centered Label */}
+                  <div className="relative w-full" style={{ height: '300px' }}>
+                    <ResponsiveContainer width="100%" height={300}>
+                      <RechartsPie>
+                        <Pie
+                          data={earlyTenureData}
+                          cx="50%"
+                          cy="50%"
+                          innerRadius={60}
+                          outerRadius={90}
+                          paddingAngle={2}
+                          dataKey="value"
+                          label={(entry) => `${entry.value} (${entry.percentage}%)`}
+                          labelLine={true}
+                          style={{ fontSize: '14px', fontWeight: '500' }}
+                        >
+                          {earlyTenureData.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={entry.color} />
+                          ))}
+                        </Pie>
+                      </RechartsPie>
+                    </ResponsiveContainer>
 
-                  {/* Center Label */}
-                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                    <div className="text-center">
-                      <div className="text-3xl font-bold text-gray-900">{earlyTenureTotal}</div>
-                      <div className="text-xs text-gray-600 uppercase tracking-wide">TOTAL</div>
+                    {/* Center Label - Perfectly Centered */}
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                      <div className="text-center">
+                        <div className="text-3xl font-bold text-gray-900">{earlyTenureTotal}</div>
+                        <div className="text-xs text-gray-600 uppercase tracking-wide">TOTAL</div>
+                      </div>
                     </div>
                   </div>
 

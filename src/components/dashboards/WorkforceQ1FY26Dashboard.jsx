@@ -1,7 +1,7 @@
 import React from 'react';
 import { Users, UserCheck, Briefcase, BarChart3, MapPin, GraduationCap, Stethoscope, FileText, TrendingDown, TrendingUp, CheckCircle, AlertCircle, Info } from 'lucide-react';
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
-import { getQuarterlyWorkforceData } from '../../data/staticData';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, LineChart, Line, XAxis, YAxis, CartesianGrid, Legend } from 'recharts';
+import { getQuarterlyWorkforceData, QUARTERLY_HEADCOUNT_TRENDS } from '../../data/staticData';
 
 /**
  * Q1 FY26 Workforce and Headcount Dashboard
@@ -213,6 +213,87 @@ const WorkforceQ1FY26Dashboard = () => {
           {/* Data Note */}
           <div className="text-xs text-gray-600 mt-6 bg-blue-50 p-3 rounded border border-blue-200 text-center">
             <span className="font-semibold">Note:</span> Workforce composition shows all employee categories as of end of {data.quarter}.
+          </div>
+        </div>
+
+        {/* Headcount Trends Chart */}
+        <div className="bg-white rounded-2xl border p-8 mb-8" style={{ borderColor: '#D7D2CB' }}>
+          <h2 className="text-2xl font-bold mb-6" style={{ color: '#00245D' }}>
+            FY24-FY25 Headcount Trend
+          </h2>
+          <ResponsiveContainer width="100%" height={350}>
+            <LineChart data={QUARTERLY_HEADCOUNT_TRENDS} margin={{ top: 40, right: 30, left: 20, bottom: 20 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#D7D2CB" />
+              <XAxis
+                dataKey="quarter"
+                tick={{ fontSize: 12, fill: '#5F7FC3' }}
+              />
+              <YAxis
+                tick={{ fontSize: 12, fill: '#5F7FC3' }}
+                domain={[0, 6000]}
+                ticks={[0, 1000, 2000, 3000, 4000, 5000, 6000]}
+              />
+              <Tooltip
+                contentStyle={{
+                  borderRadius: '12px',
+                  border: '2px solid #4366D0',
+                  backgroundColor: '#ffffff',
+                  boxShadow: '0 10px 25px -5px rgba(67, 102, 208, 0.25)'
+                }}
+              />
+              <Legend
+                wrapperStyle={{ paddingTop: '20px' }}
+                iconType="circle"
+              />
+
+              {/* Total Headcount Line */}
+              <Line
+                type="monotone"
+                dataKey="total"
+                stroke="#0054A6"
+                strokeWidth={4}
+                dot={{ r: 7, fill: '#0054A6', strokeWidth: 2, stroke: '#ffffff' }}
+                name="Total Headcount"
+                activeDot={{ r: 9, fill: '#0054A6', stroke: '#ffffff', strokeWidth: 3 }}
+                label={{
+                  position: 'top',
+                  offset: 15,
+                  style: { fontSize: 16, fontWeight: 'bold', fill: '#0054A6' }
+                }}
+              />
+
+              {/* Faculty Line (Dashed) */}
+              <Line
+                type="monotone"
+                dataKey="faculty"
+                stroke="#10B981"
+                strokeWidth={3}
+                strokeDasharray="5 5"
+                dot={{ r: 6, fill: '#10B981', strokeWidth: 2, stroke: '#ffffff' }}
+                name="Benefit Eligible Faculty"
+                activeDot={{ r: 8, fill: '#10B981', stroke: '#ffffff', strokeWidth: 3 }}
+              />
+
+              {/* Staff Line (Dashed) */}
+              <Line
+                type="monotone"
+                dataKey="staff"
+                stroke="#3B82F6"
+                strokeWidth={3}
+                strokeDasharray="5 5"
+                dot={{ r: 6, fill: '#3B82F6', strokeWidth: 2, stroke: '#ffffff' }}
+                name="Benefit Eligible Staff"
+                activeDot={{ r: 8, fill: '#3B82F6', stroke: '#ffffff', strokeWidth: 3 }}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+
+          {/* Data Note */}
+          <div className="text-center mt-4 rounded-lg p-3" style={{ backgroundColor: '#B5D2F3' }}>
+            <span className="text-sm" style={{ color: '#5F7FC3' }}>Note: </span>
+            <span className="text-sm" style={{ color: '#00245D' }}>
+              Headcount trends show total workforce and benefit-eligible employees across all campuses from Q1 FY24 through Q4 FY25. Total headcount includes all employee categories (faculty, staff, students, house staff physicians, and temporary employees).
+            </span>
           </div>
         </div>
 
