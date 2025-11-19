@@ -1,0 +1,128 @@
+{
+  "reportingDate": "9/30/25",
+  "quarter": "Q1 FY26",
+  "fiscalPeriod": "July 2025 - September 2025",
+  "ethnicity": {
+    "faculty": {
+      "category": "Benefit-Eligible Faculty",
+      "total": 697,
+      "distribution": [
+        {
+          "ethnicity": "White",
+          "count": 543,
+          "percentage": 77.9
+        },
+        {
+          "ethnicity": "Not Disclosed",
+          "count": 53,
+          "percentage": 7.6
+        },
+        {
+          "ethnicity": "Asian",
+          "count": 51,
+          "percentage": 7.3
+        },
+        {
+          "ethnicity": "Two or More Races",
+          "count": 18,
+          "percentage": 2.6
+        },
+        {
+          "ethnicity": "Black or African American",
+          "count": 17,
+          "percentage": 2.4
+        },
+        {
+          "ethnicity": "Hispanic or Latino",
+          "count": 12,
+          "percentage": 1.7
+        },
+        {
+          "ethnicity": "American Indian or Alaska Native",
+          "count": 3,
+          "percentage": 0.4
+        }
+      ]
+    },
+    "staff": {
+      "category": "Benefit-Eligible Staff",
+      "total": 1431,
+      "distribution": [
+        {
+          "ethnicity": "White",
+          "count": 989,
+          "percentage": 69.1
+        },
+        {
+          "ethnicity": "Not Disclosed",
+          "count": 126,
+          "percentage": 8.8
+        },
+        {
+          "ethnicity": "Asian",
+          "count": 106,
+          "percentage": 7.4
+        },
+        {
+          "ethnicity": "Black or African American",
+          "count": 82,
+          "percentage": 5.7
+        },
+        {
+          "ethnicity": "Hispanic or Latino",
+          "count": 63,
+          "percentage": 4.4
+        },
+        {
+          "ethnicity": "Two or More Races",
+          "count": 56,
+          "percentage": 3.9
+        },
+        {
+          "ethnicity": "American Indian or Alaska Native",
+          "count": 6,
+          "percentage": 0.4
+        },
+        {
+          "ethnicity": "Native Hawaiian or other Pacific Islander",
+          "count": 3,
+          "percentage": 0.2
+        }
+      ]
+    }
+  },
+  "gender": {
+    "faculty": {
+      "category": "Benefit-Eligible Faculty",
+      "total": 697,
+      "distribution": [
+        {
+          "gender": "F",
+          "count": 369,
+          "percentage": 52.9
+        },
+        {
+          "gender": "M",
+          "count": 328,
+          "percentage": 47.1
+        }
+      ]
+    },
+    "staff": {
+      "category": "Benefit-Eligible Staff",
+      "total": 1431,
+      "distribution": [
+        {
+          "gender": "F",
+          "count": 903,
+          "percentage": 63.1
+        },
+        {
+          "gender": "M",
+          "count": 528,
+          "percentage": 36.9
+        }
+      ]
+    }
+  }
+}

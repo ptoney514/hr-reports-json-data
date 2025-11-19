@@ -2116,6 +2116,53 @@ export const QUARTERLY_WORKFORCE_DATA = {
       "F10": 10,    // Full-time 10-month
       "PT11": 1,    // Part-time 11-month
       "PT10": 8     // Part-time 10-month
+    },
+    // Ethnicity and Gender Demographics (Benefit-Eligible only)
+    // Source: scripts/extract_q1_fy26_ethnicity.py
+    demographics: {
+      ethnicity: {
+        faculty: {
+          total: 697,
+          distribution: [
+            { ethnicity: "White", count: 543, percentage: 77.9, color: "#93C5FD" },
+            { ethnicity: "Not Disclosed", count: 53, percentage: 7.6, color: "#D1D5DB" },
+            { ethnicity: "Asian", count: 51, percentage: 7.3, color: "#60A5FA" },
+            { ethnicity: "Two or More Races", count: 18, percentage: 2.6, color: "#FBBF24" },
+            { ethnicity: "Black or African American", count: 17, percentage: 2.4, color: "#34D399" },
+            { ethnicity: "Hispanic or Latino", count: 12, percentage: 1.7, color: "#F87171" },
+            { ethnicity: "American Indian or Alaska Native", count: 3, percentage: 0.4, color: "#A78BFA" }
+          ]
+        },
+        staff: {
+          total: 1431,
+          distribution: [
+            { ethnicity: "White", count: 989, percentage: 69.1, color: "#93C5FD" },
+            { ethnicity: "Not Disclosed", count: 126, percentage: 8.8, color: "#D1D5DB" },
+            { ethnicity: "Asian", count: 106, percentage: 7.4, color: "#60A5FA" },
+            { ethnicity: "Black or African American", count: 82, percentage: 5.7, color: "#34D399" },
+            { ethnicity: "Hispanic or Latino", count: 63, percentage: 4.4, color: "#FBBF24" },
+            { ethnicity: "Two or More Races", count: 56, percentage: 3.9, color: "#F87171" },
+            { ethnicity: "American Indian or Alaska Native", count: 6, percentage: 0.4, color: "#A78BFA" },
+            { ethnicity: "Native Hawaiian or other Pacific Islander", count: 3, percentage: 0.2, color: "#FB923C" }
+          ]
+        }
+      },
+      gender: {
+        faculty: {
+          total: 697,
+          distribution: [
+            { gender: "Female", count: 369, percentage: 52.9, color: "#EC4899" },
+            { gender: "Male", count: 328, percentage: 47.1, color: "#3B82F6" }
+          ]
+        },
+        staff: {
+          total: 1431,
+          distribution: [
+            { gender: "Female", count: 903, percentage: 63.1, color: "#EC4899" },
+            { gender: "Male", count: 528, percentage: 36.9, color: "#3B82F6" }
+          ]
+        }
+      }
     }
   }
 };
