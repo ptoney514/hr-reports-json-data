@@ -124,5 +124,87 @@
         }
       ]
     }
+  },
+  "ageGender": {
+    "faculty": {
+      "category": "Benefit-Eligible Faculty",
+      "total": 697,
+      "femaleTotal": 369,
+      "maleTotal": 328,
+      "femalePercentage": 52.9,
+      "malePercentage": 47.1,
+      "ageGenderBreakdown": [
+        {
+          "ageBand": "20-30",
+          "female": 4,
+          "male": 8,
+          "total": 12
+        },
+        {
+          "ageBand": "31-40",
+          "female": 91,
+          "male": 52,
+          "total": 143
+        },
+        {
+          "ageBand": "41-50",
+          "female": 126,
+          "male": 74,
+          "total": 200
+        },
+        {
+          "ageBand": "51-60",
+          "female": 81,
+          "male": 82,
+          "total": 163
+        },
+        {
+          "ageBand": "61 Plus",
+          "female": 67,
+          "male": 112,
+          "total": 179
+        }
+      ]
+    },
+    "staff": {
+      "category": "Benefit-Eligible Staff",
+      "total": 1431,
+      "femaleTotal": 903,
+      "maleTotal": 528,
+      "femalePercentage": 63.1,
+      "malePercentage": 36.9,
+      "ageGenderBreakdown": [
+        {
+          "ageBand": "20-30",
+          "female": 146,
+          "male": 81,
+          "total": 227
+        },
+        {
+          "ageBand": "31-40",
+          "female": 174,
+          "male": 121,
+          "total": 295
+        },
+        {
+          "ageBand": "41-50",
+          "female": 214,
+          "male": 115,
+          "total": 329
+        },
+        {
+          "ageBand": "51-60",
+          "female": 230,
+          "male": 116,
+          "total": 346
+        },
+        {
+          "ageBand": "61 Plus",
+          "female": 139,
+          "male": 95,
+          "total": 234
+        }
+      ]
+    }
   }
 }
