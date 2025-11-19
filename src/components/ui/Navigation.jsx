@@ -137,6 +137,14 @@ const Navigation = () => {
       path: '/dashboards/turnover-trends',
       icon: LineChart,
       isActive: isActive('/dashboards/turnover-trends')
+    },
+    {
+      id: 'workforce-q1-fy26',
+      label: 'Q1 FY26 Workforce',
+      shortLabel: 'Q1 Work',
+      path: '/dashboards/workforce-q1',
+      icon: Users,
+      isActive: isActive('/dashboards/workforce-q1')
     }
   ];
 

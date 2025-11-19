@@ -30,6 +30,8 @@ const ExitSurveyOverview = lazy(() => import('./components/dashboards/ExitSurvey
 // Quarterly Turnover Reports
 const TurnoverQ1Dashboard = lazy(() => import('./components/dashboards/TurnoverQ1FY26Dashboard'));
 const TurnoverTrendsDashboard = lazy(() => import('./components/dashboards/TurnoverTrendsDashboard'));
+// Quarterly Workforce Reports
+const WorkforceQ1Dashboard = lazy(() => import('./components/dashboards/WorkforceQ1FY26Dashboard'));
 // WorkforceAudit temporarily disabled - papaparse dependency issue
 // const WorkforceAudit = lazy(() => import('./components/dashboards/WorkforceAudit'));
 // AdminDashboard removed - using static data now
@@ -142,6 +144,9 @@ function App() {
               {/* Quarterly Turnover Reports */}
               <Route path="/dashboards/turnover-q1" element={<TurnoverQ1Dashboard />} />
               <Route path="/dashboards/turnover-trends" element={<TurnoverTrendsDashboard />} />
+
+              {/* Quarterly Workforce Reports */}
+              <Route path="/dashboards/workforce-q1" element={<WorkforceQ1Dashboard />} />
 
               {/* Testing routes removed - using static data approach */}
               
