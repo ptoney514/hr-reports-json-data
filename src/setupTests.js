@@ -12,20 +12,13 @@ expect.extend(toHaveNoViolations);
 
 // Configure axe with comprehensive accessibility rules
 global.axeConfig = {
-  rules: {
-    // Enable all WCAG 2.1 AA rules
-    'color-contrast': { enabled: true },
-    'keyboard-navigation': { enabled: true },
-    'aria-labels': { enabled: true },
-    'heading-order': { enabled: true },
-    'landmark-roles': { enabled: true },
-    'form-labels': { enabled: true },
-    'image-alt': { enabled: true },
-    'focus-management': { enabled: true },
-    'skip-links': { enabled: true },
-    'live-regions': { enabled: true }
+  runOnly: {
+    type: 'tag',
+    values: ['wcag2a', 'wcag2aa', 'wcag21aa', 'best-practice']
   },
-  tags: ['wcag2a', 'wcag2aa', 'wcag21aa', 'best-practice'],
+  rules: {
+    'color-contrast': { enabled: true }
+  },
   reporter: 'v2'
 };
 

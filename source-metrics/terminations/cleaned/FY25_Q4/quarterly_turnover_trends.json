@@ -1,0 +1,241 @@
+{
+  "metadata": {
+    "generated": "2025-11-18T08:39:20.236255",
+    "quarters": 16,
+    "startQuarter": "Q2 FY22",
+    "endQuarter": "Q1 FY26",
+    "categories": [
+      "Faculty",
+      "Staff Exempt",
+      "Staff Non-Exempt"
+    ]
+  },
+  "overallTurnover": [
+    {
+      "quarter": "Q2 FY22",
+      "faculty": 9,
+      "staffExempt": 17,
+      "staffNonExempt": 31,
+      "total": 57
+    },
+    {
+      "quarter": "Q3 FY22",
+      "faculty": 8,
+      "staffExempt": 42,
+      "staffNonExempt": 22,
+      "total": 72
+    },
+    {
+      "quarter": "Q4 FY22",
+      "faculty": 17,
+      "staffExempt": 29,
+      "staffNonExempt": 37,
+      "total": 83
+    },
+    {
+      "quarter": "Q1 FY23",
+      "faculty": 10,
+      "staffExempt": 50,
+      "staffNonExempt": 38,
+      "total": 98
+    },
+    {
+      "quarter": "Q2 FY23",
+      "faculty": 5,
+      "staffExempt": 23,
+      "staffNonExempt": 32,
+      "total": 60
+    },
+    {
+      "quarter": "Q3 FY23",
+      "faculty": 3,
+      "staffExempt": 24,
+      "staffNonExempt": 29,
+      "total": 56
+    },
+    {
+      "quarter": "Q4 FY23",
+      "faculty": 10,
+      "staffExempt": 37,
+      "staffNonExempt": 30,
+      "total": 77
+    },
+    {
+      "quarter": "Q1 FY24",
+      "faculty": 4,
+      "staffExempt": 42,
+      "staffNonExempt": 30,
+      "total": 76
+    },
+    {
+      "quarter": "Q2 FY24",
+      "faculty": 6,
+      "staffExempt": 21,
+      "staffNonExempt": 20,
+      "total": 47
+    },
+    {
+      "quarter": "Q3 FY24",
+      "faculty": 3,
+      "staffExempt": 26,
+      "staffNonExempt": 24,
+      "total": 53
+    },
+    {
+      "quarter": "Q4 FY24",
+      "faculty": 24,
+      "staffExempt": 37,
+      "staffNonExempt": 22,
+      "total": 83
+    },
+    {
+      "quarter": "Q1 FY25",
+      "faculty": 5,
+      "staffExempt": 45,
+      "staffNonExempt": 29,
+      "total": 79
+    },
+    {
+      "quarter": "Q2 FY25",
+      "faculty": 4,
+      "staffExempt": 17,
+      "staffNonExempt": 17,
+      "total": 38
+    },
+    {
+      "quarter": "Q3 FY25",
+      "faculty": 8,
+      "staffExempt": 23,
+      "staffNonExempt": 20,
+      "total": 51
+    },
+    {
+      "quarter": "Q4 FY25",
+      "faculty": 10,
+      "staffExempt": 24,
+      "staffNonExempt": 17,
+      "total": 51
+    },
+    {
+      "quarter": "Q1 FY26",
+      "faculty": 4,
+      "staffExempt": 39,
+      "staffNonExempt": 30,
+      "total": 73
+    }
+  ],
+  "earlyTurnover": [
+    {
+      "quarter": "Q2 FY22",
+      "faculty": 0,
+      "staffExempt": 2,
+      "staffNonExempt": 9,
+      "total": 11
+    },
+    {
+      "quarter": "Q3 FY22",
+      "faculty": 1,
+      "staffExempt": 9,
+      "staffNonExempt": 10,
+      "total": 20
+    },
+    {
+      "quarter": "Q4 FY22",
+      "faculty": 2,
+      "staffExempt": 5,
+      "staffNonExempt": 6,
+      "total": 13
+    },
+    {
+      "quarter": "Q1 FY23",
+      "faculty": 0,
+      "staffExempt": 7,
+      "staffNonExempt": 12,
+      "total": 19
+    },
+    {
+      "quarter": "Q2 FY23",
+      "faculty": 1,
+      "staffExempt": 5,
+      "staffNonExempt": 9,
+      "total": 15
+    },
+    {
+      "quarter": "Q3 FY23",
+      "faculty": 1,
+      "staffExempt": 4,
+      "staffNonExempt": 12,
+      "total": 17
+    },
+    {
+      "quarter": "Q4 FY23",
+      "faculty": 1,
+      "staffExempt": 2,
+      "staffNonExempt": 12,
+      "total": 15
+    },
+    {
+      "quarter": "Q1 FY24",
+      "faculty": 2,
+      "staffExempt": 4,
+      "staffNonExempt": 11,
+      "total": 17
+    },
+    {
+      "quarter": "Q2 FY24",
+      "faculty": 0,
+      "staffExempt": 1,
+      "staffNonExempt": 10,
+      "total": 11
+    },
+    {
+      "quarter": "Q3 FY24",
+      "faculty": 0,
+      "staffExempt": 3,
+      "staffNonExempt": 11,
+      "total": 14
+    },
+    {
+      "quarter": "Q4 FY24",
+      "faculty": 4,
+      "staffExempt": 4,
+      "staffNonExempt": 12,
+      "total": 20
+    },
+    {
+      "quarter": "Q1 FY25",
+      "faculty": 1,
+      "staffExempt": 11,
+      "staffNonExempt": 8,
+      "total": 20
+    },
+    {
+      "quarter": "Q2 FY25",
+      "faculty": 1,
+      "staffExempt": 5,
+      "staffNonExempt": 8,
+      "total": 14
+    },
+    {
+      "quarter": "Q3 FY25",
+      "faculty": 1,
+      "staffExempt": 2,
+      "staffNonExempt": 7,
+      "total": 10
+    },
+    {
+      "quarter": "Q4 FY25",
+      "faculty": 0,
+      "staffExempt": 0,
+      "staffNonExempt": 5,
+      "total": 5
+    },
+    {
+      "quarter": "Q1 FY26",
+      "faculty": 0,
+      "staffExempt": 8,
+      "staffNonExempt": 9,
+      "total": 17
+    }
+  ]
+}

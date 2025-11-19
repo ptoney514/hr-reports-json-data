@@ -4,9 +4,10 @@ import { getExitSurveyData } from '../../data/staticData';
 
 /**
  * Q1 FY26 Exit Survey Dashboard
- * Displays quarterly exit survey analysis following the Exit Survey Design System
+ * Displays quarterly exit survey analysis following the Quarterly Reports Design System
  *
- * Design System Reference: docs/EXIT_SURVEY_DESIGN_SYSTEM.md
+ * Design System Reference: docs/QUARTERLY_REPORTS_DESIGN_SYSTEM.md
+ * Exit Survey Patterns: docs/EXIT_SURVEY_DESIGN_SYSTEM.md
  * Wireframe Reference: docs/wireframes/exit-survey-q1-fy26-wireframe.html
  */
 const ExitSurveyQ1FY26Dashboard = () => {
@@ -17,43 +18,43 @@ const ExitSurveyQ1FY26Dashboard = () => {
   const quarterlyData = [
     {
       quarter: 'Q1 FY26',
-      terminations: 67,
-      faculty: 8, // From termination data analysis
-      staff: 59, // 67 - 8
+      terminations: 73,
+      faculty: 4, // From Assignment Category filter (F/PT regular only)
+      staff: 69, // 73 - 4
       responses: 15,
-      responseRate: 22.4,
+      responseRate: 20.5,
       satisfaction: 80 // Would recommend
     },
     {
       quarter: 'Q4 FY25',
-      terminations: 62, // Corrected from 51
-      faculty: 15, // From Q4 FY25 data
-      staff: 47, // 62 - 15
+      terminations: 51, // Assignment Category filter
+      faculty: 10,
+      staff: 41, // 51 - 10
       responses: 18,
-      responseRate: 29.0, // Corrected from 35.3
+      responseRate: 35.3,
       satisfaction: 83.3
     },
     {
       quarter: 'Q3 FY25',
-      terminations: 52,
-      faculty: 9,
+      terminations: 51, // Assignment Category filter
+      faculty: 8,
       staff: 43,
       responses: 20,
-      responseRate: 38.5,
+      responseRate: 39.2,
       satisfaction: 45
     },
     {
       quarter: 'Q2 FY25',
-      terminations: 76,
-      faculty: 3,
-      staff: 73,
+      terminations: 38, // Assignment Category filter
+      faculty: 4,
+      staff: 34, // 38 - 4
       responses: 26,
-      responseRate: 34.2,
+      responseRate: 68.4,
       satisfaction: 57.7
     },
     {
       quarter: 'Q1 FY25',
-      terminations: 79,
+      terminations: 79, // Assignment Category filter (includes Jesuits)
       faculty: 5,
       staff: 74,
       responses: 25,
@@ -246,7 +247,7 @@ const ExitSurveyQ1FY26Dashboard = () => {
                   ))}
                   <li className="flex items-start gap-2">
                     <div className="w-2 h-2 rounded-full bg-blue-600 mt-2"></div>
-                    <span><strong>Diverse reasons</strong> - {surveyData.departureReasons.length - 2} additional unique departure factors cited</span>
+                    <span><strong>Distinct reasons</strong> - {surveyData.departureReasons.length - 2} additional unique departure factors cited</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <div className="w-2 h-2 rounded-full bg-blue-600 mt-2"></div>

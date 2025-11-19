@@ -37,11 +37,11 @@ describe('FY26 Q1 Exit Survey Data Validation', () => {
 
   describe('Response Metrics', () => {
     test('should have calculated response rate from termination data', () => {
-      expect(surveyData.responseRate).toBe(22.4);
+      expect(surveyData.responseRate).toBe(20.5);
     });
 
     test('should have total exits from termination data', () => {
-      expect(surveyData.totalExits).toBe(67);
+      expect(surveyData.totalExits).toBe(73);
     });
 
     test('should have would recommend percentage', () => {
