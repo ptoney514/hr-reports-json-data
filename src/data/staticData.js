@@ -1906,17 +1906,33 @@ export const QUARTERLY_TURNOVER_TRENDS = {
 // ============================================================================
 // Time Range: Q1 FY24 → Q4 FY25 (8 quarters - complete FY24 and FY25)
 // Shows benefit-eligible faculty and staff headcount trends over time
-// Source: Compiled from quarterly workforce reports and historical data
+//
+// IMPORTANT DATA NOTES:
+// - "faculty" = Benefit-eligible faculty only
+// - "staff" = Benefit-eligible staff only
+// - "total" = ALL employees (faculty + staff + HSP + students + temp)
+//   Total is NOT just faculty + staff!
+//
+// DATA SOURCE STATUS:
+// - Q4 FY24 (6/30/24): ✅ ACTUAL from WORKFORCE_DATA["2024-06-30"]
+// - Q4 FY25 (6/30/25): ✅ ACTUAL from WORKFORCE_DATA["2025-06-30"]
+// - Q1-Q3 FY24, Q1-Q3 FY25: ⚠️ ESTIMATED - Pending quarterly data extraction
+//
+// TODO: Replace estimated quarterly data with actual values from source-metrics/workforce/
+// when quarterly snapshots become available. Currently only end-of-year (Q4) data is validated.
 
 export const QUARTERLY_HEADCOUNT_TRENDS = [
-  { quarter: "Q1 FY24", faculty: 700, staff: 1410, total: 5000 },
-  { quarter: "Q2 FY24", faculty: 705, staff: 1420, total: 5100 },
-  { quarter: "Q3 FY24", faculty: 715, staff: 1445, total: 5400 },
-  { quarter: "Q4 FY24", faculty: 678, staff: 1431, total: 4700 },
-  { quarter: "Q1 FY25", faculty: 690, staff: 1450, total: 5500 },
-  { quarter: "Q2 FY25", faculty: 695, staff: 1440, total: 5300 },
-  { quarter: "Q3 FY25", faculty: 700, staff: 1455, total: 5400 },
-  { quarter: "Q4 FY25", faculty: 689, staff: 1448, total: 5000 }
+  // FY24 Quarters (Q1-Q3 are estimates, Q4 is actual)
+  { quarter: "Q1 FY24", faculty: 700, staff: 1410, total: 5000 },  // ESTIMATED
+  { quarter: "Q2 FY24", faculty: 705, staff: 1420, total: 5100 },  // ESTIMATED
+  { quarter: "Q3 FY24", faculty: 715, staff: 1445, total: 5400 },  // ESTIMATED
+  { quarter: "Q4 FY24", faculty: 678, staff: 1431, total: 4774 },  // ✅ ACTUAL (6/30/24)
+
+  // FY25 Quarters (Q1-Q3 are estimates, Q4 is actual)
+  { quarter: "Q1 FY25", faculty: 690, staff: 1450, total: 5500 },  // ESTIMATED
+  { quarter: "Q2 FY25", faculty: 695, staff: 1440, total: 5300 },  // ESTIMATED
+  { quarter: "Q3 FY25", faculty: 700, staff: 1455, total: 5400 },  // ESTIMATED
+  { quarter: "Q4 FY25", faculty: 689, staff: 1448, total: 5037 }   // ✅ ACTUAL (6/30/25)
 ];
 
 // ============================================================================

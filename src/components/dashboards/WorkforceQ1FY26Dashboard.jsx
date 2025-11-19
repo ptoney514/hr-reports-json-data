@@ -292,7 +292,9 @@ const WorkforceQ1FY26Dashboard = () => {
           <div className="text-center mt-4 rounded-lg p-3" style={{ backgroundColor: '#B5D2F3' }}>
             <span className="text-sm" style={{ color: '#5F7FC3' }}>Note: </span>
             <span className="text-sm" style={{ color: '#00245D' }}>
-              Headcount trends show total workforce and benefit-eligible employees across all campuses from Q1 FY24 through Q4 FY25. Total headcount includes all employee categories (faculty, staff, students, house staff physicians, and temporary employees).
+              Headcount trends show total workforce and benefit-eligible employees across all campuses from Q1 FY24 through Q4 FY25.
+              Total headcount includes all employee categories (faculty, staff, students, house staff physicians, and temporary employees).
+              Q4 FY24 and Q4 FY25 data points are actual end-of-year values; Q1-Q3 quarters are estimates pending quarterly data extraction.
             </span>
           </div>
         </div>
