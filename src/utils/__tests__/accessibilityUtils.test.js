@@ -314,10 +314,11 @@ describe('Keyboard Navigation Handlers', () => {
         key: 'ArrowRight',
         preventDefault: jest.fn()
       };
-      
+
       handleTableKeyNavigation(mockEvent, 3, 3, 1, 2, mockCallback);
-      
-      expect(mockCallback).toHaveBeenCalledWith(1, 2); // Stays at last column
+
+      // Callback should NOT be called when already at boundary (position doesn't change)
+      expect(mockCallback).not.toHaveBeenCalled();
     });
 
     test('navigates to first/last cell with Ctrl+Home/End', () => {
@@ -377,9 +378,16 @@ describe('Focus Management', () => {
         <div tabindex="-1">Non-focusable div</div>
       `;
       document.body.appendChild(container);
-      
+
+      // Mock offsetWidth and offsetHeight for JSDOM (elements have no dimensions by default)
+      const elements = container.querySelectorAll('*');
+      elements.forEach(el => {
+        Object.defineProperty(el, 'offsetWidth', { value: 100, configurable: true });
+        Object.defineProperty(el, 'offsetHeight', { value: 100, configurable: true });
+      });
+
       const focusable = FocusManager.getFocusableElements(container);
-      
+
       expect(focusable).toHaveLength(4); // button, input, link, focusable div
       expect(focusable[0].tagName).toBe('BUTTON');
       expect(focusable[1].tagName).toBe('INPUT');
@@ -394,9 +402,16 @@ describe('Focus Management', () => {
         <button>Second</button>
       `;
       document.body.appendChild(container);
-      
+
+      // Mock offsetWidth and offsetHeight for JSDOM
+      const elements = container.querySelectorAll('*');
+      elements.forEach(el => {
+        Object.defineProperty(el, 'offsetWidth', { value: 100, configurable: true });
+        Object.defineProperty(el, 'offsetHeight', { value: 100, configurable: true });
+      });
+
       const success = FocusManager.focusFirstElement(container);
-      
+
       expect(success).toBe(true);
       expect(document.activeElement.textContent).toBe('First');
     });
@@ -408,9 +423,16 @@ describe('Focus Management', () => {
         <button>Last</button>
       `;
       document.body.appendChild(container);
-      
+
+      // Mock offsetWidth and offsetHeight for JSDOM
+      const elements = container.querySelectorAll('*');
+      elements.forEach(el => {
+        Object.defineProperty(el, 'offsetWidth', { value: 100, configurable: true });
+        Object.defineProperty(el, 'offsetHeight', { value: 100, configurable: true });
+      });
+
       const success = FocusManager.focusLastElement(container);
-      
+
       expect(success).toBe(true);
       expect(document.activeElement.textContent).toBe('Last');
     });
@@ -422,19 +444,26 @@ describe('Focus Management', () => {
         <button id="last">Last</button>
       `;
       document.body.appendChild(container);
-      
+
+      // Mock offsetWidth and offsetHeight for JSDOM
+      const elements = container.querySelectorAll('*');
+      elements.forEach(el => {
+        Object.defineProperty(el, 'offsetWidth', { value: 100, configurable: true });
+        Object.defineProperty(el, 'offsetHeight', { value: 100, configurable: true });
+      });
+
       const firstButton = container.querySelector('#first');
       const lastButton = container.querySelector('#last');
-      
+
       // Test Tab on last element
       lastButton.focus();
       const tabEvent = {
         key: 'Tab',
         preventDefault: jest.fn()
       };
-      
+
       FocusManager.trapFocus(container, tabEvent);
-      
+
       expect(tabEvent.preventDefault).toHaveBeenCalled();
       expect(document.activeElement).toBe(firstButton);
       

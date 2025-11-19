@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import dataSyncService from '../services/dataSyncService';
+import dataSyncService, { initializeDataSync } from '../services/dataSyncService';
 
 export const useDataSync = () => {
   const [syncStatus, setSyncStatus] = useState({
@@ -86,14 +86,14 @@ export const useDataSync = () => {
     if (!isInitialized) {
       const initialize = async () => {
         try {
-          const status = await dataSyncService.initializeDataSync();
+          const status = await initializeDataSync();
           setSyncStatus(status);
           setIsInitialized(true);
         } catch (error) {
           console.error('Failed to initialize data sync:', error);
         }
       };
-      
+
       initialize();
     }
   }, [isInitialized]);
