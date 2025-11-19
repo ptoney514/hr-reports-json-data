@@ -1,7 +1,8 @@
 // Data sync service - handles synchronization between source files and cached JSON
-// Note: For initial implementation, we'll use static data and add real file processing later
+// Note: This is a legacy feature from when the app used live file syncing
+// The app now uses static data in staticData.js, so this sync doesn't process real data
 
-import fileMonitorService, { initializeFileMonitor } from './fileMonitorService';
+import { initializeFileMonitor } from './fileMonitorService';
 
 // Data source configuration
 const DATA_SOURCES = {
@@ -330,42 +331,27 @@ class DataSyncService {
 // Create singleton instance
 const dataSyncService = new DataSyncService();
 
-// Auto-sync on app start
+// Initialize data sync - MANUAL MODE ONLY
+// Auto-sync disabled - user must press "Sync All Sources" button to sync
 export const initializeDataSync = async () => {
-  // Initialize file monitor
+  // Initialize file monitor but don't start it
   const fileMonitor = initializeFileMonitor();
-  
-  // Subscribe to file changes
+
+  // Subscribe to file changes (for future manual sync operations)
   fileMonitor.subscribe((event) => {
     if (event.event === 'file-changed') {
       console.log('File changed:', event.data.path);
-      // Trigger sync for the changed source
-      Object.entries(DATA_SOURCES).forEach(([key, source]) => {
-        if (source.path === event.data.path) {
-          dataSyncService.syncDataSource(key);
-        }
-      });
+      // Note: Auto-sync disabled - user must manually trigger sync
     }
   });
-  
-  // Start monitoring with 10 second intervals
-  fileMonitor.startMonitoring(10000);
-  
-  // Check for modified sources on startup
-  const modified = await dataSyncService.checkAndSyncModified();
-  
-  if (modified.length === 0) {
-    // No modifications, check if we have any cached data
-    const hasCache = Object.keys(DATA_SOURCES).some(key => 
-      dataSyncService.getCachedData(key) !== null
-    );
-    
-    if (!hasCache) {
-      // No cache, do initial sync
-      await dataSyncService.syncAllSources();
-    }
-  }
-  
+
+  // DO NOT auto-start monitoring - sync is manual-only now
+  // fileMonitor.startMonitoring(10000);
+
+  // DO NOT auto-check or auto-sync on startup
+  // User must press "Sync All Sources" button to trigger sync
+
+  // Just return initial status
   return dataSyncService.getSyncStatus();
 };
 

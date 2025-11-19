@@ -1,15 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  RefreshCw, 
-  AlertCircle, 
-  CheckCircle, 
-  Clock, 
+import React, { useState } from 'react';
+import {
+  RefreshCw,
+  AlertCircle,
+  CheckCircle,
+  Clock,
   Database,
-  Calendar,
   History,
   Search,
-  Download,
-  Upload,
   FileText,
   AlertTriangle,
   Activity,
@@ -41,16 +38,17 @@ const DataSourceAdmin = () => {
   const [showHistoryModal, setShowHistoryModal] = useState(false);
   const [syncingSource, setSyncingSource] = useState(null);
 
-  // Auto-check for modifications every 30 seconds
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (!syncStatus.inProgress) {
-        checkModified();
-      }
-    }, 30000);
-
-    return () => clearInterval(interval);
-  }, [checkModified, syncStatus.inProgress]);
+  // Auto-check disabled - sync is now manual-only
+  // User must press "Sync All Sources" or individual "Quick Sync" buttons
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     if (!syncStatus.inProgress) {
+  //       checkModified();
+  //     }
+  //   }, 30000);
+  //
+  //   return () => clearInterval(interval);
+  // }, [checkModified, syncStatus.inProgress]);
 
   // Filter sources
   const filteredSources = Object.entries(syncStatus.sources || {}).filter(([key, source]) => {
