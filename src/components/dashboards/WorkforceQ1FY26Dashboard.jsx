@@ -149,11 +149,11 @@ const WorkforceQ1FY26Dashboard = () => {
 
         </div>
 
-        {/* Workforce by Employee Group */}
+        {/* Workforce by Employee Type */}
         <div className="bg-white rounded-lg shadow-sm border p-6 mb-8">
           <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
             <BarChart3 style={{color: '#0054A6'}} size={20} />
-            Workforce by Employee Group
+            Workforce by Employee Type
           </h2>
 
           {/* Chart Area */}
@@ -215,172 +215,164 @@ const WorkforceQ1FY26Dashboard = () => {
           </div>
         </div>
 
-        {/* Location Distribution */}
+        {/* Campus Comparison by Employee Type */}
         <div className="bg-white rounded-lg shadow-sm border p-6 mb-8">
           <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
             <MapPin style={{color: '#0054A6'}} size={20} />
-            Workforce by Location
+            Campus Comparison by Employee Type
           </h2>
 
-          {/* Chart Area */}
-          <div className="relative" style={{ height: '360px' }}>
-            {/* Y-axis with horizontal grid lines */}
-            <div className="absolute left-0 top-0 bottom-0 w-12 flex flex-col justify-between text-xs text-gray-500">
-              {[5000, 4000, 3000, 2000, 1000, 0].map((step, index) => (
-                <div key={index} className="relative">
-                  <span className="absolute -left-2 -top-2">{step}</span>
-                </div>
-              ))}
-            </div>
-
-            {/* Horizontal grid lines */}
-            <div className="absolute left-12 right-0 top-0 bottom-0">
-              {[0, 1000, 2000, 3000, 4000, 5000].map((step, index) => (
-                <div
-                  key={index}
-                  className="absolute left-0 right-0 border-t border-gray-200"
-                  style={{ bottom: `${(step / 5000) * 100}%` }}
-                />
-              ))}
-            </div>
-
-            {/* Vertical Stacked Bar Chart */}
-            <div className="absolute left-12 right-0 bottom-0 flex items-end justify-center gap-24" style={{ height: '320px' }}>
-              {/* OMA Bar */}
-              <div className="flex flex-col items-center" style={{ width: '200px' }}>
-                <div className="text-base font-semibold text-gray-900 mb-2">
-                  {data.locationDetails.omaha.total.toLocaleString()}
-                </div>
-                <div className="w-full relative flex flex-col-reverse">
-                  {/* Faculty segment (bottom, green) */}
-                  <div
-                    className="w-full bg-green-500 flex items-center justify-center text-white text-sm font-medium"
-                    style={{ height: `${(data.locationDetails.omaha.faculty / 5000) * 320}px` }}
-                  >
-                    {data.locationDetails.omaha.faculty >= 50 && data.locationDetails.omaha.faculty}
-                  </div>
-
-                  {/* Staff segment */}
-                  <div
-                    className="w-full bg-blue-600 flex items-center justify-center text-white text-sm font-medium"
-                    style={{ height: `${(data.locationDetails.omaha.staff / 5000) * 320}px` }}
-                  >
-                    {data.locationDetails.omaha.staff >= 50 && data.locationDetails.omaha.staff.toLocaleString()}
-                  </div>
-
-                  {/* HSP segment */}
-                  <div
-                    className="w-full bg-purple-600 flex items-center justify-center text-white text-sm font-medium"
-                    style={{ height: `${(data.locationDetails.omaha.hsp / 5000) * 320}px` }}
-                  >
-                    {data.locationDetails.omaha.hsp >= 50 && data.locationDetails.omaha.hsp}
-                  </div>
-
-                  {/* Students segment */}
-                  <div
-                    className="w-full bg-yellow-500 flex items-center justify-center text-white text-sm font-medium"
-                    style={{ height: `${(data.locationDetails.omaha.students / 5000) * 320}px` }}
-                  >
-                    {data.locationDetails.omaha.students >= 50 && data.locationDetails.omaha.students.toLocaleString()}
-                  </div>
-
-                  {/* Temp segment (top) */}
-                  <div
-                    className="w-full bg-gray-500 flex items-center justify-center text-white text-sm font-medium"
-                    style={{ height: `${(data.locationDetails.omaha.temp / 5000) * 320}px` }}
-                  >
-                    {data.locationDetails.omaha.temp >= 50 && data.locationDetails.omaha.temp}
-                  </div>
-                </div>
-
-                {/* Location label */}
-                <div className="text-sm text-gray-700 mt-3 text-center">
-                  Omaha
-                </div>
-              </div>
-
-              {/* PHX Bar */}
-              <div className="flex flex-col items-center" style={{ width: '200px' }}>
-                <div className="text-base font-semibold text-gray-900 mb-2">
-                  {data.locationDetails.phoenix.total}
-                </div>
-                <div className="w-full relative flex flex-col-reverse">
-                  {/* Faculty segment (bottom, green) */}
-                  <div
-                    className="w-full bg-green-500 flex items-center justify-center text-white text-sm font-medium"
-                    style={{ height: `${(data.locationDetails.phoenix.faculty / 5000) * 320}px` }}
-                  >
-                    {data.locationDetails.phoenix.faculty >= 50 && data.locationDetails.phoenix.faculty}
-                  </div>
-
-                  {/* Staff segment */}
-                  <div
-                    className="w-full bg-blue-600 flex items-center justify-center text-white text-sm font-medium"
-                    style={{ height: `${(data.locationDetails.phoenix.staff / 5000) * 320}px` }}
-                  >
-                    {data.locationDetails.phoenix.staff >= 50 && data.locationDetails.phoenix.staff}
-                  </div>
-
-                  {/* HSP segment */}
-                  <div
-                    className="w-full bg-purple-600 flex items-center justify-center text-white text-sm font-medium"
-                    style={{ height: `${(data.locationDetails.phoenix.hsp / 5000) * 320}px` }}
-                  >
-                    {data.locationDetails.phoenix.hsp >= 50 && data.locationDetails.phoenix.hsp}
-                  </div>
-
-                  {/* Students segment */}
-                  <div
-                    className="w-full bg-yellow-500 flex items-center justify-center text-white text-sm font-medium"
-                    style={{ height: `${(data.locationDetails.phoenix.students / 5000) * 320}px` }}
-                  >
-                    {data.locationDetails.phoenix.students >= 50 && data.locationDetails.phoenix.students}
-                  </div>
-
-                  {/* Temp segment (top) */}
-                  <div
-                    className="w-full bg-gray-500 flex items-center justify-center text-white text-sm font-medium"
-                    style={{ height: `${(data.locationDetails.phoenix.temp / 5000) * 320}px` }}
-                  >
-                    {data.locationDetails.phoenix.temp >= 50 && data.locationDetails.phoenix.temp}
-                  </div>
-                </div>
-
-                {/* Location label */}
-                <div className="text-sm text-gray-700 mt-3 text-center">
-                  Phoenix
-                </div>
-              </div>
-            </div>
-          </div>
-
           {/* Legend */}
-          <div className="mt-6 flex justify-center gap-4 text-sm flex-wrap">
+          <div className="mb-6 flex justify-center gap-6 text-sm flex-wrap">
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 bg-green-500 rounded"></div>
-              <span className="text-gray-700">Faculty</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 bg-blue-600 rounded"></div>
+              <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
               <span className="text-gray-700">Staff</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 bg-purple-600 rounded"></div>
-              <span className="text-gray-700">House Staff</span>
+              <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+              <span className="text-gray-700">Faculty</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 bg-yellow-500 rounded"></div>
+              <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
               <span className="text-gray-700">Students</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 bg-gray-500 rounded"></div>
-              <span className="text-gray-700">Temporary</span>
+              <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
+              <span className="text-gray-700">House Staff</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+              <span className="text-gray-700">Non-Benefit</span>
+            </div>
+          </div>
+
+          {/* Horizontal Stacked Bar Chart */}
+          <div className="space-y-8">
+            {/* X-axis scale */}
+            <div className="relative">
+              <div className="flex justify-between text-xs text-gray-500 mb-2 px-32">
+                <span>0</span>
+                <span>500</span>
+                <span>1,000</span>
+                <span>1,500</span>
+                <span>2,000</span>
+                <span>2,500</span>
+                <span>3,000</span>
+                <span>3,500</span>
+                <span>4,000</span>
+                <span>4,500</span>
+              </div>
+
+              {/* Vertical grid lines */}
+              <div className="absolute top-6 left-32 right-32 bottom-0 flex justify-between pointer-events-none">
+                {[0, 500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500].map((_, idx) => (
+                  <div key={idx} className="border-l border-gray-200 h-full"></div>
+                ))}
+              </div>
+
+              {/* Omaha Bar */}
+              <div className="mb-6">
+                <div className="flex items-center gap-4">
+                  <div className="w-24 text-sm text-gray-700 font-medium text-right">Omaha (OMA)</div>
+                  <div className="flex-1 relative">
+                    <div className="flex h-12 rounded overflow-hidden">
+                      {/* Staff - Blue */}
+                      <div
+                        className="bg-blue-500 flex items-center justify-center text-white text-xs font-medium"
+                        style={{ width: `${(data.locationDetails.omaha.staff / 5000) * 100}%` }}
+                      >
+                        {data.locationDetails.omaha.staff >= 120 && data.locationDetails.omaha.staff.toLocaleString()}
+                      </div>
+                      {/* Faculty - Green */}
+                      <div
+                        className="bg-green-500 flex items-center justify-center text-white text-xs font-medium"
+                        style={{ width: `${(data.locationDetails.omaha.faculty / 5000) * 100}%` }}
+                      >
+                        {data.locationDetails.omaha.faculty >= 120 && data.locationDetails.omaha.faculty}
+                      </div>
+                      {/* Students - Purple */}
+                      <div
+                        className="bg-purple-500 flex items-center justify-center text-white text-xs font-medium"
+                        style={{ width: `${(data.locationDetails.omaha.students / 5000) * 100}%` }}
+                      >
+                        {data.locationDetails.omaha.students >= 120 && data.locationDetails.omaha.students.toLocaleString()}
+                      </div>
+                      {/* House Staff - Orange */}
+                      <div
+                        className="bg-orange-500 flex items-center justify-center text-white text-xs font-medium"
+                        style={{ width: `${(data.locationDetails.omaha.hsp / 5000) * 100}%` }}
+                      >
+                        {data.locationDetails.omaha.hsp >= 120 && data.locationDetails.omaha.hsp}
+                      </div>
+                      {/* Temporary - Red */}
+                      <div
+                        className="bg-red-500 flex items-center justify-center text-white text-xs font-medium"
+                        style={{ width: `${(data.locationDetails.omaha.temp / 5000) * 100}%` }}
+                      >
+                        {data.locationDetails.omaha.temp >= 120 && data.locationDetails.omaha.temp}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="w-20 text-right text-base font-bold text-gray-900">
+                    {data.locationDetails.omaha.total.toLocaleString()}
+                  </div>
+                </div>
+              </div>
+
+              {/* Phoenix Bar */}
+              <div>
+                <div className="flex items-center gap-4">
+                  <div className="w-24 text-sm text-gray-700 font-medium text-right">Phoenix (PHX)</div>
+                  <div className="flex-1 relative">
+                    <div className="flex h-12 rounded overflow-hidden">
+                      {/* Staff - Blue */}
+                      <div
+                        className="bg-blue-500 flex items-center justify-center text-white text-xs font-medium"
+                        style={{ width: `${(data.locationDetails.phoenix.staff / 5000) * 100}%` }}
+                      >
+                        {data.locationDetails.phoenix.staff >= 120 && data.locationDetails.phoenix.staff}
+                      </div>
+                      {/* Faculty - Green */}
+                      <div
+                        className="bg-green-500 flex items-center justify-center text-white text-xs font-medium"
+                        style={{ width: `${(data.locationDetails.phoenix.faculty / 5000) * 100}%` }}
+                      >
+                        {data.locationDetails.phoenix.faculty >= 120 && data.locationDetails.phoenix.faculty}
+                      </div>
+                      {/* Students - Purple */}
+                      <div
+                        className="bg-purple-500 flex items-center justify-center text-white text-xs font-medium"
+                        style={{ width: `${(data.locationDetails.phoenix.students / 5000) * 100}%` }}
+                      >
+                        {data.locationDetails.phoenix.students >= 120 && data.locationDetails.phoenix.students}
+                      </div>
+                      {/* House Staff - Orange */}
+                      <div
+                        className="bg-orange-500 flex items-center justify-center text-white text-xs font-medium"
+                        style={{ width: `${(data.locationDetails.phoenix.hsp / 5000) * 100}%` }}
+                      >
+                        {data.locationDetails.phoenix.hsp >= 120 && data.locationDetails.phoenix.hsp}
+                      </div>
+                      {/* Temporary - Red */}
+                      <div
+                        className="bg-red-500 flex items-center justify-center text-white text-xs font-medium"
+                        style={{ width: `${(data.locationDetails.phoenix.temp / 5000) * 100}%` }}
+                      >
+                        {data.locationDetails.phoenix.temp >= 120 && data.locationDetails.phoenix.temp}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="w-20 text-right text-base font-bold text-gray-900">
+                    {data.locationDetails.phoenix.total}
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
           {/* Data Note */}
           <div className="text-xs text-gray-600 mt-6 bg-blue-50 p-3 rounded border border-blue-200 text-center">
-            <span className="font-semibold">Note:</span> Location distribution shows {headcountData.total.count.toLocaleString()} total employees across Omaha ({data.locationDetails.omaha.total.toLocaleString()}) and Phoenix ({data.locationDetails.phoenix.total}) campuses as of end of {data.quarter}.
+            <span className="font-semibold">Note:</span> Campus comparison shows {headcountData.total.count.toLocaleString()} total employees across Omaha ({data.locationDetails.omaha.total.toLocaleString()}) and Phoenix ({data.locationDetails.phoenix.total}) campuses as of end of {data.quarter}.
           </div>
         </div>
 
