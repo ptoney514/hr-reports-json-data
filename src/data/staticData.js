@@ -1990,6 +1990,136 @@ export const QUARTERLY_TURNOVER_DATA = {
   }
 };
 
+// ============================================================================
+// QUARTERLY WORKFORCE DATA (Detailed by Quarter)
+// Detailed headcount and workforce composition for quarterly workforce dashboards
+// ============================================================================
+// Source: Workforce audit data and quarterly snapshots
+// Pattern: Follows same structure as QUARTERLY_TURNOVER_DATA with date-based keys
+
+export const QUARTERLY_WORKFORCE_DATA = {
+  // Q1 FY26 - July-September 2025
+  // Data Source: source-metrics/workforce/raw/FY26_Q1/New Emp List since FY20 to Q1FY25 1031 PT.xlsx
+  // Processed: 2025-11-18 via scripts/extract_q1_fy26_workforce.js
+  // Methodology: WORKFORCE_METHODOLOGY.md v2.0 (Person Type + Assignment Category)
+  "2025-09-30": {
+    reportingDate: "9/30/25",
+    quarter: "Q1 FY26",
+    fiscalPeriod: "July 2025 - September 2025",
+    summary: {
+      total: {
+        count: 5528,
+        oma: 4834,
+        phx: 694
+      },
+      faculty: {
+        count: 697,
+        oma: 657,
+        phx: 40
+      },
+      staff: {
+        count: 1431,
+        oma: 1330,
+        phx: 101
+      },
+      houseStaffPhysicians: {
+        count: 613,
+        oma: 270,
+        phx: 343
+      },
+      studentWorkers: {
+        count: 2157,
+        oma: 2088,
+        phx: 69
+      },
+      temporary: {
+        count: 630,
+        oma: 489,
+        phx: 141
+      }
+    },
+    // Employee group breakdown
+    employeeGroups: [
+      {
+        group: "Benefit-Eligible Faculty",
+        faculty: 697,
+        staff: 0,
+        hsp: 0,
+        students: 0,
+        total: 697
+      },
+      {
+        group: "Benefit-Eligible Staff",
+        faculty: 0,
+        staff: 1431,
+        hsp: 0,
+        students: 0,
+        total: 1431
+      },
+      {
+        group: "House Staff Physicians",
+        faculty: 0,
+        staff: 0,
+        hsp: 613,
+        students: 0,
+        total: 613
+      },
+      {
+        group: "Student Workers",
+        faculty: 0,
+        staff: 0,
+        hsp: 0,
+        students: 2157,
+        total: 2157
+      },
+      {
+        group: "Temporary Employees",
+        faculty: 0,
+        staff: 0,
+        hsp: 0,
+        students: 0,
+        total: 630
+      }
+    ],
+    // Location breakdown
+    locationDetails: {
+      omaha: {
+        faculty: 657,
+        staff: 1330,
+        hsp: 270,
+        students: 2088,
+        temp: 489,
+        total: 4834
+      },
+      phoenix: {
+        faculty: 40,
+        staff: 101,
+        hsp: 343,
+        students: 69,
+        temp: 141,
+        total: 694
+      }
+    },
+    // Assignment category breakdown
+    assignmentCategories: {
+      "F12": 1694,  // Full-time 12-month
+      "HSR": 613,   // House Staff Residents
+      "PT12": 49,   // Part-time 12-month
+      "TEMP": 516,  // Temporary
+      "SUE": 1793,  // Student Worker Employment
+      "CWS": 364,   // College Work Study
+      "F11": 49,    // Full-time 11-month
+      "F09": 297,   // Full-time 9-month
+      "PRN": 107,   // PRN (as needed)
+      "PT9": 20,    // Part-time 9-month
+      "NBE": 7,     // Non-benefit eligible
+      "F10": 10,    // Full-time 10-month
+      "PT11": 1,    // Part-time 11-month
+      "PT10": 8     // Part-time 10-month
+    }
+  }
+};
+
 // Available reporting dates - All FY25 quarters + Q1 FY26
 export const AVAILABLE_DATES = [
   { value: "2024-09-30", label: "9/30/24 (Q1 FY25)", status: "complete" },
@@ -2018,6 +2148,10 @@ export const getExitSurveyData = (date = "2025-06-30") => {
 
 export const getQuarterlyTurnoverData = (date = "2025-09-30") => {
   return QUARTERLY_TURNOVER_DATA[date] || QUARTERLY_TURNOVER_DATA["2025-09-30"];
+};
+
+export const getQuarterlyWorkforceData = (date = "2025-09-30") => {
+  return QUARTERLY_WORKFORCE_DATA[date] || QUARTERLY_WORKFORCE_DATA["2025-09-30"];
 };
 
 export const getTop15SchoolOrgData = (date = "2025-06-30") => {

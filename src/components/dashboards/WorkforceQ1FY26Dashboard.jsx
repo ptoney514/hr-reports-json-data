@@ -1,0 +1,386 @@
+import React from 'react';
+import { Users, UserCheck, Briefcase, BarChart3, MapPin, GraduationCap, Stethoscope } from 'lucide-react';
+import { getQuarterlyWorkforceData } from '../../data/staticData';
+
+/**
+ * Q1 FY26 Workforce and Headcount Dashboard
+ * Displays quarterly workforce composition and headcount analysis
+ *
+ * Data Source: source-metrics/workforce/raw/FY26_Q1/ (Calculated from raw Excel)
+ * Methodology: WORKFORCE_METHODOLOGY.md v2.0 (Person Type + Assignment Category)
+ * Design System Reference: docs/QUARTERLY_REPORTS_DESIGN_SYSTEM.md
+ */
+const WorkforceQ1FY26Dashboard = () => {
+  // Load Q1 FY26 workforce data from staticData.js (calculated from raw Excel)
+  const data = getQuarterlyWorkforceData("2025-09-30");
+
+  const headcountData = data.summary;
+
+  // Employee Group Distribution - Use data from employeeGroups
+  const employeeGroupData = data.employeeGroups;
+
+  return (
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="max-w-7xl mx-auto px-6">
+
+        {/* Page Header */}
+        <div className="mb-8">
+          <div className="bg-white rounded-lg shadow-sm border p-8">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <Users style={{color: '#0054A6'}} size={32} />
+                <div>
+                  <h1 className="text-3xl font-bold text-gray-900">
+                    {data.quarter} Workforce and Headcount Report
+                  </h1>
+                  <p className="text-gray-600 text-lg mt-2">
+                    Quarterly Workforce Analysis • {data.fiscalPeriod}
+                  </p>
+                  <p className="text-gray-500 text-sm mt-1">
+                    Employee headcount, workforce composition, and organizational trends
+                  </p>
+                </div>
+              </div>
+              <div className="text-right">
+                <div className="text-5xl font-bold" style={{color: '#0054A6'}}>
+                  {headcountData.total.count.toLocaleString()}
+                </div>
+                <div className="text-sm text-gray-600 font-medium">Total {data.quarter} Headcount</div>
+                <div className="text-xs text-gray-500 mt-1">
+                  Faculty: {headcountData.faculty.count} | Staff: {headcountData.staff.count}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Headcount Metric Cards - 6 Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-6 gap-4 mb-8">
+
+          {/* Total Headcount Card */}
+          <div className="bg-white p-6 rounded-lg shadow-sm border">
+            <div className="flex items-center justify-between mb-4">
+              <Users style={{color: '#0054A6'}} size={20} />
+              <span className="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-800 font-medium uppercase">
+                Total
+              </span>
+            </div>
+            <div className="text-3xl font-bold text-gray-900 mb-1">{headcountData.total.count.toLocaleString()}</div>
+            <div className="text-xs text-gray-600 font-medium mb-2">Total Headcount</div>
+            <div className="text-xs text-gray-500">
+              OMA: {headcountData.total.oma.toLocaleString()} | PHX: {headcountData.total.phx}
+            </div>
+          </div>
+
+          {/* Benefit Eligible Faculty Card */}
+          <div className="bg-white p-6 rounded-lg shadow-sm border">
+            <div className="flex items-center justify-between mb-4">
+              <UserCheck style={{color: '#0054A6'}} size={20} />
+              <span className="text-xs px-2 py-1 rounded-full bg-purple-100 text-purple-800 font-medium uppercase">
+                Faculty
+              </span>
+            </div>
+            <div className="text-3xl font-bold text-gray-900 mb-1">{headcountData.faculty.count}</div>
+            <div className="text-xs text-gray-600 font-medium mb-2">Benefit Eligible Faculty</div>
+            <div className="text-xs text-gray-500">
+              OMA: {headcountData.faculty.oma} | PHX: {headcountData.faculty.phx}
+            </div>
+          </div>
+
+          {/* Benefit Eligible Staff Card */}
+          <div className="bg-white p-6 rounded-lg shadow-sm border">
+            <div className="flex items-center justify-between mb-4">
+              <Briefcase style={{color: '#0054A6'}} size={20} />
+              <span className="text-xs px-2 py-1 rounded-full bg-green-100 text-green-800 font-medium uppercase">
+                Staff
+              </span>
+            </div>
+            <div className="text-3xl font-bold text-gray-900 mb-1">{headcountData.staff.count.toLocaleString()}</div>
+            <div className="text-xs text-gray-600 font-medium mb-2">Benefit Eligible Staff</div>
+            <div className="text-xs text-gray-500">
+              OMA: {headcountData.staff.oma.toLocaleString()} | PHX: {headcountData.staff.phx}
+            </div>
+          </div>
+
+          {/* House Staff Physicians Card */}
+          <div className="bg-white p-6 rounded-lg shadow-sm border">
+            <div className="flex items-center justify-between mb-4">
+              <Stethoscope style={{color: '#0054A6'}} size={20} />
+              <span className="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-800 font-medium uppercase">
+                HSP
+              </span>
+            </div>
+            <div className="text-3xl font-bold text-gray-900 mb-1">{headcountData.houseStaffPhysicians.count}</div>
+            <div className="text-xs text-gray-600 font-medium mb-2">House Staff Physicians</div>
+            <div className="text-xs text-gray-500">
+              OMA: {headcountData.houseStaffPhysicians.oma} | PHX: {headcountData.houseStaffPhysicians.phx}
+            </div>
+          </div>
+
+          {/* Student Workers Card */}
+          <div className="bg-white p-6 rounded-lg shadow-sm border">
+            <div className="flex items-center justify-between mb-4">
+              <GraduationCap style={{color: '#0054A6'}} size={20} />
+              <span className="text-xs px-2 py-1 rounded-full bg-yellow-100 text-yellow-800 font-medium uppercase">
+                Students
+              </span>
+            </div>
+            <div className="text-3xl font-bold text-gray-900 mb-1">{headcountData.studentWorkers.count.toLocaleString()}</div>
+            <div className="text-xs text-gray-600 font-medium mb-2">Student Workers</div>
+            <div className="text-xs text-gray-500">
+              OMA: {headcountData.studentWorkers.oma.toLocaleString()} | PHX: {headcountData.studentWorkers.phx}
+            </div>
+          </div>
+
+          {/* Temporary Employees Card */}
+          <div className="bg-white p-6 rounded-lg shadow-sm border">
+            <div className="flex items-center justify-between mb-4">
+              <Users style={{color: '#0054A6'}} size={20} />
+              <span className="text-xs px-2 py-1 rounded-full bg-orange-100 text-orange-800 font-medium uppercase">
+                Temp
+              </span>
+            </div>
+            <div className="text-3xl font-bold text-gray-900 mb-1">{headcountData.temporary.count}</div>
+            <div className="text-xs text-gray-600 font-medium mb-2">Temporary Employees</div>
+            <div className="text-xs text-gray-500">
+              OMA: {headcountData.temporary.oma} | PHX: {headcountData.temporary.phx}
+            </div>
+          </div>
+
+        </div>
+
+        {/* Workforce by Employee Type */}
+        <div className="bg-white rounded-lg shadow-sm border p-6 mb-8">
+          <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+            <BarChart3 style={{color: '#0054A6'}} size={20} />
+            Workforce by Employee Type
+          </h2>
+
+          {/* Chart Area */}
+          <div className="relative" style={{ height: '360px' }}>
+            {/* Y-axis with horizontal grid lines */}
+            <div className="absolute left-0 top-0 bottom-0 w-12 flex flex-col justify-between text-xs text-gray-500">
+              {[2400, 2000, 1600, 1200, 800, 400, 0].map((step, index) => (
+                <div key={index} className="relative">
+                  <span className="absolute -left-2 -top-2">{step}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Horizontal grid lines */}
+            <div className="absolute left-12 right-0 top-0 bottom-0">
+              {[0, 400, 800, 1200, 1600, 2000, 2400].map((step, index) => (
+                <div
+                  key={index}
+                  className="absolute left-0 right-0 border-t border-gray-200"
+                  style={{ bottom: `${(step / 2400) * 100}%` }}
+                />
+              ))}
+            </div>
+
+            {/* Vertical Stacked Bar Chart */}
+            <div className="absolute left-12 right-0 bottom-0 flex items-end justify-around" style={{ height: '320px' }}>
+              {employeeGroupData.map((group, index) => {
+                // Calculate bar height as percentage of chart height based on y-axis max (2400)
+                const barHeightPx = (group.total / 2400) * 320;
+
+                return (
+                  <div key={index} className="flex flex-col items-center" style={{ width: '14%' }}>
+                    {/* Total label above bar */}
+                    <div className="text-base font-semibold text-gray-900 mb-1">
+                      {group.total.toLocaleString()}
+                    </div>
+
+                    {/* Bar */}
+                    <div
+                      className="w-full flex items-center justify-center text-white text-sm font-medium bg-blue-600"
+                      style={{ height: `${barHeightPx}px` }}
+                    >
+                      {group.total >= 50 && group.total}
+                    </div>
+
+                    {/* Group label */}
+                    <div className="text-xs text-gray-600 mt-2 text-center leading-tight">
+                      {group.group}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Data Note */}
+          <div className="text-xs text-gray-600 mt-6 bg-blue-50 p-3 rounded border border-blue-200 text-center">
+            <span className="font-semibold">Note:</span> Workforce composition shows all employee categories as of end of {data.quarter}.
+          </div>
+        </div>
+
+        {/* Campus Comparison by Employee Type */}
+        <div className="bg-white rounded-lg shadow-sm border p-6 mb-8">
+          <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+            <MapPin style={{color: '#0054A6'}} size={20} />
+            Campus Comparison by Employee Type
+          </h2>
+
+          {/* Legend */}
+          <div className="mb-6 flex justify-center gap-6 text-sm flex-wrap">
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+              <span className="text-gray-700">Staff</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+              <span className="text-gray-700">Faculty</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
+              <span className="text-gray-700">Students</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
+              <span className="text-gray-700">House Staff</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+              <span className="text-gray-700">Non-Benefit</span>
+            </div>
+          </div>
+
+          {/* Horizontal Stacked Bar Chart */}
+          <div className="space-y-8">
+            {/* X-axis scale */}
+            <div className="relative">
+              <div className="flex justify-between text-xs text-gray-500 mb-2 px-32">
+                <span>0</span>
+                <span>500</span>
+                <span>1,000</span>
+                <span>1,500</span>
+                <span>2,000</span>
+                <span>2,500</span>
+                <span>3,000</span>
+                <span>3,500</span>
+                <span>4,000</span>
+                <span>4,500</span>
+              </div>
+
+              {/* Vertical grid lines */}
+              <div className="absolute top-6 left-32 right-32 bottom-0 flex justify-between pointer-events-none">
+                {[0, 500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500].map((_, idx) => (
+                  <div key={idx} className="border-l border-gray-200 h-full"></div>
+                ))}
+              </div>
+
+              {/* Omaha Bar */}
+              <div className="mb-6">
+                <div className="flex items-center gap-4">
+                  <div className="w-24 text-sm text-gray-700 font-medium text-right">Omaha (OMA)</div>
+                  <div className="flex-1 relative">
+                    <div className="flex h-12 rounded overflow-hidden">
+                      {/* Staff - Blue */}
+                      <div
+                        className="bg-blue-500 flex items-center justify-center text-white text-xs font-medium"
+                        style={{ width: `${(data.locationDetails.omaha.staff / 5000) * 100}%` }}
+                      >
+                        {data.locationDetails.omaha.staff >= 120 && data.locationDetails.omaha.staff.toLocaleString()}
+                      </div>
+                      {/* Faculty - Green */}
+                      <div
+                        className="bg-green-500 flex items-center justify-center text-white text-xs font-medium"
+                        style={{ width: `${(data.locationDetails.omaha.faculty / 5000) * 100}%` }}
+                      >
+                        {data.locationDetails.omaha.faculty >= 120 && data.locationDetails.omaha.faculty}
+                      </div>
+                      {/* Students - Purple */}
+                      <div
+                        className="bg-purple-500 flex items-center justify-center text-white text-xs font-medium"
+                        style={{ width: `${(data.locationDetails.omaha.students / 5000) * 100}%` }}
+                      >
+                        {data.locationDetails.omaha.students >= 120 && data.locationDetails.omaha.students.toLocaleString()}
+                      </div>
+                      {/* House Staff - Orange */}
+                      <div
+                        className="bg-orange-500 flex items-center justify-center text-white text-xs font-medium"
+                        style={{ width: `${(data.locationDetails.omaha.hsp / 5000) * 100}%` }}
+                      >
+                        {data.locationDetails.omaha.hsp >= 120 && data.locationDetails.omaha.hsp}
+                      </div>
+                      {/* Temporary - Red */}
+                      <div
+                        className="bg-red-500 flex items-center justify-center text-white text-xs font-medium"
+                        style={{ width: `${(data.locationDetails.omaha.temp / 5000) * 100}%` }}
+                      >
+                        {data.locationDetails.omaha.temp >= 120 && data.locationDetails.omaha.temp}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="w-20 text-right text-base font-bold text-gray-900">
+                    {data.locationDetails.omaha.total.toLocaleString()}
+                  </div>
+                </div>
+              </div>
+
+              {/* Phoenix Bar */}
+              <div>
+                <div className="flex items-center gap-4">
+                  <div className="w-24 text-sm text-gray-700 font-medium text-right">Phoenix (PHX)</div>
+                  <div className="flex-1 relative">
+                    <div className="flex h-12 rounded overflow-hidden">
+                      {/* Staff - Blue */}
+                      <div
+                        className="bg-blue-500 flex items-center justify-center text-white text-xs font-medium"
+                        style={{ width: `${(data.locationDetails.phoenix.staff / 5000) * 100}%` }}
+                      >
+                        {data.locationDetails.phoenix.staff >= 120 && data.locationDetails.phoenix.staff}
+                      </div>
+                      {/* Faculty - Green */}
+                      <div
+                        className="bg-green-500 flex items-center justify-center text-white text-xs font-medium"
+                        style={{ width: `${(data.locationDetails.phoenix.faculty / 5000) * 100}%` }}
+                      >
+                        {data.locationDetails.phoenix.faculty >= 120 && data.locationDetails.phoenix.faculty}
+                      </div>
+                      {/* Students - Purple */}
+                      <div
+                        className="bg-purple-500 flex items-center justify-center text-white text-xs font-medium"
+                        style={{ width: `${(data.locationDetails.phoenix.students / 5000) * 100}%` }}
+                      >
+                        {data.locationDetails.phoenix.students >= 120 && data.locationDetails.phoenix.students}
+                      </div>
+                      {/* House Staff - Orange */}
+                      <div
+                        className="bg-orange-500 flex items-center justify-center text-white text-xs font-medium"
+                        style={{ width: `${(data.locationDetails.phoenix.hsp / 5000) * 100}%` }}
+                      >
+                        {data.locationDetails.phoenix.hsp >= 120 && data.locationDetails.phoenix.hsp}
+                      </div>
+                      {/* Temporary - Red */}
+                      <div
+                        className="bg-red-500 flex items-center justify-center text-white text-xs font-medium"
+                        style={{ width: `${(data.locationDetails.phoenix.temp / 5000) * 100}%` }}
+                      >
+                        {data.locationDetails.phoenix.temp >= 120 && data.locationDetails.phoenix.temp}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="w-20 text-right text-base font-bold text-gray-900">
+                    {data.locationDetails.phoenix.total}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Data Note */}
+          <div className="text-xs text-gray-600 mt-6 bg-blue-50 p-3 rounded border border-blue-200 text-center">
+            <span className="font-semibold">Note:</span> Campus comparison shows {headcountData.total.count.toLocaleString()} total employees across Omaha ({data.locationDetails.omaha.total.toLocaleString()}) and Phoenix ({data.locationDetails.phoenix.total}) campuses as of end of {data.quarter}.
+          </div>
+        </div>
+
+        {/* Future: Additional workforce charts and visualizations will go here */}
+
+      </div>
+    </div>
+  );
+};
+
+export default WorkforceQ1FY26Dashboard;
