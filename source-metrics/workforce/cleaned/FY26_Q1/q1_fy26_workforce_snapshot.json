@@ -14,8 +14,8 @@
       "phx": 40
     },
     "staff": {
-      "count": 1431,
-      "oma": 1330,
+      "count": 1419,
+      "oma": 1318,
       "phx": 101
     },
     "houseStaffPhysicians": {
@@ -29,8 +29,8 @@
       "phx": 69
     },
     "temporary": {
-      "count": 630,
-      "oma": 489,
+      "count": 642,
+      "oma": 501,
       "phx": 141
     }
   },
@@ -46,10 +46,10 @@
     {
       "group": "Benefit-Eligible Staff",
       "faculty": 0,
-      "staff": 1431,
+      "staff": 1419,
       "hsp": 0,
       "students": 0,
-      "total": 1431
+      "total": 1419
     },
     {
       "group": "House Staff Physicians",
@@ -73,16 +73,16 @@
       "staff": 0,
       "hsp": 0,
       "students": 0,
-      "total": 630
+      "total": 642
     }
   ],
   "locationDetails": {
     "omaha": {
       "faculty": 657,
-      "staff": 1330,
+      "staff": 1318,
       "hsp": 270,
       "students": 2088,
-      "temp": 489,
+      "temp": 501,
       "total": 4834
     },
     "phoenix": {

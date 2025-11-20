@@ -123,7 +123,61 @@ else:
 
 ---
 
-### 4. Termination Type Classification
+### 4. Benefit Eligibility Determination
+
+**Purpose**: Define which employees are benefit-eligible for turnover reporting
+
+**Two-Step Filter Process**:
+
+#### Step 1: Assignment Category Filter
+**Include**:
+- F12, F11, F10, F09 (Full-time regular)
+- PT12, PT11, PT10, PT9 (Part-time regular)
+
+**Exclude**:
+- HSR (House Staff Residents - tracked separately)
+- TEMP, NBE, PRN (Temporary/non-benefit)
+- SUE, CWS (Student workers)
+
+#### Step 2: Grade Code Exclusion (CRITICAL)
+**Exclude Grade R** - Even if Assignment Category is F12/PT12:
+
+**Rule**: `Grade Code NOT LIKE 'R%'`
+
+**Rationale**:
+- Grade R = Residents/Fellows (PT, OT, Pharmacy)
+- These positions are:
+  - **NOT benefits-eligible** despite F12/PT12 assignment
+  - Training programs (1-2 year rotations)
+  - Different compensation structure
+  - Excluded from benefit-eligible reporting
+
+**Examples of Grade R Job Titles**:
+- Physical Therapy Resident
+- Occupational Therapy Fellow
+- Pharmacy Resident
+- Pharmacy Fellow
+
+**Implementation**:
+```python
+BENEFIT_ELIGIBLE_CODES = ['F12', 'F11', 'F10', 'F09', 'PT12', 'PT11', 'PT10', 'PT9']
+
+benefit_eligible = df[
+    (df['Assignment_Category'].isin(BENEFIT_ELIGIBLE_CODES)) &
+    (~df['Grade'].str.startswith('R', na=False))  # EXCLUDE Grade R
+]
+```
+
+**Q1 FY26 Impact**:
+- Without Grade R exclusion: 73 terminations
+- Grade R employees to exclude: 15
+- Corrected benefit-eligible: **58 terminations**
+
+**Data Quality Note**: Grade R exclusion applies to both terminations AND workforce headcount
+
+---
+
+### 5. Termination Type Classification
 
 **Field**: `Termination_Type` (Text)
 

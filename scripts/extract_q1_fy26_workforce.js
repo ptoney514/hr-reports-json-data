@@ -92,6 +92,7 @@ const assignmentCategoryCount = {};
 q1fy26Records.forEach(record => {
   const personType = (record['Person Type'] || record['personType'] || '').toUpperCase();
   const assignmentCategory = (record['Assignment Category Code'] || record['assignmentCategory'] || '').toUpperCase();
+  const gradeCode = (record['Grade Code'] || record['grade'] || record['Grade'] || '').toUpperCase();
   const location = (record['Location'] || record['location'] || 'Omaha').toLowerCase();
   const campus = location.includes('phoen') ? 'phoenix' : 'omaha';
 
@@ -100,7 +101,7 @@ q1fy26Records.forEach(record => {
     assignmentCategoryCount[assignmentCategory] = (assignmentCategoryCount[assignmentCategory] || 0) + 1;
   }
 
-  // Categorize according to WORKFORCE_METHODOLOGY.md
+  // Categorize according to WORKFORCE_METHODOLOGY.md (UPDATED 2025-11-19 with Grade R exclusion)
 
   // 1. House Staff Physicians (HSR code)
   if (assignmentCategory === 'HSR') {
@@ -117,7 +118,13 @@ q1fy26Records.forEach(record => {
     categories.nonBenefitEligible.push(record);
     locationBreakdown[campus].temp++;
   }
-  // 4. Benefit-Eligible (F and PT codes) - Use Person Type to determine Staff vs Faculty
+  // 4. EXCLUDE Grade R (Residents/Fellows) - Even if F12/PT12 assignment
+  else if (gradeCode.startsWith('R')) {
+    // Grade R = Residents/Fellows (PT, OT, Pharmacy) - NOT benefit-eligible
+    categories.nonBenefitEligible.push(record);
+    locationBreakdown[campus].temp++;
+  }
+  // 5. Benefit-Eligible (F and PT codes, EXCLUDING Grade R) - Use Person Type to determine Staff vs Faculty
   else if (['F12', 'F11', 'F10', 'F09', 'PT12', 'PT11', 'PT10', 'PT9'].includes(assignmentCategory)) {
     if (personType === 'FACULTY') {
       categories.benefitEligibleFaculty.push(record);

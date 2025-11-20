@@ -15,14 +15,15 @@ const ExitSurveyQ1FY26Dashboard = () => {
   const surveyData = getExitSurveyData("2025-09-30");
 
   // Quarterly trend data (Q1 FY26 → Q1 FY25, descending)
+  // UPDATED 2025-11-19: Grade R exclusion applied to Q1 FY26
   const quarterlyData = [
     {
       quarter: 'Q1 FY26',
-      terminations: 73,
-      faculty: 4, // From Assignment Category filter (F/PT regular only)
-      staff: 69, // 73 - 4
+      terminations: 58,  // Corrected from 73 (15 Grade R excluded)
+      faculty: 4,
+      staff: 54,         // Corrected from 69 (15 Grade R excluded)
       responses: 15,
-      responseRate: 20.5,
+      responseRate: 25.9,  // Corrected from 20.5 (15/58 vs 15/73)
       satisfaction: 80 // Would recommend
     },
     {
@@ -130,15 +131,15 @@ const ExitSurveyQ1FY26Dashboard = () => {
           <div className="bg-white p-6 rounded-lg shadow-sm border">
             <div className="flex items-center justify-between mb-4">
               <BarChart3 style={{color: '#1F74DB'}} size={24} />
-              <span className="text-xs px-2 py-1 rounded-full bg-yellow-100 text-yellow-800 font-medium">
-                PENDING
+              <span className="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-800 font-medium">
+                UPDATED
               </span>
             </div>
             <div className="text-4xl font-bold text-gray-900 mb-1">
               {surveyData.responseRate ? `${surveyData.responseRate}%` : 'TBD'}
             </div>
             <div className="text-sm text-gray-600 font-medium">Survey Response Rate</div>
-            <div className="text-xs text-gray-500 mt-2">Awaiting termination data</div>
+            <div className="text-xs text-gray-500 mt-2">15 of 58 terminations</div>
           </div>
 
           {/* Card 3: Would Recommend */}

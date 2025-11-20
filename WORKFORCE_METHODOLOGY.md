@@ -21,19 +21,25 @@ This document describes the methodology for calculating and analyzing workforce 
 Employee types are classified by assignment category codes:
 
 **Faculty Categories (Benefit Eligible)**:
-- **F12**: Full-time Faculty (12-month)
-- **F11**: Faculty (11-month)
-- **F10**: Faculty (10-month)
-- **F09**: Faculty (9-month)
+- **F12**: Full-time Faculty (12-month) *excluding Grade R*
+- **F11**: Faculty (11-month) *excluding Grade R*
+- **F10**: Faculty (10-month) *excluding Grade R*
+- **F09**: Faculty (9-month) *excluding Grade R*
 
 **Staff Categories (Benefit Eligible)**:
-- **PT12**: Part-time Staff (12-month)
-- **PT11**: Part-time Staff (11-month)
-- **PT10**: Part-time Staff (10-month)
-- **PT9**: Part-time Staff (9-month)
+- **PT12**: Part-time Staff (12-month) *excluding Grade R*
+- **PT11**: Part-time Staff (11-month) *excluding Grade R*
+- **PT10**: Part-time Staff (10-month) *excluding Grade R*
+- **PT9**: Part-time Staff (9-month) *excluding Grade R*
+
+**⚠️ CRITICAL EXCLUSION: Grade R (Residents/Fellows)**:
+- **Grade R** employees are **NOT benefit-eligible** even with F12/PT12 assignment
+- Includes: Physical Therapy Residents, Occupational Therapy Fellows, Pharmacy Residents/Fellows
+- Training programs with different compensation structure
+- Must be filtered out AFTER assignment category check
 
 **House Staff Physicians**:
-- **HSR**: House Staff Residents/Physicians
+- **HSR**: House Staff Residents/Physicians (mostly Grade R)
 
 **Temporary/Non-Benefit Eligible**:
 - **TEMP**: Temporary Workers
@@ -65,26 +71,62 @@ Total Workforce = COUNT(DISTINCT Employee ID)
 
 ### 2. Benefit-Eligible Employee Calculation
 
+**CRITICAL: Two-Step Filter Process**
+
+#### Step 1: Assignment Category Filter
+```
+Benefit_Eligible_Pool = WHERE Assignment_Category IN (
+    'F12', 'F11', 'F10', 'F09',    # Full-time regular
+    'PT12', 'PT11', 'PT10', 'PT9'  # Part-time regular
+)
+```
+
+#### Step 2: Grade R Exclusion (ADDED 2025-11-19)
+```
+Benefit_Eligible_Final = Benefit_Eligible_Pool
+    WHERE Grade Code NOT LIKE 'R%'
+```
+
+**⚠️ Grade R Exclusion Rule**:
+- Even if employee has F12/PT12 assignment category
+- Grade R = Residents/Fellows (NOT benefit-eligible)
+- Includes: PT Residents, OT Fellows, Pharmacy Residents/Fellows
+- Must be excluded from all benefit-eligible calculations
+
 #### Faculty Count
 ```
-Faculty = SUM(F12 + F11 + F10 + F09)
+Faculty = COUNT(Employee WHERE
+    Assignment_Category IN ('F12', 'F11', 'F10', 'F09') AND
+    Grade NOT LIKE 'R%' AND
+    Employee_Category = 'Faculty'
+)
 ```
 **FY25 Total**: 788 faculty members
 - Comprised of: F12 (1,708 positions), F09 (286), F11 (53), F10 (12)
 - **Note**: F12 category includes both faculty and staff positions; actual faculty split is calculated
+- **Grade R excluded**: Removes any Residents/Fellows mistakenly in faculty categories
 
 #### Staff Count
 ```
-Staff = SUM(PT12 + PT11 + PT10 + PT9) + [F12 staff portion]
+Staff = COUNT(Employee WHERE
+    Assignment_Category IN ('F12', 'F11', 'F10', 'F09', 'PT12', 'PT11', 'PT10', 'PT9') AND
+    Grade NOT LIKE 'R%' AND
+    Employee_Category IN ('Staff Exempt', 'Staff Non-Exempt')
+)
 ```
 **FY25 Total**: 1,349 staff members
 - Comprised of: PT12 (52), PT11 (1), PT10 (6), PT9 (19) + F12 staff portion
+- **Grade R excluded**: Removes Residents/Fellows from benefit-eligible staff counts
 
 #### Benefit-Eligible Total
 ```
-Benefit Eligible = Faculty + Staff
+Benefit Eligible = Faculty + Staff (both with Grade R excluded)
 ```
 **FY25 Total**: 2,137 benefit-eligible employees
+
+**Q1 FY26 Impact of Grade R Exclusion**:
+- Previous count: 1,431 staff (included 12 Grade R)
+- Corrected count: **1,419 staff** (Grade R excluded)
 
 ### 3. House Staff Physicians (HSP)
 ```
