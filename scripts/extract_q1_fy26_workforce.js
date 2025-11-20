@@ -119,7 +119,7 @@ q1fy26Records.forEach(record => {
     locationBreakdown[campus].temp++;
   }
   // 4. EXCLUDE Grade R (Residents/Fellows) - Even if F12/PT12 assignment
-  else if (gradeCode.startsWith('R')) {
+  else if (gradeCode && gradeCode.startsWith('R')) {
     // Grade R = Residents/Fellows (PT, OT, Pharmacy) - NOT benefit-eligible
     categories.nonBenefitEligible.push(record);
     locationBreakdown[campus].temp++;

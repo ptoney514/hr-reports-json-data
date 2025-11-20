@@ -1,5 +1,5 @@
 import React from 'react';
-import { TrendingDown } from 'lucide-react';
+import { TrendingDown, AlertCircle } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { QUARTERLY_TURNOVER_TRENDS } from '../../data/staticData';
 
@@ -43,6 +43,21 @@ const TurnoverTrendsDashboard = () => {
                   Benefit-eligible employees: Faculty and Staff
                 </p>
               </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Methodology Change Notice */}
+        <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+          <div className="flex items-start gap-3">
+            <AlertCircle className="w-5 h-5 text-yellow-600 mt-0.5 flex-shrink-0" />
+            <div>
+              <p className="text-sm font-semibold text-yellow-800 mb-1">Methodology Update (2025-11-19)</p>
+              <p className="text-sm text-yellow-700">
+                Q1 FY26 data now excludes Grade R employees (PT/OT/Pharmacy Residents/Fellows) from benefit-eligible counts.
+                Historical quarters (Q1 FY23 - Q4 FY25) still include Grade R and will be updated in a future release.
+                This may cause an apparent decrease in Q1 FY26 that reflects methodology improvement, not actual trend change.
+              </p>
             </div>
           </div>
         </div>
