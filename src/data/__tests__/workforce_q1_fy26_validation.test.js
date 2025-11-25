@@ -6,6 +6,12 @@
  *
  * Data Source: source-metrics/workforce/cleaned/FY26_Q1/q1_fy26_workforce_snapshot.json
  * Processing: scripts/extract_q1_fy26_workforce.js
+ *
+ * METHODOLOGY UPDATE (Nov 19, 2025):
+ * - Grade R (Residents/Fellows) excluded from benefit-eligible staff counts
+ * - Staff: 1431 → 1419 (12 Grade R moved to temporary)
+ * - Temporary: 630 → 642 (12 Grade R added)
+ * - Benefit-eligible total: 2128 → 2116
  */
 
 import {
@@ -96,18 +102,19 @@ describe('Q1 FY26 Workforce Data Validation', () => {
 
     describe('Benefit-Eligible Staff Validation', () => {
       it('should have correct staff count per methodology', () => {
-        // Per WORKFORCE_METHODOLOGY.md: Staff with F or PT codes (excluding HSR)
-        expect(q1fy26Data.summary.staff.count).toBe(1431);
+        // Per WORKFORCE_METHODOLOGY.md: Staff with F or PT codes (excluding HSR and Grade R)
+        // Updated Nov 2025: Grade R (Residents/Fellows) excluded from benefit-eligible
+        expect(q1fy26Data.summary.staff.count).toBe(1419);
       });
 
       it('should have correct campus distribution', () => {
-        expect(q1fy26Data.summary.staff.oma).toBe(1330);
+        expect(q1fy26Data.summary.staff.oma).toBe(1318);
         expect(q1fy26Data.summary.staff.phx).toBe(101);
-        expect(q1fy26Data.summary.staff.oma + q1fy26Data.summary.staff.phx).toBe(1431);
+        expect(q1fy26Data.summary.staff.oma + q1fy26Data.summary.staff.phx).toBe(1419);
       });
 
       it('should match locationDetails', () => {
-        expect(q1fy26Data.locationDetails.omaha.staff).toBe(1330);
+        expect(q1fy26Data.locationDetails.omaha.staff).toBe(1318);
         expect(q1fy26Data.locationDetails.phoenix.staff).toBe(101);
       });
     });
@@ -156,13 +163,14 @@ describe('Q1 FY26 Workforce Data Validation', () => {
     describe('Temporary Employees Validation', () => {
       it('should have correct temporary count per methodology', () => {
         // Per WORKFORCE_METHODOLOGY.md: TEMP + NBE + PRN codes
-        expect(q1fy26Data.summary.temporary.count).toBe(630);
+        // Updated Nov 2025: Now includes Grade R (Residents/Fellows)
+        expect(q1fy26Data.summary.temporary.count).toBe(642);
       });
 
       it('should have correct campus distribution', () => {
-        expect(q1fy26Data.summary.temporary.oma).toBe(489);
+        expect(q1fy26Data.summary.temporary.oma).toBe(501);
         expect(q1fy26Data.summary.temporary.phx).toBe(141);
-        expect(q1fy26Data.summary.temporary.oma + q1fy26Data.summary.temporary.phx).toBe(630);
+        expect(q1fy26Data.summary.temporary.oma + q1fy26Data.summary.temporary.phx).toBe(642);
       });
 
       it('should equal TEMP + NBE + PRN assignment categories', () => {
@@ -171,8 +179,8 @@ describe('Q1 FY26 Workforce Data Validation', () => {
           q1fy26Data.assignmentCategories['NBE'] +
           q1fy26Data.assignmentCategories['PRN'];
 
+        // Validates temp categories sum matches temporary count
         expect(tempSum).toBe(q1fy26Data.summary.temporary.count);
-        expect(tempSum).toBe(516 + 7 + 107);
       });
     });
   });
@@ -283,15 +291,17 @@ describe('Q1 FY26 Workforce Data Validation', () => {
 
     it('should validate second largest group is Benefit-Eligible Staff', () => {
       const staffGroup = q1fy26Data.employeeGroups.find(g => g.group === "Benefit-Eligible Staff");
-      expect(staffGroup.total).toBe(1431);
+      // Updated Nov 2025: Grade R excluded from benefit-eligible
+      expect(staffGroup.total).toBe(1419);
     });
   });
 
   describe('Business Rule Validation', () => {
     it('should validate benefit-eligible total (Faculty + Staff)', () => {
       const benefitEligibleTotal = q1fy26Data.summary.faculty.count + q1fy26Data.summary.staff.count;
-      expect(benefitEligibleTotal).toBe(697 + 1431);
-      expect(benefitEligibleTotal).toBe(2128);
+      // Updated Nov 2025: Grade R excluded from benefit-eligible
+      expect(benefitEligibleTotal).toBe(697 + 1419);
+      expect(benefitEligibleTotal).toBe(2116);
     });
 
     it('should validate benefit-eligible is approximately 38% of total workforce', () => {
@@ -300,7 +310,8 @@ describe('Q1 FY26 Workforce Data Validation', () => {
 
       expect(percentage).toBeGreaterThan(35);
       expect(percentage).toBeLessThan(42);
-      expect(Math.round(percentage * 10) / 10).toBe(38.5); // ~38.5%
+      // Updated Nov 2025: 2116/5528 = 38.3%
+      expect(Math.round(percentage * 10) / 10).toBe(38.3);
     });
 
     it('should validate student workers are approximately 39% of total workforce', () => {
@@ -384,7 +395,8 @@ describe('Q1 FY26 Workforce Data Validation', () => {
       const expectedTotal = q1fy26Data.summary.faculty.count + q1fy26Data.summary.staff.count;
 
       expect(benefitSum).toBe(expectedTotal);
-      expect(benefitSum).toBe(2128); // 697 + 1431
+      // Updated Nov 2025: 697 + 1419 = 2116 (Grade R excluded)
+      expect(benefitSum).toBe(2116);
     });
 
     it('should validate student codes sum to student workers', () => {
@@ -400,7 +412,8 @@ describe('Q1 FY26 Workforce Data Validation', () => {
         q1fy26Data.assignmentCategories['PRN'];
 
       expect(tempSum).toBe(q1fy26Data.summary.temporary.count);
-      expect(tempSum).toBe(630);
+      // Updated Nov 2025: 642 (includes Grade R)
+      expect(tempSum).toBe(642);
     });
 
     it('should validate all assignment categories are positive integers', () => {
@@ -474,12 +487,13 @@ describe('Q1 FY26 Workforce Data Validation', () => {
 
     it('should validate data matches extraction script output', () => {
       // These values should match scripts/extract_q1_fy26_workforce.js output
+      // Updated Nov 2025: Grade R methodology change
       expect(q1fy26Data.summary.total.count).toBe(5528);
       expect(q1fy26Data.summary.faculty.count).toBe(697);
-      expect(q1fy26Data.summary.staff.count).toBe(1431);
+      expect(q1fy26Data.summary.staff.count).toBe(1419); // Grade R excluded
       expect(q1fy26Data.summary.houseStaffPhysicians.count).toBe(613);
       expect(q1fy26Data.summary.studentWorkers.count).toBe(2157);
-      expect(q1fy26Data.summary.temporary.count).toBe(630);
+      expect(q1fy26Data.summary.temporary.count).toBe(642); // Includes Grade R
     });
   });
 });

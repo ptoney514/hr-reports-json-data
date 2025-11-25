@@ -1,10 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import dataValidationService from '../../services/dataValidationService';
 import DataCalculations from './DataCalculations';
-import { 
-  CheckCircle2, 
-  AlertTriangle, 
-  XCircle, 
+import MethodologyChangeLog from '../audit/MethodologyChangeLog';
+import DataBreakdownTable from '../audit/DataBreakdownTable';
+import QualityChecks from '../audit/QualityChecks';
+import {
+  CheckCircle2,
+  AlertTriangle,
+  XCircle,
   RefreshCw,
   Database,
   FileSpreadsheet,
@@ -366,18 +369,18 @@ const DataValidation = () => {
           </div>
 
           {/* Tabs */}
-          <div className="flex space-x-8 border-t border-gray-200">
-            {['overview', 'calculations', 'sources', 'validations', 'audit', 'settings'].map((tab) => (
+          <div className="flex space-x-8 border-t border-gray-200 overflow-x-auto">
+            {['overview', 'audit-quality', 'calculations', 'sources', 'validations', 'audit', 'settings'].map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`py-3 px-1 border-b-2 font-medium text-sm capitalize ${
+                className={`py-3 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
                   activeTab === tab
                     ? 'border-blue-500 text-blue-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700'
                 }`}
               >
-                {tab}
+                {tab === 'audit-quality' ? 'Audit & Quality' : tab.charAt(0).toUpperCase() + tab.slice(1)}
               </button>
             ))}
           </div>
@@ -385,6 +388,36 @@ const DataValidation = () => {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Audit & Quality Tab */}
+        {activeTab === 'audit-quality' && (
+          <div className="space-y-8">
+            {/* Methodology Change Log */}
+            <div className="bg-white rounded-lg shadow p-6">
+              <MethodologyChangeLog />
+            </div>
+
+            {/* Quality Checks */}
+            <div className="bg-white rounded-lg shadow p-6">
+              <QualityChecks quarterDate="2025-09-30" />
+            </div>
+
+            {/* Data Breakdowns */}
+            <div className="bg-white rounded-lg shadow p-6">
+              <h2 className="text-xl font-bold text-gray-900 mb-6">Data Breakdowns by Grade & Assignment</h2>
+
+              {/* Workforce Breakdown */}
+              <div className="mb-8">
+                <DataBreakdownTable type="workforce" quarterDate="2025-09-30" />
+              </div>
+
+              {/* Termination Breakdown */}
+              <div>
+                <DataBreakdownTable type="terminations" quarterDate="2025-09-30" />
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Overview Tab */}
         {activeTab === 'overview' && (
           <div className="space-y-6">
