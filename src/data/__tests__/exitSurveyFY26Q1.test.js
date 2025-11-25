@@ -5,6 +5,11 @@
  * has correct structure, valid ranges, and internally consistent calculations.
  *
  * Run with: npm test -- src/data/__tests__/exitSurveyFY26Q1.test.js
+ *
+ * METHODOLOGY UPDATE (Nov 19, 2025):
+ * - Grade R (Residents/Fellows) excluded from benefit-eligible termination counts
+ * - Total exits: 73 → 58 (excluding Grade R)
+ * - Response rate recalculated: 15/58 = 25.9%
  */
 
 const { getExitSurveyData } = require('../staticData');
@@ -37,11 +42,13 @@ describe('FY26 Q1 Exit Survey Data Validation', () => {
 
   describe('Response Metrics', () => {
     test('should have calculated response rate from termination data', () => {
-      expect(surveyData.responseRate).toBe(20.5);
+      // Updated Nov 2025: 15/58 = 25.9% (Grade R excluded from exits)
+      expect(surveyData.responseRate).toBe(25.9);
     });
 
     test('should have total exits from termination data', () => {
-      expect(surveyData.totalExits).toBe(73);
+      // Updated Nov 2025: Grade R excluded from benefit-eligible terminations
+      expect(surveyData.totalExits).toBe(58);
     });
 
     test('should have would recommend percentage', () => {
@@ -148,7 +155,8 @@ describe('FY26 Q1 Exit Survey Data Validation', () => {
   describe('Department Analysis', () => {
     test('should have department exits array', () => {
       expect(Array.isArray(surveyData.departmentExits)).toBe(true);
-      expect(surveyData.departmentExits.length).toBe(8);
+      // Updated Nov 2025: 9 departments after Grade R methodology change
+      expect(surveyData.departmentExits.length).toBe(9);
     });
 
     test('all departments should have required properties', () => {

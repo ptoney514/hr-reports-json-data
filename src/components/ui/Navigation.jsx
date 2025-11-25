@@ -165,6 +165,14 @@ const Navigation = () => {
       path: '/admin/data-sources',
       icon: Database,
       isActive: isActive('/admin/data-sources')
+    },
+    {
+      id: 'report-generator',
+      label: 'Report Generator',
+      shortLabel: 'Reports',
+      path: '/admin/report-generator',
+      icon: FileText,
+      isActive: isActive('/admin/report-generator')
     }
   ];
 

@@ -77,7 +77,7 @@ const ExitSurveyQ1FY26Dashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div id="exit-survey-q1-fy26-dashboard" className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-6">
 
         {/* Page Header */}
