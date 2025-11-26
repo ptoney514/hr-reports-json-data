@@ -219,9 +219,9 @@ const WorkforceQ1FY26Dashboard = () => {
         {/* Headcount Trends Chart */}
         <div className="bg-white rounded-2xl border p-8 mb-8" style={{ borderColor: '#D7D2CB' }}>
           <h2 className="text-2xl font-bold mb-6" style={{ color: '#00245D' }}>
-            FY24-FY25 Headcount Trend
+            FY24-Q1 FY26 Headcount Trend
           </h2>
-          <ResponsiveContainer width="100%" height={350}>
+          <ResponsiveContainer width="100%" height={385}>
             <LineChart data={QUARTERLY_HEADCOUNT_TRENDS} margin={{ top: 40, right: 30, left: 20, bottom: 20 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#D7D2CB" />
               <XAxis
@@ -285,6 +285,42 @@ const WorkforceQ1FY26Dashboard = () => {
                 name="Benefit Eligible Staff"
                 activeDot={{ r: 8, fill: '#3B82F6', stroke: '#ffffff', strokeWidth: 3 }}
               />
+
+              {/* House Staff Physicians Line (Dashed) */}
+              <Line
+                type="monotone"
+                dataKey="hsp"
+                stroke="#FBBF24"
+                strokeWidth={3}
+                strokeDasharray="5 5"
+                dot={{ r: 6, fill: '#FBBF24', strokeWidth: 2, stroke: '#ffffff' }}
+                name="House Staff Physicians"
+                activeDot={{ r: 8, fill: '#FBBF24', stroke: '#ffffff', strokeWidth: 3 }}
+              />
+
+              {/* Students Line (Dashed) */}
+              <Line
+                type="monotone"
+                dataKey="students"
+                stroke="#8B5CF6"
+                strokeWidth={3}
+                strokeDasharray="5 5"
+                dot={{ r: 6, fill: '#8B5CF6', strokeWidth: 2, stroke: '#ffffff' }}
+                name="Student Workers"
+                activeDot={{ r: 8, fill: '#8B5CF6', stroke: '#ffffff', strokeWidth: 3 }}
+              />
+
+              {/* Temporary Employees Line (Dashed) */}
+              <Line
+                type="monotone"
+                dataKey="temp"
+                stroke="#EF4444"
+                strokeWidth={3}
+                strokeDasharray="5 5"
+                dot={{ r: 6, fill: '#EF4444', strokeWidth: 2, stroke: '#ffffff' }}
+                name="Temporary Employees"
+                activeDot={{ r: 8, fill: '#EF4444', stroke: '#ffffff', strokeWidth: 3 }}
+              />
             </LineChart>
           </ResponsiveContainer>
 
@@ -292,9 +328,9 @@ const WorkforceQ1FY26Dashboard = () => {
           <div className="text-center mt-4 rounded-lg p-3" style={{ backgroundColor: '#B5D2F3' }}>
             <span className="text-sm" style={{ color: '#5F7FC3' }}>Note: </span>
             <span className="text-sm" style={{ color: '#00245D' }}>
-              Headcount trends show total workforce and benefit-eligible employees across all campuses from Q1 FY24 through Q4 FY25.
+              Headcount trends show total workforce and benefit-eligible employees across all campuses from Q1 FY24 through Q1 FY26.
               Total headcount includes all employee categories (faculty, staff, students, house staff physicians, and temporary employees).
-              Q4 FY24 and Q4 FY25 data points are actual end-of-year values; Q1-Q3 quarters are estimates pending quarterly data extraction.
+              Q4 FY24, Q4 FY25, and Q1 FY26 data points are actual values; Q1-Q3 FY24 and Q1-Q3 FY25 quarters are estimates pending quarterly data extraction.
             </span>
           </div>
         </div>
@@ -461,6 +497,7 @@ const WorkforceQ1FY26Dashboard = () => {
         </div>
 
         {/* Ethnicity Distribution - Two Pie Charts */}
+        {data.demographics?.ethnicity && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
 
           {/* Faculty Ethnicity Distribution */}
@@ -584,8 +621,10 @@ const WorkforceQ1FY26Dashboard = () => {
           </div>
 
         </div>
+        )}
 
         {/* Age/Gender Distribution - Diverging Bar Chart */}
+        {data.demographics?.ageGender && (
         <div className="bg-white rounded-lg shadow-sm border p-8 mb-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">
             Age/Gender Distribution
@@ -761,6 +800,7 @@ const WorkforceQ1FY26Dashboard = () => {
 
           </div>
         </div>
+        )}
 
         {/* Executive Summary */}
         <div className="bg-white rounded-lg shadow-sm border p-8 mb-8">
@@ -788,7 +828,7 @@ const WorkforceQ1FY26Dashboard = () => {
                 <div className="flex items-start gap-3">
                   <CheckCircle className="w-5 h-5 text-green-600 mt-0.5" />
                   <div className="text-sm text-gray-700">
-                    <span className="font-semibold">2,741 total benefit-eligible employees</span> as of 09/30/2025
+                    <span className="font-semibold">2,116 total benefit-eligible employees</span> as of 09/30/2025
                   </div>
                 </div>
 
@@ -804,7 +844,7 @@ const WorkforceQ1FY26Dashboard = () => {
                 <div className="flex items-start gap-3">
                   <TrendingDown className="w-5 h-5 text-blue-600 mt-0.5" />
                   <div className="text-sm text-gray-700">
-                    <span className="font-semibold">1,431 benefit-eligible staff</span> down 17 from prior quarter (-1.2%)
+                    <span className="font-semibold">1,419 benefit-eligible staff</span> down 29 from prior quarter (-2.0%)
                   </div>
                 </div>
 
@@ -812,7 +852,7 @@ const WorkforceQ1FY26Dashboard = () => {
                 <div className="flex items-start gap-3">
                   <Info className="w-5 h-5 text-blue-600 mt-0.5" />
                   <div className="text-sm text-gray-700">
-                    <span className="font-semibold">82.3% Omaha campus employees</span> 2,257 of 2,741 benefit-eligible workforce
+                    <span className="font-semibold">93.3% Omaha campus employees</span> 1,975 of 2,116 benefit-eligible workforce
                   </div>
                 </div>
 
@@ -844,7 +884,7 @@ const WorkforceQ1FY26Dashboard = () => {
                 <div className="flex items-start gap-3">
                   <Info className="w-5 h-5 text-blue-600 mt-0.5" />
                   <div className="text-sm text-gray-700">
-                    <span className="font-semibold">House Staff concentration:</span> 22.4% of benefit-eligible workforce (613 positions)
+                    <span className="font-semibold">House Staff concentration:</span> 22.5% of core workforce (613 of 2,729 faculty + staff + HSP)
                   </div>
                 </div>
 

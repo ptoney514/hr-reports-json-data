@@ -6,7 +6,18 @@ import { getQuarterlyWorkforceData } from '../../../data/staticData';
 
 // Mock staticData
 jest.mock('../../../data/staticData', () => ({
-  getQuarterlyWorkforceData: jest.fn()
+  getQuarterlyWorkforceData: jest.fn(),
+  QUARTERLY_HEADCOUNT_TRENDS: [
+    { quarter: "Q1 FY24", faculty: 700, staff: 1410, hsp: 580, students: 1700, temp: 610, total: 5000 },
+    { quarter: "Q2 FY24", faculty: 705, staff: 1420, hsp: 585, students: 1780, temp: 610, total: 5100 },
+    { quarter: "Q3 FY24", faculty: 715, staff: 1445, hsp: 590, students: 2030, temp: 620, total: 5400 },
+    { quarter: "Q4 FY24", faculty: 678, staff: 1431, hsp: 595, students: 1450, temp: 620, total: 4774 },
+    { quarter: "Q1 FY25", faculty: 690, staff: 1450, hsp: 600, students: 2130, temp: 630, total: 5500 },
+    { quarter: "Q2 FY25", faculty: 695, staff: 1440, hsp: 605, students: 1930, temp: 630, total: 5300 },
+    { quarter: "Q3 FY25", faculty: 700, staff: 1455, hsp: 605, students: 2010, temp: 630, total: 5400 },
+    { quarter: "Q4 FY25", faculty: 689, staff: 1448, hsp: 610, students: 1650, temp: 640, total: 5037 },
+    { quarter: "Q1 FY26", faculty: 697, staff: 1419, hsp: 613, students: 2157, temp: 642, total: 5528 }
+  ]
 }));
 
 describe('WorkforceQ1FY26Dashboard', () => {
@@ -121,6 +132,83 @@ describe('WorkforceQ1FY26Dashboard', () => {
       "F10": 10,
       "PT11": 1,
       "PT10": 8
+    },
+    demographics: {
+      ethnicity: {
+        faculty: {
+          total: 697,
+          distribution: [
+            { ethnicity: "White", count: 543, percentage: 77.9, color: "#93C5FD" },
+            { ethnicity: "Not Disclosed", count: 53, percentage: 7.6, color: "#D1D5DB" },
+            { ethnicity: "Asian", count: 51, percentage: 7.3, color: "#60A5FA" },
+            { ethnicity: "Two or More Races", count: 18, percentage: 2.6, color: "#FBBF24" },
+            { ethnicity: "Black or African American", count: 17, percentage: 2.4, color: "#34D399" },
+            { ethnicity: "Hispanic or Latino", count: 12, percentage: 1.7, color: "#F87171" },
+            { ethnicity: "American Indian or Alaska Native", count: 3, percentage: 0.4, color: "#A78BFA" }
+          ]
+        },
+        staff: {
+          total: 1419,
+          distribution: [
+            { ethnicity: "White", count: 989, percentage: 69.1, color: "#93C5FD" },
+            { ethnicity: "Not Disclosed", count: 126, percentage: 8.8, color: "#D1D5DB" },
+            { ethnicity: "Asian", count: 106, percentage: 7.4, color: "#60A5FA" },
+            { ethnicity: "Black or African American", count: 82, percentage: 5.7, color: "#34D399" },
+            { ethnicity: "Hispanic or Latino", count: 63, percentage: 4.4, color: "#FBBF24" },
+            { ethnicity: "Two or More Races", count: 56, percentage: 3.9, color: "#F87171" },
+            { ethnicity: "American Indian or Alaska Native", count: 6, percentage: 0.4, color: "#A78BFA" },
+            { ethnicity: "Native Hawaiian or other Pacific Islander", count: 3, percentage: 0.2, color: "#FB923C" }
+          ]
+        }
+      },
+      gender: {
+        faculty: {
+          total: 697,
+          distribution: [
+            { gender: "Female", count: 369, percentage: 52.9, color: "#EC4899" },
+            { gender: "Male", count: 328, percentage: 47.1, color: "#3B82F6" }
+          ]
+        },
+        staff: {
+          total: 1419,
+          distribution: [
+            { gender: "Female", count: 903, percentage: 63.1, color: "#EC4899" },
+            { gender: "Male", count: 528, percentage: 36.9, color: "#3B82F6" }
+          ]
+        }
+      },
+      ageGender: {
+        faculty: {
+          category: "Benefit-Eligible Faculty",
+          total: 697,
+          femaleTotal: 369,
+          maleTotal: 328,
+          femalePercentage: 52.9,
+          malePercentage: 47.1,
+          ageGenderBreakdown: [
+            { ageBand: "20-30", female: 4, male: 8, total: 12 },
+            { ageBand: "31-40", female: 91, male: 52, total: 143 },
+            { ageBand: "41-50", female: 126, male: 74, total: 200 },
+            { ageBand: "51-60", female: 81, male: 82, total: 163 },
+            { ageBand: "61 Plus", female: 67, male: 112, total: 179 }
+          ]
+        },
+        staff: {
+          category: "Benefit-Eligible Staff",
+          total: 1419,
+          femaleTotal: 903,
+          maleTotal: 528,
+          femalePercentage: 63.1,
+          malePercentage: 36.9,
+          ageGenderBreakdown: [
+            { ageBand: "20-30", female: 146, male: 81, total: 227 },
+            { ageBand: "31-40", female: 174, male: 121, total: 295 },
+            { ageBand: "41-50", female: 214, male: 115, total: 329 },
+            { ageBand: "51-60", female: 230, male: 116, total: 346 },
+            { ageBand: "61 Plus", female: 139, male: 95, total: 234 }
+          ]
+        }
+      }
     }
   };
 

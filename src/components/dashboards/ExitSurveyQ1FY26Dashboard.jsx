@@ -277,8 +277,8 @@ const ExitSurveyQ1FY26Dashboard = () => {
             <p className="text-sm text-gray-600 mb-6">Top reason cited by respondents</p>
 
             <div className="space-y-3">
-              {surveyData.departureReasons.slice(0, 7).map((reason, index) => {
-                const colors = ['#6B7280', '#EF4444', '#3B82F6', '#3B82F6', '#3B82F6', '#10B981', '#F59E0B'];
+              {surveyData.departureReasons.map((reason, index) => {
+                const colors = ['#6B7280', '#EF4444', '#3B82F6', '#3B82F6', '#3B82F6', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899', '#14B8A6', '#F97316', '#6366F1'];
                 // Scale bar widths for better visibility: multiply percentage by 3
                 // Count 3 (20%) → 60% width, Count 2 (13.3%) → 40% width, Count 1 (6.7%) → 20% width
                 const visualWidth = Math.min(reason.percentage * 3, 100);

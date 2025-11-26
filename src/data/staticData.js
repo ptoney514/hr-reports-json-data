@@ -1924,16 +1924,20 @@ export const QUARTERLY_TURNOVER_TRENDS = {
 
 export const QUARTERLY_HEADCOUNT_TRENDS = [
   // FY24 Quarters (Q1-Q3 are estimates, Q4 is actual)
-  { quarter: "Q1 FY24", faculty: 700, staff: 1410, total: 5000 },  // ESTIMATED
-  { quarter: "Q2 FY24", faculty: 705, staff: 1420, total: 5100 },  // ESTIMATED
-  { quarter: "Q3 FY24", faculty: 715, staff: 1445, total: 5400 },  // ESTIMATED
-  { quarter: "Q4 FY24", faculty: 678, staff: 1431, total: 4774 },  // ✅ ACTUAL (6/30/24)
+  // Categories: faculty, staff, hsp (House Staff Physicians), students, temp (Temporary Employees)
+  { quarter: "Q1 FY24", faculty: 700, staff: 1410, hsp: 580, students: 1700, temp: 610, total: 5000 },  // ESTIMATED
+  { quarter: "Q2 FY24", faculty: 705, staff: 1420, hsp: 585, students: 1780, temp: 610, total: 5100 },  // ESTIMATED
+  { quarter: "Q3 FY24", faculty: 715, staff: 1445, hsp: 590, students: 2030, temp: 620, total: 5400 },  // ESTIMATED
+  { quarter: "Q4 FY24", faculty: 678, staff: 1431, hsp: 595, students: 1450, temp: 620, total: 4774 },  // ✅ ACTUAL (6/30/24)
 
   // FY25 Quarters (Q1-Q3 are estimates, Q4 is actual)
-  { quarter: "Q1 FY25", faculty: 690, staff: 1450, total: 5500 },  // ESTIMATED
-  { quarter: "Q2 FY25", faculty: 695, staff: 1440, total: 5300 },  // ESTIMATED
-  { quarter: "Q3 FY25", faculty: 700, staff: 1455, total: 5400 },  // ESTIMATED
-  { quarter: "Q4 FY25", faculty: 689, staff: 1448, total: 5037 }   // ✅ ACTUAL (6/30/25)
+  { quarter: "Q1 FY25", faculty: 690, staff: 1450, hsp: 600, students: 2130, temp: 630, total: 5500 },  // ESTIMATED
+  { quarter: "Q2 FY25", faculty: 695, staff: 1440, hsp: 605, students: 1930, temp: 630, total: 5300 },  // ESTIMATED
+  { quarter: "Q3 FY25", faculty: 700, staff: 1455, hsp: 605, students: 2010, temp: 630, total: 5400 },  // ESTIMATED
+  { quarter: "Q4 FY25", faculty: 689, staff: 1448, hsp: 610, students: 1650, temp: 640, total: 5037 },  // ✅ ACTUAL (6/30/25)
+
+  // FY26 Quarters
+  { quarter: "Q1 FY26", faculty: 697, staff: 1419, hsp: 613, students: 2157, temp: 642, total: 5528 }   // ✅ ACTUAL (9/30/25)
 ];
 
 // ============================================================================
@@ -2138,9 +2142,12 @@ export const QUARTERLY_WORKFORCE_DATA = {
         total: 694
       }
     },
-    // Assignment category breakdown
+    // Assignment category breakdown (RAW counts from HR system)
+    // NOTE: 12 Grade R employees have F12 assignment but are NOT benefit-eligible
+    // Summary counts are ADJUSTED: F12 benefit-eligible = 1694 - 12 = 1682
+    // Temporary ADJUSTED: 516 + 107 + 7 + 12 (Grade R) = 642
     assignmentCategories: {
-      "F12": 1694,  // Full-time 12-month
+      "F12": 1694,  // Full-time 12-month (includes 12 Grade R - see note)
       "HSR": 613,   // House Staff Residents
       "PT12": 49,   // Part-time 12-month
       "TEMP": 516,  // Temporary
@@ -2154,6 +2161,11 @@ export const QUARTERLY_WORKFORCE_DATA = {
       "F10": 10,    // Full-time 10-month
       "PT11": 1,    // Part-time 11-month
       "PT10": 8     // Part-time 10-month
+    },
+    // Grade R exclusion count (for test validation)
+    gradeRExclusion: {
+      count: 12,
+      description: "Grade R employees with F12 assignment excluded from benefit-eligible counts"
     },
     // Ethnicity and Gender Demographics (Benefit-Eligible only)
     // Source: scripts/extract_q1_fy26_ethnicity.py
