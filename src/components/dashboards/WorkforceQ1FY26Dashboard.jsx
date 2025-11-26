@@ -11,6 +11,16 @@ import { getQuarterlyWorkforceData, QUARTERLY_HEADCOUNT_TRENDS } from '../../dat
  * Methodology: WORKFORCE_METHODOLOGY.md v2.0 (Person Type + Assignment Category)
  * Design System Reference: docs/QUARTERLY_REPORTS_DESIGN_SYSTEM.md
  */
+
+// Helper to generate common Line chart props for secondary trend lines (dashed style)
+const getSecondaryLineProps = (color) => ({
+  type: 'monotone',
+  strokeWidth: 3,
+  strokeDasharray: '5 5',
+  dot: { r: 6, fill: color, strokeWidth: 2, stroke: '#ffffff' },
+  activeDot: { r: 8, fill: color, stroke: '#ffffff', strokeWidth: 3 }
+});
+
 const WorkforceQ1FY26Dashboard = () => {
   // Load Q1 FY26 workforce data from staticData.js (calculated from raw Excel)
   const data = getQuarterlyWorkforceData("2025-09-30");
@@ -221,6 +231,7 @@ const WorkforceQ1FY26Dashboard = () => {
           <h2 className="text-2xl font-bold mb-6" style={{ color: '#00245D' }}>
             FY24-Q1 FY26 Headcount Trend
           </h2>
+          {/* Height increased from 350 to 385 to accommodate expanded legend with 6 trend lines */}
           <ResponsiveContainer width="100%" height={385}>
             <LineChart data={QUARTERLY_HEADCOUNT_TRENDS} margin={{ top: 40, right: 30, left: 20, bottom: 20 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#D7D2CB" />
@@ -288,38 +299,26 @@ const WorkforceQ1FY26Dashboard = () => {
 
               {/* House Staff Physicians Line (Dashed) */}
               <Line
-                type="monotone"
+                {...getSecondaryLineProps('#FBBF24')}
                 dataKey="hsp"
                 stroke="#FBBF24"
-                strokeWidth={3}
-                strokeDasharray="5 5"
-                dot={{ r: 6, fill: '#FBBF24', strokeWidth: 2, stroke: '#ffffff' }}
                 name="House Staff Physicians"
-                activeDot={{ r: 8, fill: '#FBBF24', stroke: '#ffffff', strokeWidth: 3 }}
               />
 
               {/* Students Line (Dashed) */}
               <Line
-                type="monotone"
+                {...getSecondaryLineProps('#8B5CF6')}
                 dataKey="students"
                 stroke="#8B5CF6"
-                strokeWidth={3}
-                strokeDasharray="5 5"
-                dot={{ r: 6, fill: '#8B5CF6', strokeWidth: 2, stroke: '#ffffff' }}
                 name="Student Workers"
-                activeDot={{ r: 8, fill: '#8B5CF6', stroke: '#ffffff', strokeWidth: 3 }}
               />
 
               {/* Temporary Employees Line (Dashed) */}
               <Line
-                type="monotone"
+                {...getSecondaryLineProps('#EF4444')}
                 dataKey="temp"
                 stroke="#EF4444"
-                strokeWidth={3}
-                strokeDasharray="5 5"
-                dot={{ r: 6, fill: '#EF4444', strokeWidth: 2, stroke: '#ffffff' }}
                 name="Temporary Employees"
-                activeDot={{ r: 8, fill: '#EF4444', stroke: '#ffffff', strokeWidth: 3 }}
               />
             </LineChart>
           </ResponsiveContainer>

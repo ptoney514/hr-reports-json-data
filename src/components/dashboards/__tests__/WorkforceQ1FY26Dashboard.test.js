@@ -37,8 +37,8 @@ describe('WorkforceQ1FY26Dashboard', () => {
         phx: 40
       },
       staff: {
-        count: 1431,
-        oma: 1330,
+        count: 1419,  // Updated for Grade R exclusion (was 1431)
+        oma: 1318,    // Updated for Grade R exclusion (was 1330)
         phx: 101
       },
       houseStaffPhysicians: {
@@ -52,8 +52,8 @@ describe('WorkforceQ1FY26Dashboard', () => {
         phx: 69
       },
       temporary: {
-        count: 630,
-        oma: 489,
+        count: 642,  // Updated: includes Grade R (was 630)
+        oma: 501,    // Updated (was 489)
         phx: 141
       }
     },
@@ -69,10 +69,10 @@ describe('WorkforceQ1FY26Dashboard', () => {
       {
         group: "Benefit-Eligible Staff",
         faculty: 0,
-        staff: 1431,
+        staff: 1419,  // Updated for Grade R exclusion (was 1431)
         hsp: 0,
         students: 0,
-        total: 1431
+        total: 1419   // Updated (was 1431)
       },
       {
         group: "House Staff Physicians",
@@ -96,16 +96,16 @@ describe('WorkforceQ1FY26Dashboard', () => {
         staff: 0,
         hsp: 0,
         students: 0,
-        total: 630
+        total: 642  // Updated: includes Grade R (was 630)
       }
     ],
     locationDetails: {
       omaha: {
         faculty: 657,
-        staff: 1330,
+        staff: 1318,  // Updated for Grade R exclusion (was 1330)
         hsp: 270,
         students: 2088,
-        temp: 489,
+        temp: 501,    // Updated: includes Grade R (was 489)
         total: 4834
       },
       phoenix: {
@@ -270,9 +270,9 @@ describe('WorkforceQ1FY26Dashboard', () => {
       expect(screen.getByText('Benefit Eligible Faculty')).toBeInTheDocument();
       expect(screen.getAllByText('697').length).toBeGreaterThan(0);
 
-      // Staff - appears in card and chart
+      // Staff - appears in card and chart (updated for Grade R: 1,419)
       expect(screen.getByText('Benefit Eligible Staff')).toBeInTheDocument();
-      expect(screen.getAllByText('1,431').length).toBeGreaterThan(0);
+      expect(screen.getAllByText('1,419').length).toBeGreaterThan(0);
 
       // House Staff Physicians - appears in card and chart
       expect(screen.getAllByText('House Staff Physicians').length).toBeGreaterThan(0);
@@ -282,9 +282,9 @@ describe('WorkforceQ1FY26Dashboard', () => {
       expect(screen.getAllByText('Student Workers').length).toBeGreaterThan(0);
       expect(screen.getAllByText('2,157').length).toBeGreaterThan(0);
 
-      // Temporary Employees - appears in card and chart
+      // Temporary Employees - appears in card and chart (updated for Grade R: 642)
       expect(screen.getAllByText('Temporary Employees').length).toBeGreaterThan(0);
-      expect(screen.getAllByText('630').length).toBeGreaterThan(0);
+      expect(screen.getAllByText('642').length).toBeGreaterThan(0);
     });
 
     it('should display location breakdown for each metric card', () => {
@@ -450,19 +450,21 @@ describe('WorkforceQ1FY26Dashboard', () => {
       expect(assignmentCategorySum).toBe(data.summary.total.count);
     });
 
-    it('should validate benefit-eligible categories match methodology', () => {
+    it('should validate benefit-eligible categories match methodology (with Grade R exclusion)', () => {
       const data = getQuarterlyWorkforceData("2025-09-30");
 
       // Benefit-eligible assignment codes from WORKFORCE_METHODOLOGY.md
       const benefitEligibleCodes = ['F12', 'F11', 'F10', 'F09', 'PT12', 'PT11', 'PT10', 'PT9'];
 
-      const benefitEligibleSum = benefitEligibleCodes.reduce((sum, code) => {
+      const rawBenefitSum = benefitEligibleCodes.reduce((sum, code) => {
         return sum + (data.assignmentCategories[code] || 0);
       }, 0);
 
-      // Should equal Faculty + Staff (both are benefit-eligible)
-      expect(benefitEligibleSum).toBe(data.summary.faculty.count + data.summary.staff.count);
-      expect(benefitEligibleSum).toBe(697 + 1431); // 2128
+      // Raw assignment category sum = 2128 (includes 12 Grade R with F12 assignment)
+      // Grade R are NOT benefit-eligible, so adjusted sum = 2128 - 12 = 2116
+      // Summary: Faculty (697) + Staff (1419) = 2116
+      expect(rawBenefitSum).toBe(697 + 1431); // 2128 raw from assignment categories
+      expect(data.summary.faculty.count + data.summary.staff.count).toBe(697 + 1419); // 2116 adjusted
     });
 
     it('should validate student worker categories', () => {
@@ -474,7 +476,7 @@ describe('WorkforceQ1FY26Dashboard', () => {
       expect(studentSum).toBe(1793 + 364); // 2157
     });
 
-    it('should validate temporary/non-benefit categories', () => {
+    it('should validate temporary/non-benefit categories (with Grade R)', () => {
       const data = getQuarterlyWorkforceData("2025-09-30");
 
       const tempSum =
@@ -482,8 +484,11 @@ describe('WorkforceQ1FY26Dashboard', () => {
         (data.assignmentCategories['NBE'] || 0) +
         (data.assignmentCategories['PRN'] || 0);
 
-      expect(tempSum).toBe(data.summary.temporary.count);
-      expect(tempSum).toBe(516 + 7 + 107); // 630
+      // Base temp categories sum to 630, but Grade R (12) adds to temporary count
+      // Assignment categories: 516 + 7 + 107 = 630
+      // Summary count includes Grade R adjustment: 630 + 12 = 642
+      expect(tempSum).toBe(516 + 7 + 107); // 630 from assignment categories
+      expect(data.summary.temporary.count).toBe(642); // Includes Grade R
     });
 
     it('should validate HSR category equals house staff count', () => {
@@ -520,8 +525,9 @@ describe('WorkforceQ1FY26Dashboard', () => {
     it('should have correct staff count', () => {
       const data = getQuarterlyWorkforceData("2025-09-30");
 
-      expect(data.summary.staff.count).toBe(1431);
-      expect(data.summary.staff.oma).toBe(1330);
+      // Updated for Grade R exclusion methodology (was 1431/1330)
+      expect(data.summary.staff.count).toBe(1419);
+      expect(data.summary.staff.oma).toBe(1318);
       expect(data.summary.staff.phx).toBe(101);
     });
 
@@ -544,8 +550,9 @@ describe('WorkforceQ1FY26Dashboard', () => {
     it('should have correct temporary employees count', () => {
       const data = getQuarterlyWorkforceData("2025-09-30");
 
-      expect(data.summary.temporary.count).toBe(630);
-      expect(data.summary.temporary.oma).toBe(489);
+      // Updated: includes Grade R employees (was 630/489)
+      expect(data.summary.temporary.count).toBe(642);
+      expect(data.summary.temporary.oma).toBe(501);
       expect(data.summary.temporary.phx).toBe(141);
     });
   });

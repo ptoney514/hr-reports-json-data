@@ -10,6 +10,23 @@ import { getExitSurveyData } from '../../data/staticData';
  * Exit Survey Patterns: docs/EXIT_SURVEY_DESIGN_SYSTEM.md
  * Wireframe Reference: docs/wireframes/exit-survey-q1-fy26-wireframe.html
  */
+
+// Color palette for departure reasons chart (12 distinct colors for all reasons)
+const DEPARTURE_REASON_COLORS = [
+  '#6B7280', // Gray - Other
+  '#EF4444', // Red - Dissatisfied with supervisor
+  '#3B82F6', // Blue - Career/Job reasons
+  '#3B82F6', // Blue
+  '#3B82F6', // Blue
+  '#10B981', // Green - Personal reasons
+  '#F59E0B', // Amber - Salary
+  '#8B5CF6', // Purple - Leadership
+  '#EC4899', // Pink - Relocation
+  '#14B8A6', // Teal - Workload
+  '#F97316', // Orange - Retirement
+  '#6366F1'  // Indigo - Remote/Hybrid
+];
+
 const ExitSurveyQ1FY26Dashboard = () => {
   // Get Q1 FY26 data
   const surveyData = getExitSurveyData("2025-09-30");
@@ -278,7 +295,6 @@ const ExitSurveyQ1FY26Dashboard = () => {
 
             <div className="space-y-3">
               {surveyData.departureReasons.map((reason, index) => {
-                const colors = ['#6B7280', '#EF4444', '#3B82F6', '#3B82F6', '#3B82F6', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899', '#14B8A6', '#F97316', '#6366F1'];
                 // Scale bar widths for better visibility: multiply percentage by 3
                 // Count 3 (20%) → 60% width, Count 2 (13.3%) → 40% width, Count 1 (6.7%) → 20% width
                 const visualWidth = Math.min(reason.percentage * 3, 100);
@@ -295,7 +311,7 @@ const ExitSurveyQ1FY26Dashboard = () => {
                           style={{
                             width: `${visualWidth}%`,
                             minWidth: '100px',
-                            backgroundColor: colors[index % colors.length]
+                            backgroundColor: DEPARTURE_REASON_COLORS[index % DEPARTURE_REASON_COLORS.length]
                           }}
                         >
                           {reason.count} ({reason.percentage}%)
@@ -322,7 +338,6 @@ const ExitSurveyQ1FY26Dashboard = () => {
 
             <div className="space-y-3">
               {surveyData.contributingReasons && surveyData.contributingReasons.slice(0, 10).map((reason, index) => {
-                const colors = ['#F59E0B', '#EF4444', '#06B6D4', '#EF4444', '#8B5CF6', '#F59E0B', '#3B82F6', '#6B7280', '#8B5CF6', '#F59E0B'];
                 return (
                   <div key={index} className="flex items-center gap-4">
                     <div className="w-48 text-sm text-gray-700 font-medium truncate" title={reason.reason}>
@@ -335,7 +350,7 @@ const ExitSurveyQ1FY26Dashboard = () => {
                           style={{
                             width: `${Math.max(reason.percentage, 15)}%`,
                             minWidth: '95px',
-                            backgroundColor: colors[index % colors.length]
+                            backgroundColor: DEPARTURE_REASON_COLORS[index % DEPARTURE_REASON_COLORS.length]
                           }}
                         >
                           {reason.count} ({reason.percentage}%)
