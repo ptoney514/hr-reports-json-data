@@ -87,10 +87,10 @@ const FALLBACK_DATA = {
       { name: 'Public Safety', value: 2 },
       { name: 'Research', value: 1 },
       { name: 'UCOM', value: 1 },
-      { name: 'VPEM', value: 1 },
+      { name: 'Enrollment Management', value: 1 },
       { name: 'VPGE', value: 1 },
-      { name: 'VPIT', value: 3 },
-      { name: 'VPSL', value: 3 }
+      { name: 'Information Technology', value: 3 },
+      { name: 'Student Life', value: 3 }
     ],
     topExitReasons: [
       { reason: 'Resigned', total: 25, percentage: 40.3, faculty: 3, staff: 22 },

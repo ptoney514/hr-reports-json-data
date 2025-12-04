@@ -4861,7 +4861,7 @@
           "total": 3
         },
         {
-          "name": "VPSL",
+          "name": "Student Life",
           "faculty": 0,
           "staff": 1,
           "hsp": 0,
@@ -5283,7 +5283,7 @@
           "total": 1
         },
         {
-          "name": "VPSL",
+          "name": "Student Life",
           "faculty": 0,
           "staff": 1,
           "hsp": 0,
@@ -5699,7 +5699,7 @@
           "total": 3
         },
         {
-          "name": "VPSL",
+          "name": "Student Life",
           "faculty": 0,
           "staff": 1,
           "hsp": 0,
@@ -6115,7 +6115,7 @@
           "total": 5
         },
         {
-          "name": "VPIT",
+          "name": "Information Technology",
           "faculty": 0,
           "staff": 4,
           "hsp": 0,
@@ -6136,7 +6136,7 @@
           "total": 3
         },
         {
-          "name": "VPEM",
+          "name": "Enrollment Management",
           "faculty": 0,
           "staff": 2,
           "hsp": 0,
@@ -6150,7 +6150,7 @@
           "total": 1
         },
         {
-          "name": "VPSL",
+          "name": "Student Life",
           "faculty": 0,
           "staff": 1,
           "hsp": 0,
@@ -6587,7 +6587,7 @@
           "total": 2
         },
         {
-          "name": "VPSL",
+          "name": "Student Life",
           "faculty": 0,
           "staff": 1,
           "hsp": 0,
@@ -8824,7 +8824,7 @@
           "total": 707
         },
         {
-          "name": "VPSL",
+          "name": "Student Life",
           "faculty": 0,
           "staff": 568,
           "hsp": 0,
@@ -8859,7 +8859,7 @@
           "total": 216
         },
         {
-          "name": "VPEM",
+          "name": "Enrollment Management",
           "faculty": 0,
           "staff": 180,
           "hsp": 0,
@@ -8894,7 +8894,7 @@
           "total": 137
         },
         {
-          "name": "VPUR",
+          "name": "University Relations",
           "faculty": 0,
           "staff": 125,
           "hsp": 0,
@@ -8908,14 +8908,14 @@
           "total": 120
         },
         {
-          "name": "VPIT",
+          "name": "Information Technology",
           "faculty": 0,
           "staff": 111,
           "hsp": 0,
           "total": 111
         },
         {
-          "name": "SueSucs",
+          "name": "Student Success",
           "faculty": 0,
           "staff": 109,
           "hsp": 0,
@@ -9247,7 +9247,7 @@
           "total": 711
         },
         {
-          "name": "VPSL",
+          "name": "Student Life",
           "faculty": 0,
           "staff": 582,
           "hsp": 0,
@@ -9289,7 +9289,7 @@
           "total": 197
         },
         {
-          "name": "VPEM",
+          "name": "Enrollment Management",
           "faculty": 0,
           "staff": 185,
           "hsp": 0,
@@ -9317,7 +9317,7 @@
           "total": 157
         },
         {
-          "name": "SueSucs",
+          "name": "Student Success",
           "faculty": 0,
           "staff": 133,
           "hsp": 0,
@@ -9331,14 +9331,14 @@
           "total": 132
         },
         {
-          "name": "VPUR",
+          "name": "University Relations",
           "faculty": 0,
           "staff": 130,
           "hsp": 0,
           "total": 130
         },
         {
-          "name": "VPIT",
+          "name": "Information Technology",
           "faculty": 0,
           "staff": 110,
           "hsp": 0,
@@ -9670,7 +9670,7 @@
           "total": 601
         },
         {
-          "name": "VPSL",
+          "name": "Student Life",
           "faculty": 0,
           "staff": 573,
           "hsp": 0,
@@ -9705,7 +9705,7 @@
           "total": 192
         },
         {
-          "name": "VPEM",
+          "name": "Enrollment Management",
           "faculty": 0,
           "staff": 176,
           "hsp": 0,
@@ -9733,14 +9733,14 @@
           "total": 152
         },
         {
-          "name": "SueSucs",
+          "name": "Student Success",
           "faculty": 0,
           "staff": 132,
           "hsp": 0,
           "total": 132
         },
         {
-          "name": "VPUR",
+          "name": "University Relations",
           "faculty": 0,
           "staff": 127,
           "hsp": 0,
@@ -9761,7 +9761,7 @@
           "total": 114
         },
         {
-          "name": "VPIT",
+          "name": "Information Technology",
           "faculty": 0,
           "staff": 104,
           "hsp": 0,

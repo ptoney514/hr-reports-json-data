@@ -268,6 +268,126 @@ const TurnoverQ1FY26Dashboard = () => {
           </div>
         </div>
 
+        {/* Turnover by School - Combined Faculty & Staff Table */}
+        <div className="bg-white rounded-lg shadow-sm border p-6 mb-8">
+          <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+            <BarChart3 style={{color: '#0054A6'}} size={20} />
+            Turnover by School/Area
+          </h2>
+
+          {/* Table */}
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-gray-200">
+                  <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">School/Area</th>
+                  <th className="text-center py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Total</th>
+                  <th className="text-center py-3 px-4 text-xs font-semibold uppercase tracking-wider" style={{color: '#0054A6'}}>Faculty</th>
+                  <th className="text-center py-3 px-4 text-xs font-semibold text-green-600 uppercase tracking-wider">Staff</th>
+                  <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Distribution</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.turnoverBySchool.map((row, index) => {
+                  const totalTerminations = terminationData.total.count;
+                  const percentage = ((row.total / totalTerminations) * 100).toFixed(1);
+                  // Max value is 16 (Other), scale bar width accordingly
+                  const maxCount = 16;
+                  const barWidthPercent = (row.total / maxCount) * 100;
+
+                  return (
+                    <tr key={index} className={`border-b border-gray-100 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}>
+                      <td className="py-3 px-4">
+                        <div className="text-sm font-medium text-gray-900">{row.school}</div>
+                        {row.note && <div className="text-xs text-gray-500 mt-1">{row.note}</div>}
+                      </td>
+                      <td className="py-3 px-4 text-center">
+                        <div className="text-lg font-bold text-gray-900">{row.total}</div>
+                      </td>
+                      <td className="py-3 px-4 text-center">
+                        <span
+                          className={`inline-flex items-center justify-center px-3 py-1 rounded-lg text-sm font-semibold ${row.faculty > 0 ? 'text-white' : 'bg-gray-100 text-gray-400'}`}
+                          style={row.faculty > 0 ? {backgroundColor: '#0054A6'} : {}}
+                        >
+                          {row.faculty}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 text-center">
+                        <span className={`inline-flex items-center justify-center px-3 py-1 rounded-lg text-sm font-semibold ${row.staff > 0 ? 'bg-green-500 text-white' : 'bg-gray-100 text-gray-400'}`}>
+                          {row.staff}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4">
+                        <div className="flex items-center gap-2">
+                          <div className="flex h-4 bg-gray-100 rounded overflow-hidden" style={{width: '120px'}}>
+                            {/* Faculty portion */}
+                            {row.faculty > 0 && (
+                              <div
+                                className="h-full"
+                                style={{
+                                  width: `${(row.faculty / row.total) * barWidthPercent}%`,
+                                  backgroundColor: '#0054A6'
+                                }}
+                              />
+                            )}
+                            {/* Staff portion */}
+                            {row.staff > 0 && (
+                              <div
+                                className="h-full bg-green-500"
+                                style={{ width: `${(row.staff / row.total) * barWidthPercent}%` }}
+                              />
+                            )}
+                          </div>
+                          <span className="text-xs text-gray-500 w-10">{percentage}%</span>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+              <tfoot>
+                <tr className="border-t-2 border-gray-300 bg-gray-50">
+                  <td className="py-4 px-4 font-semibold text-gray-900">Total</td>
+                  <td className="py-4 px-4 text-center">
+                    <div className="text-xl font-bold text-gray-900">{terminationData.total.count}</div>
+                  </td>
+                  <td className="py-4 px-4 text-center">
+                    <span
+                      className="inline-flex items-center justify-center px-4 py-2 rounded-lg text-white text-sm font-bold"
+                      style={{backgroundColor: '#0054A6'}}
+                    >
+                      {terminationData.faculty.count}
+                    </span>
+                  </td>
+                  <td className="py-4 px-4 text-center">
+                    <span className="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-green-500 text-white text-sm font-bold">
+                      {terminationData.staff.count}
+                    </span>
+                  </td>
+                  <td className="py-4 px-4"></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+
+          {/* Legend */}
+          <div className="mt-4 flex justify-center gap-6 text-sm">
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 rounded" style={{backgroundColor: '#0054A6'}}></div>
+              <span className="text-gray-700">Faculty Terminations</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 rounded bg-green-500"></div>
+              <span className="text-gray-700">Staff Terminations</span>
+            </div>
+          </div>
+
+          {/* Data Note */}
+          <div className="text-xs text-gray-600 mt-4 bg-blue-50 p-3 rounded border border-blue-200 text-center">
+            <span className="font-semibold">Note:</span> All counts represent benefit-eligible employees only (Faculty + Staff). Sorted by total departures descending.
+          </div>
+        </div>
+
         {/* Turnover by Length of Service */}
         <div className="bg-white rounded-lg shadow-sm border p-6 mb-8">
           <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
@@ -460,7 +580,7 @@ const TurnoverQ1FY26Dashboard = () => {
               Early Turnover Deep Dive (&lt;1 Year Tenure)
             </h2>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
               {/* By Employee Category */}
               <div className="bg-white rounded-lg shadow-sm border p-6">
@@ -564,11 +684,124 @@ const TurnoverQ1FY26Dashboard = () => {
                 </div>
               </div>
 
+              {/* By School/Area */}
+              <div className="bg-white rounded-lg shadow-sm border p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                  By School/Area (&lt;1 Year Tenure)
+                </h3>
+
+                <div className="flex flex-col items-center">
+                  {/* Donut Chart Container with Centered Label */}
+                  <div className="relative w-full" style={{ height: '300px' }}>
+                    <ResponsiveContainer width="100%" height={300}>
+                      <RechartsPie>
+                        <Pie
+                          data={data.earlyTurnover.bySchool}
+                          cx="50%"
+                          cy="50%"
+                          innerRadius={60}
+                          outerRadius={90}
+                          paddingAngle={2}
+                          dataKey="count"
+                          label={(entry) => `${entry.count} (${entry.percentage}%)`}
+                          labelLine={true}
+                          style={{ fontSize: '14px', fontWeight: '500' }}
+                        >
+                          {data.earlyTurnover.bySchool.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={entry.color} />
+                          ))}
+                        </Pie>
+                      </RechartsPie>
+                    </ResponsiveContainer>
+
+                    {/* Center Label - Perfectly Centered */}
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                      <div className="text-center">
+                        <div className="text-3xl font-bold text-gray-900">{earlyTenureTotal}</div>
+                        <div className="text-xs text-gray-600 uppercase tracking-wide">TOTAL</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Custom Legend */}
+                  <div className="flex flex-col gap-1 text-sm mt-2">
+                    {data.earlyTurnover.bySchool.map((item, index) => (
+                      <div key={index} className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded" style={{backgroundColor: item.color}}></div>
+                        <span className="text-gray-700 text-xs">{item.school}: <strong>{item.count}</strong> ({item.percentage}%)</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
             </div>
 
-            {/* Section Data Note */}
-            <div className="text-xs text-gray-600 mt-6 bg-blue-50 p-3 rounded border border-blue-200 text-center">
-              <span className="font-semibold">Note:</span> Early turnover analysis focuses on {earlyTenureTotal} benefit-eligible employees who left within their first year of service in {data.quarter}.
+            {/* Early Turnover by School Table - Detailed Breakdown */}
+            <div className="mt-8 bg-white rounded-lg shadow-sm border p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <BarChart3 style={{color: '#0054A6'}} size={18} />
+                Early Turnover by School/Area (Detailed)
+              </h3>
+
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-gray-200">
+                      <th className="text-left py-2 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">School/Area</th>
+                      <th className="text-center py-2 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Count</th>
+                      <th className="text-left py-2 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Distribution</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {data.earlyTurnover.bySchoolDetailed?.map((row, index) => {
+                      const maxCount = 4; // Medicine has the highest at 4
+                      const barWidthPercent = (row.count / maxCount) * 100;
+
+                      return (
+                        <tr key={index} className={`border-b border-gray-100 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}>
+                          <td className="py-2 px-4">
+                            <div className="text-sm font-medium text-gray-900">{row.school}</div>
+                          </td>
+                          <td className="py-2 px-4 text-center">
+                            <span className="inline-flex items-center justify-center px-3 py-1 rounded-lg text-sm font-semibold bg-blue-500 text-white">
+                              {row.count}
+                            </span>
+                          </td>
+                          <td className="py-2 px-4">
+                            <div className="flex items-center gap-2">
+                              <div className="flex h-4 bg-gray-100 rounded overflow-hidden" style={{width: '120px'}}>
+                                <div
+                                  className="h-full bg-blue-500"
+                                  style={{ width: `${barWidthPercent}%` }}
+                                />
+                              </div>
+                              <span className="text-xs text-gray-500 w-12">{row.percentage}%</span>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                  <tfoot>
+                    <tr className="border-t-2 border-gray-300 bg-gray-50">
+                      <td className="py-3 px-4 font-semibold text-gray-900">Total</td>
+                      <td className="py-3 px-4 text-center">
+                        <span className="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-bold">
+                          {earlyTenureTotal}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4">
+                        <span className="text-xs text-gray-500">100%</span>
+                      </td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+
+              <div className="text-xs text-gray-600 mt-4 bg-blue-50 p-3 rounded border border-blue-200 text-center">
+                <span className="font-semibold">Note:</span> Shows all {data.earlyTurnover.bySchoolDetailed?.length || 0} schools/areas with early turnover (&lt;1 year tenure) in {data.quarter}. Sorted by count descending.
+              </div>
             </div>
           </div>
         </div>

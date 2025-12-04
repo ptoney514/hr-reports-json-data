@@ -53,10 +53,10 @@ const FALLBACK_DATA = {
     { department: 'Public Safety', exits: 2, responses: 0, responseRate: '0%' },
     { department: 'Research', exits: 1, responses: 0, responseRate: '0%' },
     { department: 'UCOM', exits: 1, responses: 1, responseRate: '100%' },
-    { department: 'VPEM', exits: 1, responses: 0, responseRate: '0%' },
+    { department: 'Enrollment Management', exits: 1, responses: 0, responseRate: '0%' },
     { department: 'VPGE', exits: 1, responses: 0, responseRate: '0%' },
-    { department: 'VPIT', exits: 3, responses: 2, responseRate: '66.7%' },
-    { department: 'VPSL', exits: 3, responses: 3, responseRate: '100%' },
+    { department: 'Information Technology', exits: 3, responses: 2, responseRate: '66.7%' },
+    { department: 'Student Life', exits: 3, responses: 3, responseRate: '100%' },
     { department: 'Other Departments', exits: 0, responses: 6, responseRate: '-' }
   ],
   keyInsights: {

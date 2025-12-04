@@ -530,7 +530,7 @@ export const WORKFORCE_DATA = {
                 "total": 711
           },
           {
-                "name": "VPSL",
+                "name": "Student Life",
                 "faculty": 0,
                 "staff": 582,
                 "hsp": 0,
@@ -572,7 +572,7 @@ export const WORKFORCE_DATA = {
                 "total": 197
           },
           {
-                "name": "VPEM",
+                "name": "Enrollment Management",
                 "faculty": 0,
                 "staff": 185,
                 "hsp": 0,
@@ -600,7 +600,7 @@ export const WORKFORCE_DATA = {
                 "total": 157
           },
           {
-                "name": "SueSucs",
+                "name": "Student Success",
                 "faculty": 0,
                 "staff": 133,
                 "hsp": 0,
@@ -614,14 +614,14 @@ export const WORKFORCE_DATA = {
                 "total": 132
           },
           {
-                "name": "VPUR",
+                "name": "University Relations",
                 "faculty": 0,
                 "staff": 130,
                 "hsp": 0,
                 "total": 130
           },
           {
-                "name": "VPIT",
+                "name": "Information Technology",
                 "faculty": 0,
                 "staff": 110,
                 "hsp": 0,
@@ -941,7 +941,7 @@ export const WORKFORCE_DATA = {
                 "total": 601
           },
           {
-                "name": "VPSL",
+                "name": "Student Life",
                 "faculty": 0,
                 "staff": 573,
                 "hsp": 0,
@@ -976,7 +976,7 @@ export const WORKFORCE_DATA = {
                 "total": 192
           },
           {
-                "name": "VPEM",
+                "name": "Enrollment Management",
                 "faculty": 0,
                 "staff": 176,
                 "hsp": 0,
@@ -1004,14 +1004,14 @@ export const WORKFORCE_DATA = {
                 "total": 152
           },
           {
-                "name": "SueSucs",
+                "name": "Student Success",
                 "faculty": 0,
                 "staff": 132,
                 "hsp": 0,
                 "total": 132
           },
           {
-                "name": "VPUR",
+                "name": "University Relations",
                 "faculty": 0,
                 "staff": 127,
                 "hsp": 0,
@@ -1032,7 +1032,7 @@ export const WORKFORCE_DATA = {
                 "total": 114
           },
           {
-                "name": "VPIT",
+                "name": "Information Technology",
                 "faculty": 0,
                 "staff": 104,
                 "hsp": 0,
@@ -2025,9 +2025,65 @@ export const QUARTERLY_TURNOVER_DATA = {
         { name: "Involuntary", value: 2, percentage: 15.4, color: "#EF4444" }  // Updated
       ],
       byEmployeeCategory: [
-        { name: "Staff", value: 13, percentage: 100.0, color: "#3B82F6" }  // Corrected from 17
+        { name: "Benefit Eligible Staff", value: 13, percentage: 100.0, color: "#3B82F6" }  // Corrected from 17
+      ],
+      // Early turnover by school/area - where <1 year tenure departures occurred
+      // Source: source-metrics/terminations/cleaned/FY25_Q4/terminations_cleaned.csv
+      // Filter: Q1 FY26, Faculty + Staff, <1 year tenure, excludes TEMP/PRN and Grade R
+      bySchool: [
+        { school: "Medicine", count: 4, percentage: 30.8, color: "#3B82F6" },
+        { school: "Public Safety", count: 2, percentage: 15.4, color: "#EC4899" },
+        { school: "Facilities", count: 2, percentage: 15.4, color: "#EF4444" },
+        { school: "Other", count: 5, percentage: 38.5, color: "#6B7280" }  // Aggregated for donut chart
+      ],
+      // Detailed breakdown by school - all 8 schools with early turnover
+      bySchoolDetailed: [
+        { school: "Medicine", count: 4, percentage: 30.8 },
+        { school: "Facilities", count: 2, percentage: 15.4 },
+        { school: "Public Safety", count: 2, percentage: 15.4 },
+        { school: "Pharmacy & Health Professions", count: 1, percentage: 7.7 },
+        { school: "Provost", count: 1, percentage: 7.7 },
+        { school: "Student Success", count: 1, percentage: 7.7 },
+        { school: "Enrollment Management", count: 1, percentage: 7.7 },
+        { school: "Student Life", count: 1, percentage: 7.7 }
       ]
-    }
+    },
+    // Staff Turnover by School/Area - Deep dive into where staff departures occurred
+    // Source: source-metrics/terminations/cleaned/FY25_Q4/terminations_cleaned.csv
+    // Filter: Q1 FY26, Staff Exempt + Non-Exempt, excludes TEMP/PRN and Grade R
+    staffTurnoverBySchool: [
+      { school: "Medicine", count: 10, percentage: 18.5, color: "#3B82F6" },
+      { school: "Pharmacy & Health Professions", count: 5, percentage: 9.3, color: "#10B981" },
+      { school: "Student Life", count: 5, percentage: 9.3, color: "#8B5CF6" },
+      { school: "Dentistry", count: 5, percentage: 9.3, color: "#F59E0B" },
+      { school: "Facilities", count: 5, percentage: 9.3, color: "#EF4444" },
+      { school: "Athletics", count: 4, percentage: 7.4, color: "#06B6D4" },
+      { school: "Public Safety", count: 3, percentage: 5.6, color: "#EC4899" },
+      { school: "Other", count: 17, percentage: 31.5, color: "#6B7280" }  // 11 areas with 1-2 departures each
+    ],
+    // Faculty Turnover by School - Deep dive into where faculty departures occurred
+    // Source: source-metrics/terminations/cleaned/FY25_Q4/terminations_cleaned.csv
+    // Filter: Q1 FY26, Faculty, excludes TEMP/PRN
+    facultyTurnoverBySchool: [
+      { school: "Pharmacy & Health Professions", count: 2, percentage: 50.0, color: "#10B981" },
+      { school: "Law School", count: 1, percentage: 25.0, color: "#3B82F6" },
+      { school: "Arts & Sciences", count: 1, percentage: 25.0, color: "#8B5CF6" }
+    ],
+    // Combined Turnover by School - Faculty + Staff together for complete picture
+    // Source: source-metrics/terminations/cleaned/FY25_Q4/terminations_cleaned.csv
+    // Shows all schools with any departures, sorted by total descending
+    turnoverBySchool: [
+      { school: "Medicine", faculty: 0, staff: 10, total: 10 },
+      { school: "Pharmacy & Health Professions", faculty: 2, staff: 5, total: 7 },
+      { school: "Student Life", faculty: 0, staff: 5, total: 5 },
+      { school: "Dentistry", faculty: 0, staff: 5, total: 5 },
+      { school: "Facilities", faculty: 0, staff: 5, total: 5 },
+      { school: "Athletics", faculty: 0, staff: 4, total: 4 },
+      { school: "Public Safety", faculty: 0, staff: 3, total: 3 },
+      { school: "Law School", faculty: 1, staff: 1, total: 2 },
+      { school: "Arts & Sciences", faculty: 1, staff: 0, total: 1 },
+      { school: "Other", faculty: 0, staff: 16, total: 16, note: "Enrollment Management, UCOM, University Relations, Phoenix, Provost, VPMM, VPFN, CollProCE, Student Success, Information Technology, (blank)" }
+    ]
   }
 };
 
