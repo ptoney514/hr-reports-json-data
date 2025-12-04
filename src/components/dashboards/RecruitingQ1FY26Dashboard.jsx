@@ -1,6 +1,6 @@
-import React from 'react';
-import { UserPlus, Users, UserCheck, Briefcase, BarChart3, MapPin, Building2, Calendar, TrendingUp, FileText, CheckCircle, AlertCircle, Info, Clock, Target, Filter, Award, Linkedin, Globe } from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, FunnelChart, Funnel, LabelList } from 'recharts';
+import React, { useState, useMemo } from 'react';
+import { UserPlus, Users, UserCheck, Briefcase, BarChart3, MapPin, Building2, Calendar, TrendingUp, FileText, CheckCircle, AlertCircle, Info, Clock, Target, Filter, Award, Linkedin, Globe, ChevronUp, ChevronDown } from 'lucide-react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, FunnelChart, Funnel, LabelList, LineChart, Line } from 'recharts';
 
 /**
  * Q1 FY26 Recruiting Dashboard
@@ -157,11 +157,181 @@ const INTERFOLIO_DATA = {
   }
 };
 
+// Oracle HCM - All 69 Benefit-Eligible New Hires (Source of Truth)
+// Cross-referenced with Interfolio (Faculty) and ORC ATS/myJobs (Staff)
+// Includes Assignment Category (Benefit Eligibility) codes
+const ORACLE_HIRES_DATA = {
+  source: "Oracle HCM",
+  asOf: "Q1 FY26",
+  hires: [
+    { name: "Emma Irwin-Herzog", position: "Assistant Professor", department: "Philosophy Department", school: "Arts & Sciences", type: "FACULTY", hireDate: "07/01/2025", assignmentCode: "F09", assignmentType: "FT 9-Mo", inInterfolio: false, inORC: false },
+    { name: "Adam Garzoli", position: "Assistant Professor", department: "Law School Instruction", school: "Law School", type: "FACULTY", hireDate: "07/01/2025", assignmentCode: "F09", assignmentType: "FT 9-Mo", inInterfolio: false, inORC: false },
+    { name: "Kwanghyun Kim", position: "Assistant Professor", department: "Masters in Public Health", school: "Medicine", type: "FACULTY", hireDate: "07/01/2025", assignmentCode: "F12", assignmentType: "FT 12-Mo", inInterfolio: false, inORC: false },
+    { name: "Kristina Medero", position: "Assistant Professor", department: "Communication Studies Department", school: "Arts & Sciences", type: "FACULTY", hireDate: "07/01/2025", assignmentCode: "F09", assignmentType: "FT 9-Mo", inInterfolio: false, inORC: false },
+    { name: "Ann Aindow", position: "Assistant Professor", department: "Biology Department", school: "Arts & Sciences", type: "FACULTY", hireDate: "07/01/2025", assignmentCode: "F09", assignmentType: "FT 9-Mo", inInterfolio: false, inORC: false },
+    { name: "Patrick Kelly", position: "Professor", department: "Theology Department", school: "Arts & Sciences", type: "FACULTY", hireDate: "07/01/2025", assignmentCode: "F09", assignmentType: "FT 9-Mo", inInterfolio: false, inORC: false },
+    { name: "Cameron Flynn", position: "Assistant Professor", department: "Modern Languages and Literatures", school: "Arts & Sciences", type: "FACULTY", hireDate: "07/01/2025", assignmentCode: "F09", assignmentType: "FT 9-Mo", inInterfolio: false, inORC: false },
+    { name: "Nicole Buczkowski", position: "Assistant Professor", department: "Mathematics Department", school: "Arts & Sciences", type: "FACULTY", hireDate: "07/01/2025", assignmentCode: "F09", assignmentType: "FT 9-Mo", inInterfolio: false, inORC: false },
+    { name: "Caleb Krieger", position: "Assistant Professor", department: "Business Intelligence and Analytics", school: "Heider College of Business", type: "FACULTY", hireDate: "07/01/2025", assignmentCode: "F09", assignmentType: "FT 9-Mo", inInterfolio: false, inORC: false },
+    { name: "Benedict Shoup", position: "Assistant Professor", department: "Theology Department", school: "Arts & Sciences", type: "FACULTY", hireDate: "07/01/2025", assignmentCode: "F09", assignmentType: "FT 9-Mo", inInterfolio: false, inORC: false },
+    { name: "Cole Bruening", position: "Resident Assistant Professor", department: "Philosophy Department", school: "Arts & Sciences", type: "FACULTY", hireDate: "07/01/2025", assignmentCode: "F09", assignmentType: "FT 9-Mo", inInterfolio: false, inORC: false },
+    { name: "Ivan Andreu Rascon", position: "Assistant Professor", department: "Modern Languages and Literatures", school: "Arts & Sciences", type: "FACULTY", hireDate: "07/01/2025", assignmentCode: "F09", assignmentType: "FT 9-Mo", inInterfolio: false, inORC: false },
+    { name: "Jedediah Pida-Reese", position: "Resident Assistant Professor", department: "Economics & Finance Dept", school: "Heider College of Business", type: "FACULTY", hireDate: "07/01/2025", assignmentCode: "F09", assignmentType: "FT 9-Mo", inInterfolio: false, inORC: false },
+    { name: "Sara Hanson", position: "Adjunct Instructor", department: "Dental Dean Administration", school: "Dentistry", type: "FACULTY", hireDate: "07/01/2025", assignmentCode: "PT10", assignmentType: "PT 10-Mo", inInterfolio: false, inORC: false },
+    { name: "Jessica Farrell", position: "Resident Assistant Professor", department: "History Department", school: "Arts & Sciences", type: "FACULTY", hireDate: "07/01/2025", assignmentCode: "F09", assignmentType: "FT 9-Mo", inInterfolio: false, inORC: false },
+    { name: "David Paternostro", position: "Assistant Professor", department: "Philosophy Department", school: "Arts & Sciences", type: "FACULTY", hireDate: "07/01/2025", assignmentCode: "F09", assignmentType: "FT 9-Mo", inInterfolio: false, inORC: false },
+    { name: "Mehdi Maleki Sanukesh", position: "Resident Assistant Professor", department: "Physics Department", school: "Arts & Sciences", type: "FACULTY", hireDate: "07/01/2025", assignmentCode: "F09", assignmentType: "FT 9-Mo", inInterfolio: false, inORC: false },
+    { name: "Altangerel Tsogtsaikhan", position: "Resident Assistant Professor", department: "Biology Department", school: "Arts & Sciences", type: "FACULTY", hireDate: "07/01/2025", assignmentCode: "F09", assignmentType: "FT 9-Mo", inInterfolio: false, inORC: false },
+    { name: "Jill Hibbard", position: "Adjunct Assistant Professor", department: "Fine and Performing Arts", school: "Arts & Sciences", type: "FACULTY", hireDate: "07/01/2025", assignmentCode: "PT9", assignmentType: "PT 9-Mo", inInterfolio: false, inORC: false },
+    { name: "Kathryn Hecht-Weber", position: "Assistant Professor", department: "Education Department", school: "Arts & Sciences", type: "FACULTY", hireDate: "07/01/2025", assignmentCode: "F09", assignmentType: "FT 9-Mo", inInterfolio: false, inORC: false },
+    { name: "Lauren Loyd", position: "Instructor", department: "Nursing - Undergrad Faculty", school: "Nursing", type: "FACULTY", hireDate: "07/01/2025", assignmentCode: "F09", assignmentType: "FT 9-Mo", inInterfolio: false, inORC: false },
+    { name: "David Cooke", position: "Professor", department: "Mathematics Department", school: "Arts & Sciences", type: "FACULTY", hireDate: "07/01/2025", assignmentCode: "F09", assignmentType: "FT 9-Mo", inInterfolio: false, inORC: false },
+    { name: "Derrick Ganye", position: "Assistant Professor", department: "Business Intelligence and Analytics", school: "Heider College of Business", type: "FACULTY", hireDate: "07/01/2025", assignmentCode: "F09", assignmentType: "FT 9-Mo", inInterfolio: false, inORC: false },
+    { name: "Schuyler Chambers", position: "Assistant Professor", department: "Chemistry Department", school: "Arts & Sciences", type: "FACULTY", hireDate: "07/01/2025", assignmentCode: "F09", assignmentType: "FT 9-Mo", inInterfolio: false, inORC: false },
+    { name: "Poe Meh", position: "Custodian", department: "Facilities Management - Custodial", school: "Facilities", type: "STAFF", hireDate: "07/07/2025", assignmentCode: "F12", assignmentType: "FT 12-Mo", inInterfolio: false, inORC: true },
+    { name: "Ronette Bruner", position: "Director of Assessment", department: "CFE Administrative", school: "CFE", type: "STAFF", hireDate: "07/07/2025", assignmentCode: "F12", assignmentType: "FT 12-Mo", inInterfolio: false, inORC: true },
+    { name: "Angela Goltl", position: "Dental Assistant II", department: "Dental Dean Administration", school: "Dentistry", type: "STAFF", hireDate: "07/07/2025", assignmentCode: "F11", assignmentType: "FT 11-Mo", inInterfolio: false, inORC: true },
+    { name: "Kristen Nichols", position: "Assistant Professor", department: "Dental Dean Administration", school: "Dentistry", type: "FACULTY", hireDate: "07/14/2025", assignmentCode: "F12", assignmentType: "FT 12-Mo", inInterfolio: false, inORC: false },
+    { name: "Zachariah Barrientos", position: "Client Engagement Specialist", department: "Interdisciplinary Studies", school: "CollProCE", type: "STAFF", hireDate: "07/14/2025", assignmentCode: "F12", assignmentType: "FT 12-Mo", inInterfolio: false, inORC: true },
+    { name: "Teresa Gibbons", position: "Research Laboratory Technician II", department: "Bio-Medical Sciences", school: "Medicine", type: "STAFF", hireDate: "07/14/2025", assignmentCode: "F12", assignmentType: "FT 12-Mo", inInterfolio: false, inORC: true },
+    { name: "Parisa Rafiei", position: "Research Laboratory Technician II", department: "Pharmacology & Neuro Ops", school: "Medicine", type: "STAFF", hireDate: "07/14/2025", assignmentCode: "F12", assignmentType: "FT 12-Mo", inInterfolio: false, inORC: true },
+    { name: "Hayden Newburn", position: "Custodian", department: "Facilities Management - Custodial", school: "Facilities", type: "STAFF", hireDate: "07/14/2025", assignmentCode: "F12", assignmentType: "FT 12-Mo", inInterfolio: false, inORC: true },
+    { name: "Mohammad Alharakeh", position: "Postdoctoral Research Fellow", department: "Bio-Medical Sciences", school: "Medicine", type: "STAFF", hireDate: "07/16/2025", assignmentCode: "F12", assignmentType: "FT 12-Mo", inInterfolio: false, inORC: true },
+    { name: "Dominic Boand", position: "Custodian", department: "Facilities Management - Custodial", school: "Facilities", type: "STAFF", hireDate: "07/21/2025", assignmentCode: "F12", assignmentType: "FT 12-Mo", inInterfolio: false, inORC: true },
+    { name: "Erfei Zhou", position: "Research Laboratory Technician I", department: "Pharmacology & Neurosciences", school: "Medicine", type: "STAFF", hireDate: "07/21/2025", assignmentCode: "F12", assignmentType: "FT 12-Mo", inInterfolio: false, inORC: true },
+    { name: "Zhanna Griffin-Bell", position: "Sr Academic Info Resource Specialist", department: "Reinert Alumni Library", school: "VPLS", type: "STAFF", hireDate: "07/21/2025", assignmentCode: "F12", assignmentType: "FT 12-Mo", inInterfolio: false, inORC: true },
+    { name: "Jeffrey Sapakoff", position: "Athletic Intern", department: "Athletic Department - Weight Room", school: "Athletics", type: "STAFF", hireDate: "07/21/2025", assignmentCode: "F12", assignmentType: "FT 12-Mo", inInterfolio: false, inORC: true },
+    { name: "James Stannard", position: "Assoc Dir Marketing and Sales Athletics", department: "Athletic Department - Marketing", school: "Athletics", type: "STAFF", hireDate: "07/22/2025", assignmentCode: "F12", assignmentType: "FT 12-Mo", inInterfolio: false, inORC: true },
+    { name: "Paige Baker", position: "Painter II", department: "Facilities Management - Paint Shop", school: "Facilities", type: "STAFF", hireDate: "07/22/2025", assignmentCode: "F12", assignmentType: "FT 12-Mo", inInterfolio: false, inORC: true },
+    { name: "Clarissa Thiriot", position: "Instructional Designer II", department: "CFE Administrative", school: "CFE", type: "STAFF", hireDate: "07/23/2025", assignmentCode: "F12", assignmentType: "FT 12-Mo", inInterfolio: false, inORC: true },
+    { name: "Audrey Meyersieck", position: "Pre-Professional Advisor", department: "Center for Advising Resources", school: "SueSucs", type: "STAFF", hireDate: "07/28/2025", assignmentCode: "F12", assignmentType: "FT 12-Mo", inInterfolio: false, inORC: true },
+    { name: "Amy Peterson", position: "Administrative Assistant III", department: "Heider College of Business", school: "Heider College of Business", type: "STAFF", hireDate: "07/30/2025", assignmentCode: "F12", assignmentType: "FT 12-Mo", inInterfolio: false, inORC: true },
+    { name: "Amritpal Singh", position: "Premier Club Coach", department: "Enrollment Management", school: "VPEM", type: "STAFF", hireDate: "08/01/2025", assignmentCode: "F12", assignmentType: "FT 12-Mo", inInterfolio: false, inORC: true },
+    { name: "Joshua Kochanowsky", position: "Assistant Professor", department: "Microbiology Department", school: "Medicine", type: "FACULTY", hireDate: "08/01/2025", assignmentCode: "F12", assignmentType: "FT 12-Mo", inInterfolio: false, inORC: false },
+    { name: "Adam Goodrick", position: "Assistant Professor", department: "Dental Dean Administration", school: "Dentistry", type: "FACULTY", hireDate: "08/01/2025", assignmentCode: "F12", assignmentType: "FT 12-Mo", inInterfolio: false, inORC: false },
+    { name: "Dawn Fichter", position: "Assistant Professor", department: "Nursing - Undergrad Faculty", school: "Nursing", type: "FACULTY", hireDate: "08/01/2025", assignmentCode: "F12", assignmentType: "FT 12-Mo", inInterfolio: false, inORC: false },
+    { name: "Joseph Tariman", position: "Associate Dean", department: "Nursing - Undergrad Faculty", school: "Nursing", type: "STAFF", hireDate: "08/01/2025", assignmentCode: "F12", assignmentType: "FT 12-Mo", inInterfolio: false, inORC: true },
+    { name: "Bryan Harmer", position: "Assistant Professor", department: "EMS (Paramedicine)", school: "Nursing", type: "FACULTY", hireDate: "08/01/2025", assignmentCode: "F12", assignmentType: "FT 12-Mo", inInterfolio: true, inORC: false },
+    { name: "Vincent Strand", position: "Endowed Chair", department: "Waite Chair", school: "PRES", type: "FACULTY", hireDate: "08/01/2025", assignmentCode: "F12", assignmentType: "FT 12-Mo", inInterfolio: false, inORC: false },
+    { name: "Kyuchul Oh", position: "Assistant Professor", department: "Dental Dean Administration", school: "Dentistry", type: "FACULTY", hireDate: "08/01/2025", assignmentCode: "F12", assignmentType: "FT 12-Mo", inInterfolio: false, inORC: false },
+    { name: "Amy Riessland", position: "Mental Health Practitioner", department: "Counseling Center", school: "VPSL", type: "STAFF", hireDate: "08/04/2025", assignmentCode: "F12", assignmentType: "FT 12-Mo", inInterfolio: false, inORC: true },
+    { name: "Nicholas Wells", position: "Postdoctoral Research Fellow", department: "Bio-Medical Sciences", school: "Medicine", type: "STAFF", hireDate: "08/11/2025", assignmentCode: "F12", assignmentType: "FT 12-Mo", inInterfolio: false, inORC: true },
+    { name: "Pray Meh", position: "Custodian", department: "Facilities Management - Custodial", school: "Facilities", type: "STAFF", hireDate: "08/11/2025", assignmentCode: "F12", assignmentType: "FT 12-Mo", inInterfolio: false, inORC: true },
+    { name: "Alexis Robinson-Dailey", position: "Program Coordinator", department: "Multicultural & Community Affairs", school: "Medicine", type: "STAFF", hireDate: "08/13/2025", assignmentCode: "PT12", assignmentType: "PT 12-Mo", inInterfolio: false, inORC: true },
+    { name: "Alexis Hartley", position: "Asst Director of Student Affairs", department: "Law School - Dean's Office", school: "Law School", type: "STAFF", hireDate: "08/13/2025", assignmentCode: "F12", assignmentType: "FT 12-Mo", inInterfolio: false, inORC: true },
+    { name: "Andrew Kollath", position: "Senior Web Strategist", department: "Web Strategy", school: "UCOM", type: "STAFF", hireDate: "08/13/2025", assignmentCode: "F12", assignmentType: "FT 12-Mo", inInterfolio: false, inORC: true },
+    { name: "Ulysses Johnson", position: "Admin Assistant II - Student Groups", department: "VP's Office - Student Life", school: "VPSL", type: "STAFF", hireDate: "08/14/2025", assignmentCode: "F12", assignmentType: "FT 12-Mo", inInterfolio: false, inORC: true },
+    { name: "Dee Paw", position: "Custodian", department: "Facilities Management - Custodial", school: "Facilities", type: "STAFF", hireDate: "08/18/2025", assignmentCode: "F12", assignmentType: "FT 12-Mo", inInterfolio: false, inORC: true },
+    { name: "Hannah Haack", position: "Global Program Advisor", department: "Global Engagement Office", school: "VPGE", type: "STAFF", hireDate: "08/18/2025", assignmentCode: "F12", assignmentType: "FT 12-Mo", inInterfolio: false, inORC: true },
+    { name: "Emery Laine", position: "Metadata and Digital Initiatives Spec", department: "Law Library", school: "Law School", type: "STAFF", hireDate: "08/18/2025", assignmentCode: "F12", assignmentType: "FT 12-Mo", inInterfolio: false, inORC: true },
+    { name: "Poh Naw", position: "Custodian", department: "Facilities Management - Custodial", school: "Facilities", type: "STAFF", hireDate: "08/18/2025", assignmentCode: "F12", assignmentType: "FT 12-Mo", inInterfolio: false, inORC: true },
+    { name: "Kimberly Duckworth", position: "Team Lead iJay Store", department: "iJay Apple Store", school: "Heider College of Business", type: "STAFF", hireDate: "08/19/2025", assignmentCode: "F12", assignmentType: "FT 12-Mo", inInterfolio: false, inORC: true },
+    { name: "Lyman Jacoba", position: "Driver", department: "Shuttle Bus Department", school: "Public Safety", type: "STAFF", hireDate: "08/19/2025", assignmentCode: "F12", assignmentType: "FT 12-Mo", inInterfolio: false, inORC: true },
+    { name: "Cody Willoughby", position: "Athletic Equipment Manager", department: "Athletic Department", school: "Athletics", type: "STAFF", hireDate: "08/23/2025", assignmentCode: "F12", assignmentType: "FT 12-Mo", inInterfolio: false, inORC: true },
+    { name: "Naw Gay", position: "Custodian", department: "Facilities Management - Custodial", school: "Facilities", type: "STAFF", hireDate: "08/25/2025", assignmentCode: "F12", assignmentType: "FT 12-Mo", inInterfolio: false, inORC: true },
+    { name: "Allison Krotter", position: "Speech Pathologist", department: "Creighton Pediatric Therapy", school: "Pharmacy & Health Professions", type: "STAFF", hireDate: "08/25/2025", assignmentCode: "F12", assignmentType: "FT 12-Mo", inInterfolio: false, inORC: true },
+    { name: "Guadalupe Perez-Aguilar", position: "Administrative Assistant III", department: "Dental Dean Administration", school: "Dentistry", type: "STAFF", hireDate: "08/25/2025", assignmentCode: "F12", assignmentType: "FT 12-Mo", inInterfolio: false, inORC: true },
+    { name: "Jacqueline Fuentes", position: "Contracts Coordinator", department: "Admin. Office - Provost", school: "Provost", type: "STAFF", hireDate: "08/25/2025", assignmentCode: "F12", assignmentType: "FT 12-Mo", inInterfolio: false, inORC: true },
+    { name: "Christopher Vavra", position: "Administrative Assistant III", department: "Dental Dean Administration", school: "Dentistry", type: "STAFF", hireDate: "08/25/2025", assignmentCode: "F12", assignmentType: "FT 12-Mo", inInterfolio: false, inORC: true }
+  ],
+  summary: {
+    total: 69,
+    faculty: 31,
+    staff: 38,
+    inInterfolio: 1,
+    inORC: 38,
+    notInEitherSystem: 30,
+    byAssignment: {
+      F12: 44,
+      F09: 21,
+      F11: 1,
+      PT12: 1,
+      PT10: 1,
+      PT9: 1
+    }
+  }
+};
+
+// Quarterly Hiring Trends - Benefit-Eligible New Hires (FY24-Q1 FY26)
+// Source: Oracle HCM new hire data, extracted from workforce headcount Excel
+const QUARTERLY_HIRING_TRENDS = [
+  { quarter: "Q1 FY24", faculty: 33, staff: 77, total: 110 },
+  { quarter: "Q2 FY24", faculty: 5, staff: 56, total: 61 },
+  { quarter: "Q3 FY24", faculty: 11, staff: 60, total: 71 },
+  { quarter: "Q4 FY24", faculty: 4, staff: 66, total: 70 },
+  { quarter: "Q1 FY25", faculty: 31, staff: 62, total: 93 },
+  { quarter: "Q2 FY25", faculty: 8, staff: 44, total: 52 },
+  { quarter: "Q3 FY25", faculty: 3, staff: 44, total: 47 },
+  { quarter: "Q4 FY25", faculty: 3, staff: 47, total: 50 },
+  { quarter: "Q1 FY26", faculty: 31, staff: 38, total: 69 }
+];
+
 const RecruitingQ1FY26Dashboard = () => {
   const data = Q1_FY26_DATA;
   const summary = data.summary;
   const myJobs = MYJOBS_DATA;
   const interfolio = INTERFOLIO_DATA;
+  const oracleHires = ORACLE_HIRES_DATA;
+
+  // Sorting state for Oracle Hiring Details table
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
+
+  // Sort handler
+  const handleSort = (key) => {
+    setSortConfig(prev => ({
+      key,
+      direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc'
+    }));
+  };
+
+  // Sorted hires data
+  const sortedHires = useMemo(() => {
+    if (!sortConfig.key) return oracleHires.hires;
+
+    return [...oracleHires.hires].sort((a, b) => {
+      let aVal, bVal;
+
+      if (sortConfig.key === 'ats') {
+        // Sort by ATS coverage: Interfolio first, then ORC, then neither
+        aVal = a.inInterfolio ? 2 : (a.inORC ? 1 : 0);
+        bVal = b.inInterfolio ? 2 : (b.inORC ? 1 : 0);
+      } else if (sortConfig.key === 'hireDate') {
+        // Parse dates for proper sorting
+        aVal = new Date(a.hireDate);
+        bVal = new Date(b.hireDate);
+      } else {
+        aVal = a[sortConfig.key]?.toLowerCase?.() || a[sortConfig.key] || '';
+        bVal = b[sortConfig.key]?.toLowerCase?.() || b[sortConfig.key] || '';
+      }
+
+      if (aVal < bVal) return sortConfig.direction === 'asc' ? -1 : 1;
+      if (aVal > bVal) return sortConfig.direction === 'asc' ? 1 : -1;
+      return 0;
+    });
+  }, [oracleHires.hires, sortConfig]);
+
+  // Sortable header component
+  const SortableHeader = ({ label, sortKey, className = '' }) => (
+    <th
+      className={`py-3 px-3 text-xs font-semibold text-gray-500 uppercase cursor-pointer hover:bg-gray-100 select-none ${className}`}
+      onClick={() => handleSort(sortKey)}
+    >
+      <div className="flex items-center gap-1 justify-center">
+        <span>{label}</span>
+        <span className="flex flex-col">
+          <ChevronUp
+            size={10}
+            className={sortConfig.key === sortKey && sortConfig.direction === 'asc' ? 'text-blue-600' : 'text-gray-300'}
+          />
+          <ChevronDown
+            size={10}
+            className={sortConfig.key === sortKey && sortConfig.direction === 'desc' ? 'text-blue-600' : 'text-gray-300'}
+            style={{ marginTop: '-4px' }}
+          />
+        </span>
+      </div>
+    </th>
+  );
 
   // Colors for charts
   const COLORS = {
@@ -225,6 +395,84 @@ const RecruitingQ1FY26Dashboard = () => {
         {/* Data Freshness Note */}
         <div className="text-xs text-amber-700 mb-6 bg-amber-50 p-3 rounded border border-amber-200">
           <span className="font-semibold">Note:</span> {data.note} Data as of {data.dataAsOf}.
+        </div>
+
+        {/* Hiring Trends Chart - Matches Workforce Dashboard Style */}
+        <div className="bg-white rounded-2xl border p-8 mb-8" style={{ borderColor: '#D7D2CB' }}>
+          <h2 className="text-2xl font-bold mb-6" style={{ color: '#00245D' }}>
+            Quarterly Benefit-Eligible Hiring Trend
+          </h2>
+          <ResponsiveContainer width="100%" height={385}>
+            <LineChart data={QUARTERLY_HIRING_TRENDS} margin={{ top: 40, right: 30, left: 20, bottom: 20 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#D7D2CB" />
+              <XAxis
+                dataKey="quarter"
+                tick={{ fontSize: 12, fill: '#5F7FC3' }}
+              />
+              <YAxis
+                tick={{ fontSize: 12, fill: '#5F7FC3' }}
+                domain={[0, 120]}
+                ticks={[0, 20, 40, 60, 80, 100, 120]}
+              />
+              <Tooltip
+                contentStyle={{
+                  borderRadius: '12px',
+                  border: '2px solid #4366D0',
+                  backgroundColor: '#ffffff',
+                  boxShadow: '0 10px 25px -5px rgba(67, 102, 208, 0.25)'
+                }}
+              />
+              <Legend
+                wrapperStyle={{ paddingTop: '20px' }}
+                iconType="circle"
+              />
+
+              {/* Total New Hires Line */}
+              <Line
+                type="monotone"
+                dataKey="total"
+                stroke="#0054A6"
+                strokeWidth={4}
+                dot={{ r: 7, fill: '#0054A6', strokeWidth: 2, stroke: '#ffffff' }}
+                name="Total Benefit-Eligible Hires"
+                activeDot={{ r: 9, fill: '#0054A6', stroke: '#ffffff', strokeWidth: 3 }}
+                label={{
+                  position: 'top',
+                  offset: 15,
+                  style: { fontSize: 14, fontWeight: 'bold', fill: '#0054A6' }
+                }}
+              />
+
+              {/* Faculty Line (Dashed) */}
+              <Line
+                type="monotone"
+                dataKey="faculty"
+                stroke="#10B981"
+                strokeWidth={3}
+                strokeDasharray="5 5"
+                dot={{ r: 6, fill: '#10B981', strokeWidth: 2, stroke: '#ffffff' }}
+                name="Benefit-Eligible Faculty"
+                activeDot={{ r: 8, fill: '#10B981', stroke: '#ffffff', strokeWidth: 3 }}
+              />
+
+              {/* Staff Line (Dashed) */}
+              <Line
+                type="monotone"
+                dataKey="staff"
+                stroke="#3B82F6"
+                strokeWidth={3}
+                strokeDasharray="5 5"
+                dot={{ r: 6, fill: '#3B82F6', strokeWidth: 2, stroke: '#ffffff' }}
+                name="Benefit-Eligible Staff"
+                activeDot={{ r: 8, fill: '#3B82F6', stroke: '#ffffff', strokeWidth: 3 }}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+
+          {/* Trend Note */}
+          <div className="text-xs text-gray-600 mt-4 bg-blue-50 p-3 rounded border border-blue-200 text-center">
+            <span className="font-semibold">Note:</span> Q1 shows peak hiring aligned with academic year start. Faculty hiring is concentrated in Q1 (fall semester), while staff hiring is more evenly distributed. Year-over-year Q1 comparison: FY25 (93) vs FY26 (69) reflects 26% decrease.
+          </div>
         </div>
 
         {/* New Hire Metric Cards */}
@@ -387,204 +635,11 @@ const RecruitingQ1FY26Dashboard = () => {
 
           </div>
 
-          {/* Two Column Layout: Job Families + Requisition Aging */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
-            {/* Top Job Families */}
-            <div className="bg-white rounded-lg shadow-sm border p-6">
-              <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <Building2 size={18} style={{color: '#0054A6'}} />
-                Job Openings by Family
-              </h3>
-
-              <div style={{ height: '300px' }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart
-                    data={myJobs.topJobFamilies}
-                    layout="vertical"
-                    margin={{ top: 5, right: 30, left: 140, bottom: 5 }}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
-                    <XAxis type="number" tick={{ fontSize: 11, fill: '#6B7280' }} />
-                    <YAxis
-                      type="category"
-                      dataKey="name"
-                      tick={{ fontSize: 10, fill: '#374151' }}
-                      width={135}
-                    />
-                    <Tooltip />
-                    <Bar dataKey="openings" fill="#0054A6" radius={[0, 4, 4, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-
-            {/* Requisition Aging */}
-            <div className="bg-white rounded-lg shadow-sm border p-6">
-              <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <Clock size={18} style={{color: '#0054A6'}} />
-                Requisition Aging
-              </h3>
-
-              <div className="flex flex-col items-center">
-                <ResponsiveContainer width="100%" height={250}>
-                  <PieChart>
-                    <Pie
-                      data={myJobs.requisitionAging}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={50}
-                      outerRadius={90}
-                      paddingAngle={2}
-                      dataKey="count"
-                      label={(entry) => `${entry.count}`}
-                      labelLine={false}
-                    >
-                      {myJobs.requisitionAging.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <Tooltip formatter={(value, name, props) => [`${value} reqs (${props.payload.percentage}%)`, props.payload.range]} />
-                  </PieChart>
-                </ResponsiveContainer>
-
-                {/* Legend */}
-                <div className="grid grid-cols-3 gap-2 text-xs mt-2">
-                  {myJobs.requisitionAging.map((item, index) => (
-                    <div key={index} className="flex items-center gap-1">
-                      <div className="w-3 h-3 rounded" style={{backgroundColor: item.color}}></div>
-                      <span className="text-gray-700">{item.range}: {item.count}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="mt-3 text-xs text-amber-600 text-center">
-                22.4% of requisitions open 90+ days
-              </div>
-            </div>
-
-          </div>
-        </div>
-
-        {/* ============================================== */}
-        {/* FACULTY HIRING SECTION (from Interfolio)      */}
-        {/* ============================================== */}
-
-        <div className="bg-gradient-to-r from-green-50 to-white rounded-lg shadow-sm border p-6 mb-8">
-          <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-3">
-            <Award style={{color: '#10B981'}} size={24} />
-            Faculty Hiring Detail
-            <span className="text-sm font-normal text-gray-500 ml-2">(Interfolio)</span>
-          </h2>
-
-          {/* Faculty Hire Summary Cards */}
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
-            <div className="bg-white p-4 rounded-lg shadow-sm border text-center">
-              <div className="text-2xl font-bold text-gray-900">{interfolio.summary.total}</div>
-              <div className="text-xs text-gray-600">Total Hires</div>
-            </div>
-            <div className="bg-white p-4 rounded-lg shadow-sm border text-center">
-              <div className="text-2xl font-bold text-green-600">{interfolio.summary.tenureTrack}</div>
-              <div className="text-xs text-gray-600">Tenure Track</div>
-            </div>
-            <div className="bg-white p-4 rounded-lg shadow-sm border text-center">
-              <div className="text-2xl font-bold text-blue-600">{interfolio.summary.nonTenure}</div>
-              <div className="text-xs text-gray-600">Non-Tenure</div>
-            </div>
-            <div className="bg-white p-4 rounded-lg shadow-sm border text-center">
-              <div className="text-2xl font-bold text-purple-600">{interfolio.summary.instructor}</div>
-              <div className="text-xs text-gray-600">Instructor</div>
-            </div>
-            <div className="bg-white p-4 rounded-lg shadow-sm border text-center">
-              <div className="text-2xl font-bold text-amber-600">{interfolio.summary.specialFaculty}</div>
-              <div className="text-xs text-gray-600">Special Faculty</div>
-            </div>
-          </div>
-
-          {/* Faculty Hires Table */}
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-gray-200 bg-gray-50">
-                  <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Name</th>
-                  <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Degree</th>
-                  <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Position</th>
-                  <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Department</th>
-                  <th className="text-center py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Type</th>
-                  <th className="text-center py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Hire Date</th>
-                </tr>
-              </thead>
-              <tbody>
-                {interfolio.hires.map((hire, index) => (
-                  <tr key={index} className={`border-b border-gray-100 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}>
-                    <td className="py-3 px-4 text-sm font-medium text-gray-900">{hire.name}</td>
-                    <td className="py-3 px-4 text-sm text-gray-600">{hire.degree}</td>
-                    <td className="py-3 px-4 text-sm text-gray-700">{hire.position}</td>
-                    <td className="py-3 px-4 text-sm text-gray-600">{hire.department}</td>
-                    <td className="py-3 px-4 text-center">
-                      <span className={`inline-flex px-2 py-1 text-xs rounded-full font-medium ${
-                        hire.type === 'Tenure Track' ? 'bg-green-100 text-green-800' :
-                        hire.type === 'Non-Tenure' ? 'bg-blue-100 text-blue-800' :
-                        hire.type === 'Instructor' ? 'bg-purple-100 text-purple-800' :
-                        'bg-amber-100 text-amber-800'
-                      }`}>
-                        {hire.type}
-                      </span>
-                    </td>
-                    <td className="py-3 px-4 text-center text-sm text-gray-600">{hire.hireDate}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          <div className="mt-4 text-xs text-gray-500 text-center">
-            50% tenure-track positions (3 of 6 faculty hires)
-          </div>
         </div>
 
         {/* ============================================== */}
         {/* NEW HIRES BREAKDOWN SECTION                   */}
         {/* ============================================== */}
-
-        {/* Monthly Hiring Trend */}
-        <div className="bg-white rounded-lg shadow-sm border p-6 mb-8">
-          <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-            <Calendar style={{color: '#0054A6'}} size={20} />
-            Monthly Hiring Trend
-          </h2>
-
-          {/* Chart Area */}
-          <div className="relative" style={{ height: '320px' }}>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={data.byMonth} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
-                <XAxis
-                  dataKey="month"
-                  tick={{ fontSize: 12, fill: '#6B7280' }}
-                  tickFormatter={(value) => value.replace(' 2025', '')}
-                />
-                <YAxis tick={{ fontSize: 12, fill: '#6B7280' }} />
-                <Tooltip
-                  contentStyle={{
-                    borderRadius: '8px',
-                    border: '1px solid #E5E7EB',
-                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
-                  }}
-                />
-                <Legend />
-                <Bar dataKey="faculty" name="Faculty" fill={COLORS.faculty} radius={[4, 4, 0, 0]} />
-                <Bar dataKey="staff" name="Staff" fill={COLORS.staff} radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-
-          {/* Legend Note */}
-          <div className="text-xs text-gray-600 mt-4 bg-blue-50 p-3 rounded border border-blue-200 text-center">
-            <span className="font-semibold">Note:</span> July shows highest hiring activity with 42 new hires (25 Faculty, 17 Staff), aligning with academic year start. September data pending.
-          </div>
-        </div>
 
         {/* New Hires by School/Organization */}
         <div className="bg-white rounded-lg shadow-sm border p-6 mb-8">
@@ -780,6 +835,230 @@ const RecruitingQ1FY26Dashboard = () => {
           {/* Data Note */}
           <div className="text-xs text-gray-600 mt-6 bg-blue-50 p-3 rounded border border-blue-200 text-center">
             <span className="font-semibold">Note:</span> Gender distribution shows near-equal representation with 49.3% female and 50.7% male new hires in {data.quarter}.
+          </div>
+        </div>
+
+        {/* ============================================== */}
+        {/* ORACLE HIRING DETAILS (All 69 Hires)          */}
+        {/* ============================================== */}
+
+        <div className="bg-gradient-to-r from-blue-50 to-white rounded-lg shadow-sm border p-6 mb-8">
+          <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-3">
+            <Users style={{color: '#0054A6'}} size={24} />
+            Oracle Hiring Details
+            <span className="text-sm font-normal text-gray-500 ml-2">(Oracle HCM - Source of Truth)</span>
+          </h2>
+
+          {/* Coverage Summary Cards */}
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+            <div className="bg-white p-4 rounded-lg shadow-sm border text-center">
+              <div className="text-2xl font-bold text-gray-900">{oracleHires.summary.total}</div>
+              <div className="text-xs text-gray-600">Total Hires</div>
+            </div>
+            <div className="bg-white p-4 rounded-lg shadow-sm border text-center">
+              <div className="text-2xl font-bold text-green-600">{oracleHires.summary.faculty}</div>
+              <div className="text-xs text-gray-600">Faculty</div>
+            </div>
+            <div className="bg-white p-4 rounded-lg shadow-sm border text-center">
+              <div className="text-2xl font-bold text-blue-600">{oracleHires.summary.staff}</div>
+              <div className="text-xs text-gray-600">Staff</div>
+            </div>
+            <div className="bg-white p-4 rounded-lg shadow-sm border text-center">
+              <div className="text-2xl font-bold text-purple-600">{oracleHires.summary.inORC}</div>
+              <div className="text-xs text-gray-600">In ORC ATS</div>
+            </div>
+            <div className="bg-white p-4 rounded-lg shadow-sm border text-center">
+              <div className="text-2xl font-bold text-amber-600">{oracleHires.summary.notInEitherSystem}</div>
+              <div className="text-xs text-gray-600">Not in ATS</div>
+            </div>
+          </div>
+
+          {/* Legend */}
+          <div className="flex flex-wrap gap-4 mb-4 text-xs">
+            <div className="flex items-center gap-2">
+              <span className="inline-flex px-2 py-1 rounded-full bg-green-100 text-green-800 font-medium">FACULTY</span>
+              <span className="text-gray-600">Faculty Hire</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="inline-flex px-2 py-1 rounded-full bg-blue-100 text-blue-800 font-medium">STAFF</span>
+              <span className="text-gray-600">Staff Hire</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="inline-flex px-2 py-1 rounded font-mono bg-teal-100 text-teal-800 font-medium">F##</span>
+              <span className="text-gray-600">Full-Time</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="inline-flex px-2 py-1 rounded font-mono bg-orange-100 text-orange-800 font-medium">PT##</span>
+              <span className="text-gray-600">Part-Time</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="inline-flex w-5 h-5 items-center justify-center rounded bg-purple-100 text-purple-800 font-bold text-xs">I</span>
+              <span className="text-gray-600">In Interfolio</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="inline-flex w-5 h-5 items-center justify-center rounded bg-blue-100 text-blue-800 font-bold text-xs">O</span>
+              <span className="text-gray-600">In ORC ATS</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="inline-flex w-5 h-5 items-center justify-center rounded bg-gray-100 text-gray-500 font-bold text-xs">-</span>
+              <span className="text-gray-600">Not in ATS</span>
+            </div>
+          </div>
+
+          {/* Oracle Hires Table */}
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gray-50">
+                <tr className="border-b border-gray-200">
+                  <SortableHeader label="Name" sortKey="name" className="text-left" />
+                  <SortableHeader label="Position" sortKey="position" className="text-left" />
+                  <SortableHeader label="Department" sortKey="department" className="text-left" />
+                  <SortableHeader label="School" sortKey="school" className="text-left" />
+                  <SortableHeader label="Type" sortKey="type" />
+                  <SortableHeader label="Elig Code" sortKey="assignmentCode" />
+                  <SortableHeader label="Hire Date" sortKey="hireDate" />
+                  <SortableHeader label="ATS" sortKey="ats" />
+                </tr>
+              </thead>
+              <tbody>
+                {sortedHires.map((hire, index) => (
+                  <tr key={index} className={`border-b border-gray-100 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} ${!hire.inInterfolio && !hire.inORC ? 'bg-amber-50' : ''}`}>
+                    <td className="py-2 px-3 text-sm font-medium text-gray-900">{hire.name}</td>
+                    <td className="py-2 px-3 text-sm text-gray-700 max-w-[180px] truncate" title={hire.position}>{hire.position}</td>
+                    <td className="py-2 px-3 text-sm text-gray-600 max-w-[150px] truncate" title={hire.department}>{hire.department}</td>
+                    <td className="py-2 px-3 text-sm text-gray-600 max-w-[100px] truncate" title={hire.school}>{hire.school}</td>
+                    <td className="py-2 px-2 text-center">
+                      <span className={`inline-flex px-2 py-1 text-xs rounded-full font-medium ${
+                        hire.type === 'FACULTY' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'
+                      }`}>
+                        {hire.type}
+                      </span>
+                    </td>
+                    <td className="py-2 px-2 text-center">
+                      <span className={`inline-flex px-2 py-1 text-xs rounded font-mono font-medium ${
+                        hire.assignmentCode.startsWith('F') ? 'bg-teal-100 text-teal-800' : 'bg-orange-100 text-orange-800'
+                      }`} title={hire.assignmentCode.startsWith('F') ? 'Full-Time' : 'Part-Time'}>
+                        {hire.assignmentCode}
+                      </span>
+                    </td>
+                    <td className="py-2 px-2 text-center text-sm text-gray-600">{hire.hireDate}</td>
+                    <td className="py-2 px-2 text-center">
+                      <div className="flex justify-center gap-1">
+                        {hire.inInterfolio && (
+                          <span className="inline-flex w-5 h-5 items-center justify-center rounded bg-purple-100 text-purple-800 font-bold text-xs" title="In Interfolio">I</span>
+                        )}
+                        {hire.inORC && (
+                          <span className="inline-flex w-5 h-5 items-center justify-center rounded bg-blue-100 text-blue-800 font-bold text-xs" title="In ORC ATS (myJobs)">O</span>
+                        )}
+                        {!hire.inInterfolio && !hire.inORC && (
+                          <span className="inline-flex w-5 h-5 items-center justify-center rounded bg-gray-100 text-gray-500 font-bold text-xs" title="Not tracked in ATS">-</span>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="mt-4 text-xs text-gray-500 text-center">
+            {oracleHires.summary.notInEitherSystem} of {oracleHires.summary.total} hires ({Math.round(oracleHires.summary.notInEitherSystem / oracleHires.summary.total * 100)}%) not captured in Interfolio or ORC ATS
+          </div>
+
+          {/* Coverage Gap Analysis */}
+          <div className="mt-4 bg-amber-50 p-4 rounded-lg border border-amber-200">
+            <h4 className="text-sm font-semibold text-amber-800 mb-2">Coverage Gap Analysis</h4>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs text-amber-700">
+              <div>
+                <span className="font-semibold">Faculty not in Interfolio:</span> {oracleHires.summary.faculty - oracleHires.summary.inInterfolio} of {oracleHires.summary.faculty}
+                <p className="text-gray-600 mt-1">Most faculty hired directly without Interfolio search</p>
+              </div>
+              <div>
+                <span className="font-semibold">Staff in ORC ATS:</span> {oracleHires.summary.inORC} of {oracleHires.summary.staff}
+                <p className="text-gray-600 mt-1">100% of staff hires tracked in ORC</p>
+              </div>
+              <div>
+                <span className="font-semibold">Not in any ATS:</span> {oracleHires.summary.notInEitherSystem}
+                <p className="text-gray-600 mt-1">Primarily faculty direct hires</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ============================================== */}
+        {/* FACULTY HIRING SECTION (from Interfolio)      */}
+        {/* ============================================== */}
+
+        <div className="bg-gradient-to-r from-green-50 to-white rounded-lg shadow-sm border p-6 mb-8">
+          <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-3">
+            <Award style={{color: '#10B981'}} size={24} />
+            Faculty Hiring Detail
+            <span className="text-sm font-normal text-gray-500 ml-2">(Interfolio)</span>
+          </h2>
+
+          {/* Faculty Hire Summary Cards */}
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+            <div className="bg-white p-4 rounded-lg shadow-sm border text-center">
+              <div className="text-2xl font-bold text-gray-900">{interfolio.summary.total}</div>
+              <div className="text-xs text-gray-600">Total Hires</div>
+            </div>
+            <div className="bg-white p-4 rounded-lg shadow-sm border text-center">
+              <div className="text-2xl font-bold text-green-600">{interfolio.summary.tenureTrack}</div>
+              <div className="text-xs text-gray-600">Tenure Track</div>
+            </div>
+            <div className="bg-white p-4 rounded-lg shadow-sm border text-center">
+              <div className="text-2xl font-bold text-blue-600">{interfolio.summary.nonTenure}</div>
+              <div className="text-xs text-gray-600">Non-Tenure</div>
+            </div>
+            <div className="bg-white p-4 rounded-lg shadow-sm border text-center">
+              <div className="text-2xl font-bold text-purple-600">{interfolio.summary.instructor}</div>
+              <div className="text-xs text-gray-600">Instructor</div>
+            </div>
+            <div className="bg-white p-4 rounded-lg shadow-sm border text-center">
+              <div className="text-2xl font-bold text-amber-600">{interfolio.summary.specialFaculty}</div>
+              <div className="text-xs text-gray-600">Special Faculty</div>
+            </div>
+          </div>
+
+          {/* Faculty Hires Table */}
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-gray-200 bg-gray-50">
+                  <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Name</th>
+                  <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Degree</th>
+                  <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Position</th>
+                  <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Department</th>
+                  <th className="text-center py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Type</th>
+                  <th className="text-center py-3 px-4 text-xs font-semibold text-gray-500 uppercase">Hire Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                {interfolio.hires.map((hire, index) => (
+                  <tr key={index} className={`border-b border-gray-100 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}>
+                    <td className="py-3 px-4 text-sm font-medium text-gray-900">{hire.name}</td>
+                    <td className="py-3 px-4 text-sm text-gray-600">{hire.degree}</td>
+                    <td className="py-3 px-4 text-sm text-gray-700">{hire.position}</td>
+                    <td className="py-3 px-4 text-sm text-gray-600">{hire.department}</td>
+                    <td className="py-3 px-4 text-center">
+                      <span className={`inline-flex px-2 py-1 text-xs rounded-full font-medium ${
+                        hire.type === 'Tenure Track' ? 'bg-green-100 text-green-800' :
+                        hire.type === 'Non-Tenure' ? 'bg-blue-100 text-blue-800' :
+                        hire.type === 'Instructor' ? 'bg-purple-100 text-purple-800' :
+                        'bg-amber-100 text-amber-800'
+                      }`}>
+                        {hire.type}
+                      </span>
+                    </td>
+                    <td className="py-3 px-4 text-center text-sm text-gray-600">{hire.hireDate}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="mt-4 text-xs text-gray-500 text-center">
+            50% tenure-track positions (3 of 6 faculty hires)
           </div>
         </div>
 

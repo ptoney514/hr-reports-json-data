@@ -234,7 +234,7 @@ const WorkforceQ1FY26Dashboard = () => {
         {/* Headcount Trends Chart */}
         <div className="bg-white rounded-2xl border p-8 mb-8" style={{ borderColor: '#D7D2CB' }}>
           <h2 className="text-2xl font-bold mb-6" style={{ color: '#00245D' }}>
-            FY24-Q1 FY26 Headcount Trend
+            Quarterly Workforce Headcount Trend
           </h2>
           {/* Height increased from 350 to 385 to accommodate expanded legend with 6 trend lines */}
           <ResponsiveContainer width="100%" height={385}>
