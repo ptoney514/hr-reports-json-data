@@ -97,7 +97,7 @@ const TurnoverTrendsDashboard = () => {
                 stroke={colors.faculty}
                 strokeWidth={4}
                 dot={{ r: 7, fill: colors.faculty, strokeWidth: 2, stroke: '#ffffff' }}
-                name="Faculty"
+                name="Benefit Eligible Faculty"
                 activeDot={{ r: 9, fill: colors.faculty, stroke: '#ffffff', strokeWidth: 3 }}
                 label={{
                   position: 'top',
@@ -113,7 +113,7 @@ const TurnoverTrendsDashboard = () => {
                 stroke={colors.staff}
                 strokeWidth={4}
                 dot={{ r: 7, fill: colors.staff, strokeWidth: 2, stroke: '#ffffff' }}
-                name="Staff"
+                name="Benefit Eligible Staff"
                 activeDot={{ r: 9, fill: colors.staff, stroke: '#ffffff', strokeWidth: 3 }}
                 label={{
                   position: 'top',
@@ -128,7 +128,7 @@ const TurnoverTrendsDashboard = () => {
           <div className="text-center mt-4 rounded-lg p-3" style={{ backgroundColor: '#B5D2F3' }}>
             <span className="text-sm" style={{ color: '#5F7FC3' }}>Note: </span>
             <span className="text-sm" style={{ color: colors.text }}>
-              Overall turnover includes all benefit-eligible terminations (voluntary, involuntary, retirement, end of assignment) from Q1 FY23 through Q1 FY26. Provides complete fiscal year comparisons for FY23, FY24, and FY25.
+              Overall turnover includes all benefit-eligible terminations (voluntary, involuntary, retirement, end of assignment) from Q1 FY23 through Q1 FY26.
             </span>
           </div>
         </div>
@@ -168,7 +168,7 @@ const TurnoverTrendsDashboard = () => {
                 stroke={colors.faculty}
                 strokeWidth={4}
                 dot={{ r: 7, fill: colors.faculty, strokeWidth: 2, stroke: '#ffffff' }}
-                name="Faculty"
+                name="Benefit Eligible Faculty"
                 activeDot={{ r: 9, fill: colors.faculty, stroke: '#ffffff', strokeWidth: 3 }}
                 label={{
                   position: 'top',
@@ -184,7 +184,7 @@ const TurnoverTrendsDashboard = () => {
                 stroke={colors.staff}
                 strokeWidth={4}
                 dot={{ r: 7, fill: colors.staff, strokeWidth: 2, stroke: '#ffffff' }}
-                name="Staff"
+                name="Benefit Eligible Staff"
                 activeDot={{ r: 9, fill: colors.staff, stroke: '#ffffff', strokeWidth: 3 }}
                 label={{
                   position: 'top',

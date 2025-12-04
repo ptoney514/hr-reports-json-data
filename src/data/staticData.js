@@ -2115,7 +2115,7 @@ export const QUARTERLY_WORKFORCE_DATA = {
         total: 2157
       },
       {
-        group: "Temporary Employees",
+        group: "Not-Benefit Eligible",
         faculty: 0,
         staff: 0,
         hsp: 0,

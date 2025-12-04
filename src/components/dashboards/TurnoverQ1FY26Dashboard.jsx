@@ -70,7 +70,7 @@ const TurnoverQ1FY26Dashboard = () => {
                     {data.quarter} Terminations & Turnover Report
                   </h1>
                   <p className="text-gray-600 text-lg mt-2">
-                    Quarterly Termination Analysis • {data.fiscalPeriod}
+                    Benefit Eligible Employees • {data.fiscalPeriod}
                   </p>
                   <p className="text-gray-500 text-sm mt-1">
                     Employee terminations, turnover rates, and workforce trends
@@ -83,7 +83,7 @@ const TurnoverQ1FY26Dashboard = () => {
                 </div>
                 <div className="text-sm text-gray-600 font-medium">Total {data.quarter} Terminations</div>
                 <div className="text-xs text-gray-500 mt-1">
-                  Faculty: {terminationData.faculty.count} | Staff: {terminationData.staff.count}
+                  Benefit Eligible - Faculty: {terminationData.faculty.count} | Staff: {terminationData.staff.count}
                 </div>
               </div>
             </div>
@@ -117,7 +117,7 @@ const TurnoverQ1FY26Dashboard = () => {
               </span>
             </div>
             <div className="text-4xl font-bold text-gray-900 mb-1">{terminationData.faculty.count}</div>
-            <div className="text-sm text-gray-600 font-medium">Faculty Terminations</div>
+            <div className="text-sm text-gray-600 font-medium">Benefit Eligible Faculty Terminations</div>
             <div className="text-xs text-gray-500 mt-2">
               OMA: {terminationData.faculty.oma} | PHX: {terminationData.faculty.phx}
             </div>
@@ -132,7 +132,7 @@ const TurnoverQ1FY26Dashboard = () => {
               </span>
             </div>
             <div className="text-4xl font-bold text-gray-900 mb-1">{terminationData.staff.count}</div>
-            <div className="text-sm text-gray-600 font-medium">Staff Terminations</div>
+            <div className="text-sm text-gray-600 font-medium">Benefit Eligible Staff Terminations</div>
             <div className="text-xs text-gray-500 mt-2">
               OMA: {terminationData.staff.oma} | PHX: {terminationData.staff.phx}
             </div>
@@ -348,17 +348,17 @@ const TurnoverQ1FY26Dashboard = () => {
           <div className="mt-6 flex justify-center gap-8 text-sm">
             <div className="flex items-center gap-2">
               <div className="w-4 h-4 bg-green-500 rounded"></div>
-              <span className="text-gray-700">Faculty</span>
+              <span className="text-gray-700">Benefit Eligible Faculty</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-4 h-4 bg-blue-600 rounded"></div>
-              <span className="text-gray-700">Staff</span>
+              <span className="text-gray-700">Benefit Eligible Staff</span>
             </div>
           </div>
 
           {/* Data Note */}
           <div className="text-xs text-gray-600 mt-4 bg-blue-50 p-3 rounded border border-blue-200 text-center">
-            <span className="font-semibold">Note:</span> Displays years of service at termination for {terminationData.faculty.count} faculty and {terminationData.staff.count} staff terminations in {data.quarter}.
+            <span className="font-semibold">Note:</span> Displays years of service at termination for {terminationData.faculty.count} benefit-eligible faculty and {terminationData.staff.count} benefit-eligible staff terminations in {data.quarter}.
           </div>
         </div>
 
@@ -438,17 +438,17 @@ const TurnoverQ1FY26Dashboard = () => {
           <div className="mt-6 flex justify-center gap-8 text-sm">
             <div className="flex items-center gap-2">
               <div className="w-4 h-4 bg-green-500 rounded"></div>
-              <span className="text-gray-700">Faculty</span>
+              <span className="text-gray-700">Benefit Eligible Faculty</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-4 h-4 bg-blue-600 rounded"></div>
-              <span className="text-gray-700">Staff</span>
+              <span className="text-gray-700">Benefit Eligible Staff</span>
             </div>
           </div>
 
           {/* Data Note */}
           <div className="text-xs text-gray-600 mt-4 bg-blue-50 p-3 rounded border border-blue-200 text-center">
-            <span className="font-semibold">Note:</span> Displays age distribution at termination for {terminationData.faculty.count} faculty and {terminationData.staff.count} benefit-eligible staff terminations in {data.quarter}.
+            <span className="font-semibold">Note:</span> Displays age distribution at termination for {terminationData.faculty.count} benefit-eligible faculty and {terminationData.staff.count} benefit-eligible staff terminations in {data.quarter}.
           </div>
         </div>
 

@@ -45,7 +45,7 @@ const WorkforceQ1FY26Dashboard = () => {
                     {data.quarter} Workforce and Headcount Report
                   </h1>
                   <p className="text-gray-600 text-lg mt-2">
-                    Quarterly Workforce Analysis • {data.fiscalPeriod}
+                    Benefit Eligible Employees • {data.fiscalPeriod}
                   </p>
                   <p className="text-gray-500 text-sm mt-1">
                     Employee headcount, workforce composition, and organizational trends
@@ -58,7 +58,7 @@ const WorkforceQ1FY26Dashboard = () => {
                 </div>
                 <div className="text-sm text-gray-600 font-medium">Total {data.quarter} Headcount</div>
                 <div className="text-xs text-gray-500 mt-1">
-                  Faculty: {headcountData.faculty.count} | Staff: {headcountData.staff.count}
+                  Benefit Eligible - Faculty: {headcountData.faculty.count} | Staff: {headcountData.staff.count}
                 </div>
               </div>
             </div>
@@ -143,21 +143,26 @@ const WorkforceQ1FY26Dashboard = () => {
             </div>
           </div>
 
-          {/* Temporary Employees Card */}
+          {/* Not-Benefit Eligible Card */}
           <div className="bg-white p-6 rounded-lg shadow-sm border">
             <div className="flex items-center justify-between mb-4">
               <Users style={{color: '#0054A6'}} size={20} />
               <span className="text-xs px-2 py-1 rounded-full bg-orange-100 text-orange-800 font-medium uppercase">
-                Temp
+                NBE
               </span>
             </div>
             <div className="text-3xl font-bold text-gray-900 mb-1">{headcountData.temporary.count}</div>
-            <div className="text-xs text-gray-600 font-medium mb-2">Temporary Employees</div>
+            <div className="text-xs text-gray-600 font-medium mb-2">Not-Benefit Eligible</div>
             <div className="text-xs text-gray-500">
               OMA: {headcountData.temporary.oma} | PHX: {headcountData.temporary.phx}
             </div>
           </div>
 
+        </div>
+
+        {/* Category Definition Note */}
+        <div className="text-xs text-gray-600 mb-8 bg-blue-50 p-3 rounded border border-blue-200">
+          <span className="font-semibold">Note:</span> Not-Benefit Eligible (NBE) includes TEMP, PRN, and Grade R employees (PT Residents, OT Fellows, Pharmacy Residents/Fellows). Student Workers are tracked separately but are also not benefit-eligible.
         </div>
 
         {/* Workforce by Employee Type */}
@@ -313,12 +318,12 @@ const WorkforceQ1FY26Dashboard = () => {
                 name="Student Workers"
               />
 
-              {/* Temporary Employees Line (Dashed) */}
+              {/* Not-Benefit Eligible Line (Dashed) */}
               <Line
                 {...getSecondaryLineProps('#EF4444')}
                 dataKey="temp"
                 stroke="#EF4444"
-                name="Temporary Employees"
+                name="Not-Benefit Eligible"
               />
             </LineChart>
           </ResponsiveContainer>
@@ -327,9 +332,7 @@ const WorkforceQ1FY26Dashboard = () => {
           <div className="text-center mt-4 rounded-lg p-3" style={{ backgroundColor: '#B5D2F3' }}>
             <span className="text-sm" style={{ color: '#5F7FC3' }}>Note: </span>
             <span className="text-sm" style={{ color: '#00245D' }}>
-              Headcount trends show total workforce and benefit-eligible employees across all campuses from Q1 FY24 through Q1 FY26.
-              Total headcount includes all employee categories (faculty, staff, students, house staff physicians, and temporary employees).
-              Q4 FY24, Q4 FY25, and Q1 FY26 data points are actual values; Q1-Q3 FY24 and Q1-Q3 FY25 quarters are estimates pending quarterly data extraction.
+              Q1 typically shows higher headcount due to fall semester staffing. Year-over-year, total workforce remains stable at +0.5% (5,528 vs 5,500), with benefit-eligible faculty up 1.0% and staff down 2.1%—both within normal variance. Student workers and not-benefit eligible employees fluctuate with predictable academic calendar patterns.
             </span>
           </div>
         </div>
@@ -361,7 +364,7 @@ const WorkforceQ1FY26Dashboard = () => {
             </div>
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-              <span className="text-gray-700">Non-Benefit</span>
+              <span className="text-gray-700">Not-Benefit Eligible</span>
             </div>
           </div>
 
@@ -423,7 +426,7 @@ const WorkforceQ1FY26Dashboard = () => {
                       >
                         {data.locationDetails.omaha.hsp >= 120 && data.locationDetails.omaha.hsp}
                       </div>
-                      {/* Temporary - Red */}
+                      {/* Not-Benefit Eligible - Red */}
                       <div
                         className="bg-red-500 flex items-center justify-center text-white text-xs font-medium"
                         style={{ width: `${(data.locationDetails.omaha.temp / 5000) * 100}%` }}
@@ -472,7 +475,7 @@ const WorkforceQ1FY26Dashboard = () => {
                       >
                         {data.locationDetails.phoenix.hsp >= 120 && data.locationDetails.phoenix.hsp}
                       </div>
-                      {/* Temporary - Red */}
+                      {/* Not-Benefit Eligible - Red */}
                       <div
                         className="bg-red-500 flex items-center justify-center text-white text-xs font-medium"
                         style={{ width: `${(data.locationDetails.phoenix.temp / 5000) * 100}%` }}
