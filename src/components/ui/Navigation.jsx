@@ -131,6 +131,14 @@ const Navigation = () => {
       isActive: isActive('/dashboards/turnover-q1')
     },
     {
+      id: 'recruiting-q1-fy26',
+      label: 'Q1 FY26 Recruiting',
+      shortLabel: 'Q1 Recruit',
+      path: '/dashboards/recruiting-q1',
+      icon: UserPlus,
+      isActive: isActive('/dashboards/recruiting-q1')
+    },
+    {
       id: 'turnover-trends',
       label: 'Turnover Trends (Since Q1 FY23)',
       shortLabel: 'Trends',

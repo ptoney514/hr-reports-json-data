@@ -32,6 +32,8 @@ const TurnoverQ1Dashboard = lazy(() => import('./components/dashboards/TurnoverQ
 const TurnoverTrendsDashboard = lazy(() => import('./components/dashboards/TurnoverTrendsDashboard'));
 // Quarterly Workforce Reports
 const WorkforceQ1Dashboard = lazy(() => import('./components/dashboards/WorkforceQ1FY26Dashboard'));
+// Quarterly Recruiting Reports
+const RecruitingQ1Dashboard = lazy(() => import('./components/dashboards/RecruitingQ1FY26Dashboard'));
 // Report Generator
 const ReportGenerator = lazy(() => import('./components/reports/ReportGenerator'));
 // WorkforceAudit temporarily disabled - papaparse dependency issue
@@ -149,6 +151,9 @@ function App() {
 
               {/* Quarterly Workforce Reports */}
               <Route path="/dashboards/workforce-q1" element={<WorkforceQ1Dashboard />} />
+
+              {/* Quarterly Recruiting Reports */}
+              <Route path="/dashboards/recruiting-q1" element={<RecruitingQ1Dashboard />} />
 
               {/* Testing routes removed - using static data approach */}
               

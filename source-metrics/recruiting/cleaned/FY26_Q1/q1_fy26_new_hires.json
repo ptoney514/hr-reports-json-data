@@ -1,0 +1,349 @@
+{
+  "reportingDate": "9/30/25",
+  "quarter": "Q1 FY26",
+  "fiscalPeriod": "July 2025 - September 2025",
+  "dataAsOf": "2025-08-31",
+  "note": "Data available through August 2025. September hires pending next data refresh.",
+  "summary": {
+    "total": {
+      "count": 69,
+      "oma": 68,
+      "phx": 1
+    },
+    "faculty": {
+      "count": 31,
+      "oma": 31,
+      "phx": 0
+    },
+    "staff": {
+      "count": 38,
+      "oma": 37,
+      "phx": 1
+    }
+  },
+  "bySchool": [
+    {
+      "school": "Arts & Sciences",
+      "faculty": 17,
+      "staff": 0,
+      "total": 17
+    },
+    {
+      "school": "Medicine",
+      "faculty": 2,
+      "staff": 6,
+      "total": 8
+    },
+    {
+      "school": "Facilities",
+      "faculty": 0,
+      "staff": 8,
+      "total": 8
+    },
+    {
+      "school": "Dentistry",
+      "faculty": 4,
+      "staff": 3,
+      "total": 7
+    },
+    {
+      "school": "Heider College of Business",
+      "faculty": 3,
+      "staff": 2,
+      "total": 5
+    },
+    {
+      "school": "Nursing",
+      "faculty": 3,
+      "staff": 1,
+      "total": 4
+    },
+    {
+      "school": "Athletics",
+      "faculty": 0,
+      "staff": 3,
+      "total": 3
+    },
+    {
+      "school": "Law School",
+      "faculty": 1,
+      "staff": 2,
+      "total": 3
+    },
+    {
+      "school": "VPSL",
+      "faculty": 0,
+      "staff": 2,
+      "total": 2
+    },
+    {
+      "school": "CFE",
+      "faculty": 0,
+      "staff": 2,
+      "total": 2
+    },
+    {
+      "school": "CollProCE",
+      "faculty": 0,
+      "staff": 1,
+      "total": 1
+    },
+    {
+      "school": "Pharmacy & Health Professions",
+      "faculty": 0,
+      "staff": 1,
+      "total": 1
+    },
+    {
+      "school": "Provost",
+      "faculty": 0,
+      "staff": 1,
+      "total": 1
+    },
+    {
+      "school": "Public Safety",
+      "faculty": 0,
+      "staff": 1,
+      "total": 1
+    },
+    {
+      "school": "SueSucs",
+      "faculty": 0,
+      "staff": 1,
+      "total": 1
+    },
+    {
+      "school": "UCOM",
+      "faculty": 0,
+      "staff": 1,
+      "total": 1
+    },
+    {
+      "school": "VPEM",
+      "faculty": 0,
+      "staff": 1,
+      "total": 1
+    },
+    {
+      "school": "VPGE",
+      "faculty": 0,
+      "staff": 1,
+      "total": 1
+    },
+    {
+      "school": "VPLS",
+      "faculty": 0,
+      "staff": 1,
+      "total": 1
+    },
+    {
+      "school": "PRES",
+      "faculty": 1,
+      "staff": 0,
+      "total": 1
+    }
+  ],
+  "byDepartment": [
+    {
+      "department": "Facilities Management - Custodial Services",
+      "faculty": 0,
+      "staff": 7,
+      "total": 7
+    },
+    {
+      "department": "Dental Dean Administration",
+      "faculty": 4,
+      "staff": 3,
+      "total": 7
+    },
+    {
+      "department": "Philosophy Department",
+      "faculty": 3,
+      "staff": 0,
+      "total": 3
+    },
+    {
+      "department": "Bio-Medical Sciences Department",
+      "faculty": 0,
+      "staff": 3,
+      "total": 3
+    },
+    {
+      "department": "Nursing - Undergrad Faculty",
+      "faculty": 2,
+      "staff": 1,
+      "total": 3
+    },
+    {
+      "department": "Department of Business Intelligence and Analytics",
+      "faculty": 2,
+      "staff": 0,
+      "total": 2
+    },
+    {
+      "department": "Modern Languages and Literatures Department",
+      "faculty": 2,
+      "staff": 0,
+      "total": 2
+    },
+    {
+      "department": "Biology Department",
+      "faculty": 2,
+      "staff": 0,
+      "total": 2
+    },
+    {
+      "department": "Theology Department",
+      "faculty": 2,
+      "staff": 0,
+      "total": 2
+    },
+    {
+      "department": "Mathematics Department",
+      "faculty": 2,
+      "staff": 0,
+      "total": 2
+    },
+    {
+      "department": "CFE Administrative",
+      "faculty": 0,
+      "staff": 2,
+      "total": 2
+    },
+    {
+      "department": "Multicultural & Community Affairs (MACA)",
+      "faculty": 0,
+      "staff": 1,
+      "total": 1
+    },
+    {
+      "department": "Counseling Center",
+      "faculty": 0,
+      "staff": 1,
+      "total": 1
+    },
+    {
+      "department": "Creighton Pediatric Therapy",
+      "faculty": 0,
+      "staff": 1,
+      "total": 1
+    },
+    {
+      "department": "Reinert Alumni Library",
+      "faculty": 0,
+      "staff": 1,
+      "total": 1
+    }
+  ],
+  "byMonth": [
+    {
+      "month": "July 2025",
+      "faculty": 25,
+      "staff": 17,
+      "total": 42
+    },
+    {
+      "month": "August 2025",
+      "faculty": 6,
+      "staff": 21,
+      "total": 27
+    },
+    {
+      "month": "September 2025",
+      "faculty": 0,
+      "staff": 0,
+      "total": 0
+    }
+  ],
+  "demographics": {
+    "gender": {
+      "female": 34,
+      "male": 35,
+      "femalePercentage": 49.3,
+      "malePercentage": 50.7
+    },
+    "ethnicity": [
+      {
+        "category": "White",
+        "count": 34,
+        "percentage": 49.3
+      },
+      {
+        "category": "Not Disclosed",
+        "count": 14,
+        "percentage": 20.3
+      },
+      {
+        "category": "Asian",
+        "count": 10,
+        "percentage": 14.5
+      },
+      {
+        "category": "More than one Ethnicity",
+        "count": 6,
+        "percentage": 8.7
+      },
+      {
+        "category": "I am Hispanic or Latino.",
+        "count": 3,
+        "percentage": 4.3
+      },
+      {
+        "category": "Black or African American",
+        "count": 2,
+        "percentage": 2.9
+      }
+    ],
+    "ageDistribution": [
+      {
+        "band": "31-40",
+        "count": 28,
+        "percentage": 40.6
+      },
+      {
+        "band": "21-30",
+        "count": 16,
+        "percentage": 23.2
+      },
+      {
+        "band": "41-50",
+        "count": 11,
+        "percentage": 15.9
+      },
+      {
+        "band": "51-60",
+        "count": 6,
+        "percentage": 8.7
+      },
+      {
+        "band": "20-30",
+        "count": 5,
+        "percentage": 7.2
+      },
+      {
+        "band": "61 Plus",
+        "count": 3,
+        "percentage": 4.3
+      }
+    ]
+  },
+  "methodology": {
+    "benefitEligibleCodes": [
+      "F12",
+      "F11",
+      "F10",
+      "F09",
+      "PT12",
+      "PT11",
+      "PT10",
+      "PT9"
+    ],
+    "gradeRExcluded": true,
+    "deduplicatedByEmployeeId": true
+  },
+  "metadata": {
+    "generated": "2025-12-03T20:25:15.214245",
+    "source": "../source-metrics/workforce-headcount/New Emp List since FY20 to Q1FY25 1031 PT.xlsx",
+    "totalBenefitEligible": 69
+  }
+}
