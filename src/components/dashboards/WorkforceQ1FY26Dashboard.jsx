@@ -234,7 +234,7 @@ const WorkforceQ1FY26Dashboard = () => {
         {/* Headcount Trends Chart */}
         <div className="bg-white rounded-2xl border p-8 mb-8" style={{ borderColor: '#D7D2CB' }}>
           <h2 className="text-2xl font-bold mb-6" style={{ color: '#00245D' }}>
-            Quarterly Workforce Headcount Trend
+            Quarterly Benefit Eligible Faculty & Staff Headcount Trend
           </h2>
           {/* Height increased from 350 to 385 to accommodate expanded legend with 6 trend lines */}
           <ResponsiveContainer width="100%" height={385}>
@@ -288,6 +288,11 @@ const WorkforceQ1FY26Dashboard = () => {
                 dot={{ r: 6, fill: '#10B981', strokeWidth: 2, stroke: '#ffffff' }}
                 name="Benefit Eligible Faculty"
                 activeDot={{ r: 8, fill: '#10B981', stroke: '#ffffff', strokeWidth: 3 }}
+                label={{
+                  position: 'top',
+                  offset: 10,
+                  style: { fontSize: 11, fontWeight: 'bold', fill: '#10B981' }
+                }}
               />
 
               {/* Staff Line (Dashed) */}
@@ -300,6 +305,11 @@ const WorkforceQ1FY26Dashboard = () => {
                 dot={{ r: 6, fill: '#3B82F6', strokeWidth: 2, stroke: '#ffffff' }}
                 name="Benefit Eligible Staff"
                 activeDot={{ r: 8, fill: '#3B82F6', stroke: '#ffffff', strokeWidth: 3 }}
+                label={{
+                  position: 'top',
+                  offset: 10,
+                  style: { fontSize: 11, fontWeight: 'bold', fill: '#3B82F6' }
+                }}
               />
             </LineChart>
           </ResponsiveContainer>
@@ -308,7 +318,7 @@ const WorkforceQ1FY26Dashboard = () => {
           <div className="text-center mt-4 rounded-lg p-3" style={{ backgroundColor: '#B5D2F3' }}>
             <span className="text-sm" style={{ color: '#5F7FC3' }}>Note: </span>
             <span className="text-sm" style={{ color: '#00245D' }}>
-              All data is actual Oracle HCM headcount (Q1 FY23-Q1 FY26). Benefit-eligible staff show stable growth from 2,047 total (Q1 FY23) to 2,149 total (Q1 FY26), +4.98% over 3 years. Faculty remain relatively stable (689-703 avg), while staff grew from 1,358 to 1,451, +6.8%. Q1 typically peaks due to fall semester staffing and academic hiring cycles.
+              All data is actual Oracle HCM headcount (Q1 FY24-Q1 FY26). Benefit-eligible staff show stable growth from 2,095 total (Q1 FY24) to 2,149 total (Q1 FY26), +2.57% over 2 years. Faculty remain relatively stable (702-698), while staff grew from 1,393 to 1,451, +4.2%. Q1 typically peaks due to fall semester staffing and academic hiring cycles.
             </span>
           </div>
         </div>
