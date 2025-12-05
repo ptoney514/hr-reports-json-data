@@ -3,6 +3,18 @@ import { UserPlus, Users, GraduationCap, Stethoscope, Clock, MapPin } from 'luci
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { QUARTERLY_HEADCOUNT_TRENDS } from '../../data/staticData';
 
+// Chart styling constants
+const CHART_MAX_SCALE = 3600;
+const CHART_TICKS = [0, 600, 1200, 1800, 2400, 3000, 3600];
+const CHART_Y_COLOR = '#5F7FC3';
+const CHART_BORDER_COLOR = '#D7D2CB';
+const CHART_PRIMARY_COLOR = '#8B5CF6';
+
+// Campus comparison scale
+const CAMPUS_SCALE_MAX = 3000;
+const CAMPUS_SCALE_LABELS = [0, 500, 1000, 1500, 2000, 2500, 3000];
+const CAMPUS_SCALE_STEP = 500;
+
 /**
  * Q1 FY26 Temporary Workers Recruiting Dashboard
  * Displays quarterly new hire data for Temporary Workers:
@@ -111,15 +123,15 @@ const RecruitingNBEQ1FY26Dashboard = () => {
           </h2>
           <ResponsiveContainer width="100%" height={385}>
             <LineChart data={QUARTERLY_TEMP_HEADCOUNT_TRENDS} margin={{ top: 40, right: 30, left: 20, bottom: 20 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#D7D2CB" />
+              <CartesianGrid strokeDasharray="3 3" stroke={CHART_BORDER_COLOR} />
               <XAxis
                 dataKey="quarter"
-                tick={{ fontSize: 12, fill: '#5F7FC3' }}
+                tick={{ fontSize: 12, fill: CHART_Y_COLOR }}
               />
               <YAxis
-                tick={{ fontSize: 12, fill: '#5F7FC3' }}
-                domain={[0, 3600]}
-                ticks={[0, 600, 1200, 1800, 2400, 3000, 3600]}
+                tick={{ fontSize: 12, fill: CHART_Y_COLOR }}
+                domain={[0, CHART_MAX_SCALE]}
+                ticks={CHART_TICKS}
               />
               <Tooltip
                 contentStyle={{
@@ -138,15 +150,15 @@ const RecruitingNBEQ1FY26Dashboard = () => {
               <Line
                 type="monotone"
                 dataKey="total"
-                stroke="#8B5CF6"
+                stroke={CHART_PRIMARY_COLOR}
                 strokeWidth={4}
-                dot={{ r: 7, fill: '#8B5CF6', strokeWidth: 2, stroke: '#ffffff' }}
+                dot={{ r: 7, fill: CHART_PRIMARY_COLOR, strokeWidth: 2, stroke: '#ffffff' }}
                 name="Total Temporary Headcount"
-                activeDot={{ r: 9, fill: '#8B5CF6', stroke: '#ffffff', strokeWidth: 3 }}
+                activeDot={{ r: 9, fill: CHART_PRIMARY_COLOR, stroke: '#ffffff', strokeWidth: 3 }}
                 label={{
                   position: 'top',
                   offset: 15,
-                  style: { fontSize: 14, fontWeight: 'bold', fill: '#8B5CF6' }
+                  style: { fontSize: 14, fontWeight: 'bold', fill: CHART_PRIMARY_COLOR }
                 }}
               />
 
@@ -290,18 +302,14 @@ const RecruitingNBEQ1FY26Dashboard = () => {
             {/* X-axis scale */}
             <div className="relative">
               <div className="flex justify-between text-xs text-gray-500 mb-2 px-32">
-                <span>0</span>
-                <span>500</span>
-                <span>1,000</span>
-                <span>1,500</span>
-                <span>2,000</span>
-                <span>2,500</span>
-                <span>3,000</span>
+                {CAMPUS_SCALE_LABELS.map((label) => (
+                  <span key={label}>{label.toLocaleString()}</span>
+                ))}
               </div>
 
               {/* Vertical grid lines */}
               <div className="absolute top-6 left-32 right-32 bottom-0 flex justify-between pointer-events-none">
-                {[0, 500, 1000, 1500, 2000, 2500, 3000].map((_, idx) => (
+                {CAMPUS_SCALE_LABELS.map((_, idx) => (
                   <div key={idx} className="border-l border-gray-200 h-full"></div>
                 ))}
               </div>
@@ -315,21 +323,21 @@ const RecruitingNBEQ1FY26Dashboard = () => {
                       {/* HSP - Orange */}
                       <div
                         className="bg-orange-500 flex items-center justify-center text-white text-xs font-medium"
-                        style={{ width: `${(summary.hsp.oma / 3000) * 100}%` }}
+                        style={{ width: `${(summary.hsp.oma / CAMPUS_SCALE_MAX) * 100}%` }}
                       >
                         {summary.hsp.oma >= 80 && summary.hsp.oma}
                       </div>
                       {/* Temp NBE - Gray */}
                       <div
                         className="bg-gray-500 flex items-center justify-center text-white text-xs font-medium"
-                        style={{ width: `${(summary.temp.oma / 3000) * 100}%` }}
+                        style={{ width: `${(summary.temp.oma / CAMPUS_SCALE_MAX) * 100}%` }}
                       >
                         {summary.temp.oma >= 80 && summary.temp.oma}
                       </div>
                       {/* Students - Green */}
                       <div
                         className="bg-green-500 flex items-center justify-center text-white text-xs font-medium"
-                        style={{ width: `${(summary.students.oma / 3000) * 100}%` }}
+                        style={{ width: `${(summary.students.oma / CAMPUS_SCALE_MAX) * 100}%` }}
                       >
                         {summary.students.oma >= 80 && summary.students.oma.toLocaleString()}
                       </div>
@@ -350,21 +358,21 @@ const RecruitingNBEQ1FY26Dashboard = () => {
                       {/* HSP - Orange */}
                       <div
                         className="bg-orange-500 flex items-center justify-center text-white text-xs font-medium"
-                        style={{ width: `${(summary.hsp.phx / 3000) * 100}%` }}
+                        style={{ width: `${(summary.hsp.phx / CAMPUS_SCALE_MAX) * 100}%` }}
                       >
                         {summary.hsp.phx >= 80 && summary.hsp.phx}
                       </div>
                       {/* Temp NBE - Gray */}
                       <div
                         className="bg-gray-500 flex items-center justify-center text-white text-xs font-medium"
-                        style={{ width: `${(summary.temp.phx / 3000) * 100}%` }}
+                        style={{ width: `${(summary.temp.phx / CAMPUS_SCALE_MAX) * 100}%` }}
                       >
                         {summary.temp.phx >= 80 && summary.temp.phx}
                       </div>
                       {/* Students - Green */}
                       <div
                         className="bg-green-500 flex items-center justify-center text-white text-xs font-medium"
-                        style={{ width: `${(summary.students.phx / 3000) * 100}%` }}
+                        style={{ width: `${(summary.students.phx / CAMPUS_SCALE_MAX) * 100}%` }}
                       >
                         {summary.students.phx >= 80 && summary.students.phx}
                       </div>

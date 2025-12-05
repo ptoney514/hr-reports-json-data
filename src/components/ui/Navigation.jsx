@@ -223,6 +223,49 @@ const Navigation = () => {
 
 
 
+  // Render desktop icon-based navigation items
+  const renderDesktopNavItem = (item) => {
+    const IconComponent = item.icon;
+    return (
+      <Link
+        key={item.id}
+        to={item.path}
+        onClick={() => announceToScreenReader(`Navigating to ${item.label}`)}
+        aria-label={item.label}
+        className={`flex flex-col items-center gap-1 px-2 py-2 rounded-lg transition-colors focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none ${
+          item.isActive
+            ? 'bg-blue-50 text-blue-700'
+            : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
+        }`}
+      >
+        <IconComponent size={20} />
+        <span className="text-xs text-center leading-tight break-words max-w-full">
+          {item.shortLabel}
+        </span>
+      </Link>
+    );
+  };
+
+  // Render mobile full-text navigation items
+  const renderMobileNavItem = (item) => {
+    const IconComponent = item.icon;
+    return (
+      <Link
+        key={item.id}
+        to={item.path}
+        onClick={closeMobileMenu}
+        className={`flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium transition-colors ${
+          item.isActive
+            ? 'bg-blue-50 text-blue-700'
+            : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
+        }`}
+      >
+        <IconComponent size={20} />
+        {item.label}
+      </Link>
+    );
+  };
+
   return (
     <>
       {/* Desktop Sidebar - Compact Icon Navigation */}
@@ -230,8 +273,8 @@ const Navigation = () => {
         <div className="flex flex-col h-full">
           {/* Logo/Brand - Compact */}
           <div className="flex items-center justify-center p-4 border-b border-gray-200">
-            <Link 
-              to="/dashboards" 
+            <Link
+              to="/dashboards"
               className="flex flex-col items-center gap-1 text-blue-700 hover:text-blue-800 transition-colors"
               aria-label="HR Reports Home"
             >
@@ -243,54 +286,14 @@ const Navigation = () => {
           {/* Navigation Items - Icon with abbreviated labels */}
           <div className="flex-1 py-4 px-2 space-y-1 overflow-y-auto">
             {/* Core Navigation */}
-            {coreNavigationItems.map((item) => {
-              const IconComponent = item.icon;
-              return (
-                <Link
-                  key={item.id}
-                  to={item.path}
-                  onClick={() => announceToScreenReader(`Navigating to ${item.label}`)}
-                  aria-label={item.label}
-                  className={`flex flex-col items-center gap-1 px-2 py-2 rounded-lg transition-colors focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none ${
-                    item.isActive
-                      ? 'bg-blue-50 text-blue-700'
-                      : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
-                  }`}
-                >
-                  <IconComponent size={20} />
-                  <span className="text-xs text-center leading-tight break-words max-w-full">
-                    {item.shortLabel}
-                  </span>
-                </Link>
-              );
-            })}
+            {coreNavigationItems.map(renderDesktopNavItem)}
 
             {/* ANNUAL REPORTS Section */}
             <div className="pt-2 border-t border-gray-200">
               <div className="text-xs font-bold text-gray-500 uppercase text-center px-2 py-2">
                 Annual
               </div>
-              {annualReportItems.map((item) => {
-                const IconComponent = item.icon;
-                return (
-                  <Link
-                    key={item.id}
-                    to={item.path}
-                    onClick={() => announceToScreenReader(`Navigating to ${item.label}`)}
-                    aria-label={item.label}
-                    className={`flex flex-col items-center gap-1 px-2 py-2 rounded-lg transition-colors focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none ${
-                      item.isActive
-                        ? 'bg-blue-50 text-blue-700'
-                        : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
-                    }`}
-                  >
-                    <IconComponent size={20} />
-                    <span className="text-xs text-center leading-tight break-words max-w-full">
-                      {item.shortLabel}
-                    </span>
-                  </Link>
-                );
-              })}
+              {annualReportItems.map(renderDesktopNavItem)}
             </div>
 
             {/* QUARTERLY REPORTS Section */}
@@ -298,55 +301,15 @@ const Navigation = () => {
               <div className="text-xs font-bold text-gray-500 uppercase text-center px-2 py-2">
                 Quarterly
               </div>
-              {quarterlyReportItems.map((item) => {
-                const IconComponent = item.icon;
-                return (
-                  <Link
-                    key={item.id}
-                    to={item.path}
-                    onClick={() => announceToScreenReader(`Navigating to ${item.label}`)}
-                    aria-label={item.label}
-                    className={`flex flex-col items-center gap-1 px-2 py-2 rounded-lg transition-colors focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none ${
-                      item.isActive
-                        ? 'bg-blue-50 text-blue-700'
-                        : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
-                    }`}
-                  >
-                    <IconComponent size={20} />
-                    <span className="text-xs text-center leading-tight break-words max-w-full">
-                      {item.shortLabel}
-                    </span>
-                  </Link>
-                );
-              })}
+              {quarterlyReportItems.map(renderDesktopNavItem)}
             </div>
 
             {/* ADMIN Section */}
             <div className="pt-2 border-t border-gray-200">
-              {adminNavigationItems.map((item) => {
-                const IconComponent = item.icon;
-                return (
-                  <Link
-                    key={item.id}
-                    to={item.path}
-                    onClick={() => announceToScreenReader(`Navigating to ${item.label}`)}
-                    aria-label={item.label}
-                    className={`flex flex-col items-center gap-1 px-2 py-2 rounded-lg transition-colors focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none ${
-                      item.isActive
-                        ? 'bg-blue-50 text-blue-700'
-                        : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
-                    }`}
-                  >
-                    <IconComponent size={20} />
-                    <span className="text-xs text-center leading-tight break-words max-w-full">
-                      {item.shortLabel}
-                    </span>
-                  </Link>
-                );
-              })}
+              {adminNavigationItems.map(renderDesktopNavItem)}
             </div>
           </div>
-          
+
           {/* Sync Status Indicator - Bottom of sidebar */}
           <div className="p-2 border-t border-gray-200">
             <SyncStatusIndicator className="text-xs" />
@@ -399,24 +362,7 @@ const Navigation = () => {
               {/* Mobile Navigation Items */}
               <div className="flex-1 py-6 px-4 space-y-2 overflow-y-auto">
                 {/* Core Navigation */}
-                {coreNavigationItems.map((item) => {
-                  const IconComponent = item.icon;
-                  return (
-                    <Link
-                      key={item.id}
-                      to={item.path}
-                      onClick={closeMobileMenu}
-                      className={`flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium transition-colors ${
-                        item.isActive
-                          ? 'bg-blue-50 text-blue-700'
-                          : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
-                      }`}
-                    >
-                      <IconComponent size={20} />
-                      {item.label}
-                    </Link>
-                  );
-                })}
+                {coreNavigationItems.map(renderMobileNavItem)}
 
                 {/* ANNUAL REPORTS Section */}
                 <div className="pt-2 border-t border-gray-200">

@@ -53,6 +53,27 @@ describe('Navigation Component', () => {
       const workforceLinks = screen.getAllByRole('link', { name: /workforce/i });
       expect(workforceLinks.length).toBeGreaterThan(0);
     });
+
+    test('includes Q1 FY26 Recruiting (Temp) dashboard link', () => {
+      renderWithRoute();
+
+      // Check for the new temporary workers recruiting dashboard
+      const tempRecruitingLinks = screen.getAllByRole('link', { name: /Q1.*Temp/i });
+      expect(tempRecruitingLinks.length).toBeGreaterThan(0);
+    });
+
+    test('Q1 FY26 Recruiting (Temp) link navigates to correct route', () => {
+      renderWithRoute();
+
+      const tempRecruitingLinks = screen.getAllByRole('link', { name: /Q1.*Temp/i });
+      expect(tempRecruitingLinks.length).toBeGreaterThan(0);
+
+      // Check that at least one has the correct href
+      const hasCorrectRoute = tempRecruitingLinks.some(link =>
+        link.getAttribute('href') === '/dashboards/recruiting-nbe-q1'
+      );
+      expect(hasCorrectRoute).toBe(true);
+    });
   });
 
   // SKIPPED: Complex UI interaction tests not needed for PDF export workflow
