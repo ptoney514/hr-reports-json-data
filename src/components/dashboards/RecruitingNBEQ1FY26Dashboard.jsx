@@ -120,6 +120,71 @@ const RecruitingNBEQ1FY26Dashboard = () => {
           <span className="font-semibold">Note:</span> {data.note} Data as of {data.dataAsOf}.
         </div>
 
+        {/* New Hire Metric Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+
+          {/* Total Temp Hires Card */}
+          <div className="bg-white p-6 rounded-lg shadow-sm border">
+            <div className="flex items-center justify-between mb-4">
+              <Users style={{color: '#8B5CF6'}} size={24} />
+              <span className="text-xs px-2 py-1 rounded-full bg-purple-100 text-purple-800 font-medium">
+                Q1
+              </span>
+            </div>
+            <div className="text-4xl font-bold text-gray-900 mb-1">{summary.total.count}</div>
+            <div className="text-sm text-gray-600 font-medium">Total Temp Hires</div>
+            <div className="text-xs text-gray-500 mt-2">
+              OMA: {summary.total.oma} | PHX: {summary.total.phx}
+            </div>
+          </div>
+
+          {/* House Staff Physicians Card */}
+          <div className="bg-white p-6 rounded-lg shadow-sm border">
+            <div className="flex items-center justify-between mb-4">
+              <Stethoscope style={{color: '#F59E0B'}} size={24} />
+              <span className="text-xs px-2 py-1 rounded-full bg-amber-100 text-amber-800 font-medium">
+                HSP
+              </span>
+            </div>
+            <div className="text-4xl font-bold text-gray-900 mb-1">{summary.hsp.count}</div>
+            <div className="text-sm text-gray-600 font-medium">House Staff Physicians</div>
+            <div className="text-xs text-gray-500 mt-2">
+              OMA: {summary.hsp.oma} | PHX: {summary.hsp.phx}
+            </div>
+          </div>
+
+          {/* Temporary NBE Card */}
+          <div className="bg-white p-6 rounded-lg shadow-sm border">
+            <div className="flex items-center justify-between mb-4">
+              <Clock style={{color: '#6B7280'}} size={24} />
+              <span className="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-800 font-medium">
+                TEMP
+              </span>
+            </div>
+            <div className="text-4xl font-bold text-gray-900 mb-1">{summary.temp.count}</div>
+            <div className="text-sm text-gray-600 font-medium">Temporary NBE</div>
+            <div className="text-xs text-gray-500 mt-2">
+              OMA: {summary.temp.oma} | PHX: {summary.temp.phx}
+            </div>
+          </div>
+
+          {/* Student Workers Card */}
+          <div className="bg-white p-6 rounded-lg shadow-sm border">
+            <div className="flex items-center justify-between mb-4">
+              <GraduationCap style={{color: '#10B981'}} size={24} />
+              <span className="text-xs px-2 py-1 rounded-full bg-green-100 text-green-800 font-medium">
+                STUDENT
+              </span>
+            </div>
+            <div className="text-4xl font-bold text-gray-900 mb-1">{summary.students.count}</div>
+            <div className="text-sm text-gray-600 font-medium">Student Workers</div>
+            <div className="text-xs text-gray-500 mt-2">
+              OMA: {summary.students.oma} | PHX: {summary.students.phx}
+            </div>
+          </div>
+
+        </div>
+
         {/* Hiring Trends Chart - Matches Workforce Dashboard Style */}
         <div className="bg-white rounded-2xl border p-8 mb-8" style={{ borderColor: '#D7D2CB' }}>
           <h2 className="text-2xl font-bold mb-6" style={{ color: '#00245D' }}>
@@ -208,71 +273,6 @@ const RecruitingNBEQ1FY26Dashboard = () => {
           <div className="text-xs text-gray-600 mt-4 bg-purple-50 p-3 rounded border border-purple-200 text-center">
             <span className="font-semibold">Note:</span> All quarterly data is actual headcount from Oracle HCM (since Q1 FY23). Student headcount peaks align with academic semesters. HSP headcount reflects residency program cycles.
           </div>
-        </div>
-
-        {/* New Hire Metric Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-
-          {/* Total Temp Hires Card */}
-          <div className="bg-white p-6 rounded-lg shadow-sm border">
-            <div className="flex items-center justify-between mb-4">
-              <Users style={{color: '#8B5CF6'}} size={24} />
-              <span className="text-xs px-2 py-1 rounded-full bg-purple-100 text-purple-800 font-medium">
-                Q1
-              </span>
-            </div>
-            <div className="text-4xl font-bold text-gray-900 mb-1">{summary.total.count}</div>
-            <div className="text-sm text-gray-600 font-medium">Total Temp Hires</div>
-            <div className="text-xs text-gray-500 mt-2">
-              OMA: {summary.total.oma} | PHX: {summary.total.phx}
-            </div>
-          </div>
-
-          {/* House Staff Physicians Card */}
-          <div className="bg-white p-6 rounded-lg shadow-sm border">
-            <div className="flex items-center justify-between mb-4">
-              <Stethoscope style={{color: '#F59E0B'}} size={24} />
-              <span className="text-xs px-2 py-1 rounded-full bg-amber-100 text-amber-800 font-medium">
-                HSP
-              </span>
-            </div>
-            <div className="text-4xl font-bold text-gray-900 mb-1">{summary.hsp.count}</div>
-            <div className="text-sm text-gray-600 font-medium">House Staff Physicians</div>
-            <div className="text-xs text-gray-500 mt-2">
-              OMA: {summary.hsp.oma} | PHX: {summary.hsp.phx}
-            </div>
-          </div>
-
-          {/* Temporary NBE Card */}
-          <div className="bg-white p-6 rounded-lg shadow-sm border">
-            <div className="flex items-center justify-between mb-4">
-              <Clock style={{color: '#6B7280'}} size={24} />
-              <span className="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-800 font-medium">
-                TEMP
-              </span>
-            </div>
-            <div className="text-4xl font-bold text-gray-900 mb-1">{summary.temp.count}</div>
-            <div className="text-sm text-gray-600 font-medium">Temporary NBE</div>
-            <div className="text-xs text-gray-500 mt-2">
-              OMA: {summary.temp.oma} | PHX: {summary.temp.phx}
-            </div>
-          </div>
-
-          {/* Student Workers Card */}
-          <div className="bg-white p-6 rounded-lg shadow-sm border">
-            <div className="flex items-center justify-between mb-4">
-              <GraduationCap style={{color: '#10B981'}} size={24} />
-              <span className="text-xs px-2 py-1 rounded-full bg-green-100 text-green-800 font-medium">
-                STUDENT
-              </span>
-            </div>
-            <div className="text-4xl font-bold text-gray-900 mb-1">{summary.students.count}</div>
-            <div className="text-sm text-gray-600 font-medium">Student Workers</div>
-            <div className="text-xs text-gray-500 mt-2">
-              OMA: {summary.students.oma} | PHX: {summary.students.phx}
-            </div>
-          </div>
-
         </div>
 
         {/* ============================================== */}
