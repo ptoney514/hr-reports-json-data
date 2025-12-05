@@ -19,35 +19,30 @@ def load_data():
     df = pd.read_csv(INPUT_CSV)
 
     # Filter to Q1 FY26 benefit-eligible only
-    # IMPORTANT: Two-step filter process (UPDATED 2025-11-19)
+    # IMPORTANT: Updated 2025-12-04 - Grade R now INCLUDED as HSP
     # Reference: TERMINATION_METHODOLOGY.md Section 4 (Benefit Eligibility)
 
-    # Step 1: Assignment Category Filter
+    # Assignment Category Filter
     BENEFIT_ELIGIBLE_CODES = [
         'F12', 'F11', 'F10', 'FT9',    # Full-time regular employees
         'PT12', 'PT11', 'PT10', 'PT9'  # Part-time regular employees
     ]
 
-    # Step 2: Apply both Assignment Category AND Grade R exclusion
+    # Get all benefit-eligible terminations (including Grade R as HSP)
     q1_fy26 = df[
         (df['Termination_Fiscal_Period'] == 'Q1 FY26') &
-        (df['Assignment_Category'].isin(BENEFIT_ELIGIBLE_CODES)) &
-        (~df['Grade'].str.startswith('R', na=False))  # EXCLUDE Grade R (Residents/Fellows)
+        (df['Assignment_Category'].isin(BENEFIT_ELIGIBLE_CODES))
     ].copy()
 
-    print(f"Q1 FY26 Benefit-Eligible Terminations (with Grade R exclusion): {len(q1_fy26)}")
+    print(f"Q1 FY26 Benefit-Eligible Terminations: {len(q1_fy26)}")
     print(f"Employee Category Breakdown:")
     print(q1_fy26['Employee_Category'].value_counts())
 
-    # Show what was excluded
-    grade_r_excluded = df[
-        (df['Termination_Fiscal_Period'] == 'Q1 FY26') &
-        (df['Assignment_Category'].isin(BENEFIT_ELIGIBLE_CODES)) &
-        (df['Grade'].str.startswith('R', na=False))
-    ]
-    if len(grade_r_excluded) > 0:
-        print(f"\n⚠️  Excluded {len(grade_r_excluded)} Grade R employees (Residents/Fellows)")
-        print(grade_r_excluded['Job_Name'].value_counts())
+    # Show Grade R employees included as HSP
+    grade_r_included = q1_fy26[q1_fy26['Grade'].str.startswith('R', na=False)]
+    if len(grade_r_included) > 0:
+        print(f"\n✅ Included {len(grade_r_included)} Grade R employees as House Staff Physicians")
+        print(grade_r_included['Job_Name'].value_counts())
 
     return q1_fy26
 

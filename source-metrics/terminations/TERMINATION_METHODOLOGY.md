@@ -127,30 +127,30 @@ else:
 
 **Purpose**: Define which employees are benefit-eligible for turnover reporting
 
-**Two-Step Filter Process**:
-
-#### Step 1: Assignment Category Filter
-**Include**:
+#### Assignment Category Filter
+**Include (Benefit-Eligible)**:
 - F12, F11, F10, F09 (Full-time regular)
 - PT12, PT11, PT10, PT9 (Part-time regular)
 
-**Exclude**:
-- HSR (House Staff Residents - tracked separately)
+**House Staff Physicians (Benefit-Eligible, Separate Category)**:
+- HSR (House Staff Residents/Physicians)
+- Grade R (Residents/Fellows: PT Residents, OT Fellows, Pharmacy Residents/Fellows)
+
+**Exclude (Non-Benefit-Eligible)**:
 - TEMP, NBE, PRN (Temporary/non-benefit)
 - SUE, CWS (Student workers)
 
-#### Step 2: Grade Code Exclusion (CRITICAL)
-**Exclude Grade R** - Even if Assignment Category is F12/PT12:
+#### Grade R Classification (Updated December 2025)
+**Grade R employees are now benefit-eligible** and included under House Staff Physicians:
 
-**Rule**: `Grade Code NOT LIKE 'R%'`
+**Rule**: `Grade Code LIKE 'R%' → House Staff Physicians (benefit-eligible)`
 
 **Rationale**:
 - Grade R = Residents/Fellows (PT, OT, Pharmacy)
 - These positions are:
-  - **NOT benefits-eligible** despite F12/PT12 assignment
-  - Training programs (1-2 year rotations)
-  - Different compensation structure
-  - Excluded from benefit-eligible reporting
+  - **Benefit-eligible** as part of House Staff Physicians
+  - Training programs tracked with HSR category
+  - Included in benefit-eligible reporting
 
 **Examples of Grade R Job Titles**:
 - Physical Therapy Resident
@@ -162,18 +162,23 @@ else:
 ```python
 BENEFIT_ELIGIBLE_CODES = ['F12', 'F11', 'F10', 'F09', 'PT12', 'PT11', 'PT10', 'PT9']
 
-benefit_eligible = df[
-    (df['Assignment_Category'].isin(BENEFIT_ELIGIBLE_CODES)) &
-    (~df['Grade'].str.startswith('R', na=False))  # EXCLUDE Grade R
+# Faculty and Staff (benefit-eligible)
+benefit_eligible = df[df['Assignment_Category'].isin(BENEFIT_ELIGIBLE_CODES)]
+
+# House Staff Physicians (HSR or Grade R - also benefit-eligible)
+house_staff = df[
+    (df['Assignment_Category'] == 'HSR') |
+    (df['Grade'].str.startswith('R', na=False))
 ]
 ```
 
-**Q1 FY26 Impact**:
-- Without Grade R exclusion: 73 terminations
-- Grade R employees to exclude: 15
-- Corrected benefit-eligible: **58 terminations**
+**Q1 FY26 Totals**:
+- Faculty: 4 terminations
+- Staff: 54 terminations
+- House Staff Physicians: 15 terminations (Grade R)
+- **Total Benefit-Eligible**: 73 terminations
 
-**Data Quality Note**: Grade R exclusion applies to both terminations AND workforce headcount
+**Data Quality Note**: Grade R is included as benefit-eligible under House Staff Physicians
 
 ---
 
@@ -457,6 +462,7 @@ DATA_CLEANING_AUDIT.md must document every transformation for reproducibility.
 
 | Date | Version | Changes |
 |------|---------|---------|
+| 2025-12-04 | 1.1 | Grade R employees now included as benefit-eligible under House Staff Physicians |
 | 2025-10-29 | 1.0 | Initial TERMINATION_METHODOLOGY.md created |
 
 ---

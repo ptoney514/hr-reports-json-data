@@ -1759,13 +1759,13 @@ export const EXIT_SURVEY_DATA = {
     }
   },
   // Q1 FY26 - First quarter of fiscal year 2026
-  // UPDATED 2025-11-19: Grade R exclusion applied (response rate recalculated)
+  // UPDATED 2025-12-04: Grade R now included as benefit-eligible (HSP terminations)
   "2025-09-30": {
     reportingDate: "9/30/25",
     quarter: "Q1 FY26",
-    responseRate: 25.9,  // Corrected: 15/58 (was 20.5 based on 15/73)
+    responseRate: 20.5,  // 15/73 (includes Grade R as benefit-eligible)
     totalResponses: 15,
-    totalExits: 58,      // Corrected from 73 (excluded 15 Grade R)
+    totalExits: 73,      // Includes 15 Grade R (now benefit-eligible)
     overallSatisfaction: 3.3,
     wouldRecommend: 80,
     wouldRecommendCount: {
@@ -1809,9 +1809,9 @@ export const EXIT_SURVEY_DATA = {
       { reason: "Other", count: 1, percentage: 6.7 }
     ],
     departmentExits: [
-      // UPDATED 2025-11-19: Grade R exclusion applied (12 from Pharmacy excluded)
+      // UPDATED 2025-12-04: Grade R now included as benefit-eligible
+      { department: "Pharmacy & Health Professions", exits: 19, responses: 0, responseRate: "0%" },  // Includes Grade R
       { department: "School of Medicine", exits: 10, responses: 3, responseRate: "30%" },
-      { department: "Pharmacy & Health Professions", exits: 7, responses: 0, responseRate: "0%" },  // Corrected from 19 (12 Grade R excluded)
       { department: "Student Life", exits: 5, responses: 3, responseRate: "60%" },
       { department: "School of Dentistry", exits: 5, responses: 3, responseRate: "60%" },
       { department: "Facilities", exits: 5, responses: 0, responseRate: "0%" },
@@ -1878,12 +1878,12 @@ export const QUARTERLY_TURNOVER_TRENDS = {
     { quarter: "Q2 FY25", faculty: 4, staff: 34 },
     { quarter: "Q3 FY25", faculty: 8, staff: 43 },
     { quarter: "Q4 FY25", faculty: 10, staff: 41 },
-    { quarter: "Q1 FY26", faculty: 4, staff: 54 }  // Corrected from 69 (Grade R excluded)
+    { quarter: "Q1 FY26", faculty: 4, staff: 54, hsp: 15 }  // Includes Grade R as HSP
   ],
 
   // Early turnover counts by quarter (<1 year tenure only)
   // Time Range: Q1 FY23 → Q1 FY26 (13 quarters)
-  // IMPORTANT: Only includes BENEFIT-ELIGIBLE employees
+  // IMPORTANT: Only includes BENEFIT-ELIGIBLE employees (now includes HSP/Grade R)
   earlyTurnover: [
     { quarter: "Q1 FY23", faculty: 0, staff: 19 },
     { quarter: "Q2 FY23", faculty: 1, staff: 14 },
@@ -1897,7 +1897,7 @@ export const QUARTERLY_TURNOVER_TRENDS = {
     { quarter: "Q2 FY25", faculty: 1, staff: 13 },
     { quarter: "Q3 FY25", faculty: 1, staff: 9 },
     { quarter: "Q4 FY25", faculty: 0, staff: 5 },
-    { quarter: "Q1 FY26", faculty: 0, staff: 13 }  // Corrected from 17 (Grade R excluded)
+    { quarter: "Q1 FY26", faculty: 0, staff: 13, hsp: 4 }  // Includes Grade R as HSP
   ]
 };
 
@@ -1937,7 +1937,7 @@ export const QUARTERLY_HEADCOUNT_TRENDS = [
   { quarter: "Q4 FY25", faculty: 689, staff: 1448, hsp: 610, students: 1650, temp: 640, total: 5037 },  // ✅ ACTUAL (6/30/25)
 
   // FY26 Quarters
-  { quarter: "Q1 FY26", faculty: 697, staff: 1419, hsp: 613, students: 2157, temp: 642, total: 5528 }   // ✅ ACTUAL (9/30/25)
+  { quarter: "Q1 FY26", faculty: 697, staff: 1419, hsp: 625, students: 2157, temp: 630, total: 5528 }   // ✅ ACTUAL (9/30/25) - HSP includes Grade R
 ];
 
 // ============================================================================
@@ -1950,16 +1950,16 @@ export const QUARTERLY_HEADCOUNT_TRENDS = [
 
 export const QUARTERLY_TURNOVER_DATA = {
   // Q1 FY26 - July-September 2025
-  // UPDATED 2025-11-19: Grade R exclusion applied (15 Residents/Fellows excluded)
-  // Previous total: 73 → Corrected: 58 (excludes PT/OT/Pharmacy Residents/Fellows)
+  // UPDATED 2025-12-04: Grade R now included as benefit-eligible under House Staff Physicians
+  // Total: 73 (includes 15 Grade R as HSP terminations)
   "2025-09-30": {
     reportingDate: "9/30/25",
     quarter: "Q1 FY26",
     fiscalPeriod: "July 2025 - September 2025",
     summary: {
       total: {
-        count: 58,  // Corrected from 73 (excluded 15 Grade R)
-        oma: 53,    // Corrected from 68
+        count: 73,  // Includes Grade R as benefit-eligible
+        oma: 68,
         phx: 5
       },
       faculty: {
@@ -1968,8 +1968,8 @@ export const QUARTERLY_TURNOVER_DATA = {
         phx: 0
       },
       staffExempt: {
-        count: 24,  // Corrected from 39 (excluded 15 Grade R)
-        oma: 23,    // Corrected from 38
+        count: 24,  // 39 - 15 HSP (Grade R now separate category)
+        oma: 23,
         phx: 1
       },
       staffNonExempt: {
@@ -1978,9 +1978,14 @@ export const QUARTERLY_TURNOVER_DATA = {
         phx: 4
       },
       staff: {
-        count: 54,  // Corrected from 69 (24 + 30)
-        oma: 49,    // Corrected from 64 (23 + 26)
+        count: 54,  // 24 + 30 (excludes 15 HSP)
+        oma: 49,
         phx: 5
+      },
+      houseStaffPhysicians: {
+        count: 15,  // Grade R terminations (benefit-eligible)
+        oma: 15,
+        phx: 0
       }
     },
     terminationTypesByGroup: [
@@ -1994,38 +1999,48 @@ export const QUARTERLY_TURNOVER_DATA = {
       },
       {
         group: "Benefit Eligible Staff",
-        total: 54,  // Corrected from 69 (excluded 15 Grade R)
-        voluntary: 44,  // Corrected from 47
+        total: 54,
+        voluntary: 44,
         involuntary: 3,
         retirement: 7,
-        endOfAssignment: 0  // Corrected from 12 (Grade R were End of Assignment)
+        endOfAssignment: 0
+      },
+      {
+        group: "House Staff Physicians",
+        total: 15,  // Grade R terminations (now benefit-eligible)
+        voluntary: 3,
+        involuntary: 0,
+        retirement: 0,
+        endOfAssignment: 12  // Training program completions
       }
     ],
     yearsOfService: [
-      { range: "<1 Year", faculty: 0, staff: 13 },  // Corrected from 17 (4 Grade R excluded)
-      { range: "1-3 Years", faculty: 1, staff: 19 },  // Corrected from 30 (11 Grade R excluded)
-      { range: "3-5 Years", faculty: 1, staff: 11 },
-      { range: "5-10 Years", faculty: 0, staff: 6 },
-      { range: "10-15 Years", faculty: 0, staff: 3 },
-      { range: "15-20 Years", faculty: 0, staff: 0 },
-      { range: "20+ Years", faculty: 2, staff: 2 }
+      { range: "<1 Year", faculty: 0, staff: 13, hsp: 4 },  // Includes Grade R
+      { range: "1-3 Years", faculty: 1, staff: 19, hsp: 11 },  // Includes Grade R
+      { range: "3-5 Years", faculty: 1, staff: 11, hsp: 0 },
+      { range: "5-10 Years", faculty: 0, staff: 6, hsp: 0 },
+      { range: "10-15 Years", faculty: 0, staff: 3, hsp: 0 },
+      { range: "15-20 Years", faculty: 0, staff: 0, hsp: 0 },
+      { range: "20+ Years", faculty: 2, staff: 2, hsp: 0 }
     ],
     ageGroups: [
-      { range: "<25", faculty: 0, staff: 9 },   // Corrected from 10 (1 Grade R excluded)
-      { range: "25-34", faculty: 1, staff: 18 }, // Corrected from 29 (11 Grade R excluded)
-      { range: "35-44", faculty: 0, staff: 10 }, // Corrected from 13 (3 Grade R excluded)
-      { range: "45-54", faculty: 1, staff: 5 },
-      { range: "55-64", faculty: 0, staff: 7 },
-      { range: "65+", faculty: 2, staff: 5 }
+      { range: "<25", faculty: 0, staff: 9, hsp: 1 },   // Includes Grade R
+      { range: "25-34", faculty: 1, staff: 18, hsp: 11 }, // Includes Grade R
+      { range: "35-44", faculty: 0, staff: 10, hsp: 3 }, // Includes Grade R
+      { range: "45-54", faculty: 1, staff: 5, hsp: 0 },
+      { range: "55-64", faculty: 0, staff: 7, hsp: 0 },
+      { range: "65+", faculty: 2, staff: 5, hsp: 0 }
     ],
     earlyTurnover: {
-      total: 13,  // Corrected from 17 (4 Grade R excluded)
+      total: 17,  // Includes Grade R (4 HSP + 13 staff)
       byTerminationType: [
-        { name: "Voluntary", value: 11, percentage: 84.6, color: "#3B82F6" },  // Updated
-        { name: "Involuntary", value: 2, percentage: 15.4, color: "#EF4444" }  // Updated
+        { name: "Voluntary", value: 11, percentage: 64.7, color: "#3B82F6" },
+        { name: "End of Assignment", value: 4, percentage: 23.5, color: "#10B981" },  // Grade R program completions
+        { name: "Involuntary", value: 2, percentage: 11.8, color: "#EF4444" }
       ],
       byEmployeeCategory: [
-        { name: "Benefit Eligible Staff", value: 13, percentage: 100.0, color: "#3B82F6" }  // Corrected from 17
+        { name: "Benefit Eligible Staff", value: 13, percentage: 76.5, color: "#3B82F6" },
+        { name: "House Staff Physicians", value: 4, percentage: 23.5, color: "#10B981" }  // Grade R
       ],
       // Early turnover by school/area - where <1 year tenure departures occurred
       // Source: source-metrics/terminations/cleaned/FY25_Q4/terminations_cleaned.csv
@@ -2098,8 +2113,8 @@ export const QUARTERLY_WORKFORCE_DATA = {
   // Q1 FY26 - July-September 2025
   // Data Source: source-metrics/workforce/raw/FY26_Q1/New Emp List since FY20 to Q1FY25 1031 PT.xlsx
   // Processed: 2025-11-19 via scripts/extract_q1_fy26_workforce.js
-  // Methodology: WORKFORCE_METHODOLOGY.md v2.0 (Person Type + Assignment Category + Grade R Exclusion)
-  // UPDATED 2025-11-19: Grade R exclusion applied (12 Residents/Fellows excluded from benefit-eligible)
+  // Methodology: WORKFORCE_METHODOLOGY.md v2.1 (Person Type + Assignment Category)
+  // UPDATED 2025-12-04: Grade R now included as benefit-eligible under House Staff Physicians
   "2025-09-30": {
     reportingDate: "9/30/25",
     quarter: "Q1 FY26",
@@ -2116,13 +2131,13 @@ export const QUARTERLY_WORKFORCE_DATA = {
         phx: 40
       },
       staff: {
-        count: 1419,  // Corrected from 1431 (excluded 12 Grade R)
-        oma: 1318,    // Corrected from 1330
+        count: 1419,
+        oma: 1318,
         phx: 101
       },
       houseStaffPhysicians: {
-        count: 613,
-        oma: 270,
+        count: 625,  // 613 HSR + 12 Grade R (now benefit-eligible)
+        oma: 282,    // 270 HSR + 12 Grade R
         phx: 343
       },
       studentWorkers: {
@@ -2131,8 +2146,8 @@ export const QUARTERLY_WORKFORCE_DATA = {
         phx: 69
       },
       temporary: {
-        count: 642,  // Corrected from 630 (now includes 12 Grade R)
-        oma: 501,    // Corrected from 489
+        count: 630,  // TEMP + NBE + PRN only
+        oma: 489,
         phx: 141
       }
     },
@@ -2149,18 +2164,18 @@ export const QUARTERLY_WORKFORCE_DATA = {
       {
         group: "Benefit-Eligible Staff",
         faculty: 0,
-        staff: 1419,  // Corrected from 1431
+        staff: 1419,
         hsp: 0,
         students: 0,
-        total: 1419   // Corrected from 1431
+        total: 1419
       },
       {
         group: "House Staff Physicians",
         faculty: 0,
         staff: 0,
-        hsp: 613,
+        hsp: 625,  // 613 HSR + 12 Grade R (now benefit-eligible)
         students: 0,
-        total: 613
+        total: 625
       },
       {
         group: "Student Workers",
@@ -2171,22 +2186,22 @@ export const QUARTERLY_WORKFORCE_DATA = {
         total: 2157
       },
       {
-        group: "Not-Benefit Eligible",
+        group: "Non-Benefit Eligible",
         faculty: 0,
         staff: 0,
         hsp: 0,
         students: 0,
-        total: 642  // Corrected from 630 (now includes 12 Grade R)
+        total: 630  // TEMP + NBE + PRN only
       }
     ],
     // Location breakdown
     locationDetails: {
       omaha: {
         faculty: 657,
-        staff: 1318,  // Corrected from 1330 (excluded 12 Grade R)
-        hsp: 270,
+        staff: 1318,
+        hsp: 282,     // 270 HSR + 12 Grade R (now benefit-eligible)
         students: 2088,
-        temp: 501,    // Corrected from 489 (now includes 12 Grade R)
+        temp: 489,    // TEMP + NBE + PRN only
         total: 4834
       },
       phoenix: {
@@ -2199,11 +2214,10 @@ export const QUARTERLY_WORKFORCE_DATA = {
       }
     },
     // Assignment category breakdown (RAW counts from HR system)
-    // NOTE: 12 Grade R employees have F12 assignment but are NOT benefit-eligible
-    // Summary counts are ADJUSTED: F12 benefit-eligible = 1694 - 12 = 1682
-    // Temporary ADJUSTED: 516 + 107 + 7 + 12 (Grade R) = 642
+    // NOTE: Grade R employees are now included as benefit-eligible under HSP
+    // HSP total = 613 HSR + 12 Grade R = 625
     assignmentCategories: {
-      "F12": 1694,  // Full-time 12-month (includes 12 Grade R - see note)
+      "F12": 1694,  // Full-time 12-month
       "HSR": 613,   // House Staff Residents
       "PT12": 49,   // Part-time 12-month
       "TEMP": 516,  // Temporary
@@ -2218,10 +2232,11 @@ export const QUARTERLY_WORKFORCE_DATA = {
       "PT11": 1,    // Part-time 11-month
       "PT10": 8     // Part-time 10-month
     },
-    // Grade R exclusion count (for test validation)
-    gradeRExclusion: {
+    // Grade R inclusion (for test validation)
+    // As of December 2025, Grade R employees are benefit-eligible under HSP
+    gradeRInclusion: {
       count: 12,
-      description: "Grade R employees with F12 assignment excluded from benefit-eligible counts"
+      description: "Grade R employees with F12 assignment included as benefit-eligible under House Staff Physicians"
     },
     // Ethnicity and Gender Demographics (Benefit-Eligible only)
     // Source: scripts/extract_q1_fy26_ethnicity.py

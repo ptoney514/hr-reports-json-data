@@ -182,7 +182,7 @@ const QualityChecks = ({ quarterDate = '2025-09-30' }) => {
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
         <h4 className="text-sm font-semibold text-blue-900 mb-2">About Quality Checks</h4>
         <ul className="text-xs text-blue-800 space-y-1">
-          <li>• <strong>Grade R Exclusion:</strong> Verifies that Residents/Fellows are properly excluded from benefit-eligible counts</li>
+          <li>• <strong>Grade R Inclusion:</strong> Verifies that Residents/Fellows are properly included as benefit-eligible under House Staff Physicians</li>
           <li>• <strong>Data Integrity:</strong> Ensures Faculty + Staff = Total benefit-eligible employees</li>
           <li>• <strong>Cross-Dashboard Consistency:</strong> Validates that turnover counts match exit survey denominators</li>
           <li>• <strong>Calculation Accuracy:</strong> Checks that all percentages and derived metrics are correct</li>

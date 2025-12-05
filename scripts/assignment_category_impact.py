@@ -32,7 +32,7 @@ def main():
         # Old filter (Benefit_Program_Description)
         old_count = len(qtr_df[
             (qtr_df['Employee_Category'].isin(['Faculty', 'Staff Exempt', 'Staff Non-Exempt'])) &
-            (qtr_df['Benefit_Program_Description'] != 'Not Benefit Eligible')
+            (qtr_df['Benefit_Program_Description'] != 'Non-Benefit Eligible')
         ])
 
         # New filter (Assignment_Category)
@@ -49,7 +49,7 @@ def main():
     print("\n✅ Assignment Category filter is more accurate because:")
     print("   - It's based on employment type (F/PT regular), not a data quality field")
     print("   - It excludes TEMP workers incorrectly marked 'Cobra Eligible'")
-    print("   - It includes F10/F11/F12 regular employees incorrectly marked 'Not Benefit Eligible'")
+    print("   - It includes F10/F11/F12 regular employees incorrectly marked 'Non-Benefit Eligible'")
     print("\n📊 Most quarters have the SAME count but DIFFERENT people")
     print("   - This proves the Benefit_Program_Description field has data quality errors")
     print("="*80)

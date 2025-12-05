@@ -105,18 +105,23 @@ AND Assignment Category Code != 'HSR'
 
 **Note**: Staff represents the largest benefit-eligible employee type.
 
-#### 3. House Staff Physicians
-**Definition**: Physicians in residency/house staff programs (HSR code only)
+#### 3. House Staff Physicians (Benefit-Eligible)
+**Definition**: Physicians in residency/house staff programs and Grade R employees (Residents/Fellows)
 
 **Calculation**:
 ```
 WHERE Assignment Category Code = 'HSR'
+   OR Grade Code = 'R' (with F12/PT12 assignment)
 ```
 
 **Q1 FY26 Results**:
-- Total: **613** physicians
-- OMA: 270 (44.0%)
-- PHX: 343 (56.0%)
+- Total: **625** physicians (613 HSR + 12 Grade R)
+- OMA: 282 (45.1%)
+- PHX: 343 (54.9%)
+
+**Grade R Employees** (PT Residents, OT Fellows, Pharmacy Residents/Fellows):
+- Included in House Staff Physicians category
+- All are benefit-eligible
 
 **Key Insight**: Phoenix has higher concentration due to medical center operations.
 
@@ -157,6 +162,8 @@ WHERE Assignment Category Code IN ('TEMP', 'NBE', 'PRN')
 - PRN (As-needed): 107 (17.0%)
 - NBE (Non-benefit eligible): 7 (1.1%)
 
+**Note**: Grade R employees are no longer included in Temporary; they are now in House Staff Physicians.
+
 ---
 
 ## Q1 FY26 Calculated Metrics
@@ -167,8 +174,8 @@ WHERE Assignment Category Code IN ('TEMP', 'NBE', 'PRN')
 |----------|-------|-----|-----|------------|
 | **Total Headcount** | 5,528 | 4,834 | 694 | 100.0% |
 | Benefit-Eligible Faculty | 697 | 657 | 40 | 12.6% |
-| Benefit-Eligible Staff | 1,431 | 1,330 | 101 | 25.9% |
-| House Staff Physicians | 613 | 270 | 343 | 11.1% |
+| Benefit-Eligible Staff | 1,419 | 1,318 | 101 | 25.7% |
+| House Staff Physicians | 625 | 282 | 343 | 11.3% |
 | Student Workers | 2,157 | 2,088 | 69 | 39.0% |
 | Temporary Employees | 630 | 489 | 141 | 11.4% |
 
@@ -176,8 +183,8 @@ WHERE Assignment Category Code IN ('TEMP', 'NBE', 'PRN')
 
 **Omaha Campus (OMA)**: 4,834 employees (87.4%)
 - Faculty: 657 (13.6% of Omaha)
-- Staff: 1,330 (27.5% of Omaha)
-- HSP: 270 (5.6% of Omaha)
+- Staff: 1,318 (27.3% of Omaha)
+- HSP: 282 (5.8% of Omaha) - includes Grade R
 - Students: 2,088 (43.2% of Omaha)
 - Temporary: 489 (10.1% of Omaha)
 
@@ -218,7 +225,7 @@ WHERE Assignment Category Code IN ('TEMP', 'NBE', 'PRN')
 #### 1. Category Sum Validation
 ```
 Total = Faculty + Staff + HSP + Students + Temporary
-5,528 = 697 + 1,431 + 613 + 2,157 + 630 ✓
+5,528 = 697 + 1,419 + 625 + 2,157 + 630 ✓
 ```
 
 #### 2. Campus Sum Validation
@@ -228,8 +235,8 @@ For each category:
 
 Total: 5,528 = 4,834 + 694 ✓
 Faculty: 697 = 657 + 40 ✓
-Staff: 1,431 = 1,330 + 101 ✓
-HSP: 613 = 270 + 343 ✓
+Staff: 1,419 = 1,318 + 101 ✓
+HSP: 625 = 282 + 343 ✓
 Students: 2,157 = 2,088 + 69 ✓
 Temporary: 630 = 489 + 141 ✓
 ```
@@ -237,7 +244,7 @@ Temporary: 630 = 489 + 141 ✓
 #### 3. Location Details Validation
 ```
 Omaha Total = Faculty + Staff + HSP + Students + Temp
-4,834 = 657 + 1,330 + 270 + 2,088 + 489 ✓
+4,834 = 657 + 1,318 + 282 + 2,088 + 489 ✓
 
 Phoenix Total = Faculty + Staff + HSP + Students + Temp
 694 = 40 + 101 + 343 + 69 + 141 ✓
@@ -249,7 +256,7 @@ Assignment Category Sum = Total Headcount
 1694 + 1793 + 613 + 516 + 364 + ... = 5,528 ✓
 
 Benefit-Eligible Sum (F/PT codes) = Faculty + Staff
-2,128 = 697 + 1,431 ✓
+2,116 = 697 + 1,419 ✓
 
 Student Sum (SUE + CWS) = Student Workers
 2,157 = 1,793 + 364 ✓
@@ -257,8 +264,8 @@ Student Sum (SUE + CWS) = Student Workers
 Temporary Sum (TEMP + NBE + PRN) = Temporary
 630 = 516 + 7 + 107 ✓
 
-HSR = House Staff Physicians
-613 = 613 ✓
+House Staff Physicians = HSR + Grade R
+625 = 613 + 12 ✓
 ```
 
 ### Quality Score Calculation
@@ -280,9 +287,9 @@ HSR = House Staff Physicians
 
 ### Workforce Composition
 1. **Student Workers** are the largest single category (39.0% of total)
-2. **Benefit-Eligible Staff** second largest (25.9% of total)
-3. **Benefit-Eligible Employees** (Faculty + Staff) represent 38.5% of total workforce
-4. **House Staff Physicians** represent 11.1% of total workforce
+2. **Benefit-Eligible Staff** second largest (25.7% of total)
+3. **Benefit-Eligible Employees** (Faculty + Staff + HSP) represent 49.6% of total workforce
+4. **House Staff Physicians** (including Grade R) represent 11.3% of total workforce
 
 ### Campus Distribution Patterns
 1. **Omaha Campus** houses 87.4% of total workforce
@@ -410,7 +417,10 @@ for each employee record where END_DATE = '2025-09-30':
   campus = location.includes('phoen') ? 'phoenix' : 'omaha'
 
   // Categorize per WORKFORCE_METHODOLOGY.md v2.0
-  if assignmentCategory === 'HSR':
+  gradeCode = record['Grade Code']
+
+  // House Staff Physicians: HSR assignment OR Grade R (Residents/Fellows)
+  if assignmentCategory === 'HSR' OR gradeCode.startsWith('R'):
     category = 'House Staff Physicians'
     locationBreakdown[campus].hsp++
 
@@ -570,6 +580,7 @@ This methodology establishes a **repeatable quarterly process**:
 
 | Date | Version | Changes |
 |------|---------|---------|
+| 2025-12-04 | 1.1 | Grade R (Residents/Fellows) now included as benefit-eligible under House Staff Physicians |
 | 2025-11-18 | 1.0 | Initial QUARTERLY_WORKFORCE_METHODOLOGY.md created for Q1 FY26 |
 
 ---

@@ -128,6 +128,21 @@ const WorkforceQ1FY26Dashboard = () => {
             </div>
           </div>
 
+          {/* Non-Benefit Eligible Card */}
+          <div className="bg-white p-6 rounded-lg shadow-sm border">
+            <div className="flex items-center justify-between mb-4">
+              <Users style={{color: '#0054A6'}} size={20} />
+              <span className="text-xs px-2 py-1 rounded-full bg-orange-100 text-orange-800 font-medium uppercase">
+                NBE
+              </span>
+            </div>
+            <div className="text-3xl font-bold text-gray-900 mb-1">{headcountData.temporary.count}</div>
+            <div className="text-xs text-gray-600 font-medium mb-2">Non-Benefit Eligible</div>
+            <div className="text-xs text-gray-500">
+              OMA: {headcountData.temporary.oma} | PHX: {headcountData.temporary.phx}
+            </div>
+          </div>
+
           {/* Student Workers Card */}
           <div className="bg-white p-6 rounded-lg shadow-sm border">
             <div className="flex items-center justify-between mb-4">
@@ -143,26 +158,11 @@ const WorkforceQ1FY26Dashboard = () => {
             </div>
           </div>
 
-          {/* Not-Benefit Eligible Card */}
-          <div className="bg-white p-6 rounded-lg shadow-sm border">
-            <div className="flex items-center justify-between mb-4">
-              <Users style={{color: '#0054A6'}} size={20} />
-              <span className="text-xs px-2 py-1 rounded-full bg-orange-100 text-orange-800 font-medium uppercase">
-                NBE
-              </span>
-            </div>
-            <div className="text-3xl font-bold text-gray-900 mb-1">{headcountData.temporary.count}</div>
-            <div className="text-xs text-gray-600 font-medium mb-2">Not-Benefit Eligible</div>
-            <div className="text-xs text-gray-500">
-              OMA: {headcountData.temporary.oma} | PHX: {headcountData.temporary.phx}
-            </div>
-          </div>
-
         </div>
 
         {/* Category Definition Note */}
         <div className="text-xs text-gray-600 mb-8 bg-blue-50 p-3 rounded border border-blue-200">
-          <span className="font-semibold">Note:</span> Not-Benefit Eligible (NBE) includes TEMP, PRN, and Grade R employees (PT Residents, OT Fellows, Pharmacy Residents/Fellows). Student Workers are tracked separately but are also not benefit-eligible.
+          <span className="font-semibold">Note:</span> Non-Benefit Eligible (NBE) includes TEMP, PRN workers. House Staff Physicians (HSP) includes Grade R employees (PT Residents, OT Fellows, Pharmacy Residents/Fellows) and HSR and are benefit-eligible. Student Workers are tracked separately and are non-benefit eligible.
         </div>
 
         {/* Workforce by Employee Type */}
@@ -318,12 +318,12 @@ const WorkforceQ1FY26Dashboard = () => {
                 name="Student Workers"
               />
 
-              {/* Not-Benefit Eligible Line (Dashed) */}
+              {/* Non-Benefit Eligible Line (Dashed) */}
               <Line
                 {...getSecondaryLineProps('#EF4444')}
                 dataKey="temp"
                 stroke="#EF4444"
-                name="Not-Benefit Eligible"
+                name="Non-Benefit Eligible"
               />
             </LineChart>
           </ResponsiveContainer>
@@ -364,7 +364,7 @@ const WorkforceQ1FY26Dashboard = () => {
             </div>
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-              <span className="text-gray-700">Not-Benefit Eligible</span>
+              <span className="text-gray-700">Non-Benefit Eligible</span>
             </div>
           </div>
 
@@ -426,7 +426,7 @@ const WorkforceQ1FY26Dashboard = () => {
                       >
                         {data.locationDetails.omaha.hsp >= 120 && data.locationDetails.omaha.hsp}
                       </div>
-                      {/* Not-Benefit Eligible - Red */}
+                      {/* Non-Benefit Eligible - Red */}
                       <div
                         className="bg-red-500 flex items-center justify-center text-white text-xs font-medium"
                         style={{ width: `${(data.locationDetails.omaha.temp / 5000) * 100}%` }}
@@ -475,7 +475,7 @@ const WorkforceQ1FY26Dashboard = () => {
                       >
                         {data.locationDetails.phoenix.hsp >= 120 && data.locationDetails.phoenix.hsp}
                       </div>
-                      {/* Not-Benefit Eligible - Red */}
+                      {/* Non-Benefit Eligible - Red */}
                       <div
                         className="bg-red-500 flex items-center justify-center text-white text-xs font-medium"
                         style={{ width: `${(data.locationDetails.phoenix.temp / 5000) * 100}%` }}
@@ -886,7 +886,7 @@ const WorkforceQ1FY26Dashboard = () => {
                 <div className="flex items-start gap-3">
                   <Info className="w-5 h-5 text-blue-600 mt-0.5" />
                   <div className="text-sm text-gray-700">
-                    <span className="font-semibold">House Staff concentration:</span> 22.5% of core workforce (613 of 2,729 faculty + staff + HSP)
+                    <span className="font-semibold">House Staff concentration:</span> 22.8% of core workforce (625 of 2,741 faculty + staff + HSP)
                   </div>
                 </div>
 

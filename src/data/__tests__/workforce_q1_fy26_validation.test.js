@@ -1,17 +1,17 @@
 /**
  * Q1 FY26 Workforce Data Validation Test Suite
  *
- * Validates Q1 FY26 workforce data against WORKFORCE_METHODOLOGY.md v2.0
+ * Validates Q1 FY26 workforce data against WORKFORCE_METHODOLOGY.md v2.1
  * Ensures data integrity, categorization accuracy, and business rule compliance
  *
  * Data Source: source-metrics/workforce/cleaned/FY26_Q1/q1_fy26_workforce_snapshot.json
  * Processing: scripts/extract_q1_fy26_workforce.js
  *
- * METHODOLOGY UPDATE (Nov 19, 2025):
- * - Grade R (Residents/Fellows) excluded from benefit-eligible staff counts
- * - Staff: 1431 → 1419 (12 Grade R moved to temporary)
- * - Temporary: 630 → 642 (12 Grade R added)
- * - Benefit-eligible total: 2128 → 2116
+ * METHODOLOGY UPDATE (Dec 4, 2025):
+ * - Grade R (Residents/Fellows) now INCLUDED as benefit-eligible under House Staff Physicians
+ * - HSP: 613 → 625 (12 Grade R added)
+ * - Temporary: 642 → 630 (12 Grade R removed)
+ * - Benefit-eligible total: 2116 → 2128 (Faculty + Staff + HSP)
  */
 
 import {
@@ -121,14 +121,14 @@ describe('Q1 FY26 Workforce Data Validation', () => {
 
     describe('House Staff Physicians Validation', () => {
       it('should have correct HSP count per methodology', () => {
-        // Per WORKFORCE_METHODOLOGY.md: Assignment Code = HSR
-        expect(q1fy26Data.summary.houseStaffPhysicians.count).toBe(613);
+        // Per WORKFORCE_METHODOLOGY.md v2.1: HSR (613) + Grade R (12) = 625
+        expect(q1fy26Data.summary.houseStaffPhysicians.count).toBe(625);
       });
 
       it('should have correct campus distribution', () => {
-        expect(q1fy26Data.summary.houseStaffPhysicians.oma).toBe(270);
+        expect(q1fy26Data.summary.houseStaffPhysicians.oma).toBe(282);
         expect(q1fy26Data.summary.houseStaffPhysicians.phx).toBe(343);
-        expect(q1fy26Data.summary.houseStaffPhysicians.oma + q1fy26Data.summary.houseStaffPhysicians.phx).toBe(613);
+        expect(q1fy26Data.summary.houseStaffPhysicians.oma + q1fy26Data.summary.houseStaffPhysicians.phx).toBe(625);
       });
 
       it('should validate Phoenix has higher HSP concentration', () => {
@@ -136,8 +136,11 @@ describe('Q1 FY26 Workforce Data Validation', () => {
         expect(q1fy26Data.summary.houseStaffPhysicians.phx).toBeGreaterThan(q1fy26Data.summary.houseStaffPhysicians.oma);
       });
 
-      it('should match HSR assignment category count', () => {
-        expect(q1fy26Data.assignmentCategories['HSR']).toBe(613);
+      it('should include HSR assignment category plus Grade R', () => {
+        // HSR = 613, Grade R with F12 = 12, Total HSP = 625
+        const hsrCount = q1fy26Data.assignmentCategories['HSR'];
+        const gradeRCount = q1fy26Data.gradeRInclusion?.count || 12;
+        expect(hsrCount + gradeRCount).toBe(625);
       });
     });
 
@@ -162,29 +165,25 @@ describe('Q1 FY26 Workforce Data Validation', () => {
 
     describe('Temporary Employees Validation', () => {
       it('should have correct temporary count per methodology', () => {
-        // Per WORKFORCE_METHODOLOGY.md: TEMP + NBE + PRN codes
-        // Updated Nov 2025: Now includes Grade R (Residents/Fellows)
-        expect(q1fy26Data.summary.temporary.count).toBe(642);
+        // Per WORKFORCE_METHODOLOGY.md v2.1: TEMP + NBE + PRN codes only
+        // Updated Dec 2025: Grade R moved to HSP category
+        expect(q1fy26Data.summary.temporary.count).toBe(630);
       });
 
       it('should have correct campus distribution', () => {
-        expect(q1fy26Data.summary.temporary.oma).toBe(501);
+        expect(q1fy26Data.summary.temporary.oma).toBe(489);
         expect(q1fy26Data.summary.temporary.phx).toBe(141);
-        expect(q1fy26Data.summary.temporary.oma + q1fy26Data.summary.temporary.phx).toBe(642);
+        expect(q1fy26Data.summary.temporary.oma + q1fy26Data.summary.temporary.phx).toBe(630);
       });
 
-      it('should equal TEMP + NBE + PRN + Grade R assignment categories', () => {
+      it('should equal TEMP + NBE + PRN assignment categories', () => {
         const tempSum =
           q1fy26Data.assignmentCategories['TEMP'] +
           q1fy26Data.assignmentCategories['NBE'] +
           q1fy26Data.assignmentCategories['PRN'];
 
-        // Grade R employees (12) have F12 assignment but count as temporary
-        const gradeRCount = q1fy26Data.gradeRExclusion?.count || 12;
-        const adjustedTempSum = tempSum + gradeRCount;
-
-        // Validates temp categories sum + Grade R matches temporary count
-        expect(adjustedTempSum).toBe(q1fy26Data.summary.temporary.count);
+        // Updated Dec 2025: Grade R is now in HSP, not temporary
+        expect(tempSum).toBe(q1fy26Data.summary.temporary.count);
       });
     });
   });
@@ -295,26 +294,25 @@ describe('Q1 FY26 Workforce Data Validation', () => {
 
     it('should validate second largest group is Benefit-Eligible Staff', () => {
       const staffGroup = q1fy26Data.employeeGroups.find(g => g.group === "Benefit-Eligible Staff");
-      // Updated Nov 2025: Grade R excluded from benefit-eligible
       expect(staffGroup.total).toBe(1419);
     });
   });
 
   describe('Business Rule Validation', () => {
-    it('should validate benefit-eligible total (Faculty + Staff)', () => {
-      const benefitEligibleTotal = q1fy26Data.summary.faculty.count + q1fy26Data.summary.staff.count;
-      // Updated Nov 2025: Grade R excluded from benefit-eligible
-      expect(benefitEligibleTotal).toBe(697 + 1419);
-      expect(benefitEligibleTotal).toBe(2116);
+    it('should validate benefit-eligible total (Faculty + Staff + HSP)', () => {
+      // Updated Dec 2025: HSP is now benefit-eligible
+      const benefitEligibleTotal = q1fy26Data.summary.faculty.count + q1fy26Data.summary.staff.count + q1fy26Data.summary.houseStaffPhysicians.count;
+      expect(benefitEligibleTotal).toBe(697 + 1419 + 625);
+      expect(benefitEligibleTotal).toBe(2741);
     });
 
-    it('should validate benefit-eligible is approximately 38% of total workforce', () => {
+    it('should validate benefit-eligible (Faculty + Staff) is approximately 38% of total workforce', () => {
       const benefitEligibleTotal = q1fy26Data.summary.faculty.count + q1fy26Data.summary.staff.count;
       const percentage = (benefitEligibleTotal / q1fy26Data.summary.total.count) * 100;
 
       expect(percentage).toBeGreaterThan(35);
       expect(percentage).toBeLessThan(42);
-      // Updated Nov 2025: 2116/5528 = 38.3%
+      // 2116/5528 = 38.3%
       expect(Math.round(percentage * 10) / 10).toBe(38.3);
     });
 
@@ -330,8 +328,9 @@ describe('Q1 FY26 Workforce Data Validation', () => {
       const percentage = (q1fy26Data.summary.houseStaffPhysicians.count / q1fy26Data.summary.total.count) * 100;
 
       expect(percentage).toBeGreaterThan(10);
-      expect(percentage).toBeLessThan(13);
-      expect(Math.round(percentage * 10) / 10).toBe(11.1); // ~11.1%
+      expect(percentage).toBeLessThan(14);
+      // Updated Dec 2025: 625/5528 = 11.3%
+      expect(Math.round(percentage * 10) / 10).toBe(11.3);
     });
   });
 
@@ -392,18 +391,17 @@ describe('Q1 FY26 Workforce Data Validation', () => {
   });
 
   describe('Assignment Category Breakdown Validation', () => {
-    it('should validate benefit-eligible codes sum to Faculty + Staff (with Grade R exclusion)', () => {
+    it('should validate benefit-eligible codes sum to Faculty + Staff', () => {
       const benefitCodes = ['F12', 'F11', 'F10', 'F09', 'PT12', 'PT11', 'PT10', 'PT9'];
       const rawBenefitSum = benefitCodes.reduce((sum, code) => sum + (q1fy26Data.assignmentCategories[code] || 0), 0);
 
-      // Grade R employees (12) have F12 assignment but are NOT benefit-eligible
-      const gradeRCount = q1fy26Data.gradeRExclusion?.count || 12;
+      // Updated Dec 2025: Grade R (12) is now in HSP category, not subtracted from benefit-eligible
+      const gradeRCount = q1fy26Data.gradeRInclusion?.count || 12;
       const adjustedBenefitSum = rawBenefitSum - gradeRCount;
 
       const expectedTotal = q1fy26Data.summary.faculty.count + q1fy26Data.summary.staff.count;
 
       expect(adjustedBenefitSum).toBe(expectedTotal);
-      // Updated Nov 2025: 697 + 1419 = 2116 (Grade R excluded)
       expect(adjustedBenefitSum).toBe(2116);
     });
 
@@ -413,19 +411,15 @@ describe('Q1 FY26 Workforce Data Validation', () => {
       expect(studentSum).toBe(2157);
     });
 
-    it('should validate temporary codes sum to temporary employees (with Grade R)', () => {
-      const rawTempSum =
+    it('should validate temporary codes sum to temporary employees', () => {
+      const tempSum =
         q1fy26Data.assignmentCategories['TEMP'] +
         q1fy26Data.assignmentCategories['NBE'] +
         q1fy26Data.assignmentCategories['PRN'];
 
-      // Grade R employees (12) count as temporary
-      const gradeRCount = q1fy26Data.gradeRExclusion?.count || 12;
-      const adjustedTempSum = rawTempSum + gradeRCount;
-
-      expect(adjustedTempSum).toBe(q1fy26Data.summary.temporary.count);
-      // Updated Nov 2025: 630 + 12 (Grade R) = 642
-      expect(adjustedTempSum).toBe(642);
+      // Updated Dec 2025: Grade R is now in HSP, not temporary
+      expect(tempSum).toBe(q1fy26Data.summary.temporary.count);
+      expect(tempSum).toBe(630);
     });
 
     it('should validate all assignment categories are positive integers', () => {
@@ -463,7 +457,7 @@ describe('Q1 FY26 Workforce Data Validation', () => {
         "Benefit-Eligible Staff",
         "House Staff Physicians",
         "Student Workers",
-        "Temporary Employees"
+        "Non-Benefit Eligible"
       ];
 
       const actualGroups = q1fy26Data.employeeGroups.map(g => g.group);
@@ -499,13 +493,13 @@ describe('Q1 FY26 Workforce Data Validation', () => {
 
     it('should validate data matches extraction script output', () => {
       // These values should match scripts/extract_q1_fy26_workforce.js output
-      // Updated Nov 2025: Grade R methodology change
+      // Updated Dec 2025: Grade R included in HSP
       expect(q1fy26Data.summary.total.count).toBe(5528);
       expect(q1fy26Data.summary.faculty.count).toBe(697);
-      expect(q1fy26Data.summary.staff.count).toBe(1419); // Grade R excluded
-      expect(q1fy26Data.summary.houseStaffPhysicians.count).toBe(613);
+      expect(q1fy26Data.summary.staff.count).toBe(1419);
+      expect(q1fy26Data.summary.houseStaffPhysicians.count).toBe(625); // HSR + Grade R
       expect(q1fy26Data.summary.studentWorkers.count).toBe(2157);
-      expect(q1fy26Data.summary.temporary.count).toBe(642); // Includes Grade R
+      expect(q1fy26Data.summary.temporary.count).toBe(630); // Excludes Grade R
     });
   });
 });

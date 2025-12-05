@@ -49,8 +49,9 @@ describe('Navigation Component', () => {
       const homeLinks = screen.getAllByRole('link', { name: /home/i });
       expect(homeLinks.length).toBeGreaterThan(0);
 
-      const workforceLink = screen.getByRole('link', { name: /workforce/i });
-      expect(workforceLink).toBeInTheDocument();
+      // Multiple workforce links may exist in navigation
+      const workforceLinks = screen.getAllByRole('link', { name: /workforce/i });
+      expect(workforceLinks.length).toBeGreaterThan(0);
     });
   });
 

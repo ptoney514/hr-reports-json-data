@@ -83,20 +83,30 @@ Benefit Eligible Faculty =
 - PHX Campus: 40 (5.8%)
 
 #### 3. Benefit Eligible House Staff Physicians
-**Definition**: Physicians in residency/house staff programs
+**Definition**: Physicians in residency/house staff programs and Grade R employees (Residents/Fellows)
 
 **Calculation Logic**:
 ```
 House Staff Physicians =
   WHERE Assignment Category Code = 'HSR'
+     OR Grade Code = 'R' (with F12/PT12 assignment)
 ```
 
-**Note**: House Staff are benefit-eligible but tracked separately due to their unique role in medical education.
+**Note**: House Staff are benefit-eligible and tracked separately due to their unique role in medical education.
+
+**Included**:
+- **HSR**: House Staff Residents/Physicians
+- **Grade R**: Residents/Fellows (PT Residents, OT Fellows, Pharmacy Residents/Fellows)
 
 **FY25 Q4 (6/30/2025)**:
 - Total: **612** physicians
 - OMA Campus: 268 (43.8%)
 - PHX Campus: 344 (56.2%)
+
+**Q1 FY26 (9/30/2025)**:
+- Total: **625** physicians (613 HSR + 12 Grade R)
+- OMA Campus: 282 (45.1%)
+- PHX Campus: 343 (54.9%)
 
 **Observation**: Phoenix campus has higher house staff count due to medical center operations.
 
@@ -303,6 +313,16 @@ The combination of Person Type and Assignment Category Code ensures:
 ---
 
 ## Change History and Methodology Updates
+
+### Version 2.1 (December 2025)
+**Update**: Grade R employees now included as benefit-eligible under House Staff Physicians
+
+**Changes Made**:
+- ✅ Grade R (Residents/Fellows) now included in House Staff Physicians category
+- ✅ All House Staff Physicians (HSR + Grade R) are benefit-eligible
+- ✅ Updated Q1 FY26 counts: HSP = 625 (613 HSR + 12 Grade R)
+
+**Impact**: More accurate benefit-eligible totals including all resident/fellow employees.
 
 ### Version 2.0 (October 2025)
 **Major Update**: Corrected categorization logic to use Person Type field

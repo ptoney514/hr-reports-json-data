@@ -32,15 +32,16 @@ const ExitSurveyQ1FY26Dashboard = () => {
   const surveyData = getExitSurveyData("2025-09-30");
 
   // Quarterly trend data (Q1 FY26 → Q1 FY25, descending)
-  // UPDATED 2025-11-19: Grade R exclusion applied to Q1 FY26
+  // UPDATED 2025-12-04: Grade R now included as HSP (benefit-eligible)
   const quarterlyData = [
     {
       quarter: 'Q1 FY26',
-      terminations: 58,  // Corrected from 73 (15 Grade R excluded)
+      terminations: 73,  // Includes 15 HSP (Grade R included as benefit-eligible)
       faculty: 4,
-      staff: 54,         // Corrected from 69 (15 Grade R excluded)
+      staff: 54,         // Staff remains 54
+      hsp: 15,           // House Staff Physicians (Grade R)
       responses: 15,
-      responseRate: 25.9,  // Corrected from 20.5 (15/58 vs 15/73)
+      responseRate: 20.5,  // 15/73 (Grade R included as benefit-eligible)
       satisfaction: 80 // Would recommend
     },
     {
@@ -156,7 +157,7 @@ const ExitSurveyQ1FY26Dashboard = () => {
               {surveyData.responseRate ? `${surveyData.responseRate}%` : 'TBD'}
             </div>
             <div className="text-sm text-gray-600 font-medium">Survey Response Rate</div>
-            <div className="text-xs text-gray-500 mt-2">15 of 58 terminations</div>
+            <div className="text-xs text-gray-500 mt-2">15 of 73 terminations</div>
           </div>
 
           {/* Card 3: Would Recommend */}

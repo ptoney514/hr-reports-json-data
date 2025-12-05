@@ -1149,7 +1149,7 @@ const RecruitingQ1FY26Dashboard = () => {
         {/* Methodology Note */}
         <div className="text-xs text-gray-500 text-center">
           <p>Data Sources: Oracle HCM (New Hires) • Oracle Recruiting Cloud/myJobs (Staff Pipeline) • Interfolio (Faculty Pipeline)</p>
-          <p className="mt-1">Methodology: NEW_HIRES_METHODOLOGY.md • Excludes Grade R (Residents/Fellows)</p>
+          <p className="mt-1">Methodology: NEW_HIRES_METHODOLOGY.md • Grade R (Residents/Fellows) included as House Staff Physicians</p>
         </div>
 
       </div>

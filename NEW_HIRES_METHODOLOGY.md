@@ -50,32 +50,17 @@ Only include employees with benefit-eligible assignment categories:
 - **PT9**: Part-time Staff (9-month)
 
 **Excluded Categories (NOT Benefit Eligible)**:
-- **HSR**: House Staff Residents/Physicians
 - **TEMP**: Temporary Workers
 - **NBE**: Non-Benefit Eligible
 - **PRN**: As-Needed/Per Diem Workers
 - **SUE**: Student University Employees
 - **CWS**: College Work Study
 
-#### Step 2: Grade R Exclusion
+**House Staff Physicians (Benefit Eligible, Separate Category)**:
+- **HSR**: House Staff Residents/Physicians - tracked separately
+- **Grade R**: Residents/Fellows (PT Residents, OT Fellows, Pharmacy Residents/Fellows) - included in HSP
 
-**CRITICAL EXCLUSION**: Grade R (Residents/Fellows)
-
-Even if an employee has a benefit-eligible assignment category (F12, PT12, etc.), they must be excluded if their Grade Code starts with "R":
-
-```
-Benefit_Eligible_New_Hires = WHERE
-    Assignment_Category IN ('F12', 'F11', 'F10', 'F09', 'PT12', 'PT11', 'PT10', 'PT9')
-    AND Grade_Code NOT LIKE 'R%'
-```
-
-**Job Titles Excluded by Grade R**:
-- Physical Therapy Resident
-- Occupational Therapy Fellow
-- Pharmacy Resident
-- Other residency/fellowship positions
-
-**Rationale**: These are training programs with different compensation and benefits structures, not standard benefit-eligible employment.
+**Note**: As of December 2025, Grade R employees are now included as benefit-eligible under the House Staff Physicians category. They are not excluded from benefit-eligible counts.
 
 ## Calculation Methodology
 
@@ -91,8 +76,9 @@ be_hires = WHERE Assignment_Category IN (
     'PT12', 'PT11', 'PT10', 'PT9'
 )
 
-# Step 3: Exclude Grade R (Residents/Fellows)
-final_hires = WHERE Grade_Code NOT LIKE 'R%'
+# Step 3: Identify House Staff Physicians (HSR or Grade R)
+# Note: Grade R employees are included as benefit-eligible under HSP
+hsp_hires = WHERE Assignment_Category = 'HSR' OR Grade_Code LIKE 'R%'
 
 # Step 4: Deduplicate by Employee ID
 unique_hires = DISTINCT(Empl_num)
@@ -164,12 +150,14 @@ The `New School` field provides the school/organization classification:
 | Dentistry | 4 | 3 | 7 |
 | Heider College of Business | 3 | 2 | 5 |
 
-### Grade R Exclusions
+### House Staff Physicians (Grade R)
 
-13 employees were excluded due to Grade R classification:
+13 employees classified as House Staff Physicians (Grade R):
 - Pharmacy Resident
 - Physical Therapy Resident
 - Occupational Therapy Fellow
+
+**Note**: As of December 2025, these employees are included as benefit-eligible under the House Staff Physicians category.
 
 ## Data Quality and Validation
 
@@ -195,7 +183,7 @@ COUNT(DISTINCT Empl_num) = Final_Count
 1. **No Duplicate Employees**: Verify unique employee IDs after deduplication
 2. **Valid Hire Dates**: All hire dates within reporting period
 3. **Assignment Category**: Every hire has a valid benefit-eligible code
-4. **Grade R Properly Excluded**: Verify residents/fellows not in count
+4. **House Staff Physicians**: Verify Grade R employees are properly categorized as HSP
 5. **Faculty/Staff Split**: Sum equals total
 
 ### 3. Known Data Limitations
@@ -294,10 +282,10 @@ BENEFIT_ELIGIBLE_CODES = [
 **Causes**: Oracle HCM export hasn't been refreshed
 **Resolution**: Wait for next data refresh, document in output notes
 
-### Issue 2: Higher Than Expected Grade R Exclusions
-**Symptoms**: Many employees excluded due to Grade R
-**Causes**: New residency programs added
-**Resolution**: Verify exclusions are legitimate residents/fellows
+### Issue 2: Grade R Employee Categorization
+**Symptoms**: Grade R employees appearing in wrong category
+**Causes**: Person Type field inconsistency for residents/fellows
+**Resolution**: All Grade R employees should be categorized as House Staff Physicians
 
 ### Issue 3: Faculty/Staff Misclassification
 **Symptoms**: F12 employees showing as wrong category
@@ -317,6 +305,7 @@ BENEFIT_ELIGIBLE_CODES = [
 - **Data Through**: August 31, 2025 (Q1 FY26 partial)
 
 ### Change Log
+- **December 2025**: Grade R employees now included as benefit-eligible under House Staff Physicians
 - **December 2025**: Initial methodology documentation created
 - **December 2025**: Created extraction script for Q1 FY26 new hires
 

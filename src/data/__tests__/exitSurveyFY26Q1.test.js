@@ -6,10 +6,10 @@
  *
  * Run with: npm test -- src/data/__tests__/exitSurveyFY26Q1.test.js
  *
- * METHODOLOGY UPDATE (Nov 19, 2025):
- * - Grade R (Residents/Fellows) excluded from benefit-eligible termination counts
- * - Total exits: 73 → 58 (excluding Grade R)
- * - Response rate recalculated: 15/58 = 25.9%
+ * METHODOLOGY UPDATE (Dec 4, 2025):
+ * - Grade R (Residents/Fellows) now INCLUDED as benefit-eligible under House Staff Physicians
+ * - Total exits: 73 (includes 15 HSP terminations)
+ * - Response rate recalculated: 15/73 = 20.5%
  */
 
 const { getExitSurveyData } = require('../staticData');
@@ -42,13 +42,13 @@ describe('FY26 Q1 Exit Survey Data Validation', () => {
 
   describe('Response Metrics', () => {
     test('should have calculated response rate from termination data', () => {
-      // Updated Nov 2025: 15/58 = 25.9% (Grade R excluded from exits)
-      expect(surveyData.responseRate).toBe(25.9);
+      // Updated Dec 2025: 15/73 = 20.5% (Grade R included as HSP exits)
+      expect(surveyData.responseRate).toBe(20.5);
     });
 
     test('should have total exits from termination data', () => {
-      // Updated Nov 2025: Grade R excluded from benefit-eligible terminations
-      expect(surveyData.totalExits).toBe(58);
+      // Updated Dec 2025: Grade R included as benefit-eligible HSP terminations
+      expect(surveyData.totalExits).toBe(73);
     });
 
     test('should have would recommend percentage', () => {

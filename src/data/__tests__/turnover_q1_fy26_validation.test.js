@@ -7,12 +7,11 @@
  * Data Source: source-metrics/terminations/cleaned/FY25_Q4/terminations_cleaned.csv
  * Processing: scripts/extract_q1_fy26_details.py
  *
- * METHODOLOGY UPDATE (Nov 19, 2025):
- * - Grade R (Residents/Fellows) excluded from benefit-eligible staff counts
- * - Staff Exempt: 39 → 24 (15 Grade R excluded)
- * - Staff Non-Exempt: 30 (unchanged)
- * - Total Staff: 69 → 54 (15 Grade R excluded)
- * - Total Terminations: 73 → 58 (15 Grade R excluded)
+ * METHODOLOGY UPDATE (Dec 4, 2025):
+ * - Grade R (Residents/Fellows) now INCLUDED as benefit-eligible under House Staff Physicians
+ * - Reverses November 2025 exclusion policy
+ * - Total Terminations: 73 (includes 15 HSP)
+ * - Faculty: 4, Staff: 54, HSP: 15
  */
 
 import {
@@ -63,20 +62,20 @@ describe('Q1 FY26 Turnover Data Validation', () => {
 
   describe('Total Terminations Validation', () => {
     it('should have correct total terminations count', () => {
-      // Updated Nov 2025: Grade R excluded (73 → 58)
-      expect(q1fy26Data.summary.total.count).toBe(58);
+      // Updated Dec 2025: Grade R included as HSP (73 total)
+      expect(q1fy26Data.summary.total.count).toBe(73);
     });
 
     it('should match campus totals', () => {
-      expect(q1fy26Data.summary.total.oma).toBe(53);
+      expect(q1fy26Data.summary.total.oma).toBe(68);
       expect(q1fy26Data.summary.total.phx).toBe(5);
-      expect(q1fy26Data.summary.total.oma + q1fy26Data.summary.total.phx).toBe(58);
+      expect(q1fy26Data.summary.total.oma + q1fy26Data.summary.total.phx).toBe(73);
     });
 
-    it('should equal sum of faculty + staff', () => {
-      const categorySum = q1fy26Data.summary.faculty.count + q1fy26Data.summary.staff.count;
+    it('should equal sum of faculty + staff + hsp', () => {
+      const categorySum = q1fy26Data.summary.faculty.count + q1fy26Data.summary.staff.count + q1fy26Data.summary.houseStaffPhysicians.count;
       expect(categorySum).toBe(q1fy26Data.summary.total.count);
-      expect(categorySum).toBe(58);
+      expect(categorySum).toBe(73);
     });
   });
 
@@ -94,7 +93,7 @@ describe('Q1 FY26 Turnover Data Validation', () => {
 
   describe('Staff Terminations Validation', () => {
     it('should have correct staff termination count', () => {
-      // Updated Nov 2025: Grade R excluded (69 → 54)
+      // Updated Dec 2025: Staff count remains 54 (Grade R now in HSP category)
       expect(q1fy26Data.summary.staff.count).toBe(54);
     });
 
@@ -111,7 +110,7 @@ describe('Q1 FY26 Turnover Data Validation', () => {
     });
 
     it('should have correct staff exempt count', () => {
-      // Updated Nov 2025: Grade R excluded (39 → 24)
+      // Updated Dec 2025: Staff exempt 24 (Grade R in separate HSP category)
       expect(q1fy26Data.summary.staffExempt.count).toBe(24);
     });
 
@@ -120,9 +119,22 @@ describe('Q1 FY26 Turnover Data Validation', () => {
     });
   });
 
+  describe('House Staff Physicians Terminations Validation', () => {
+    it('should have correct HSP termination count', () => {
+      // Updated Dec 2025: Grade R included as HSP (15 terminations)
+      expect(q1fy26Data.summary.houseStaffPhysicians.count).toBe(15);
+    });
+
+    it('should have correct campus distribution', () => {
+      expect(q1fy26Data.summary.houseStaffPhysicians.oma).toBe(15);
+      expect(q1fy26Data.summary.houseStaffPhysicians.phx).toBe(0);
+    });
+  });
+
   describe('Termination Types by Group Validation', () => {
-    it('should have exactly 2 employee groups', () => {
-      expect(q1fy26Data.terminationTypesByGroup).toHaveLength(2);
+    it('should have exactly 3 employee groups', () => {
+      // Updated Dec 2025: Faculty, Staff, and House Staff Physicians
+      expect(q1fy26Data.terminationTypesByGroup).toHaveLength(3);
     });
 
     it('should validate faculty termination types', () => {
@@ -142,12 +154,24 @@ describe('Q1 FY26 Turnover Data Validation', () => {
         g => g.group === "Benefit Eligible Staff"
       );
       expect(staffGroup).toBeDefined();
-      // Updated Nov 2025: Grade R excluded
       expect(staffGroup.total).toBe(54);
       expect(staffGroup.voluntary).toBe(44);
       expect(staffGroup.involuntary).toBe(3);
       expect(staffGroup.retirement).toBe(7);
       expect(staffGroup.endOfAssignment).toBe(0);
+    });
+
+    it('should validate HSP termination types', () => {
+      const hspGroup = q1fy26Data.terminationTypesByGroup.find(
+        g => g.group === "House Staff Physicians"
+      );
+      expect(hspGroup).toBeDefined();
+      // Updated Dec 2025: Grade R included as HSP
+      expect(hspGroup.total).toBe(15);
+      expect(hspGroup.voluntary).toBe(3);
+      expect(hspGroup.involuntary).toBe(0);
+      expect(hspGroup.retirement).toBe(0);
+      expect(hspGroup.endOfAssignment).toBe(12);
     });
 
     it('should validate termination types sum to total for each group', () => {
@@ -351,7 +375,9 @@ describe('Q1 FY26 Turnover Data Validation', () => {
 
     it('should have total sum matching overall terminations', () => {
       const totalSum = q1fy26Data.turnoverBySchool.reduce((sum, s) => sum + s.total, 0);
-      expect(totalSum).toBe(q1fy26Data.summary.total.count);
+      // Note: turnoverBySchool only includes Faculty + Staff (not HSP)
+      const facultyPlusStaff = q1fy26Data.summary.faculty.count + q1fy26Data.summary.staff.count;
+      expect(totalSum).toBe(facultyPlusStaff);
       expect(totalSum).toBe(58);
     });
 
@@ -402,29 +428,40 @@ describe('Q1 FY26 Turnover Data Validation', () => {
 
   describe('Early Turnover Validation', () => {
     it('should have correct early turnover total', () => {
-      expect(q1fy26Data.earlyTurnover.total).toBe(13);
+      // Updated Dec 2025: Includes Grade R (17 = 13 staff + 4 HSP)
+      expect(q1fy26Data.earlyTurnover.total).toBe(17);
     });
 
     it('should have correct termination type breakdown', () => {
-      expect(q1fy26Data.earlyTurnover.byTerminationType).toHaveLength(2);
+      // Updated Dec 2025: Includes End of Assignment for Grade R
+      expect(q1fy26Data.earlyTurnover.byTerminationType).toHaveLength(3);
 
       const voluntary = q1fy26Data.earlyTurnover.byTerminationType.find(t => t.name === "Voluntary");
+      const endOfAssignment = q1fy26Data.earlyTurnover.byTerminationType.find(t => t.name === "End of Assignment");
       const involuntary = q1fy26Data.earlyTurnover.byTerminationType.find(t => t.name === "Involuntary");
 
       expect(voluntary.value).toBe(11);
+      expect(endOfAssignment.value).toBe(4);  // Grade R program completions
       expect(involuntary.value).toBe(2);
-      expect(voluntary.value + involuntary.value).toBe(13);
+      expect(voluntary.value + endOfAssignment.value + involuntary.value).toBe(17);
     });
 
     it('should have correct employee category breakdown', () => {
-      expect(q1fy26Data.earlyTurnover.byEmployeeCategory).toHaveLength(1);
+      // Updated Dec 2025: Includes HSP (Grade R)
+      expect(q1fy26Data.earlyTurnover.byEmployeeCategory).toHaveLength(2);
 
       const staff = q1fy26Data.earlyTurnover.byEmployeeCategory.find(
         c => c.name === "Benefit Eligible Staff"
       );
+      const hsp = q1fy26Data.earlyTurnover.byEmployeeCategory.find(
+        c => c.name === "House Staff Physicians"
+      );
       expect(staff).toBeDefined();
       expect(staff.value).toBe(13);
-      expect(staff.percentage).toBe(100.0);
+      expect(staff.percentage).toBe(76.5);
+      expect(hsp).toBeDefined();
+      expect(hsp.value).toBe(4);
+      expect(hsp.percentage).toBe(23.5);
     });
 
     it('should have bySchool data for early turnover', () => {
@@ -433,12 +470,12 @@ describe('Q1 FY26 Turnover Data Validation', () => {
       expect(q1fy26Data.earlyTurnover.bySchool).toHaveLength(4);
     });
 
-    it('should have bySchool sum to early turnover total', () => {
+    it('should have bySchool sum to staff early turnover', () => {
+      // Note: bySchool only tracks staff early turnover (13), not HSP (4)
       const schoolSum = q1fy26Data.earlyTurnover.bySchool.reduce(
         (sum, entry) => sum + entry.count, 0
       );
-      expect(schoolSum).toBe(q1fy26Data.earlyTurnover.total);
-      expect(schoolSum).toBe(13);
+      expect(schoolSum).toBe(13);  // Staff only
     });
 
     it('should have correct bySchool breakdown', () => {
@@ -478,12 +515,12 @@ describe('Q1 FY26 Turnover Data Validation', () => {
       expect(q1fy26Data.earlyTurnover.bySchoolDetailed).toHaveLength(8);
     });
 
-    it('should have bySchoolDetailed sum to early turnover total', () => {
+    it('should have bySchoolDetailed sum to staff early turnover', () => {
+      // Note: bySchoolDetailed only tracks staff early turnover (13), not HSP (4)
       const schoolSum = q1fy26Data.earlyTurnover.bySchoolDetailed.reduce(
         (sum, entry) => sum + entry.count, 0
       );
-      expect(schoolSum).toBe(q1fy26Data.earlyTurnover.total);
-      expect(schoolSum).toBe(13);
+      expect(schoolSum).toBe(13);  // Staff only
     });
 
     it('should have correct bySchoolDetailed breakdown', () => {
@@ -543,7 +580,8 @@ describe('Q1 FY26 Turnover Data Validation', () => {
 
     it('should validate early turnover matches <1 year tenure data', () => {
       const earlyTenure = q1fy26Data.yearsOfService.find(y => y.range === "<1 Year");
-      const earlyTenureTotal = earlyTenure.faculty + earlyTenure.staff;
+      // Updated Dec 2025: Now includes HSP (Grade R)
+      const earlyTenureTotal = earlyTenure.faculty + earlyTenure.staff + (earlyTenure.hsp || 0);
 
       expect(q1fy26Data.earlyTurnover.total).toBe(earlyTenureTotal);
     });
@@ -593,11 +631,12 @@ describe('Q1 FY26 Turnover Data Validation', () => {
 
     it('should validate data matches extraction script output', () => {
       // These values should match scripts/extract_q1_fy26_details.py output
-      // Updated Nov 2025: Grade R methodology change
-      expect(q1fy26Data.summary.total.count).toBe(58);
+      // Updated Dec 2025: Grade R included as HSP
+      expect(q1fy26Data.summary.total.count).toBe(73);
       expect(q1fy26Data.summary.faculty.count).toBe(4);
       expect(q1fy26Data.summary.staff.count).toBe(54);
-      expect(q1fy26Data.earlyTurnover.total).toBe(13);
+      expect(q1fy26Data.summary.houseStaffPhysicians.count).toBe(15);
+      expect(q1fy26Data.earlyTurnover.total).toBe(17);  // 13 staff + 4 HSP
     });
   });
 });

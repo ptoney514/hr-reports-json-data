@@ -17,16 +17,16 @@ export const getWorkforceBreakdown = (quarterDate = '2025-09-30') => {
 
   if (quarterDate === '2025-09-30') {
     return [
-      // Grade R - Not Benefit Eligible
+      // House Staff Physicians - Benefit Eligible (HSR + Grade R)
       {
         grade: 'R',
-        gradeDescription: 'Residents/Fellows',
+        gradeDescription: 'House Staff Physicians',
         assignment: 'HSR',
         assignmentDescription: 'House Staff Residents',
         count: 613,
-        eligible: false,
-        category: 'House Staff',
-        notes: 'Medical residents - excluded from benefit-eligible counts'
+        eligible: true,
+        category: 'House Staff Physicians',
+        notes: 'Medical residents - benefit-eligible'
       },
       {
         grade: 'R',
@@ -34,9 +34,9 @@ export const getWorkforceBreakdown = (quarterDate = '2025-09-30') => {
         assignment: 'F12',
         assignmentDescription: 'Full-time 12-month',
         count: 12,
-        eligible: false,
-        category: 'Residents/Fellows',
-        notes: 'PT/OT/Pharmacy Residents - excluded per Nov 2025 methodology change',
+        eligible: true,
+        category: 'House Staff Physicians',
+        notes: 'PT/OT/Pharmacy Residents - included as benefit-eligible under HSP per Dec 2025 methodology change',
         breakdown: {
           'Physical Therapy Resident': 6,
           'Occupational Therapy Fellow': 3,
@@ -98,7 +98,7 @@ export const getWorkforceBreakdown = (quarterDate = '2025-09-30') => {
         notes: 'Hourly staff positions'
       },
 
-      // Temporary - Not Benefit Eligible
+      // Temporary - Non-Benefit Eligible
       {
         grade: 'Various',
         gradeDescription: 'Temporary Workers',
@@ -107,7 +107,7 @@ export const getWorkforceBreakdown = (quarterDate = '2025-09-30') => {
         count: 630,
         eligible: false,
         category: 'Temporary',
-        notes: 'Excludes Grade R (counted separately)'
+        notes: 'TEMP, NBE, PRN workers - non-benefit-eligible'
       }
     ];
   }
@@ -123,17 +123,17 @@ export const getWorkforceBreakdown = (quarterDate = '2025-09-30') => {
 export const getTerminationBreakdown = (quarterDate = '2025-09-30') => {
   if (quarterDate === '2025-09-30') {
     return [
-      // Grade R Terminations - Excluded
+      // House Staff Physicians Terminations - Benefit Eligible (Grade R)
       {
         grade: 'R',
-        gradeDescription: 'Residents/Fellows',
+        gradeDescription: 'House Staff Physicians',
         assignment: 'F12',
         assignmentDescription: 'Full-time 12-month',
         count: 15,
-        eligible: false,
-        category: 'Residents/Fellows',
+        eligible: true,
+        category: 'House Staff Physicians',
         terminationType: 'End of Assignment',
-        notes: 'Residents/Fellows completing training programs - excluded from turnover',
+        notes: 'Residents/Fellows completing training programs - included as benefit-eligible per Dec 2025',
         breakdown: {
           'Physical Therapy Resident': 11,
           'Pharmacy Resident': 2,
@@ -160,7 +160,7 @@ export const getTerminationBreakdown = (quarterDate = '2025-09-30') => {
         gradeDescription: 'Staff Exempt',
         assignment: 'PT12',
         assignmentDescription: 'Staff positions',
-        count: 24,
+        count: 39,
         eligible: true,
         category: 'Staff Exempt',
         terminationType: 'Mixed (Voluntary/Involuntary)',
@@ -171,7 +171,7 @@ export const getTerminationBreakdown = (quarterDate = '2025-09-30') => {
         gradeDescription: 'Staff Non-Exempt',
         assignment: 'PT12',
         assignmentDescription: 'Staff positions',
-        count: 30,
+        count: 15,
         eligible: true,
         category: 'Staff Non-Exempt',
         terminationType: 'Mixed (Voluntary/Involuntary)',
@@ -241,19 +241,19 @@ export const runQualityChecks = (quarterDate = '2025-09-30') => {
     return checks;
   }
 
-  // Check 1: Grade R Exclusion Applied
-  const gradeRWorkforce = 625; // Known from GRADE_R_EXCLUSION_SUMMARY.md
-  const gradeRExcluded = 12; // Known F12 Grade R count
+  // Check 1: Grade R Inclusion Applied (HSP category)
+  const gradeRWorkforce = 625; // HSR (613) + Grade R with F12 (12)
+  const gradeRIncluded = 12; // F12 Grade R included as benefit-eligible under HSP
   checks.push({
-    id: 'grade-r-exclusion',
+    id: 'grade-r-inclusion',
     status: 'pass',
     category: 'Methodology',
-    message: `Grade R properly excluded (${gradeRWorkforce} total employees, ${gradeRExcluded} excluded from benefit-eligible)`,
+    message: `Grade R properly included as HSP (${gradeRWorkforce} total House Staff Physicians, ${gradeRIncluded} Grade R with F12 included as benefit-eligible)`,
     impact: 'critical',
     details: {
-      totalGradeR: gradeRWorkforce,
-      excludedFromBenefitEligible: gradeRExcluded,
-      remainingHSR: gradeRWorkforce - gradeRExcluded
+      totalHSP: gradeRWorkforce,
+      hsrCount: 613,
+      gradeRIncluded: gradeRIncluded
     }
   });
 
@@ -273,8 +273,8 @@ export const runQualityChecks = (quarterDate = '2025-09-30') => {
   });
 
   // Check 3: Termination counts match exit survey denominator
-  const exitSurveyExits = 58; // After Grade R exclusion
-  const turnoverTotal = turnoverData?.total?.count || 58;
+  const exitSurveyExits = 73; // Includes Grade R as benefit-eligible
+  const turnoverTotal = turnoverData?.total?.count || 73;
 
   checks.push({
     id: 'exit-survey-alignment',

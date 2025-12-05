@@ -239,7 +239,7 @@ describe('WorkforceQ1FY26Dashboard', () => {
       );
 
       expect(screen.getByText('Q1 FY26 Workforce and Headcount Report')).toBeInTheDocument();
-      expect(screen.getByText('Quarterly Workforce Analysis • July 2025 - September 2025')).toBeInTheDocument();
+      expect(screen.getByText('Benefit Eligible Employees • July 2025 - September 2025')).toBeInTheDocument();
       expect(screen.getByText('Employee headcount, workforce composition, and organizational trends')).toBeInTheDocument();
     });
 
@@ -426,7 +426,9 @@ describe('WorkforceQ1FY26Dashboard', () => {
       expect(studentsLegends.length).toBeGreaterThan(0);
 
       expect(screen.getByText('House Staff')).toBeInTheDocument();
-      expect(screen.getByText('Non-Benefit')).toBeInTheDocument();
+      // Multiple instances of "Non-Benefit Eligible" exist in the dashboard
+      const nonBenefitEligibleElements = screen.getAllByText('Non-Benefit Eligible');
+      expect(nonBenefitEligibleElements.length).toBeGreaterThan(0);
     });
   });
 
