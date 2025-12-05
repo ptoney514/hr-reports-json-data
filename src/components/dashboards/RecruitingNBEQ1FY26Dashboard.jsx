@@ -124,7 +124,7 @@ const RecruitingNBEQ1FY26Dashboard = () => {
               </span>
             </div>
             <div className="text-4xl font-bold text-gray-900 mb-1">{summary.total.count}</div>
-            <div className="text-sm text-gray-600 font-medium">Total Temp Hires</div>
+            <div className="text-sm text-gray-600 font-medium">Total Temporary Workers</div>
             <div className="text-xs text-gray-500 mt-2">
               OMA: {summary.total.oma} | PHX: {summary.total.phx}
             </div>

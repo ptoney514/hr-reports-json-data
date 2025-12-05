@@ -64,7 +64,7 @@ describe('RecruitingNBEQ1FY26Dashboard', () => {
   describe('Metric Cards', () => {
     test('renders all metric cards', () => {
       renderComponent();
-      expect(screen.getByText(/Total Temp Hires/i)).toBeInTheDocument();
+      expect(screen.getByText(/Total Temporary Workers/i)).toBeInTheDocument();
     });
 
     test('displays metric values and campus breakdown', () => {
