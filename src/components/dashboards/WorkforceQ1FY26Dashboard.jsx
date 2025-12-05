@@ -301,30 +301,6 @@ const WorkforceQ1FY26Dashboard = () => {
                 name="Benefit Eligible Staff"
                 activeDot={{ r: 8, fill: '#3B82F6', stroke: '#ffffff', strokeWidth: 3 }}
               />
-
-              {/* House Staff Physicians Line (Dashed) */}
-              <Line
-                {...getSecondaryLineProps('#FBBF24')}
-                dataKey="hsp"
-                stroke="#FBBF24"
-                name="House Staff Physicians"
-              />
-
-              {/* Students Line (Dashed) */}
-              <Line
-                {...getSecondaryLineProps('#8B5CF6')}
-                dataKey="students"
-                stroke="#8B5CF6"
-                name="Student Workers"
-              />
-
-              {/* Non-Benefit Eligible Line (Dashed) */}
-              <Line
-                {...getSecondaryLineProps('#EF4444')}
-                dataKey="temp"
-                stroke="#EF4444"
-                name="Non-Benefit Eligible"
-              />
             </LineChart>
           </ResponsiveContainer>
 
@@ -332,7 +308,7 @@ const WorkforceQ1FY26Dashboard = () => {
           <div className="text-center mt-4 rounded-lg p-3" style={{ backgroundColor: '#B5D2F3' }}>
             <span className="text-sm" style={{ color: '#5F7FC3' }}>Note: </span>
             <span className="text-sm" style={{ color: '#00245D' }}>
-              Q1 typically shows higher headcount due to fall semester staffing. Year-over-year, total workforce remains stable at +0.5% (5,528 vs 5,500), with benefit-eligible faculty up 1.0% and staff down 2.1%—both within normal variance. Student workers and not-benefit eligible employees fluctuate with predictable academic calendar patterns.
+              All data is actual Oracle HCM headcount (Q1 FY23-Q1 FY26). Benefit-eligible staff show stable growth from 2,047 total (Q1 FY23) to 2,149 total (Q1 FY26), +4.98% over 3 years. Faculty remain relatively stable (689-703 avg), while staff grew from 1,358 to 1,451, +6.8%. Q1 typically peaks due to fall semester staffing and academic hiring cycles.
             </span>
           </div>
         </div>
