@@ -203,10 +203,7 @@ const RecruitingNBEQ1FY26Dashboard = () => {
                   boxShadow: '0 10px 25px -5px rgba(139, 92, 246, 0.25)'
                 }}
               />
-              <Legend
-                wrapperStyle={{ paddingTop: '20px' }}
-                iconType="circle"
-              />
+{/* Custom legend below chart - Recharts Legend sorts alphabetically, so we build our own */}
 
               {/* HSP Line (Dashed) */}
               <Line
@@ -261,6 +258,26 @@ const RecruitingNBEQ1FY26Dashboard = () => {
               />
             </LineChart>
           </ResponsiveContainer>
+
+          {/* Custom Legend - Ordered: HSP, Temp NBE, Student Workers, Total */}
+          <div className="flex justify-center gap-6 text-sm flex-wrap mt-5">
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#F59E0B' }}></div>
+              <span className="text-gray-700">House Staff Physicians</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#6B7280' }}></div>
+              <span className="text-gray-700">Temporary NBE</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#10B981' }}></div>
+              <span className="text-gray-700">Student Workers</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: CHART_PRIMARY_COLOR }}></div>
+              <span className="text-gray-700">Total</span>
+            </div>
+          </div>
 
           {/* Trend Note */}
           <div className="text-xs text-gray-600 mt-4 bg-purple-50 p-3 rounded border border-purple-200 text-center">
