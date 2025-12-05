@@ -68,12 +68,13 @@ const Q1_FY26_TEMP_DATA = {
 // Source: QUARTERLY_HEADCOUNT_TRENDS from staticData.js
 // Transform to show only temporary worker categories (students, hsp, temp)
 // Note: All quarterly data is actual headcount from Oracle HCM (since Q1 FY23)
+// Prefixed dataKeys (1_hsp, 2_temp, 3_students, 4_total) to control Recharts legend sort order
 const QUARTERLY_TEMP_HEADCOUNT_TRENDS = QUARTERLY_HEADCOUNT_TRENDS.map(q => ({
   quarter: q.quarter,
-  students: q.students,
-  hsp: q.hsp,
-  temp: q.temp,
-  total: q.students + q.hsp + q.temp  // Sum of temporary worker categories only
+  '1_hsp': q.hsp,
+  '2_temp': q.temp,
+  '3_students': q.students,
+  '4_total': q.students + q.hsp + q.temp  // Sum of temporary worker categories only
 }));
 
 const RecruitingNBEQ1FY26Dashboard = () => {
@@ -210,7 +211,7 @@ const RecruitingNBEQ1FY26Dashboard = () => {
               {/* HSP Line (Dashed) */}
               <Line
                 type="monotone"
-                dataKey="hsp"
+                dataKey="1_hsp"
                 stroke="#F59E0B"
                 strokeWidth={3}
                 strokeDasharray="5 5"
@@ -222,7 +223,7 @@ const RecruitingNBEQ1FY26Dashboard = () => {
               {/* Temp Line (Dashed) */}
               <Line
                 type="monotone"
-                dataKey="temp"
+                dataKey="2_temp"
                 stroke="#6B7280"
                 strokeWidth={3}
                 strokeDasharray="5 5"
@@ -234,7 +235,7 @@ const RecruitingNBEQ1FY26Dashboard = () => {
               {/* Students Line (Dashed) */}
               <Line
                 type="monotone"
-                dataKey="students"
+                dataKey="3_students"
                 stroke="#10B981"
                 strokeWidth={3}
                 strokeDasharray="5 5"
@@ -246,7 +247,7 @@ const RecruitingNBEQ1FY26Dashboard = () => {
               {/* Total Temporary Workers Line */}
               <Line
                 type="monotone"
-                dataKey="total"
+                dataKey="4_total"
                 stroke={CHART_PRIMARY_COLOR}
                 strokeWidth={4}
                 dot={{ r: 7, fill: CHART_PRIMARY_COLOR, strokeWidth: 2, stroke: '#ffffff' }}
