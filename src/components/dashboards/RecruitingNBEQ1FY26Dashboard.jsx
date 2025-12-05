@@ -226,18 +226,6 @@ const RecruitingNBEQ1FY26Dashboard = () => {
                 }}
               />
 
-              {/* Students Line (Dashed) */}
-              <Line
-                type="monotone"
-                dataKey="students"
-                stroke="#10B981"
-                strokeWidth={3}
-                strokeDasharray="5 5"
-                dot={{ r: 6, fill: '#10B981', strokeWidth: 2, stroke: '#ffffff' }}
-                name="Student Workers"
-                activeDot={{ r: 8, fill: '#10B981', stroke: '#ffffff', strokeWidth: 3 }}
-              />
-
               {/* HSP Line (Dashed) */}
               <Line
                 type="monotone"
@@ -260,6 +248,18 @@ const RecruitingNBEQ1FY26Dashboard = () => {
                 dot={{ r: 6, fill: '#6B7280', strokeWidth: 2, stroke: '#ffffff' }}
                 name="Temporary NBE"
                 activeDot={{ r: 8, fill: '#6B7280', stroke: '#ffffff', strokeWidth: 3 }}
+              />
+
+              {/* Students Line (Dashed) */}
+              <Line
+                type="monotone"
+                dataKey="students"
+                stroke="#10B981"
+                strokeWidth={3}
+                strokeDasharray="5 5"
+                dot={{ r: 6, fill: '#10B981', strokeWidth: 2, stroke: '#ffffff' }}
+                name="Student Workers"
+                activeDot={{ r: 8, fill: '#10B981', stroke: '#ffffff', strokeWidth: 3 }}
               />
             </LineChart>
           </ResponsiveContainer>
