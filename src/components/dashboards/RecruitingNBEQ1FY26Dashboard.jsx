@@ -207,22 +207,6 @@ const RecruitingNBEQ1FY26Dashboard = () => {
                 iconType="circle"
               />
 
-              {/* Total Temporary Workers Line */}
-              <Line
-                type="monotone"
-                dataKey="total"
-                stroke={CHART_PRIMARY_COLOR}
-                strokeWidth={4}
-                dot={{ r: 7, fill: CHART_PRIMARY_COLOR, strokeWidth: 2, stroke: '#ffffff' }}
-                name="Total Temporary Headcount"
-                activeDot={{ r: 9, fill: CHART_PRIMARY_COLOR, stroke: '#ffffff', strokeWidth: 3 }}
-                label={{
-                  position: 'top',
-                  offset: 15,
-                  style: { fontSize: 14, fontWeight: 'bold', fill: CHART_PRIMARY_COLOR }
-                }}
-              />
-
               {/* HSP Line (Dashed) */}
               <Line
                 type="monotone"
@@ -257,6 +241,22 @@ const RecruitingNBEQ1FY26Dashboard = () => {
                 dot={{ r: 6, fill: '#10B981', strokeWidth: 2, stroke: '#ffffff' }}
                 name="Student Workers"
                 activeDot={{ r: 8, fill: '#10B981', stroke: '#ffffff', strokeWidth: 3 }}
+              />
+
+              {/* Total Temporary Workers Line */}
+              <Line
+                type="monotone"
+                dataKey="total"
+                stroke={CHART_PRIMARY_COLOR}
+                strokeWidth={4}
+                dot={{ r: 7, fill: CHART_PRIMARY_COLOR, strokeWidth: 2, stroke: '#ffffff' }}
+                name="Total"
+                activeDot={{ r: 9, fill: CHART_PRIMARY_COLOR, stroke: '#ffffff', strokeWidth: 3 }}
+                label={{
+                  position: 'top',
+                  offset: 15,
+                  style: { fontSize: 14, fontWeight: 'bold', fill: CHART_PRIMARY_COLOR }
+                }}
               />
             </LineChart>
           </ResponsiveContainer>
