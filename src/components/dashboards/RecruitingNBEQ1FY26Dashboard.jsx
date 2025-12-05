@@ -97,16 +97,13 @@ const RecruitingNBEQ1FY26Dashboard = () => {
                   <p className="text-gray-600 text-lg mt-2">
                     Students, House Staff Physicians & Temporary • {data.fiscalPeriod}
                   </p>
-                  <p className="text-gray-500 text-sm mt-1">
-                    New hire counts and hiring analytics for temporary/rotating positions
-                  </p>
                 </div>
               </div>
               <div className="text-right">
                 <div className="text-5xl font-bold" style={{color: '#8B5CF6'}}>
                   {summary.total.count}
                 </div>
-                <div className="text-sm text-gray-600 font-medium">Total {data.quarter} Temp Hires</div>
+                <div className="text-sm text-gray-600 font-medium">Total {data.quarter} Temporary Headcount</div>
                 <div className="text-xs text-gray-500 mt-1">
                   Students: {summary.students.count} | HSPs: {summary.hsp.count} | Temp: {summary.temp.count}
                 </div>
