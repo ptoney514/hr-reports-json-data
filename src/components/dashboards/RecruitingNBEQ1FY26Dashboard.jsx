@@ -60,10 +60,10 @@ const Q1_FY26_TEMP_DATA = {
   ]
 };
 
-// Quarterly Headcount Trends - Temporary Workers (FY24-Q1 FY26)
+// Quarterly Headcount Trends - Temporary Workers (Q1 FY23-Q3 FY26)
 // Source: QUARTERLY_HEADCOUNT_TRENDS from staticData.js
 // Transform to show only temporary worker categories (students, hsp, temp)
-// Note: Q4 FY24, Q4 FY25, Q1 FY26 are actual; other quarters are estimates
+// Note: All quarterly data is actual headcount from Oracle HCM (since Q1 FY23)
 const QUARTERLY_TEMP_HEADCOUNT_TRENDS = QUARTERLY_HEADCOUNT_TRENDS.map(q => ({
   quarter: q.quarter,
   students: q.students,
@@ -202,7 +202,7 @@ const RecruitingNBEQ1FY26Dashboard = () => {
 
           {/* Trend Note */}
           <div className="text-xs text-gray-600 mt-4 bg-purple-50 p-3 rounded border border-purple-200 text-center">
-            <span className="font-semibold">Note:</span> All quarterly data is actual headcount from Oracle HCM (since Q3 FY20). Student headcount peaks align with academic semesters. HSP headcount reflects residency program cycles.
+            <span className="font-semibold">Note:</span> All quarterly data is actual headcount from Oracle HCM (since Q1 FY23). Student headcount peaks align with academic semesters. HSP headcount reflects residency program cycles.
           </div>
         </div>
 
