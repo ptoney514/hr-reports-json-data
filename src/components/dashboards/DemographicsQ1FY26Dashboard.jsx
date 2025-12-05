@@ -40,9 +40,9 @@ const DemographicsQ1FY26Dashboard = () => {
               </div>
               <div className="text-right">
                 <div className="text-5xl font-bold" style={{color: '#0054A6'}}>
-                  {data.summary.total.count.toLocaleString()}
+                  {(data.summary.faculty.count + data.summary.staff.count).toLocaleString()}
                 </div>
-                <div className="text-sm text-gray-600 font-medium">Total {data.quarter} Employees</div>
+                <div className="text-sm text-gray-600 font-medium">Benefit Eligible Employees</div>
                 <div className="text-xs text-gray-500 mt-1">
                   Faculty: {data.summary.faculty.count} | Staff: {data.summary.staff.count.toLocaleString()}
                 </div>

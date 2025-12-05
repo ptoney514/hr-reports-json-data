@@ -87,9 +87,9 @@ describe('DemographicsQ1FY26Dashboard', () => {
       expect(screen.getByText(/July 2025 - September 2025/i)).toBeInTheDocument();
     });
 
-    test('displays total headcount in header', () => {
+    test('displays benefit eligible employee count in header', () => {
       renderComponent();
-      expect(screen.getByText(/Total.*Employees/i)).toBeInTheDocument();
+      expect(screen.getByText(/Benefit Eligible Employees/i)).toBeInTheDocument();
     });
   });
 
