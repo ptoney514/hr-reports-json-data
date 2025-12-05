@@ -202,7 +202,7 @@ const RecruitingNBEQ1FY26Dashboard = () => {
 
           {/* Trend Note */}
           <div className="text-xs text-gray-600 mt-4 bg-purple-50 p-3 rounded border border-purple-200 text-center">
-            <span className="font-semibold">Note:</span> Q4 FY24, Q4 FY25, and Q1 FY26 are actual headcounts; other quarters are estimates. Student headcount peaks align with academic semesters. HSP headcount reflects residency program cycles.
+            <span className="font-semibold">Note:</span> All quarterly data is actual headcount from Oracle HCM (since Q3 FY20). Student headcount peaks align with academic semesters. HSP headcount reflects residency program cycles.
           </div>
         </div>
 

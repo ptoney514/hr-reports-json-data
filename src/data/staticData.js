@@ -1923,21 +1923,36 @@ export const QUARTERLY_TURNOVER_TRENDS = {
 // when quarterly snapshots become available. Currently only end-of-year (Q4) data is validated.
 
 export const QUARTERLY_HEADCOUNT_TRENDS = [
-  // FY24 Quarters (Q1-Q3 are estimates, Q4 is actual)
-  // Categories: faculty, staff, hsp (House Staff Physicians), students, temp (Temporary Employees)
-  { quarter: "Q1 FY24", faculty: 700, staff: 1410, hsp: 580, students: 1700, temp: 610, total: 5000 },  // ESTIMATED
-  { quarter: "Q2 FY24", faculty: 705, staff: 1420, hsp: 585, students: 1780, temp: 610, total: 5100 },  // ESTIMATED
-  { quarter: "Q3 FY24", faculty: 715, staff: 1445, hsp: 590, students: 2030, temp: 620, total: 5400 },  // ESTIMATED
-  { quarter: "Q4 FY24", faculty: 678, staff: 1431, hsp: 595, students: 1450, temp: 620, total: 4774 },  // ✅ ACTUAL (6/30/24)
-
-  // FY25 Quarters (Q1-Q3 are estimates, Q4 is actual)
-  { quarter: "Q1 FY25", faculty: 690, staff: 1450, hsp: 600, students: 2130, temp: 630, total: 5500 },  // ESTIMATED
-  { quarter: "Q2 FY25", faculty: 695, staff: 1440, hsp: 605, students: 1930, temp: 630, total: 5300 },  // ESTIMATED
-  { quarter: "Q3 FY25", faculty: 700, staff: 1455, hsp: 605, students: 2010, temp: 630, total: 5400 },  // ESTIMATED
-  { quarter: "Q4 FY25", faculty: 689, staff: 1448, hsp: 610, students: 1650, temp: 640, total: 5037 },  // ✅ ACTUAL (6/30/25)
-
-  // FY26 Quarters
-  { quarter: "Q1 FY26", faculty: 697, staff: 1419, hsp: 625, students: 2157, temp: 630, total: 5528 }   // ✅ ACTUAL (9/30/25) - HSP includes Grade R
+  // TEMPORARY WORKERS QUARTERLY TRENDS (Students, HSP, Temp NBE)
+  // Source: source-metrics/workforce-headcount/New Emp List since FY20 to Q1FY25 1031 PT.xlsx
+  // ✅ ACTUAL DATA extracted from Oracle HCM
+  // Categories: students, hsp (House Staff Physicians), temp (Temporary + NBE + PRN)
+  // Note: Grade R (Residents/Fellows) included in HSP starting Q1 FY26
+  { quarter: "Q3 FY20", students: 1892, hsp: 251, temp: 481 },  // ✅ ACTUAL (9/30/19)
+  { quarter: "Q4 FY20", students: 1784, hsp: 252, temp: 441 },  // ✅ ACTUAL (12/31/19)
+  { quarter: "Q1 FY20", students: 1635, hsp: 251, temp: 478 },  // ✅ ACTUAL (3/31/20)
+  { quarter: "Q2 FY20", students: 902, hsp: 253, temp: 274 },   // ✅ ACTUAL (6/30/20)
+  { quarter: "Q3 FY21", students: 1627, hsp: 250, temp: 416 },  // ✅ ACTUAL (9/30/20)
+  { quarter: "Q4 FY21", students: 1599, hsp: 250, temp: 278 },  // ✅ ACTUAL (12/31/20)
+  { quarter: "Q1 FY21", students: 1710, hsp: 250, temp: 466 },  // ✅ ACTUAL (3/31/21)
+  { quarter: "Q2 FY21", students: 1172, hsp: 346, temp: 387 },  // ✅ ACTUAL (6/30/21)
+  { quarter: "Q3 FY22", students: 1882, hsp: 598, temp: 467 },  // ✅ ACTUAL (9/30/21)
+  { quarter: "Q4 FY22", students: 1904, hsp: 598, temp: 439 },  // ✅ ACTUAL (12/31/21)
+  { quarter: "Q1 FY22", students: 2047, hsp: 565, temp: 514 },  // ✅ ACTUAL (3/31/22)
+  { quarter: "Q2 FY22", students: 1545, hsp: 711, temp: 438 },  // ✅ ACTUAL (6/30/22)
+  { quarter: "Q3 FY23", students: 2112, hsp: 573, temp: 494 },  // ✅ ACTUAL (9/30/22)
+  { quarter: "Q4 FY23", students: 2025, hsp: 569, temp: 460 },  // ✅ ACTUAL (12/31/22)
+  { quarter: "Q1 FY23", students: 2090, hsp: 570, temp: 490 },  // ✅ ACTUAL (3/31/23)
+  { quarter: "Q2 FY23", students: 1701, hsp: 548, temp: 405 },  // ✅ ACTUAL (6/30/23)
+  { quarter: "Q3 FY24", students: 1821, hsp: 585, temp: 513 },  // ✅ ACTUAL (9/30/23)
+  { quarter: "Q4 FY24", students: 1851, hsp: 587, temp: 568 },  // ✅ ACTUAL (12/31/23)
+  { quarter: "Q1 FY24", students: 2040, hsp: 587, temp: 667 },  // ✅ ACTUAL (3/31/24)
+  { quarter: "Q2 FY24", students: 1491, hsp: 608, temp: 566 },  // ✅ ACTUAL (6/30/24)
+  { quarter: "Q3 FY25", students: 2129, hsp: 601, temp: 670 },  // ✅ ACTUAL (9/30/24)
+  { quarter: "Q4 FY25", students: 1916, hsp: 600, temp: 660 },  // ✅ ACTUAL (12/31/24)
+  { quarter: "Q1 FY25", students: 1969, hsp: 600, temp: 723 },  // ✅ ACTUAL (3/31/25)
+  { quarter: "Q2 FY25", students: 1714, hsp: 612, temp: 574 },  // ✅ ACTUAL (6/30/25)
+  { quarter: "Q3 FY26", students: 1860, hsp: 616, temp: 608 }   // ✅ ACTUAL (8/31/25)
 ];
 
 // ============================================================================
