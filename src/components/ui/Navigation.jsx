@@ -161,6 +161,14 @@ const Navigation = () => {
       path: '/dashboards/workforce-q1',
       icon: Users,
       isActive: isActive('/dashboards/workforce-q1')
+    },
+    {
+      id: 'demographics-q1-fy26',
+      label: 'Q1 FY26 Demographics',
+      shortLabel: 'Q1 Demo',
+      path: '/dashboards/demographics-q1',
+      icon: Users,
+      isActive: isActive('/dashboards/demographics-q1')
     }
   ];
 

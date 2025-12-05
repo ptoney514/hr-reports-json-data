@@ -1923,36 +1923,29 @@ export const QUARTERLY_TURNOVER_TRENDS = {
 // when quarterly snapshots become available. Currently only end-of-year (Q4) data is validated.
 
 export const QUARTERLY_HEADCOUNT_TRENDS = [
-  // TEMPORARY WORKERS QUARTERLY TRENDS (Students, HSP, Temp NBE)
+  // COMPREHENSIVE QUARTERLY WORKFORCE TRENDS (Q1 FY24 - Q1 FY26)
   // Source: source-metrics/workforce-headcount/New Emp List since FY20 to Q1FY25 1031 PT.xlsx
-  // ✅ ACTUAL DATA extracted from Oracle HCM
-  // Categories: students, hsp (House Staff Physicians), temp (Temporary + NBE + PRN)
-  // Note: Grade R (Residents/Fellows) included in HSP starting Q1 FY26
-  { quarter: "Q3 FY20", students: 1892, hsp: 251, temp: 481 },  // ✅ ACTUAL (9/30/19)
-  { quarter: "Q4 FY20", students: 1784, hsp: 252, temp: 441 },  // ✅ ACTUAL (12/31/19)
-  { quarter: "Q1 FY20", students: 1635, hsp: 251, temp: 478 },  // ✅ ACTUAL (3/31/20)
-  { quarter: "Q2 FY20", students: 902, hsp: 253, temp: 274 },   // ✅ ACTUAL (6/30/20)
-  { quarter: "Q3 FY21", students: 1627, hsp: 250, temp: 416 },  // ✅ ACTUAL (9/30/20)
-  { quarter: "Q4 FY21", students: 1599, hsp: 250, temp: 278 },  // ✅ ACTUAL (12/31/20)
-  { quarter: "Q1 FY21", students: 1710, hsp: 250, temp: 466 },  // ✅ ACTUAL (3/31/21)
-  { quarter: "Q2 FY21", students: 1172, hsp: 346, temp: 387 },  // ✅ ACTUAL (6/30/21)
-  { quarter: "Q3 FY22", students: 1882, hsp: 598, temp: 467 },  // ✅ ACTUAL (9/30/21)
-  { quarter: "Q4 FY22", students: 1904, hsp: 598, temp: 439 },  // ✅ ACTUAL (12/31/21)
-  { quarter: "Q1 FY22", students: 2047, hsp: 565, temp: 514 },  // ✅ ACTUAL (3/31/22)
-  { quarter: "Q2 FY22", students: 1545, hsp: 711, temp: 438 },  // ✅ ACTUAL (6/30/22)
-  { quarter: "Q3 FY23", students: 2112, hsp: 573, temp: 494 },  // ✅ ACTUAL (9/30/22)
-  { quarter: "Q4 FY23", students: 2025, hsp: 569, temp: 460 },  // ✅ ACTUAL (12/31/22)
-  { quarter: "Q1 FY23", students: 2090, hsp: 570, temp: 490 },  // ✅ ACTUAL (3/31/23)
-  { quarter: "Q2 FY23", students: 1701, hsp: 548, temp: 405 },  // ✅ ACTUAL (6/30/23)
-  { quarter: "Q3 FY24", students: 1821, hsp: 585, temp: 513 },  // ✅ ACTUAL (9/30/23)
-  { quarter: "Q4 FY24", students: 1851, hsp: 587, temp: 568 },  // ✅ ACTUAL (12/31/23)
-  { quarter: "Q1 FY24", students: 2040, hsp: 587, temp: 667 },  // ✅ ACTUAL (3/31/24)
-  { quarter: "Q2 FY24", students: 1491, hsp: 608, temp: 566 },  // ✅ ACTUAL (6/30/24)
-  { quarter: "Q3 FY25", students: 2129, hsp: 601, temp: 670 },  // ✅ ACTUAL (9/30/24)
-  { quarter: "Q4 FY25", students: 1916, hsp: 600, temp: 660 },  // ✅ ACTUAL (12/31/24)
-  { quarter: "Q1 FY25", students: 1969, hsp: 600, temp: 723 },  // ✅ ACTUAL (3/31/25)
-  { quarter: "Q2 FY25", students: 1714, hsp: 612, temp: 574 },  // ✅ ACTUAL (6/30/25)
-  { quarter: "Q3 FY26", students: 1860, hsp: 616, temp: 608 }   // ✅ ACTUAL (8/31/25)
+  // ✅ ALL DATA EXTRACTED FROM ORACLE HCM - Actual headcount from assignment categories
+  //
+  // Benefit-Eligible Categories (extracted Q1 FY24 onwards):
+  //   - faculty: Full-time (F09, F10, F11, F12) and Part-time (PT9, PT10, PT11, PT12) Faculty
+  //   - staff: Full-time (F09, F10, F11, F12) and Part-time (PT9, PT10, PT11, PT12) Staff
+  //   - total (benefit-eligible): faculty + staff
+  //
+  // Temporary/Non-Benefit-Eligible Categories:
+  //   - students: SUE (Student Helper), CWS (Compensated Work-Study)
+  //   - hsp: HSR (House Staff Resident), Grade R (Residents/Fellows as of Q1 FY26)
+  //   - temp: TEMP (Temporary), NBE (Non-Benefit Eligible), PRN (PRN staff)
+
+  { quarter: "Q1 FY24", faculty: 702, staff: 1393, total: 2095, students: 2040, hsp: 587, temp: 667 },  // ✅ ACTUAL
+  { quarter: "Q2 FY24", faculty: 702, staff: 1410, total: 2112, students: 1491, hsp: 608, temp: 566 },  // ✅ ACTUAL
+  { quarter: "Q3 FY24", faculty: 704, staff: 1420, total: 2124, students: 1821, hsp: 585, temp: 513 },  // ✅ ACTUAL
+  { quarter: "Q4 FY24", faculty: 678, staff: 1431, total: 2109, students: 1851, hsp: 587, temp: 568 },  // ✅ ACTUAL
+  { quarter: "Q1 FY25", faculty: 686, staff: 1432, total: 2118, students: 1969, hsp: 600, temp: 723 },  // ✅ ACTUAL
+  { quarter: "Q2 FY25", faculty: 689, staff: 1441, total: 2130, students: 1714, hsp: 612, temp: 574 },  // ✅ ACTUAL
+  { quarter: "Q3 FY25", faculty: 684, staff: 1439, total: 2123, students: 2129, hsp: 601, temp: 670 },  // ✅ ACTUAL
+  { quarter: "Q4 FY25", faculty: 689, staff: 1448, total: 2137, students: 1916, hsp: 600, temp: 660 },  // ✅ ACTUAL
+  { quarter: "Q1 FY26", faculty: 698, staff: 1451, total: 2149, students: 1860, hsp: 616, temp: 608 }   // ✅ ACTUAL
 ];
 
 // ============================================================================
@@ -2193,20 +2186,20 @@ export const QUARTERLY_WORKFORCE_DATA = {
         total: 625
       },
       {
-        group: "Student Workers",
-        faculty: 0,
-        staff: 0,
-        hsp: 0,
-        students: 2157,
-        total: 2157
-      },
-      {
         group: "Non-Benefit Eligible",
         faculty: 0,
         staff: 0,
         hsp: 0,
         students: 0,
         total: 630  // TEMP + NBE + PRN only
+      },
+      {
+        group: "Student Workers",
+        faculty: 0,
+        staff: 0,
+        hsp: 0,
+        students: 2157,
+        total: 2157
       }
     ],
     // Location breakdown

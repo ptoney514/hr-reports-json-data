@@ -456,8 +456,8 @@ describe('Q1 FY26 Workforce Data Validation', () => {
         "Benefit-Eligible Faculty",
         "Benefit-Eligible Staff",
         "House Staff Physicians",
-        "Student Workers",
-        "Non-Benefit Eligible"
+        "Non-Benefit Eligible",
+        "Student Workers"
       ];
 
       const actualGroups = q1fy26Data.employeeGroups.map(g => g.group);

@@ -234,11 +234,11 @@ const WorkforceQ1FY26Dashboard = () => {
         {/* Headcount Trends Chart */}
         <div className="bg-white rounded-2xl border p-8 mb-8" style={{ borderColor: '#D7D2CB' }}>
           <h2 className="text-2xl font-bold mb-6" style={{ color: '#00245D' }}>
-            Quarterly Workforce Headcount Trend
+            Quarterly Benefit Eligible Faculty & Staff Headcount Trend
           </h2>
           {/* Height increased from 350 to 385 to accommodate expanded legend with 6 trend lines */}
           <ResponsiveContainer width="100%" height={385}>
-            <LineChart data={QUARTERLY_HEADCOUNT_TRENDS} margin={{ top: 40, right: 30, left: 20, bottom: 20 }}>
+            <LineChart data={QUARTERLY_HEADCOUNT_TRENDS} margin={{ top: 40, right: 30, left: 50, bottom: 20 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#D7D2CB" />
               <XAxis
                 dataKey="quarter"
@@ -246,8 +246,8 @@ const WorkforceQ1FY26Dashboard = () => {
               />
               <YAxis
                 tick={{ fontSize: 12, fill: '#5F7FC3' }}
-                domain={[0, 6000]}
-                ticks={[0, 1000, 2000, 3000, 4000, 5000, 6000]}
+                domain={[0, 2500]}
+                ticks={[0, 500, 1000, 1500, 2000, 2500]}
               />
               <Tooltip
                 contentStyle={{
@@ -278,18 +278,6 @@ const WorkforceQ1FY26Dashboard = () => {
                 }}
               />
 
-              {/* Faculty Line (Dashed) */}
-              <Line
-                type="monotone"
-                dataKey="faculty"
-                stroke="#10B981"
-                strokeWidth={3}
-                strokeDasharray="5 5"
-                dot={{ r: 6, fill: '#10B981', strokeWidth: 2, stroke: '#ffffff' }}
-                name="Benefit Eligible Faculty"
-                activeDot={{ r: 8, fill: '#10B981', stroke: '#ffffff', strokeWidth: 3 }}
-              />
-
               {/* Staff Line (Dashed) */}
               <Line
                 type="monotone"
@@ -300,30 +288,28 @@ const WorkforceQ1FY26Dashboard = () => {
                 dot={{ r: 6, fill: '#3B82F6', strokeWidth: 2, stroke: '#ffffff' }}
                 name="Benefit Eligible Staff"
                 activeDot={{ r: 8, fill: '#3B82F6', stroke: '#ffffff', strokeWidth: 3 }}
+                label={{
+                  position: 'top',
+                  offset: 10,
+                  style: { fontSize: 11, fontWeight: 'bold', fill: '#3B82F6' }
+                }}
               />
 
-              {/* House Staff Physicians Line (Dashed) */}
+              {/* Faculty Line (Dashed) */}
               <Line
-                {...getSecondaryLineProps('#FBBF24')}
-                dataKey="hsp"
-                stroke="#FBBF24"
-                name="House Staff Physicians"
-              />
-
-              {/* Students Line (Dashed) */}
-              <Line
-                {...getSecondaryLineProps('#8B5CF6')}
-                dataKey="students"
-                stroke="#8B5CF6"
-                name="Student Workers"
-              />
-
-              {/* Non-Benefit Eligible Line (Dashed) */}
-              <Line
-                {...getSecondaryLineProps('#EF4444')}
-                dataKey="temp"
-                stroke="#EF4444"
-                name="Non-Benefit Eligible"
+                type="monotone"
+                dataKey="faculty"
+                stroke="#10B981"
+                strokeWidth={3}
+                strokeDasharray="5 5"
+                dot={{ r: 6, fill: '#10B981', strokeWidth: 2, stroke: '#ffffff' }}
+                name="Benefit Eligible Faculty"
+                activeDot={{ r: 8, fill: '#10B981', stroke: '#ffffff', strokeWidth: 3 }}
+                label={{
+                  position: 'top',
+                  offset: 10,
+                  style: { fontSize: 11, fontWeight: 'bold', fill: '#10B981' }
+                }}
               />
             </LineChart>
           </ResponsiveContainer>
@@ -332,7 +318,7 @@ const WorkforceQ1FY26Dashboard = () => {
           <div className="text-center mt-4 rounded-lg p-3" style={{ backgroundColor: '#B5D2F3' }}>
             <span className="text-sm" style={{ color: '#5F7FC3' }}>Note: </span>
             <span className="text-sm" style={{ color: '#00245D' }}>
-              Q1 typically shows higher headcount due to fall semester staffing. Year-over-year, total workforce remains stable at +0.5% (5,528 vs 5,500), with benefit-eligible faculty up 1.0% and staff down 2.1%—both within normal variance. Student workers and not-benefit eligible employees fluctuate with predictable academic calendar patterns.
+              All data is actual Oracle HCM headcount (Q1 FY24-Q1 FY26). Benefit-eligible staff show stable growth from 2,095 total (Q1 FY24) to 2,149 total (Q1 FY26), +2.57% over 2 years. Faculty remain relatively stable (702-698), while staff grew from 1,393 to 1,451, +4.2%. Q1 typically peaks due to fall semester staffing and academic hiring cycles.
             </span>
           </div>
         </div>
@@ -355,16 +341,16 @@ const WorkforceQ1FY26Dashboard = () => {
               <span className="text-gray-700">Faculty</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
-              <span className="text-gray-700">Students</span>
-            </div>
-            <div className="flex items-center gap-2">
               <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
               <span className="text-gray-700">House Staff</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 bg-red-500 rounded-full"></div>
               <span className="text-gray-700">Non-Benefit Eligible</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
+              <span className="text-gray-700">Student Workers</span>
             </div>
           </div>
 
@@ -498,311 +484,7 @@ const WorkforceQ1FY26Dashboard = () => {
           </div>
         </div>
 
-        {/* Ethnicity Distribution - Two Pie Charts */}
-        {data.demographics?.ethnicity && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-
-          {/* Faculty Ethnicity Distribution */}
-          <div className="bg-white rounded-lg shadow-sm border p-6">
-            <h2 className="text-lg font-bold text-gray-900 mb-6 text-center">
-              Ethnicity Distribution for Benefit Eligible Faculty
-            </h2>
-
-            <div className="flex flex-col items-center relative">
-              {/* Donut Chart */}
-              <ResponsiveContainer width="100%" height={350}>
-                <PieChart>
-                  <Pie
-                    data={data.demographics.ethnicity.faculty.distribution}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={70}
-                    outerRadius={110}
-                    paddingAngle={1}
-                    dataKey="count"
-                    label={(entry) => {
-                      const data = entry.payload || entry;
-                      return data.percentage >= 2 ? `${data.count} (${data.percentage}%)` : null;
-                    }}
-                    labelLine={true}
-                    style={{ fontSize: '12px', fontWeight: '500' }}
-                  >
-                    {data.demographics.ethnicity.faculty.distribution.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip
-                    formatter={(_, __, props) => [
-                      `${props.payload.count} (${props.payload.percentage}%)`,
-                      props.payload.ethnicity
-                    ]}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
-
-              {/* Center Label */}
-              <div className="absolute top-[175px] left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none">
-                <div className="text-center">
-                  <div className="text-4xl font-bold text-gray-900">{data.demographics.ethnicity.faculty.total}</div>
-                  <div className="text-xs text-gray-600 uppercase tracking-wide">TOTAL</div>
-                </div>
-              </div>
-
-              {/* Legend */}
-              <div className="mt-4 w-full">
-                <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs">
-                  {data.demographics.ethnicity.faculty.distribution.map((item, index) => (
-                    <div key={index} className="flex items-center gap-2">
-                      <div className="w-3 h-3 rounded" style={{backgroundColor: item.color}}></div>
-                      <span className="text-gray-700">{item.ethnicity}: <strong>{item.count}</strong> ({item.percentage}%)</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Staff Ethnicity Distribution */}
-          <div className="bg-white rounded-lg shadow-sm border p-6">
-            <h2 className="text-lg font-bold text-gray-900 mb-6 text-center">
-              Ethnicity Distribution for Benefit Eligible Staff
-            </h2>
-
-            <div className="flex flex-col items-center relative">
-              {/* Donut Chart */}
-              <ResponsiveContainer width="100%" height={350}>
-                <PieChart>
-                  <Pie
-                    data={data.demographics.ethnicity.staff.distribution}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={70}
-                    outerRadius={110}
-                    paddingAngle={1}
-                    dataKey="count"
-                    label={(entry) => {
-                      const data = entry.payload || entry;
-                      return data.percentage >= 2 ? `${data.count} (${data.percentage}%)` : null;
-                    }}
-                    labelLine={true}
-                    style={{ fontSize: '12px', fontWeight: '500' }}
-                  >
-                    {data.demographics.ethnicity.staff.distribution.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip
-                    formatter={(_, __, props) => [
-                      `${props.payload.count} (${props.payload.percentage}%)`,
-                      props.payload.ethnicity
-                    ]}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
-
-              {/* Center Label */}
-              <div className="absolute top-[175px] left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none">
-                <div className="text-center">
-                  <div className="text-4xl font-bold text-gray-900">{data.demographics.ethnicity.staff.total.toLocaleString()}</div>
-                  <div className="text-xs text-gray-600 uppercase tracking-wide">TOTAL</div>
-                </div>
-              </div>
-
-              {/* Legend */}
-              <div className="mt-4 w-full">
-                <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs">
-                  {data.demographics.ethnicity.staff.distribution.map((item, index) => (
-                    <div key={index} className="flex items-center gap-2">
-                      <div className="w-3 h-3 rounded" style={{backgroundColor: item.color}}></div>
-                      <span className="text-gray-700">{item.ethnicity}: <strong>{item.count}</strong> ({item.percentage}%)</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-
-        </div>
-        )}
-
-        {/* Age/Gender Distribution - Diverging Bar Chart */}
-        {data.demographics?.ageGender && (
-        <div className="bg-white rounded-lg shadow-sm border p-8 mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">
-            Age/Gender Distribution
-          </h2>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-
-            {/* Faculty Age/Gender - Diverging Chart */}
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2 text-center">
-                Faculty ({data.demographics.ageGender.faculty.total} total)
-              </h3>
-              <div className="text-sm text-center mb-6">
-                <span className="text-pink-600 font-medium">♀ {data.demographics.ageGender.faculty.femalePercentage}% Female</span>
-                <span className="text-gray-400 mx-2">|</span>
-                <span className="text-blue-600 font-medium">♂ {data.demographics.ageGender.faculty.malePercentage}% Male</span>
-              </div>
-
-              {/* Diverging bar chart - females left, males right */}
-              <div className="relative">
-                {/* Vertical grid lines */}
-                <div className="absolute inset-0 flex pointer-events-none">
-                  {/* Left side grid lines */}
-                  <div className="flex-1 flex justify-between pr-10">
-                    {[0, 50, 100, 150].reverse().map((_, idx) => (
-                      <div key={`left-${idx}`} className="border-l border-gray-200 h-full"></div>
-                    ))}
-                  </div>
-                  {/* Center spacing (no line) */}
-                  <div className="w-16"></div>
-                  {/* Right side grid lines */}
-                  <div className="flex-1 flex justify-between pl-10">
-                    {[0, 50, 100, 150].map((_, idx) => (
-                      <div key={`right-${idx}`} className="border-l border-gray-200 h-full"></div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Age bands - reverse order for display (61+ at top) */}
-                <div className="relative space-y-2">
-                  {[...data.demographics.ageGender.faculty.ageGenderBreakdown].reverse().map((ageBand, index) => {
-                    const maxCount = 150; // Max scale for each side
-                    return (
-                      <div key={index} className="flex items-center gap-2">
-                        {/* Female bar (extends left from center) */}
-                        <div className="flex-1 flex justify-end pr-2">
-                          <div
-                            className="bg-pink-500 h-10 flex items-center justify-center text-white text-xs font-medium rounded"
-                            style={{ width: `${(ageBand.female / maxCount) * 100}%` }}
-                          >
-                            {ageBand.female >= 15 && ageBand.female}
-                          </div>
-                        </div>
-
-                        {/* Age band label (center) */}
-                        <div className="w-16 text-sm text-gray-700 font-medium text-center bg-white z-10">{ageBand.ageBand}</div>
-
-                        {/* Male bar (extends right from center) */}
-                        <div className="flex-1 pl-2">
-                          <div
-                            className="bg-blue-500 h-10 flex items-center justify-center text-white text-xs font-medium rounded"
-                            style={{ width: `${(ageBand.male / maxCount) * 100}%` }}
-                          >
-                            {ageBand.male >= 15 && ageBand.male}
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-
-                {/* X-axis scale labels */}
-                <div className="flex items-center gap-2 mt-4 text-xs text-gray-500">
-                  <div className="flex-1 flex justify-between text-right pr-2">
-                    <span>150</span>
-                    <span>100</span>
-                    <span>50</span>
-                    <span>0</span>
-                  </div>
-                  <div className="w-16 text-center font-semibold">0</div>
-                  <div className="flex-1 flex justify-between text-left pl-2">
-                    <span>0</span>
-                    <span>50</span>
-                    <span>100</span>
-                    <span>150</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Staff Age/Gender - Diverging Chart */}
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2 text-center">
-                Staff ({data.demographics.ageGender.staff.total.toLocaleString()} total)
-              </h3>
-              <div className="text-sm text-center mb-6">
-                <span className="text-pink-600 font-medium">♀ {data.demographics.ageGender.staff.femalePercentage}% Female</span>
-                <span className="text-gray-400 mx-2">|</span>
-                <span className="text-blue-600 font-medium">♂ {data.demographics.ageGender.staff.malePercentage}% Male</span>
-              </div>
-
-              {/* Diverging bar chart - females left, males right */}
-              <div className="relative">
-                {/* Vertical grid lines */}
-                <div className="absolute inset-0 flex pointer-events-none">
-                  {/* Left side grid lines */}
-                  <div className="flex-1 flex justify-between pr-10">
-                    {[0, 100, 200].reverse().map((_, idx) => (
-                      <div key={`left-${idx}`} className="border-l border-gray-200 h-full"></div>
-                    ))}
-                  </div>
-                  {/* Center spacing (no line) */}
-                  <div className="w-16"></div>
-                  {/* Right side grid lines */}
-                  <div className="flex-1 flex justify-between pl-10">
-                    {[0, 100, 200].map((_, idx) => (
-                      <div key={`right-${idx}`} className="border-l border-gray-200 h-full"></div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Age bands - reverse order for display (61+ at top) */}
-                <div className="relative space-y-2">
-                  {[...data.demographics.ageGender.staff.ageGenderBreakdown].reverse().map((ageBand, index) => {
-                    const maxCount = 250; // Max scale for each side (staff has larger numbers)
-                    return (
-                      <div key={index} className="flex items-center gap-2">
-                        {/* Female bar (extends left from center) */}
-                        <div className="flex-1 flex justify-end pr-2">
-                          <div
-                            className="bg-pink-500 h-10 flex items-center justify-center text-white text-xs font-medium rounded"
-                            style={{ width: `${(ageBand.female / maxCount) * 100}%` }}
-                          >
-                            {ageBand.female >= 30 && ageBand.female}
-                          </div>
-                        </div>
-
-                        {/* Age band label (center) */}
-                        <div className="w-16 text-sm text-gray-700 font-medium text-center bg-white z-10">{ageBand.ageBand}</div>
-
-                        {/* Male bar (extends right from center) */}
-                        <div className="flex-1 pl-2">
-                          <div
-                            className="bg-blue-500 h-10 flex items-center justify-center text-white text-xs font-medium rounded"
-                            style={{ width: `${(ageBand.male / maxCount) * 100}%` }}
-                          >
-                            {ageBand.male >= 30 && ageBand.male}
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-
-                {/* X-axis scale labels */}
-                <div className="flex items-center gap-2 mt-4 text-xs text-gray-500">
-                  <div className="flex-1 flex justify-between text-right pr-2">
-                    <span>250</span>
-                    <span>200</span>
-                    <span>100</span>
-                    <span>0</span>
-                  </div>
-                  <div className="w-16 text-center font-semibold">0</div>
-                  <div className="flex-1 flex justify-between text-left pl-2">
-                    <span>0</span>
-                    <span>100</span>
-                    <span>200</span>
-                    <span>250</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-          </div>
-        </div>
-        )}
+        {/* Demographics visuals moved to DemographicsQ1FY26Dashboard */}
 
         {/* Executive Summary */}
         <div className="bg-white rounded-lg shadow-sm border p-8 mb-8">

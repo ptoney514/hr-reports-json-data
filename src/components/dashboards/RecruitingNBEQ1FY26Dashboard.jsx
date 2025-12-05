@@ -1,11 +1,11 @@
 import React from 'react';
 import { UserPlus, Users, GraduationCap, Stethoscope, Clock, MapPin } from 'lucide-react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { QUARTERLY_HEADCOUNT_TRENDS } from '../../data/staticData';
 
 // Chart styling constants
-const CHART_MAX_SCALE = 3600;
-const CHART_TICKS = [0, 600, 1200, 1800, 2400, 3000, 3600];
+const CHART_MAX_SCALE = 4000;
+const CHART_TICKS = [0, 500, 1000, 1500, 2000, 2500, 3000, 3500, 4000];
 const CHART_Y_COLOR = '#5F7FC3';
 const CHART_BORDER_COLOR = '#D7D2CB';
 const CHART_PRIMARY_COLOR = '#8B5CF6';
@@ -13,11 +13,10 @@ const CHART_PRIMARY_COLOR = '#8B5CF6';
 // Campus comparison scale
 const CAMPUS_SCALE_MAX = 3000;
 const CAMPUS_SCALE_LABELS = [0, 500, 1000, 1500, 2000, 2500, 3000];
-const CAMPUS_SCALE_STEP = 500;
 
 /**
- * Q1 FY26 Temporary Workers Recruiting Dashboard
- * Displays quarterly new hire data for Temporary Workers:
+ * Q1 FY26 Temporary Workers Headcount Dashboard
+ * Displays quarterly headcount data for Temporary Workers:
  * - Student Workers (non-benefit eligible)
  * - House Staff Physicians (HSPs/Residents - benefit eligible but temporary)
  * - Temporary NBE employees
@@ -47,29 +46,34 @@ const Q1_FY26_TEMP_DATA = {
     temp: { count: 630, oma: 489, phx: 141 }  // TEMP + NBE + PRN
   },
   bySchool: [
-    { school: "Arts & Sciences", students: 0, hsp: 0, temp: 0, total: 0 },
-    { school: "Medicine", students: 0, hsp: 0, temp: 0, total: 0 },
-    { school: "Nursing", students: 0, hsp: 0, temp: 0, total: 0 },
-    { school: "Dentistry", students: 0, hsp: 0, temp: 0, total: 0 },
-    { school: "Other", students: 0, hsp: 0, temp: 0, total: 0 }
+    { school: "Arts & Sciences", students: 325, hsp: 0, temp: 48, total: 373 },
+    { school: "Medicine", students: 154, hsp: 269, temp: 19, total: 442 },
+    { school: "Nursing", students: 14, hsp: 0, temp: 72, total: 86 },
+    { school: "Dentistry", students: 76, hsp: 0, temp: 54, total: 130 },
+    { school: "Pharmacy & Health Professions", students: 120, hsp: 11, temp: 115, total: 246 },
+    { school: "Law School", students: 61, hsp: 0, temp: 26, total: 87 },
+    { school: "Heider College of Business", students: 40, hsp: 0, temp: 18, total: 58 },
+    { school: "Phoenix", students: 0, hsp: 347, temp: 0, total: 347 },
+    { school: "Other Administrative", students: 1063, hsp: 0, temp: 306, total: 1369 }
   ],
   byMonth: [
     { month: "July 2025", students: 0, hsp: 0, temp: 0, total: 0 },
-    { month: "August 2025", students: 0, hsp: 0, temp: 0, total: 0 },
-    { month: "September 2025", students: 0, hsp: 0, temp: 0, total: 0 }
+    { month: "August 2025", students: 1860, hsp: 627, temp: 608, total: 3095 },
+    { month: "September 2025", students: 297, hsp: 0, temp: 22, total: 319 }
   ]
 };
 
-// Quarterly Headcount Trends - Temporary Workers (FY24-Q1 FY26)
+// Quarterly Headcount Trends - Temporary Workers (Q1 FY23-Q3 FY26)
 // Source: QUARTERLY_HEADCOUNT_TRENDS from staticData.js
 // Transform to show only temporary worker categories (students, hsp, temp)
-// Note: Q4 FY24, Q4 FY25, Q1 FY26 are actual; other quarters are estimates
+// Note: All quarterly data is actual headcount from Oracle HCM (since Q1 FY23)
+// Prefixed dataKeys (1_hsp, 2_temp, 3_students, 4_total) to control Recharts legend sort order
 const QUARTERLY_TEMP_HEADCOUNT_TRENDS = QUARTERLY_HEADCOUNT_TRENDS.map(q => ({
   quarter: q.quarter,
-  students: q.students,
-  hsp: q.hsp,
-  temp: q.temp,
-  total: q.students + q.hsp + q.temp  // Sum of temporary worker categories only
+  '1_hsp': q.hsp,
+  '2_temp': q.temp,
+  '3_students': q.students,
+  '4_total': q.students + q.hsp + q.temp  // Sum of temporary worker categories only
 }));
 
 const RecruitingNBEQ1FY26Dashboard = () => {
@@ -88,13 +92,10 @@ const RecruitingNBEQ1FY26Dashboard = () => {
                 <UserPlus style={{color: '#8B5CF6'}} size={32} />
                 <div>
                   <h1 className="text-3xl font-bold text-gray-900">
-                    {data.quarter} Temporary Workers Recruiting Report
+                    {data.quarter} Temporary Workers Headcount Report
                   </h1>
                   <p className="text-gray-600 text-lg mt-2">
                     Students, House Staff Physicians & Temporary • {data.fiscalPeriod}
-                  </p>
-                  <p className="text-gray-500 text-sm mt-1">
-                    New hire counts and hiring analytics for temporary/rotating positions
                   </p>
                 </div>
               </div>
@@ -102,107 +103,12 @@ const RecruitingNBEQ1FY26Dashboard = () => {
                 <div className="text-5xl font-bold" style={{color: '#8B5CF6'}}>
                   {summary.total.count}
                 </div>
-                <div className="text-sm text-gray-600 font-medium">Total {data.quarter} Temp Hires</div>
+                <div className="text-sm text-gray-600 font-medium">Total {data.quarter} Temporary Headcount</div>
                 <div className="text-xs text-gray-500 mt-1">
                   Students: {summary.students.count} | HSPs: {summary.hsp.count} | Temp: {summary.temp.count}
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-
-        {/* Data Freshness Note */}
-        <div className="text-xs text-amber-700 mb-6 bg-amber-50 p-3 rounded border border-amber-200">
-          <span className="font-semibold">Note:</span> {data.note} Data as of {data.dataAsOf}.
-        </div>
-
-        {/* Hiring Trends Chart - Matches Workforce Dashboard Style */}
-        <div className="bg-white rounded-2xl border p-8 mb-8" style={{ borderColor: '#D7D2CB' }}>
-          <h2 className="text-2xl font-bold mb-6" style={{ color: '#00245D' }}>
-            Quarterly Temporary Workers Headcount Trend
-          </h2>
-          <ResponsiveContainer width="100%" height={385}>
-            <LineChart data={QUARTERLY_TEMP_HEADCOUNT_TRENDS} margin={{ top: 40, right: 30, left: 20, bottom: 20 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke={CHART_BORDER_COLOR} />
-              <XAxis
-                dataKey="quarter"
-                tick={{ fontSize: 12, fill: CHART_Y_COLOR }}
-              />
-              <YAxis
-                tick={{ fontSize: 12, fill: CHART_Y_COLOR }}
-                domain={[0, CHART_MAX_SCALE]}
-                ticks={CHART_TICKS}
-              />
-              <Tooltip
-                contentStyle={{
-                  borderRadius: '12px',
-                  border: '2px solid #8B5CF6',
-                  backgroundColor: '#ffffff',
-                  boxShadow: '0 10px 25px -5px rgba(139, 92, 246, 0.25)'
-                }}
-              />
-              <Legend
-                wrapperStyle={{ paddingTop: '20px' }}
-                iconType="circle"
-              />
-
-              {/* Total Temporary Workers Line */}
-              <Line
-                type="monotone"
-                dataKey="total"
-                stroke={CHART_PRIMARY_COLOR}
-                strokeWidth={4}
-                dot={{ r: 7, fill: CHART_PRIMARY_COLOR, strokeWidth: 2, stroke: '#ffffff' }}
-                name="Total Temporary Headcount"
-                activeDot={{ r: 9, fill: CHART_PRIMARY_COLOR, stroke: '#ffffff', strokeWidth: 3 }}
-                label={{
-                  position: 'top',
-                  offset: 15,
-                  style: { fontSize: 14, fontWeight: 'bold', fill: CHART_PRIMARY_COLOR }
-                }}
-              />
-
-              {/* Students Line (Dashed) */}
-              <Line
-                type="monotone"
-                dataKey="students"
-                stroke="#10B981"
-                strokeWidth={3}
-                strokeDasharray="5 5"
-                dot={{ r: 6, fill: '#10B981', strokeWidth: 2, stroke: '#ffffff' }}
-                name="Student Workers"
-                activeDot={{ r: 8, fill: '#10B981', stroke: '#ffffff', strokeWidth: 3 }}
-              />
-
-              {/* HSP Line (Dashed) */}
-              <Line
-                type="monotone"
-                dataKey="hsp"
-                stroke="#F59E0B"
-                strokeWidth={3}
-                strokeDasharray="5 5"
-                dot={{ r: 6, fill: '#F59E0B', strokeWidth: 2, stroke: '#ffffff' }}
-                name="House Staff Physicians"
-                activeDot={{ r: 8, fill: '#F59E0B', stroke: '#ffffff', strokeWidth: 3 }}
-              />
-
-              {/* Temp Line (Dashed) */}
-              <Line
-                type="monotone"
-                dataKey="temp"
-                stroke="#6B7280"
-                strokeWidth={3}
-                strokeDasharray="5 5"
-                dot={{ r: 6, fill: '#6B7280', strokeWidth: 2, stroke: '#ffffff' }}
-                name="Temporary NBE"
-                activeDot={{ r: 8, fill: '#6B7280', stroke: '#ffffff', strokeWidth: 3 }}
-              />
-            </LineChart>
-          </ResponsiveContainer>
-
-          {/* Trend Note */}
-          <div className="text-xs text-gray-600 mt-4 bg-purple-50 p-3 rounded border border-purple-200 text-center">
-            <span className="font-semibold">Note:</span> All quarterly data is actual headcount from Oracle HCM (since Q3 FY20). Student headcount peaks align with academic semesters. HSP headcount reflects residency program cycles.
           </div>
         </div>
 
@@ -218,7 +124,7 @@ const RecruitingNBEQ1FY26Dashboard = () => {
               </span>
             </div>
             <div className="text-4xl font-bold text-gray-900 mb-1">{summary.total.count}</div>
-            <div className="text-sm text-gray-600 font-medium">Total Temp Hires</div>
+            <div className="text-sm text-gray-600 font-medium">Total Temporary Workers</div>
             <div className="text-xs text-gray-500 mt-2">
               OMA: {summary.total.oma} | PHX: {summary.total.phx}
             </div>
@@ -269,6 +175,113 @@ const RecruitingNBEQ1FY26Dashboard = () => {
             </div>
           </div>
 
+        </div>
+
+        {/* Hiring Trends Chart - Matches Workforce Dashboard Style */}
+        <div className="bg-white rounded-2xl border p-8 mb-8" style={{ borderColor: '#D7D2CB' }}>
+          <h2 className="text-2xl font-bold mb-6" style={{ color: '#00245D' }}>
+            Quarterly Temporary Workers Headcount Trend
+          </h2>
+          <ResponsiveContainer width="100%" height={385}>
+            <LineChart data={QUARTERLY_TEMP_HEADCOUNT_TRENDS} margin={{ top: 40, right: 30, left: 20, bottom: 20 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke={CHART_BORDER_COLOR} />
+              <XAxis
+                dataKey="quarter"
+                tick={{ fontSize: 12, fill: CHART_Y_COLOR }}
+              />
+              <YAxis
+                tick={{ fontSize: 12, fill: CHART_Y_COLOR }}
+                domain={[0, CHART_MAX_SCALE]}
+                ticks={CHART_TICKS}
+              />
+              <Tooltip
+                contentStyle={{
+                  borderRadius: '12px',
+                  border: '2px solid #8B5CF6',
+                  backgroundColor: '#ffffff',
+                  boxShadow: '0 10px 25px -5px rgba(139, 92, 246, 0.25)'
+                }}
+              />
+{/* Custom legend below chart - Recharts Legend sorts alphabetically, so we build our own */}
+
+              {/* HSP Line (Dashed) */}
+              <Line
+                type="monotone"
+                dataKey="1_hsp"
+                stroke="#F59E0B"
+                strokeWidth={3}
+                strokeDasharray="5 5"
+                dot={{ r: 6, fill: '#F59E0B', strokeWidth: 2, stroke: '#ffffff' }}
+                name="House Staff Physicians"
+                activeDot={{ r: 8, fill: '#F59E0B', stroke: '#ffffff', strokeWidth: 3 }}
+              />
+
+              {/* Temp Line (Dashed) */}
+              <Line
+                type="monotone"
+                dataKey="2_temp"
+                stroke="#6B7280"
+                strokeWidth={3}
+                strokeDasharray="5 5"
+                dot={{ r: 6, fill: '#6B7280', strokeWidth: 2, stroke: '#ffffff' }}
+                name="Temporary NBE"
+                activeDot={{ r: 8, fill: '#6B7280', stroke: '#ffffff', strokeWidth: 3 }}
+              />
+
+              {/* Students Line (Dashed) */}
+              <Line
+                type="monotone"
+                dataKey="3_students"
+                stroke="#10B981"
+                strokeWidth={3}
+                strokeDasharray="5 5"
+                dot={{ r: 6, fill: '#10B981', strokeWidth: 2, stroke: '#ffffff' }}
+                name="Student Workers"
+                activeDot={{ r: 8, fill: '#10B981', stroke: '#ffffff', strokeWidth: 3 }}
+              />
+
+              {/* Total Temporary Workers Line */}
+              <Line
+                type="monotone"
+                dataKey="4_total"
+                stroke={CHART_PRIMARY_COLOR}
+                strokeWidth={4}
+                dot={{ r: 7, fill: CHART_PRIMARY_COLOR, strokeWidth: 2, stroke: '#ffffff' }}
+                name="Total"
+                activeDot={{ r: 9, fill: CHART_PRIMARY_COLOR, stroke: '#ffffff', strokeWidth: 3 }}
+                label={{
+                  position: 'top',
+                  offset: 15,
+                  style: { fontSize: 14, fontWeight: 'bold', fill: CHART_PRIMARY_COLOR }
+                }}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+
+          {/* Custom Legend - Ordered: HSP, Temp NBE, Student Workers, Total */}
+          <div className="flex justify-center gap-6 text-sm flex-wrap mt-5">
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#F59E0B' }}></div>
+              <span className="text-gray-700">House Staff Physicians</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#6B7280' }}></div>
+              <span className="text-gray-700">Temporary NBE</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#10B981' }}></div>
+              <span className="text-gray-700">Student Workers</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: CHART_PRIMARY_COLOR }}></div>
+              <span className="text-gray-700">Total</span>
+            </div>
+          </div>
+
+          {/* Trend Note */}
+          <div className="text-xs text-gray-600 mt-4 bg-purple-50 p-3 rounded border border-purple-200 text-center">
+            <span className="font-semibold">Note:</span> All quarterly data is actual headcount from Oracle HCM (since Q1 FY23). Student headcount peaks align with academic semesters. HSP headcount reflects residency program cycles.
+          </div>
         </div>
 
         {/* ============================================== */}

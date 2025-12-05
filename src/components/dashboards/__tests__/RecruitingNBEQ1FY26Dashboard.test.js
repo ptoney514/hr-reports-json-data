@@ -37,7 +37,7 @@ describe('RecruitingNBEQ1FY26Dashboard', () => {
   describe('Page Header', () => {
     test('renders page title with Q1 FY26 Temporary Workers', () => {
       renderComponent();
-      expect(screen.getByText(/Q1 FY26 Temporary Workers Recruiting Report/i)).toBeInTheDocument();
+      expect(screen.getByText(/Q1 FY26 Temporary Workers Headcount Report/i)).toBeInTheDocument();
     });
 
     test('renders subtitle with employee types', () => {
@@ -52,7 +52,7 @@ describe('RecruitingNBEQ1FY26Dashboard', () => {
 
     test('displays total headcount in header', () => {
       renderComponent();
-      expect(screen.getByText(/Total.*Q1 FY26 Temp Hires/i)).toBeInTheDocument();
+      expect(screen.getByText(/Total.*Q1 FY26 Temporary Headcount/i)).toBeInTheDocument();
     });
 
     test('displays breakdown in header', () => {
@@ -64,7 +64,9 @@ describe('RecruitingNBEQ1FY26Dashboard', () => {
   describe('Metric Cards', () => {
     test('renders all metric cards', () => {
       renderComponent();
-      expect(screen.getByText(/Total Temp Hires/i)).toBeInTheDocument();
+      // Use getAllByText since this label appears in multiple places (metric card + legend)
+      const matches = screen.getAllByText(/Total Temporary Workers/i);
+      expect(matches.length).toBeGreaterThan(0);
     });
 
     test('displays metric values and campus breakdown', () => {
@@ -87,7 +89,7 @@ describe('RecruitingNBEQ1FY26Dashboard', () => {
 
     test('renders chart note about actual vs estimated data', () => {
       renderComponent();
-      expect(screen.getByText(/Q4 FY24, Q4 FY25, and Q1 FY26 are actual/i)).toBeInTheDocument();
+      expect(screen.getByText(/All quarterly data is actual headcount from Oracle HCM/i)).toBeInTheDocument();
     });
 
     test('displays note about student and HSP headcount patterns', () => {
@@ -137,7 +139,8 @@ describe('RecruitingNBEQ1FY26Dashboard', () => {
   describe('Data Freshness Information', () => {
     test('renders data freshness note', () => {
       renderComponent();
-      expect(screen.getByText(/Data as of 2025-09-30/i)).toBeInTheDocument();
+      // Data freshness note was removed from the header, this test validates the removal
+      expect(screen.queryByText(/Data as of 2025-09-30/i)).not.toBeInTheDocument();
     });
 
     test('displays methodology sources', () => {
@@ -208,7 +211,7 @@ describe('RecruitingNBEQ1FY26Dashboard', () => {
     test('renders all major sections', () => {
       renderComponent();
       // Check for key sections - at minimum check header and main content areas
-      const headerText = screen.getByText(/Temporary Workers Recruiting Report/i);
+      const headerText = screen.getByText(/Temporary Workers Headcount Report/i);
       expect(headerText).toBeInTheDocument();
       expect(headerText.closest('div')).toBeInTheDocument();
     });
