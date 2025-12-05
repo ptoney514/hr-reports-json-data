@@ -2186,20 +2186,20 @@ export const QUARTERLY_WORKFORCE_DATA = {
         total: 625
       },
       {
-        group: "Student Workers",
-        faculty: 0,
-        staff: 0,
-        hsp: 0,
-        students: 2157,
-        total: 2157
-      },
-      {
         group: "Non-Benefit Eligible",
         faculty: 0,
         staff: 0,
         hsp: 0,
         students: 0,
         total: 630  // TEMP + NBE + PRN only
+      },
+      {
+        group: "Student Workers",
+        faculty: 0,
+        staff: 0,
+        hsp: 0,
+        students: 2157,
+        total: 2157
       }
     ],
     // Location breakdown
