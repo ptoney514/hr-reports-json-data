@@ -1923,11 +1923,11 @@ export const QUARTERLY_TURNOVER_TRENDS = {
 // when quarterly snapshots become available. Currently only end-of-year (Q4) data is validated.
 
 export const QUARTERLY_HEADCOUNT_TRENDS = [
-  // COMPREHENSIVE QUARTERLY WORKFORCE TRENDS (Q1 FY23 - Q1 FY26)
+  // COMPREHENSIVE QUARTERLY WORKFORCE TRENDS (Q1 FY24 - Q1 FY26)
   // Source: source-metrics/workforce-headcount/New Emp List since FY20 to Q1FY25 1031 PT.xlsx
   // ✅ ALL DATA EXTRACTED FROM ORACLE HCM - Actual headcount from assignment categories
   //
-  // Benefit-Eligible Categories (extracted Q1 FY23 onwards):
+  // Benefit-Eligible Categories (extracted Q1 FY24 onwards):
   //   - faculty: Full-time (F09, F10, F11, F12) and Part-time (PT9, PT10, PT11, PT12) Faculty
   //   - staff: Full-time (F09, F10, F11, F12) and Part-time (PT9, PT10, PT11, PT12) Staff
   //   - total (benefit-eligible): faculty + staff
@@ -1937,10 +1937,6 @@ export const QUARTERLY_HEADCOUNT_TRENDS = [
   //   - hsp: HSR (House Staff Resident), Grade R (Residents/Fellows as of Q1 FY26)
   //   - temp: TEMP (Temporary), NBE (Non-Benefit Eligible), PRN (PRN staff)
 
-  { quarter: "Q1 FY23", faculty: 689, staff: 1358, total: 2047, students: 2090, hsp: 570, temp: 490 },  // ✅ ACTUAL
-  { quarter: "Q2 FY23", faculty: 697, staff: 1390, total: 2087, students: 1701, hsp: 548, temp: 405 },  // ✅ ACTUAL
-  { quarter: "Q3 FY23", faculty: 703, staff: 1392, total: 2095, students: 2112, hsp: 573, temp: 494 },  // ✅ ACTUAL
-  { quarter: "Q4 FY23", faculty: 686, staff: 1387, total: 2073, students: 2025, hsp: 569, temp: 460 },  // ✅ ACTUAL
   { quarter: "Q1 FY24", faculty: 702, staff: 1393, total: 2095, students: 2040, hsp: 587, temp: 667 },  // ✅ ACTUAL
   { quarter: "Q2 FY24", faculty: 702, staff: 1410, total: 2112, students: 1491, hsp: 608, temp: 566 },  // ✅ ACTUAL
   { quarter: "Q3 FY24", faculty: 704, staff: 1420, total: 2124, students: 1821, hsp: 585, temp: 513 },  // ✅ ACTUAL
