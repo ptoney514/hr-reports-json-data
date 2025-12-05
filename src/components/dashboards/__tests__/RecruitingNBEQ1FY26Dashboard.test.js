@@ -87,7 +87,7 @@ describe('RecruitingNBEQ1FY26Dashboard', () => {
 
     test('renders chart note about actual vs estimated data', () => {
       renderComponent();
-      expect(screen.getByText(/Q4 FY24, Q4 FY25, and Q1 FY26 are actual/i)).toBeInTheDocument();
+      expect(screen.getByText(/All quarterly data is actual headcount from Oracle HCM/i)).toBeInTheDocument();
     });
 
     test('displays note about student and HSP headcount patterns', () => {

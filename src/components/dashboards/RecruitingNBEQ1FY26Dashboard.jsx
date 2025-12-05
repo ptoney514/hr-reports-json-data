@@ -47,16 +47,20 @@ const Q1_FY26_TEMP_DATA = {
     temp: { count: 630, oma: 489, phx: 141 }  // TEMP + NBE + PRN
   },
   bySchool: [
-    { school: "Arts & Sciences", students: 0, hsp: 0, temp: 0, total: 0 },
-    { school: "Medicine", students: 0, hsp: 0, temp: 0, total: 0 },
-    { school: "Nursing", students: 0, hsp: 0, temp: 0, total: 0 },
-    { school: "Dentistry", students: 0, hsp: 0, temp: 0, total: 0 },
-    { school: "Other", students: 0, hsp: 0, temp: 0, total: 0 }
+    { school: "Arts & Sciences", students: 325, hsp: 0, temp: 48, total: 373 },
+    { school: "Medicine", students: 154, hsp: 269, temp: 19, total: 442 },
+    { school: "Nursing", students: 14, hsp: 0, temp: 72, total: 86 },
+    { school: "Dentistry", students: 76, hsp: 0, temp: 54, total: 130 },
+    { school: "Pharmacy & Health Professions", students: 120, hsp: 11, temp: 115, total: 246 },
+    { school: "Law School", students: 61, hsp: 0, temp: 26, total: 87 },
+    { school: "Heider College of Business", students: 40, hsp: 0, temp: 18, total: 58 },
+    { school: "Phoenix", students: 0, hsp: 347, temp: 0, total: 347 },
+    { school: "Other Administrative", students: 1063, hsp: 0, temp: 306, total: 1369 }
   ],
   byMonth: [
     { month: "July 2025", students: 0, hsp: 0, temp: 0, total: 0 },
-    { month: "August 2025", students: 0, hsp: 0, temp: 0, total: 0 },
-    { month: "September 2025", students: 0, hsp: 0, temp: 0, total: 0 }
+    { month: "August 2025", students: 1860, hsp: 627, temp: 608, total: 3095 },
+    { month: "September 2025", students: 297, hsp: 0, temp: 22, total: 319 }
   ]
 };
 
