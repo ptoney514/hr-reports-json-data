@@ -16,8 +16,8 @@ const CAMPUS_SCALE_LABELS = [0, 500, 1000, 1500, 2000, 2500, 3000];
 const CAMPUS_SCALE_STEP = 500;
 
 /**
- * Q1 FY26 Temporary Workers Recruiting Dashboard
- * Displays quarterly new hire data for Temporary Workers:
+ * Q1 FY26 Temporary Workers Headcount Dashboard
+ * Displays quarterly headcount data for Temporary Workers:
  * - Student Workers (non-benefit eligible)
  * - House Staff Physicians (HSPs/Residents - benefit eligible but temporary)
  * - Temporary NBE employees
@@ -92,7 +92,7 @@ const RecruitingNBEQ1FY26Dashboard = () => {
                 <UserPlus style={{color: '#8B5CF6'}} size={32} />
                 <div>
                   <h1 className="text-3xl font-bold text-gray-900">
-                    {data.quarter} Temporary Workers Recruiting Report
+                    {data.quarter} Temporary Workers Headcount Report
                   </h1>
                   <p className="text-gray-600 text-lg mt-2">
                     Students, House Staff Physicians & Temporary • {data.fiscalPeriod}
