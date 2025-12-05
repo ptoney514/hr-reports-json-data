@@ -115,11 +115,6 @@ const RecruitingNBEQ1FY26Dashboard = () => {
           </div>
         </div>
 
-        {/* Data Freshness Note */}
-        <div className="text-xs text-amber-700 mb-6 bg-amber-50 p-3 rounded border border-amber-200">
-          <span className="font-semibold">Note:</span> {data.note} Data as of {data.dataAsOf}.
-        </div>
-
         {/* New Hire Metric Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
 
