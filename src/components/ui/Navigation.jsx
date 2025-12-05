@@ -132,11 +132,19 @@ const Navigation = () => {
     },
     {
       id: 'recruiting-q1-fy26',
-      label: 'Q1 FY26 Recruiting',
+      label: 'Q1 FY26 Recruiting (BE)',
       shortLabel: 'Q1 Recruit',
       path: '/dashboards/recruiting-q1',
       icon: UserPlus,
       isActive: isActive('/dashboards/recruiting-q1')
+    },
+    {
+      id: 'recruiting-temp-q1-fy26',
+      label: 'Q1 FY26 Recruiting (Temp)',
+      shortLabel: 'Q1 Temp',
+      path: '/dashboards/recruiting-nbe-q1',
+      icon: UserPlus,
+      isActive: isActive('/dashboards/recruiting-nbe-q1')
     },
     {
       id: 'turnover-trends',
