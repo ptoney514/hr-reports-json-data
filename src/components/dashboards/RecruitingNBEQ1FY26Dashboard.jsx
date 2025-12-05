@@ -4,8 +4,8 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsi
 import { QUARTERLY_HEADCOUNT_TRENDS } from '../../data/staticData';
 
 // Chart styling constants
-const CHART_MAX_SCALE = 3600;
-const CHART_TICKS = [0, 600, 1200, 1800, 2400, 3000, 3600];
+const CHART_MAX_SCALE = 4000;
+const CHART_TICKS = [0, 500, 1000, 1500, 2000, 2500, 3000, 3500, 4000];
 const CHART_Y_COLOR = '#5F7FC3';
 const CHART_BORDER_COLOR = '#D7D2CB';
 const CHART_PRIMARY_COLOR = '#8B5CF6';
