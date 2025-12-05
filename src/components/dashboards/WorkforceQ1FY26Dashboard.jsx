@@ -278,23 +278,6 @@ const WorkforceQ1FY26Dashboard = () => {
                 }}
               />
 
-              {/* Faculty Line (Dashed) */}
-              <Line
-                type="monotone"
-                dataKey="faculty"
-                stroke="#10B981"
-                strokeWidth={3}
-                strokeDasharray="5 5"
-                dot={{ r: 6, fill: '#10B981', strokeWidth: 2, stroke: '#ffffff' }}
-                name="Benefit Eligible Faculty"
-                activeDot={{ r: 8, fill: '#10B981', stroke: '#ffffff', strokeWidth: 3 }}
-                label={{
-                  position: 'top',
-                  offset: 10,
-                  style: { fontSize: 11, fontWeight: 'bold', fill: '#10B981' }
-                }}
-              />
-
               {/* Staff Line (Dashed) */}
               <Line
                 type="monotone"
@@ -309,6 +292,23 @@ const WorkforceQ1FY26Dashboard = () => {
                   position: 'top',
                   offset: 10,
                   style: { fontSize: 11, fontWeight: 'bold', fill: '#3B82F6' }
+                }}
+              />
+
+              {/* Faculty Line (Dashed) */}
+              <Line
+                type="monotone"
+                dataKey="faculty"
+                stroke="#10B981"
+                strokeWidth={3}
+                strokeDasharray="5 5"
+                dot={{ r: 6, fill: '#10B981', strokeWidth: 2, stroke: '#ffffff' }}
+                name="Benefit Eligible Faculty"
+                activeDot={{ r: 8, fill: '#10B981', stroke: '#ffffff', strokeWidth: 3 }}
+                label={{
+                  position: 'top',
+                  offset: 10,
+                  style: { fontSize: 11, fontWeight: 'bold', fill: '#10B981' }
                 }}
               />
             </LineChart>
