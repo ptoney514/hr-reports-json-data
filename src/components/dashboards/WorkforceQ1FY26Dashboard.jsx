@@ -238,7 +238,7 @@ const WorkforceQ1FY26Dashboard = () => {
           </h2>
           {/* Height increased from 350 to 385 to accommodate expanded legend with 6 trend lines */}
           <ResponsiveContainer width="100%" height={385}>
-            <LineChart data={QUARTERLY_HEADCOUNT_TRENDS} margin={{ top: 40, right: 30, left: 20, bottom: 20 }}>
+            <LineChart data={QUARTERLY_HEADCOUNT_TRENDS} margin={{ top: 40, right: 30, left: 50, bottom: 20 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#D7D2CB" />
               <XAxis
                 dataKey="quarter"
