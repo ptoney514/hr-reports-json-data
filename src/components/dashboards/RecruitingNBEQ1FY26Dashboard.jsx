@@ -1,6 +1,6 @@
 import React from 'react';
 import { UserPlus, Users, GraduationCap, Stethoscope, Clock, MapPin } from 'lucide-react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { QUARTERLY_HEADCOUNT_TRENDS } from '../../data/staticData';
 
 // Chart styling constants
@@ -13,7 +13,6 @@ const CHART_PRIMARY_COLOR = '#8B5CF6';
 // Campus comparison scale
 const CAMPUS_SCALE_MAX = 3000;
 const CAMPUS_SCALE_LABELS = [0, 500, 1000, 1500, 2000, 2500, 3000];
-const CAMPUS_SCALE_STEP = 500;
 
 /**
  * Q1 FY26 Temporary Workers Headcount Dashboard

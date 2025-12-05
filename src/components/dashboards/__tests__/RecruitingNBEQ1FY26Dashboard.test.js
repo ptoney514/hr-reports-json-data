@@ -64,7 +64,9 @@ describe('RecruitingNBEQ1FY26Dashboard', () => {
   describe('Metric Cards', () => {
     test('renders all metric cards', () => {
       renderComponent();
-      expect(screen.getByText(/Total Temporary Workers/i)).toBeInTheDocument();
+      // Use getAllByText since this label appears in multiple places (metric card + legend)
+      const matches = screen.getAllByText(/Total Temporary Workers/i);
+      expect(matches.length).toBeGreaterThan(0);
     });
 
     test('displays metric values and campus breakdown', () => {
