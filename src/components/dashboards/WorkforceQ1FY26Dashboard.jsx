@@ -246,8 +246,8 @@ const WorkforceQ1FY26Dashboard = () => {
               />
               <YAxis
                 tick={{ fontSize: 12, fill: '#5F7FC3' }}
-                domain={[0, 6000]}
-                ticks={[0, 1000, 2000, 3000, 4000, 5000, 6000]}
+                domain={[0, 2500]}
+                ticks={[0, 500, 1000, 1500, 2000, 2500]}
               />
               <Tooltip
                 contentStyle={{
