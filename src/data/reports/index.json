@@ -1,0 +1,38 @@
+{
+  "reports": [
+    {
+      "id": "q1-fy26",
+      "name": "Q1 FY26",
+      "type": "quarterly",
+      "fiscalYear": "FY26",
+      "quarter": "Q1",
+      "dateRange": {
+        "start": "2025-07-01",
+        "end": "2025-09-30",
+        "label": "July 2025 - September 2025"
+      },
+      "status": "published",
+      "createdAt": "2025-10-15",
+      "updatedAt": "2025-12-08",
+      "file": "q1-fy26.json"
+    }
+  ],
+  "templates": {
+    "quarterly": {
+      "name": "Quarterly Report",
+      "description": "Standard quarterly workforce report with headcount, demographics, recruiting, turnover, and exit surveys",
+      "defaultSections": ["cover", "headcount", "demographics", "recruiting", "turnover", "exit-surveys"]
+    },
+    "annual": {
+      "name": "Annual Report",
+      "description": "Comprehensive annual report with year-over-year comparisons and strategic recommendations",
+      "defaultSections": ["cover", "headcount", "demographics", "recruiting", "turnover", "exit-surveys", "yoy-comparison", "executive-summary", "recommendations"]
+    }
+  },
+  "settings": {
+    "lastSelectedReport": "q1-fy26",
+    "defaultView": "dashboard",
+    "showDrafts": true,
+    "showArchived": false
+  }
+}

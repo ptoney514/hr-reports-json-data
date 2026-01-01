@@ -1,5 +1,5 @@
 import React, { useEffect, Suspense, lazy } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import Navigation from './components/ui/Navigation';
 import ErrorBoundary from './components/ui/ErrorBoundary';
@@ -38,9 +38,36 @@ const RecruitingQ1Dashboard = lazy(() => import('./components/dashboards/Recruit
 const RecruitingNBEQ1Dashboard = lazy(() => import('./components/dashboards/RecruitingNBEQ1FY26Dashboard'));
 // Report Generator
 const ReportGenerator = lazy(() => import('./components/reports/ReportGenerator'));
+// Print Layout (Report Builder)
+const PrintLayout = lazy(() => import('./components/print/PrintLayout'));
 // WorkforceAudit temporarily disabled - papaparse dependency issue
 // const WorkforceAudit = lazy(() => import('./components/dashboards/WorkforceAudit'));
 // AdminDashboard removed - using static data now
+
+// Layout component that conditionally shows Navigation
+const AppLayout = ({ children }) => {
+  const location = useLocation();
+  const isPrintRoute = location.pathname.startsWith('/print');
+
+  if (isPrintRoute) {
+    // Print layout has its own navigation, render full width
+    return (
+      <div className="App h-screen bg-gray-50">
+        {children}
+      </div>
+    );
+  }
+
+  // Standard layout with sidebar navigation
+  return (
+    <div className="App flex h-screen bg-gray-50">
+      <Navigation />
+      <main className="flex-1 overflow-y-auto">
+        {children}
+      </main>
+    </div>
+  );
+};
 
 // Create QueryClient with optimized configuration for PocketBase
 const queryClient = new QueryClient({
@@ -107,16 +134,11 @@ function App() {
             showHomeButton={false}
           >
           <Router>
-            <div className="App flex h-screen bg-gray-50">
-              {/* Sidebar Navigation Component */}
-              <Navigation />
-            
-            {/* Main Content Area */}
-            <main className="flex-1 overflow-y-auto">
+            <AppLayout>
               {/* Main Content with Suspense for lazy loading */}
               <Suspense fallback={
                 <div className="p-4">
-                  <DashboardSkeleton 
+                  <DashboardSkeleton
                     showHeader={true}
                     showSummaryCards={true}
                     showCharts={true}
@@ -126,6 +148,8 @@ function App() {
                 </div>
               }>
               <Routes>
+              {/* Print Layout Route - Full page, own navigation */}
+              <Route path="/print/*" element={<PrintLayout />} />
               {/* Dashboard Routes */}
               <Route path="/dashboards" element={<DashboardIndex />} />
               <Route path="/dashboards/workforce" element={<WorkforceDashboard />} />
@@ -175,8 +199,7 @@ function App() {
               <Route path="*" element={<Navigate to="/dashboards" replace />} />
               </Routes>
               </Suspense>
-            </main>
-          </div>
+            </AppLayout>
           </Router>
           
           {/* React Query DevTools - Disabled to remove TanStack logo */}
