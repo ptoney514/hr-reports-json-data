@@ -37,6 +37,8 @@ const PrintReorderView = ({ reportData, pages, onSave, onCancel }) => {
   const [draggedIndex, setDraggedIndex] = useState(null);
   const [dragOverIndex, setDragOverIndex] = useState(null);
   const [hasChanges, setHasChanges] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState(null);
 
   // Handle drag start
   const handleDragStart = (e, index) => {
@@ -84,9 +86,23 @@ const PrintReorderView = ({ reportData, pages, onSave, onCancel }) => {
     setDragOverIndex(null);
   };
 
-  // Handle save
-  const handleSave = () => {
-    onSave(orderedPages);
+  // Handle save with async support
+  const handleSave = async () => {
+    setIsSaving(true);
+    setSaveError(null);
+
+    try {
+      const success = await onSave(orderedPages);
+      if (!success) {
+        setSaveError('Failed to save page order');
+        setIsSaving(false);
+      }
+      // If successful, parent component will navigate away
+    } catch (error) {
+      console.error('Error saving page order:', error);
+      setSaveError('Error saving page order');
+      setIsSaving(false);
+    }
   };
 
   // Get status color
@@ -125,24 +141,37 @@ const PrintReorderView = ({ reportData, pages, onSave, onCancel }) => {
           </div>
 
           <div className="flex items-center gap-3">
+            {saveError && (
+              <span className="text-sm text-red-600">{saveError}</span>
+            )}
             <button
               onClick={onCancel}
-              className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+              disabled={isSaving}
+              className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50"
             >
               <X className="w-4 h-4" />
               Cancel
             </button>
             <button
               onClick={handleSave}
-              disabled={!hasChanges}
+              disabled={!hasChanges || isSaving}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
-                hasChanges
+                hasChanges && !isSaving
                   ? 'bg-blue-600 text-white hover:bg-blue-700'
                   : 'bg-gray-100 text-gray-400 cursor-not-allowed'
               }`}
             >
-              <Save className="w-4 h-4" />
-              Save Order
+              {isSaving ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <Save className="w-4 h-4" />
+                  Save Order
+                </>
+              )}
             </button>
           </div>
         </div>

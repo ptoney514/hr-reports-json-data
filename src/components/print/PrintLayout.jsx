@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import PrintSidebar from './PrintSidebar';
 import PrintDashboard from './PrintDashboard';
@@ -6,6 +6,7 @@ import PrintPageViewer from './PrintPageViewer';
 import PrintReorderView from './PrintReorderView';
 import ReportSelector from './ReportSelector';
 import reportsIndex from '../../data/reports/index.json';
+import { loadReport, saveReport, updatePageOrder, updatePageStatus } from '../../services/reportService';
 
 /**
  * PrintLayout - Main layout component for the report builder
@@ -28,9 +29,9 @@ const PrintLayout = () => {
   const [statusFilter, setStatusFilter] = useState('all'); // all | published | draft | archived
   const [isLoading, setIsLoading] = useState(true);
 
-  // Load report data
+  // Load report data using reportService
   useEffect(() => {
-    const loadReport = async () => {
+    const fetchReport = async () => {
       setIsLoading(true);
       try {
         // Get report ID from URL or use default
@@ -44,10 +45,12 @@ const PrintLayout = () => {
           return;
         }
 
-        // Dynamic import of report data
-        const reportModule = await import(`../../data/reports/${reportMeta.file}`);
-        setReportData(reportModule.default || reportModule);
-        setCurrentReport(reportId);
+        // Load report using service (checks localStorage first, then JSON file)
+        const data = await loadReport(reportId);
+        if (data) {
+          setReportData(data);
+          setCurrentReport(reportId);
+        }
 
         // Check for page param
         const pageId = searchParams.get('page');
@@ -61,8 +64,40 @@ const PrintLayout = () => {
       setIsLoading(false);
     };
 
-    loadReport();
+    fetchReport();
   }, [searchParams]);
+
+  // Handle saving page order
+  const handleSavePageOrder = useCallback(async (newOrder) => {
+    if (!currentReport) return false;
+
+    const success = await updatePageOrder(currentReport, newOrder);
+    if (success) {
+      // Reload report data to reflect changes
+      const updatedData = await loadReport(currentReport);
+      if (updatedData) {
+        setReportData(updatedData);
+      }
+    }
+    return success;
+  }, [currentReport]);
+
+  // Handle saving page status
+  const handleSavePageStatus = useCallback(async (pageId, newStatus) => {
+    if (!currentReport) return false;
+
+    const success = await updatePageStatus(currentReport, pageId, newStatus);
+    if (success) {
+      // Update local state immediately for responsiveness
+      setReportData(prev => ({
+        ...prev,
+        pages: prev.pages.map(p =>
+          p.id === pageId ? { ...p, status: newStatus } : p
+        )
+      }));
+    }
+    return success;
+  }, [currentReport]);
 
   // Handle report change
   const handleReportChange = (reportId) => {
@@ -223,6 +258,7 @@ const PrintLayout = () => {
               pages={filteredPages}
               onPageSelect={handlePageSelect}
               onBack={handleBackToDashboard}
+              onStatusChange={handleSavePageStatus}
             />
           )}
 
@@ -230,10 +266,12 @@ const PrintLayout = () => {
             <PrintReorderView
               reportData={reportData}
               pages={reportData.pages}
-              onSave={(newOrder) => {
-                // TODO: Save new order to JSON
-                console.log('New order:', newOrder);
-                handleViewChange('dashboard');
+              onSave={async (newOrder) => {
+                const success = await handleSavePageOrder(newOrder);
+                if (success) {
+                  handleViewChange('dashboard');
+                }
+                return success;
               }}
               onCancel={() => handleViewChange('dashboard')}
             />

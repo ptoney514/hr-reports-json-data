@@ -24,9 +24,11 @@ const statusOptions = [
   { id: 'archived', label: 'Archived', icon: Archive, color: 'text-gray-400' }
 ];
 
-const PrintPageViewer = ({ reportData, pageId, pages, onPageSelect, onBack }) => {
+const PrintPageViewer = ({ reportData, pageId, pages, onPageSelect, onBack, onStatusChange }) => {
   const [showStatusMenu, setShowStatusMenu] = useState(false);
   const [showActionsMenu, setShowActionsMenu] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveMessage, setSaveMessage] = useState(null);
 
   // Get current page
   const currentPage = pages?.find(p => p.id === pageId);
@@ -48,11 +50,34 @@ const PrintPageViewer = ({ reportData, pageId, pages, onPageSelect, onBack }) =>
     }
   };
 
-  // Handle status change
-  const handleStatusChange = (newStatus) => {
-    // TODO: Update page status in JSON
-    console.log('Change status to:', newStatus);
+  // Handle status change with save
+  const handleStatusChange = async (newStatus) => {
+    if (newStatus === currentPage?.status) {
+      setShowStatusMenu(false);
+      return;
+    }
+
+    setIsSaving(true);
     setShowStatusMenu(false);
+
+    try {
+      if (onStatusChange) {
+        const success = await onStatusChange(pageId, newStatus);
+        if (success) {
+          setSaveMessage({ type: 'success', text: `Status changed to ${newStatus}` });
+        } else {
+          setSaveMessage({ type: 'error', text: 'Failed to save status' });
+        }
+      }
+    } catch (error) {
+      console.error('Error changing status:', error);
+      setSaveMessage({ type: 'error', text: 'Error saving status' });
+    }
+
+    setIsSaving(false);
+
+    // Clear message after 2 seconds
+    setTimeout(() => setSaveMessage(null), 2000);
   };
 
   // Get status config
@@ -221,6 +246,15 @@ const PrintPageViewer = ({ reportData, pageId, pages, onPageSelect, onBack }) =>
 
   return (
     <div className="h-full flex flex-col">
+      {/* Save Message Toast */}
+      {saveMessage && (
+        <div className={`fixed top-4 right-4 z-50 px-4 py-2 rounded-lg shadow-lg ${
+          saveMessage.type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
+        }`}>
+          {saveMessage.text}
+        </div>
+      )}
+
       {/* Page Header */}
       <div className="bg-white border-b border-gray-200 px-6 py-4">
         <div className="flex items-center justify-between">
