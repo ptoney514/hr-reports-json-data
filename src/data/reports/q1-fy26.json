@@ -1,0 +1,295 @@
+{
+  "id": "q1-fy26",
+  "name": "Q1 FY26",
+  "title": "HR Workforce Reports",
+  "subtitle": "Quarterly Analysis for Benefit Eligible Employees",
+  "type": "quarterly",
+  "fiscalYear": "FY26",
+  "quarter": "Q1",
+  "dateRange": {
+    "start": "2025-07-01",
+    "end": "2025-09-30",
+    "label": "July 2025 - September 2025"
+  },
+  "status": "published",
+  "createdAt": "2025-10-15",
+  "updatedAt": "2025-12-08",
+
+  "branding": {
+    "organization": "Creighton University",
+    "department": "Human Resources",
+    "confidential": true,
+    "confidentialityText": "CONFIDENTIAL - For Internal Use Only",
+    "primaryColor": "#0054A6",
+    "secondaryColor": "#00245D"
+  },
+
+  "sections": [
+    {
+      "id": "headcount",
+      "name": "Headcount",
+      "icon": "Users",
+      "order": 1
+    },
+    {
+      "id": "demographics",
+      "name": "Demographics",
+      "icon": "PieChart",
+      "order": 2
+    },
+    {
+      "id": "recruiting",
+      "name": "Recruiting",
+      "icon": "UserPlus",
+      "order": 3
+    },
+    {
+      "id": "turnover",
+      "name": "Turnover",
+      "icon": "TrendingDown",
+      "order": 4
+    },
+    {
+      "id": "exit-surveys",
+      "name": "Exit Surveys",
+      "icon": "ClipboardList",
+      "order": 5
+    }
+  ],
+
+  "pages": [
+    {
+      "id": "cover",
+      "type": "cover",
+      "title": "Cover Page",
+      "section": null,
+      "status": "published",
+      "order": 1,
+      "component": "CoverPage",
+      "printSettings": {
+        "pageBreakAfter": true,
+        "includeInTOC": false
+      }
+    },
+    {
+      "id": "toc",
+      "type": "toc",
+      "title": "Table of Contents",
+      "section": null,
+      "status": "draft",
+      "order": 2,
+      "component": "TableOfContents",
+      "printSettings": {
+        "pageBreakAfter": true,
+        "includeInTOC": false
+      }
+    },
+    {
+      "id": "headcount-overview",
+      "type": "data",
+      "title": "Workforce & Headcount Overview",
+      "section": "headcount",
+      "status": "draft",
+      "order": 3,
+      "component": "HeadcountOverviewPage",
+      "route": "/dashboards/workforce-q1",
+      "dashboardId": "workforce-q1-fy26-dashboard",
+      "printSettings": {
+        "pageBreakAfter": true,
+        "includeInTOC": true,
+        "tocTitle": "Headcount"
+      }
+    },
+    {
+      "id": "headcount-campus",
+      "type": "data",
+      "title": "Campus Comparison",
+      "section": "headcount",
+      "status": "draft",
+      "order": 4,
+      "component": "HeadcountCampusPage",
+      "printSettings": {
+        "pageBreakAfter": true,
+        "includeInTOC": true
+      }
+    },
+    {
+      "id": "headcount-trends",
+      "type": "trend",
+      "title": "Headcount Trends",
+      "section": "headcount",
+      "status": "draft",
+      "order": 5,
+      "component": "HeadcountTrendsPage",
+      "printSettings": {
+        "pageBreakAfter": true,
+        "includeInTOC": true
+      }
+    },
+    {
+      "id": "demographics-overview",
+      "type": "data",
+      "title": "Demographics Overview",
+      "section": "demographics",
+      "status": "draft",
+      "order": 6,
+      "component": "DemographicsOverviewPage",
+      "route": "/dashboards/demographics-q1",
+      "dashboardId": "demographics-q1-fy26-dashboard",
+      "printSettings": {
+        "pageBreakAfter": true,
+        "includeInTOC": true,
+        "tocTitle": "Demographics"
+      }
+    },
+    {
+      "id": "demographics-age-gender",
+      "type": "data",
+      "title": "Age & Gender Distribution",
+      "section": "demographics",
+      "status": "draft",
+      "order": 7,
+      "component": "DemographicsAgeGenderPage",
+      "printSettings": {
+        "pageBreakAfter": true,
+        "includeInTOC": true
+      }
+    },
+    {
+      "id": "recruiting-overview",
+      "type": "data",
+      "title": "Recruiting Overview",
+      "section": "recruiting",
+      "status": "draft",
+      "order": 8,
+      "component": "RecruitingOverviewPage",
+      "route": "/dashboards/recruiting-q1",
+      "dashboardId": "recruiting-q1-fy26-dashboard",
+      "printSettings": {
+        "pageBreakAfter": true,
+        "includeInTOC": true,
+        "tocTitle": "Recruiting"
+      }
+    },
+    {
+      "id": "recruiting-sources",
+      "type": "data",
+      "title": "Recruiting Sources",
+      "section": "recruiting",
+      "status": "draft",
+      "order": 9,
+      "component": "RecruitingSourcesPage",
+      "printSettings": {
+        "pageBreakAfter": true,
+        "includeInTOC": true
+      }
+    },
+    {
+      "id": "recruiting-nbe",
+      "type": "data",
+      "title": "Non-Benefit Eligible Recruiting",
+      "section": "recruiting",
+      "status": "draft",
+      "order": 10,
+      "component": "RecruitingNBEPage",
+      "route": "/dashboards/recruiting-nbe-q1",
+      "printSettings": {
+        "pageBreakAfter": true,
+        "includeInTOC": true
+      }
+    },
+    {
+      "id": "turnover-overview",
+      "type": "data",
+      "title": "Turnover Overview",
+      "section": "turnover",
+      "status": "draft",
+      "order": 11,
+      "component": "TurnoverOverviewPage",
+      "route": "/dashboards/turnover-q1",
+      "dashboardId": "turnover-q1-fy26-dashboard",
+      "printSettings": {
+        "pageBreakAfter": true,
+        "includeInTOC": true,
+        "tocTitle": "Turnover"
+      }
+    },
+    {
+      "id": "turnover-analysis",
+      "type": "data",
+      "title": "Turnover Analysis",
+      "section": "turnover",
+      "status": "draft",
+      "order": 12,
+      "component": "TurnoverAnalysisPage",
+      "printSettings": {
+        "pageBreakAfter": true,
+        "includeInTOC": true
+      }
+    },
+    {
+      "id": "turnover-trends",
+      "type": "trend",
+      "title": "Turnover Trends",
+      "section": "turnover",
+      "status": "draft",
+      "order": 13,
+      "component": "TurnoverTrendsPage",
+      "route": "/dashboards/turnover-trends",
+      "printSettings": {
+        "pageBreakAfter": true,
+        "includeInTOC": true
+      }
+    },
+    {
+      "id": "exit-survey-overview",
+      "type": "data",
+      "title": "Exit Survey Overview",
+      "section": "exit-surveys",
+      "status": "draft",
+      "order": 14,
+      "component": "ExitSurveyOverviewPage",
+      "route": "/dashboards/exit-survey-q1",
+      "dashboardId": "exit-survey-q1-fy26-dashboard",
+      "printSettings": {
+        "pageBreakAfter": true,
+        "includeInTOC": true,
+        "tocTitle": "Exit Surveys"
+      }
+    },
+    {
+      "id": "exit-survey-themes",
+      "type": "data",
+      "title": "Exit Survey Themes",
+      "section": "exit-surveys",
+      "status": "draft",
+      "order": 15,
+      "component": "ExitSurveyThemesPage",
+      "printSettings": {
+        "pageBreakAfter": false,
+        "includeInTOC": true
+      }
+    }
+  ],
+
+  "pdfSettings": {
+    "orientation": "portrait",
+    "format": "letter",
+    "margins": {
+      "top": 40,
+      "right": 40,
+      "bottom": 60,
+      "left": 40
+    },
+    "header": {
+      "enabled": true,
+      "text": "Creighton University - HR Workforce Reports Q1 FY26",
+      "fontSize": 10
+    },
+    "footer": {
+      "enabled": true,
+      "showPageNumbers": true,
+      "showConfidentiality": true
+    }
+  }
+}
