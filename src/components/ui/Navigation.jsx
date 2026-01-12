@@ -4,6 +4,7 @@ import {
   BarChart3,
   Users,
   TrendingDown,
+  TrendingUp,
   Home,
   Menu,
   X,
@@ -169,6 +170,22 @@ const Navigation = () => {
       path: '/dashboards/demographics-q1',
       icon: Users,
       isActive: isActive('/dashboards/demographics-q1')
+    },
+    {
+      id: 'job-changes-q1-fy26',
+      label: 'Q1 FY26 Job Changes',
+      shortLabel: 'Q1 Jobs',
+      path: '/dashboards/internal-mobility-q1',
+      icon: TrendingUp,
+      isActive: isActive('/dashboards/internal-mobility-q1')
+    },
+    {
+      id: 'job-changes-testing',
+      label: 'Job Changes (All Data)',
+      shortLabel: 'All Jobs',
+      path: '/dashboards/job-changes-testing',
+      icon: TrendingUp,
+      isActive: isActive('/dashboards/job-changes-testing')
     }
   ];
 

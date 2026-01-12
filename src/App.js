@@ -36,6 +36,9 @@ const DemographicsQ1Dashboard = lazy(() => import('./components/dashboards/Demog
 // Quarterly Recruiting Reports
 const RecruitingQ1Dashboard = lazy(() => import('./components/dashboards/RecruitingQ1FY26Dashboard'));
 const RecruitingNBEQ1Dashboard = lazy(() => import('./components/dashboards/RecruitingNBEQ1FY26Dashboard'));
+// Quarterly Internal Mobility Reports
+const InternalMobilityQ1Dashboard = lazy(() => import('./components/dashboards/InternalMobilityQ1FY26Dashboard'));
+const JobChangesTestingDashboard = lazy(() => import('./components/dashboards/JobChangesTestingDashboard'));
 // Report Generator
 const ReportGenerator = lazy(() => import('./components/reports/ReportGenerator'));
 // Print Layout (Report Builder)
@@ -182,6 +185,10 @@ function App() {
               {/* Quarterly Recruiting Reports */}
               <Route path="/dashboards/recruiting-q1" element={<RecruitingQ1Dashboard />} />
               <Route path="/dashboards/recruiting-nbe-q1" element={<RecruitingNBEQ1Dashboard />} />
+
+              {/* Quarterly Internal Mobility Reports */}
+              <Route path="/dashboards/internal-mobility-q1" element={<InternalMobilityQ1Dashboard />} />
+              <Route path="/dashboards/job-changes-testing" element={<JobChangesTestingDashboard />} />
 
               {/* Testing routes removed - using static data approach */}
               
