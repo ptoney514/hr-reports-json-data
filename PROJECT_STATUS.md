@@ -1,12 +1,51 @@
 # Project Status
 
-## Last Updated: November 15, 2025
+## Last Updated: January 1, 2026
 
 ## Current Sprint/Phase
-**Phase**: Production Ready - Optimization Complete
-**Sprint**: P0 Critical Tasks ✅ COMPLETE - Ready for P1/P2 tasks
+**Phase**: Print Layout / Report Builder Development
+**Sprint**: Building Report Builder UI with Left Sidebar Navigation
 **Branch**: `main`
 **Environment**: Local development running at http://localhost:3000
+
+---
+
+## 🚧 ACTIVE WORK: Print Layout / Report Builder
+
+### What We're Building
+A report builder UI at `/print` with left sidebar navigation (Relume-style) that can manage 26+ pages for quarterly HR reports.
+
+### Completed Components ✅
+| Component | Location | Status |
+|-----------|----------|--------|
+| PrintLayout.jsx | src/components/print/ | ✅ Created - Main layout with header/sidebar/content |
+| PrintSidebar.jsx | src/components/print/ | ✅ Created - Left nav with filters, sections, tools |
+| PrintDashboard.jsx | src/components/print/ | ✅ Created - Thumbnail grid view |
+| PrintPageViewer.jsx | src/components/print/ | ✅ Created - Individual page view with status controls |
+| PrintReorderView.jsx | src/components/print/ | ✅ Created - Drag-and-drop page reorder |
+| ReportSelector.jsx | src/components/print/ | ✅ Created - Dropdown to switch reports |
+| reportService.js | src/services/ | ✅ Created - localStorage persistence layer |
+| index.json | src/data/reports/ | ✅ Created - Report index/registry |
+| q1-fy26.json | src/data/reports/ | ✅ Created - Q1 FY26 report config (15 pages) |
+
+### Remaining Work 🚧
+| Task | Status | Notes |
+|------|--------|-------|
+| Connect actual page components | ❌ Pending | Need to import Cover, Data, Trend, Section Divider components |
+| Update page statuses | ⚠️ In Progress | Currently 1 published, 14 draft - need to match working components |
+| Link to existing dashboards | ❌ Pending | Data pages should render actual WorkforceQ1FY26Dashboard, etc. |
+| PDF export from builder | ❌ Pending | Future enhancement |
+
+### Page Component Sources (TO BE INTEGRATED)
+The "Component Demo - Cards & Charts" at localhost:5173 shows 4 working page types:
+1. **Cover Page** - Creighton seal photo + TOC
+2. **Data Page** - Headcount metrics with bar chart
+3. **Trend Page** - Quarterly trend line chart
+4. **Section Divider** - Blue background with section title
+
+**⚠️ QUESTION**: Where are these components located? Need to import them into this project.
+
+---
 
 ## Completed Features ✅
 
@@ -58,29 +97,26 @@
 
 ## In Progress 🚧
 
-### Current Sprint: Claude Code Optimization
+### Current Sprint: Print Layout / Report Builder
+- [x] Created print layout infrastructure (Dec 2025)
+- [x] Added left sidebar navigation (Relume-style)
+- [x] Created JSON-based report configurations
+- [x] Implemented reportService for localStorage persistence
+- [x] Added drag-and-drop page reorder functionality
+- [x] Added page status management (published/draft/archived)
+- [ ] **NEXT**: Connect actual page components (Cover, Data, Trend, Section Divider)
+- [ ] **NEXT**: Link data pages to existing dashboards
+
+### Recent Commits (December 2025 - January 2026)
+- `0d7ea1a` - fix: set realistic page statuses (1 published, 14 draft)
+- `63af959` - feat: add save functionality for reorder/status changes
+- `f820d55` - feat: add print layout with left sidebar navigation
+
+### Previous Sprint: Claude Code Optimization ✅
 - [x] Technical Architecture Review completed
 - [x] Added 3 specialized agents (PM, Tech Architect, Data Analytics)
 - [x] Created pr-prep agent for pre-PR quality checks
-- [x] Added .claudeignore for performance
-- [x] Created PR_WORKFLOW.md
-- [x] Enhanced CLAUDE.md with agent documentation
-- [x] Organized docs/ directory structure
-- [x] Committed optimization changes to feature branch
-- [x] Removed product-operations agent (not needed for personal use)
-
-### ✅ P0 Critical Tasks COMPLETE (November 15, 2025)
-- [x] Optimize images (11.78MB saved, 96% reduction) - **PR #4 merged**
-  - Removed hero-bg.jpg (12MB) and never-stop-learning.jpg (280KB)
-  - Retained optimized hero-bg.webp (514KB)
-  - Added optimization documentation to public/images/README.md
-- [x] Remove unused dependencies - **PR #4 merged**
-  - Removed csv-parser (only used in legacy debug scripts)
-  - Kept csv-parse (actively used in workforce processing)
-  - Kept papaparse (used in React components)
-- [x] Update outdated packages - **Already at latest versions**
-  - postcss: 8.5.6 (latest stable)
-  - @testing-library/user-event: 14.6.1 (updated previously)
+- [x] All P0 Critical Tasks COMPLETE (November 15, 2025)
 
 ## Roadmap & Backlog 📋
 
@@ -143,23 +179,19 @@
 
 ## Next Session Goals
 
-### Immediate Tasks (Next Session)
-1. Organize assessment documents into docs/ directory
-2. Implement P0 image optimization (62MB savings)
-3. Remove unused dependencies identified by Tech Architect
-4. Set up PostHog analytics (Product Ops Week 1)
+### Immediate Tasks (Print Layout)
+1. **Locate Component Demo source** - Find where the Cover, Data, Trend, Section Divider components live
+2. **Import page components** - Integrate working components into this project
+3. **Connect to PrintPageViewer** - Replace placeholder previews with actual components
+4. **Update page statuses** - Mark pages as published as components are connected
 
-### Planning Tasks
-1. Create unified roadmap from Tech Architect + Product Ops assessments
-2. Prioritize P0-P2 tasks using RICE framework
-3. Define 6-month product vision and North Star Metric
-4. Plan Q1 2025 feature roadmap
+### Waiting On
+- **GitHub Issue #55**: HSP, Student Workers and NBE reporting (waiting on data from Tom)
 
 ### Quality & Testing
-1. Increase test coverage from 5% to 25% (first milestone toward 65%)
-2. Clean up 30+ ESLint warnings
-3. Run accessibility audit with accessibility-guardian agent
-4. Set up pr-prep workflow for all future PRs
+1. Run accessibility audit on print layout components
+2. Test drag-and-drop reorder across browsers
+3. Verify localStorage persistence works correctly
 
 ## Performance Metrics
 
