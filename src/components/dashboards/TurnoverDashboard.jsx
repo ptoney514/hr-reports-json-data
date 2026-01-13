@@ -14,139 +14,12 @@ import RetirementsByFiscalYear from '../charts/RetirementsByFiscalYear';
 import ErrorBoundary from '../ui/ErrorBoundary';
 import PDFExportButton from '../ui/PDFExportButton';
 import { getTurnoverData } from '../../data/staticData';
-import { 
-  TrendingDown, 
-  DollarSign, 
+import {
+  TrendingDown,
   BookOpen,
   Building2,
-  AlertTriangle,
-  Info,
-  Clock
+  Info
 } from 'lucide-react';
-
-// Simplified fallback data for consistent dashboard display - 6/30/2025
-const FALLBACK_DATA = {
-  summary: {
-    overallTurnoverRate: 2.2,
-    totalDepartures: 62,
-    turnoverRateChange: -10.3,
-    facultyTurnoverRate: 1.7,
-    facultyDepartures: 21,
-    facultyTurnoverChange: -7.1,
-    staffTurnoverRate: 2.9,
-    staffDepartures: 41,
-    staffTurnoverChange: -12.4,
-    totalCostImpact: 1500000,
-    avgCostPerDeparture: 24200,
-    costImpactChange: -75.0,
-    avgTenure: "TBD"
-  },
-  charts: {
-    voluntaryReasons: [
-      { name: 'Career Advancement', value: 109, percentage: 38 },
-      { name: 'Compensation', value: 60, percentage: 21 },
-      { name: 'Work-Life Balance', value: 49, percentage: 17 },
-      { name: 'Retirement', value: 34, percentage: 12 },
-      { name: 'Relocation', value: 23, percentage: 8 },
-      { name: 'Other', value: 11, percentage: 4 }
-    ],
-    tenureAnalysis: [
-      { name: '< 1 Year', value: 100, percentage: 35 },
-      { name: '1-3 Years', value: 83, percentage: 29 },
-      { name: '3-5 Years', value: 52, percentage: 18 },
-      { name: '5-10 Years', value: 29, percentage: 10 },
-      { name: '10+ Years', value: 23, percentage: 8 }
-    ],
-    gradeClassification: [
-      { name: 'Faculty', value: 89, turnoverRate: 7.4 },
-      { name: 'Professional Staff', value: 156, turnoverRate: 11.2 },
-      { name: 'Support Staff', value: 22, turnoverRate: 8.9 },
-      { name: 'Executive', value: 8, turnoverRate: 17.8 },
-      { name: 'Student Workers', value: 12, turnoverRate: 15.7 }
-    ],
-    historicalTrends: [
-      { period: 'FY2020', overall: 14.2, faculty: 9.1, staff: 17.8 },
-      { period: 'FY2021', overall: 13.8, faculty: 8.9, staff: 16.9 },
-      { period: 'FY2022', overall: 13.1, faculty: 8.5, staff: 16.2 },
-      { period: 'FY2023', overall: 12.9, faculty: 8.7, staff: 15.8 },
-      { period: 'FY2024', overall: 12.5, faculty: 8.8, staff: 15.3 }
-    ],
-    turnoverBySchool: [
-      { name: 'Arts & Sciences', value: 11 },
-      { name: 'Athletics', value: 4 },
-      { name: 'CFE', value: 2 },
-      { name: 'Dentistry', value: 5 },
-      { name: 'Facilities', value: 7 },
-      { name: 'GENC', value: 2 },
-      { name: 'Heider College of Business', value: 3 },
-      { name: 'Law School', value: 2 },
-      { name: 'Medicine', value: 5 },
-      { name: 'Nursing', value: 3 },
-      { name: 'Pharmacy & Health Professions', value: 5 },
-      { name: 'Provost', value: 1 },
-      { name: 'Public Safety', value: 2 },
-      { name: 'Research', value: 1 },
-      { name: 'UCOM', value: 1 },
-      { name: 'Enrollment Management', value: 1 },
-      { name: 'VPGE', value: 1 },
-      { name: 'Information Technology', value: 3 },
-      { name: 'Student Life', value: 3 }
-    ],
-    topExitReasons: [
-      { reason: 'Resigned', total: 25, percentage: 40.3, faculty: 3, staff: 22 },
-      { reason: 'Retirement', total: 14, percentage: 22.6, faculty: 9, staff: 5 },
-      { reason: 'End Assignment', total: 9, percentage: 14.5, faculty: 7, staff: 2 },
-      { reason: 'Better Opportunity', total: 5, percentage: 8.1, faculty: 0, staff: 5 },
-      { reason: 'Invol Performance', total: 3, percentage: 4.8, faculty: 1, staff: 2 },
-      { reason: 'Personal Reasons', total: 2, percentage: 3.2, faculty: 0, staff: 2 },
-      { reason: 'Relocation', total: 2, percentage: 3.2, faculty: 0, staff: 2 },
-      { reason: 'Death', total: 1, percentage: 1.6, faculty: 1, staff: 0 },
-      { reason: 'Reduction In Force', total: 1, percentage: 1.6, faculty: 0, staff: 1 }
-    ],
-    
-    // Employee reported turnover reasons
-    employeeReportedTurnoverReasons: [
-      { reason: 'Career Advancement', total: 40, percentage: 28, faculty: 5, staff: 35 },
-      { reason: 'Compensation', total: 31, percentage: 22, faculty: 3, staff: 28 },
-      { reason: 'Supervisor Issues', total: 26, percentage: 18, faculty: 3, staff: 23 },
-      { reason: 'Work-Life Balance', total: 21, percentage: 15, faculty: 4, staff: 17 },
-      { reason: 'Retirement', total: 17, percentage: 12, faculty: 3, staff: 14 },
-      { reason: 'Other', total: 7, percentage: 5, faculty: 0, staff: 7 }
-    ]
-  },
-  benchmarks: {
-    overall: { creighton: 12.5, industry: 14.2 },
-    faculty: { creighton: 8.8, industry: 11.1 },
-    staff: { creighton: 15.3, industry: 16.8 }
-  },
-  metrics: {
-    highRiskDepartments: [
-      { name: 'Information Technology', turnoverRate: 18.5, riskLevel: 'High' },
-      { name: 'Marketing', turnoverRate: 16.2, riskLevel: 'High' },
-      { name: 'Human Resources', turnoverRate: 14.8, riskLevel: 'Medium' },
-      { name: 'Facilities', turnoverRate: 13.9, riskLevel: 'Medium' }
-    ],
-    retention: {
-      avgTimeToFill: 45,
-      exitInterviewRate: 87,
-      preventableTurnover: 34,
-      retentionRate: 87.5
-    },
-    historical: {
-      fiveYearAverage: 13.2,
-      trend: 'downward',
-      bestYear: { rate: 10.1, year: '2019' }
-    }
-  }
-};
-
-// Helper function to safely format numbers
-const safeToFixed = (value, decimals = 1) => {
-  if (typeof value === 'number' && !isNaN(value)) {
-    return value.toFixed(decimals);
-  }
-  return '0.0';
-};
 
 const TurnoverDashboard = () => {
   // Static data for 6/30/25 reporting period only
@@ -193,12 +66,8 @@ const TurnoverDashboard = () => {
       turnoverByLengthOfService: currentData.turnoverByLengthOfService || { faculty: [], staff: [] }
     }
   };
-  
-  const filters = { fiscalYear: '2025' };
 
-  // Enhanced subtitle with data source
-  const dataSource = 'Static Data';
-  const subtitle = `FY ${filters.fiscalYear || '2025'} | 📊 Cached (${dataSource})`;
+  // Data sourced from static data
 
   // Validate data structure to prevent object rendering errors
   if (!data || typeof data !== 'object') {

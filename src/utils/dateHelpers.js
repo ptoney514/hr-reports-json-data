@@ -1,4 +1,4 @@
-import { format, parseISO, addMonths, subMonths, startOfMonth, endOfMonth, startOfQuarter, endOfQuarter, isValid, differenceInDays, differenceInMonths } from 'date-fns';
+import { format, parseISO, addMonths, subMonths, startOfMonth, endOfMonth, isValid, differenceInDays, differenceInMonths } from 'date-fns';
 
 /**
  * Format a quarter string (e.g., "Q2-2025")

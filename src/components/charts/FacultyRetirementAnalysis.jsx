@@ -1,6 +1,6 @@
-import React, { memo, useMemo } from 'react';
+import React, { memo } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { TrendingUp, Users, Calendar } from 'lucide-react';
+import { Users } from 'lucide-react';
 import ChartErrorBoundary from '../ui/ChartErrorBoundary';
 
 const FacultyRetirementAnalysis = memo(({ 

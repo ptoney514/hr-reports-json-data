@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Calendar, FileText, AlertCircle, Code, GitCommit, CheckCircle, TrendingUp, TrendingDown } from 'lucide-react';
+import { Calendar, FileText, Code, GitCommit, CheckCircle, TrendingUp, TrendingDown } from 'lucide-react';
 import { METHODOLOGY_CHANGELOG } from '../../data/methodologyChangelog';
 
 const MethodologyChangeLog = () => {

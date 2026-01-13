@@ -40,27 +40,6 @@ const AgeDistributionChart = ({ data }) => {
     return null;
   };
 
-  // Custom label renderer for bars
-  const renderCustomLabel = (props) => {
-    const { x, y, width, height, value, dataKey } = props;
-    const item = chartData.find(d => 
-      (dataKey === 'faculty' && d.faculty === value) ||
-      (dataKey === 'staff' && d.staff === value)
-    );
-    const percentage = dataKey === 'faculty' ? item?.facultyPct : item?.staffPct;
-    
-    return (
-      <text 
-        x={x + width / 2} 
-        y={y - 5} 
-        fill="#333" 
-        textAnchor="middle" 
-        fontSize="11"
-      >
-        {value}
-      </text>
-    );
-  };
 
   return (
     <div className="bg-white rounded-lg shadow p-6 print:break-inside-avoid">

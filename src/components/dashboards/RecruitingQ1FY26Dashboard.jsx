@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
-import { UserPlus, Users, UserCheck, Briefcase, BarChart3, MapPin, Building2, Calendar, TrendingUp, FileText, CheckCircle, AlertCircle, Info, Clock, Target, Filter, Award, Linkedin, Globe, ChevronUp, ChevronDown } from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, FunnelChart, Funnel, LabelList, LineChart, Line } from 'recharts';
+import { UserPlus, Users, UserCheck, Briefcase, Building2, TrendingUp, FileText, CheckCircle, AlertCircle, Info, Clock, Target, Filter, Award, Globe, ChevronUp, ChevronDown } from 'lucide-react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
 
 /**
  * Q1 FY26 Recruiting Dashboard
@@ -348,14 +348,6 @@ const RecruitingQ1FY26Dashboard = () => {
     Staff: s.staff,
     total: s.total
   }));
-
-  // Recruitment funnel data
-  const funnelData = [
-    { name: 'Applications', value: myJobs.applications.new, fill: '#3B82F6' },
-    { name: 'Active', value: myJobs.applications.active, fill: '#10B981' },
-    { name: 'HR Processing', value: myJobs.hires.hrProcessing, fill: '#F59E0B' },
-    { name: 'Hired', value: myJobs.hires.total, fill: '#0054A6' }
-  ];
 
   return (
     <div id="recruiting-q1-fy26-dashboard" className="min-h-screen bg-gray-50 py-8">

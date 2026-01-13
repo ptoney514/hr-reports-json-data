@@ -6,7 +6,7 @@ import PrintPageViewer from './PrintPageViewer';
 import PrintReorderView from './PrintReorderView';
 import ReportSelector from './ReportSelector';
 import reportsIndex from '../../data/reports/index.json';
-import { loadReport, saveReport, updatePageOrder, updatePageStatus } from '../../services/reportService';
+import { loadReport, updatePageOrder, updatePageStatus } from '../../services/reportService';
 
 /**
  * PrintLayout - Main layout component for the report builder

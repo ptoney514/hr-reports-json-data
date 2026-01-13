@@ -792,7 +792,7 @@ export const formUtils = {
   }
 };
 
-export default {
+const accessibilityUtils = {
   generateChartAriaLabel,
   generateChartAriaDescription,
   generateTableSummary,
@@ -808,4 +808,6 @@ export default {
   skipLinkUtils,
   liveRegionUtils,
   formUtils
-}; 
+};
+
+export default accessibilityUtils; 

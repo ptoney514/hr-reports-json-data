@@ -27,7 +27,6 @@ const statusOptions = [
 const PrintPageViewer = ({ reportData, pageId, pages, onPageSelect, onBack, onStatusChange }) => {
   const [showStatusMenu, setShowStatusMenu] = useState(false);
   const [showActionsMenu, setShowActionsMenu] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState(null);
 
   // Get current page
@@ -57,7 +56,6 @@ const PrintPageViewer = ({ reportData, pageId, pages, onPageSelect, onBack, onSt
       return;
     }
 
-    setIsSaving(true);
     setShowStatusMenu(false);
 
     try {
@@ -73,8 +71,6 @@ const PrintPageViewer = ({ reportData, pageId, pages, onPageSelect, onBack, onSt
       console.error('Error changing status:', error);
       setSaveMessage({ type: 'error', text: 'Error saving status' });
     }
-
-    setIsSaving(false);
 
     // Clear message after 2 seconds
     setTimeout(() => setSaveMessage(null), 2000);

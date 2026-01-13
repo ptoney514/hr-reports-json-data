@@ -1,5 +1,5 @@
 import React from 'react';
-import { Users, BarChart3, FileText } from 'lucide-react';
+import { Users, FileText } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { getQuarterlyWorkforceData } from '../../data/staticData';
 

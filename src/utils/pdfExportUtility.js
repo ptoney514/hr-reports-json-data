@@ -13,9 +13,7 @@
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import { formatDate } from './dateHelpers';
-
-// Import jspdf-autotable plugin
-import autoTable from 'jspdf-autotable';
+import 'jspdf-autotable';
 
 // Professional CLARITY branding configuration
 const CLARITY_BRANDING = {

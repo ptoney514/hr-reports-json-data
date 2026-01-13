@@ -1,13 +1,12 @@
 import React from 'react';
-import { 
-  AlertTriangle, 
-  RefreshCw, 
-  Wifi, 
-  WifiOff, 
-  Database, 
-  BarChart3,
+import {
+  AlertTriangle,
+  RefreshCw,
+  Wifi,
+  WifiOff,
+  Database,
   Home,
-  Bug
+  BarChart3
 } from 'lucide-react';
 
 class ErrorBoundary extends React.Component {
@@ -108,7 +107,7 @@ class ErrorBoundary extends React.Component {
   };
 
   getErrorDetails() {
-    const { errorType, error } = this.state;
+    const { errorType } = this.state;
     
     const errorDetails = {
       network: {
