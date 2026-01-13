@@ -1,6 +1,6 @@
 import React from 'react';
-import { Users, UserCheck, Briefcase, BarChart3, MapPin, GraduationCap, Stethoscope, FileText, TrendingDown, TrendingUp, CheckCircle, AlertCircle, Info } from 'lucide-react';
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, LineChart, Line, XAxis, YAxis, CartesianGrid, Legend } from 'recharts';
+import { Users, UserCheck, Briefcase, GraduationCap, Stethoscope, FileText, TrendingDown, CheckCircle, AlertCircle, Info, BarChart3, MapPin } from 'lucide-react';
+import { ResponsiveContainer, Tooltip, LineChart, Line, XAxis, YAxis, CartesianGrid, Legend } from 'recharts';
 import { getQuarterlyWorkforceData, QUARTERLY_HEADCOUNT_TRENDS } from '../../data/staticData';
 
 /**
@@ -13,13 +13,6 @@ import { getQuarterlyWorkforceData, QUARTERLY_HEADCOUNT_TRENDS } from '../../dat
  */
 
 // Helper to generate common Line chart props for secondary trend lines (dashed style)
-const getSecondaryLineProps = (color) => ({
-  type: 'monotone',
-  strokeWidth: 3,
-  strokeDasharray: '5 5',
-  dot: { r: 6, fill: color, strokeWidth: 2, stroke: '#ffffff' },
-  activeDot: { r: 8, fill: color, stroke: '#ffffff', strokeWidth: 3 }
-});
 
 const WorkforceQ1FY26Dashboard = () => {
   // Load Q1 FY26 workforce data from staticData.js (calculated from raw Excel)

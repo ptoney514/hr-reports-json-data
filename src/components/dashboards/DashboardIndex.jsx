@@ -1,12 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { 
+import {
   Users,
   BookOpen,
   Briefcase,
   Sparkles,
   Trophy,
-  Zap,
   CheckCircle2,
   GraduationCap,
   Shield,
@@ -15,50 +14,10 @@ import {
   Activity,
   FileText,
   Share2,
-  Printer,
-  Eye
+  Printer
 } from 'lucide-react';
 
 const DashboardIndex = () => {
-  // Key metrics with more detail
-  const keyMetrics = [
-    { 
-      label: "On-Demand Courses", 
-      value: "660", 
-      subtitle: "Available across the learning library",
-      icon: BookOpen
-    },
-    { 
-      label: "Live Trainings since Nov '22", 
-      value: "236", 
-      subtitle: "Scaled via myLearning",
-      icon: Activity
-    },
-    { 
-      label: "Compliance Journey", 
-      value: "90%+", 
-      subtitle: "Faculty & staff completion",
-      icon: Shield
-    },
-    { 
-      label: "Total Reward Statements", 
-      value: "2,066", 
-      subtitle: "Delivered with zero data quality issues",
-      icon: FileText
-    }
-  ];
-
-  const compensationMetrics = {
-    completed: 90,
-    remaining: 10,
-    details: [
-      { label: "Positions Evaluated", value: "1,268", subtitle: "Faculty & staff employees" },
-      { label: "Market Adjustments", value: "729", subtitle: "Faculty & staff" },
-      { label: "Staff Positions Reviewed", value: "326", subtitle: "Phases 3 & 4" },
-      { label: "Employees Affected", value: "384", subtitle: "Across those positions" }
-    ]
-  };
-
   const pillars = [
     {
       title: "Total Rewards",

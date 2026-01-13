@@ -1,31 +1,21 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { 
-  Award,
-  TrendingUp,
+import {
   Users,
   BookOpen,
-  Heart,
-  DollarSign,
   Briefcase,
   Sparkles,
-  ChevronRight,
-  Star,
   Trophy,
-  Zap,
   CheckCircle2,
   GraduationCap,
   Shield,
   Gift,
   BarChart3,
-  Clock,
   Activity,
   FileText,
   Share2,
   Printer,
-  Eye,
-  MessageSquare,
-  Calendar
+  Eye
 } from 'lucide-react';
 
 const AccomplishmentsOverview = () => {

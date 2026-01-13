@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import ErrorBoundary from '../ui/ErrorBoundary';
-import { 
+import {
   DollarSign,
   Users,
   CheckCircle,
@@ -11,11 +11,8 @@ import {
   Briefcase,
   Target,
   BarChart3,
-  ClipboardCheck,
-  Calendar,
   Sparkles,
   Building2,
-  UserCheck,
   Shield
 } from 'lucide-react';
 

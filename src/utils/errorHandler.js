@@ -467,7 +467,7 @@ export const validateData = (data, schema, componentName = 'DataValidator') => {
   }
 };
 
-export default {
+const errorHandler = {
   ERROR_TYPES,
   ERROR_SEVERITY,
   classifyError,
@@ -480,4 +480,6 @@ export default {
   useErrorHandler,
   handleNetworkError,
   validateData
-}; 
+};
+
+export default errorHandler; 

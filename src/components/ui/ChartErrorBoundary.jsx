@@ -1,5 +1,5 @@
 import React from 'react';
-import { BarChart3, AlertTriangle, RefreshCw, Database } from 'lucide-react';
+import { AlertTriangle, RefreshCw, Database } from 'lucide-react';
 
 class ChartErrorBoundary extends React.Component {
   constructor(props) {

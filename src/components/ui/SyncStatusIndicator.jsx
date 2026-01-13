@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { RefreshCw, CheckCircle, AlertCircle, Clock, Database } from 'lucide-react';
 import { useDataSync } from '../../hooks/useDataSync';
 

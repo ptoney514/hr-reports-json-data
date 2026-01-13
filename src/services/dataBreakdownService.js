@@ -334,10 +334,12 @@ export const filterBreakdown = (data, filters = {}) => {
   return filtered;
 };
 
-export default {
+const dataBreakdownService = {
   getWorkforceBreakdown,
   getTerminationBreakdown,
   getQuarterSummary,
   runQualityChecks,
   filterBreakdown
 };
+
+export default dataBreakdownService;

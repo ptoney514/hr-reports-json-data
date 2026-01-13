@@ -1,5 +1,4 @@
 import React from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, LabelList } from 'recharts';
 
 const AgeGenderPyramid = ({ data }) => {
   if (!data || !data.ageGenderBreakdown) return null;
@@ -32,25 +31,6 @@ const AgeGenderPyramid = ({ data }) => {
   const facultyFemaleTotal = Object.values(data.ageGenderBreakdown.faculty).reduce((sum, band) => sum + band.female, 0);
   const staffMaleTotal = Object.values(data.ageGenderBreakdown.staff).reduce((sum, band) => sum + band.male, 0);
   const staffFemaleTotal = Object.values(data.ageGenderBreakdown.staff).reduce((sum, band) => sum + band.female, 0);
-
-  // Custom label renderer
-  const renderCustomLabel = (props) => {
-    const { x, y, width, height, value } = props;
-    if (value === 0) return null;
-    return (
-      <text 
-        x={x + width / 2} 
-        y={y + height / 2} 
-        fill="#fff" 
-        textAnchor="middle" 
-        dominantBaseline="middle"
-        fontSize="12"
-        fontWeight="500"
-      >
-        {value}
-      </text>
-    );
-  };
 
   return (
     <div className="bg-white rounded-lg shadow p-6 print:break-inside-avoid">

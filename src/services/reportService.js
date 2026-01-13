@@ -198,7 +198,7 @@ export const hasStoredChanges = (reportId) => {
   return localStorage.getItem(getStorageKey(reportId)) !== null;
 };
 
-export default {
+const reportService = {
   loadReportsIndex,
   loadReport,
   saveReport,
@@ -210,3 +210,5 @@ export default {
   clearAllStoredReports,
   hasStoredChanges
 };
+
+export default reportService;

@@ -1,5 +1,4 @@
 import React from 'react';
-import { TrendingDown, TrendingUp } from 'lucide-react';
 
 const TurnoverRatesTable = ({ data, title = "Turnover Rates by Category", className = "" }) => {
   // Transform data into table format with higher education averages and changes
@@ -23,8 +22,7 @@ const TurnoverRatesTable = ({ data, title = "Turnover Rates by Category", classN
 
     // Current FY2025 data (from current year data)
     const facultyCurrentRate = currentYear.turnoverByCategory?.find(c => c.category === 'Faculty')?.turnoverRate || 6.1;
-    const staffRate = currentYear.turnoverByCategory?.find(c => c.category === 'Staff')?.turnoverRate || 15.3;
-    
+
     // Note: Using hardcoded values for Staff Exempt/Non-Exempt as JSON doesn't separate these categories
 
     return [
@@ -85,25 +83,6 @@ const TurnoverRatesTable = ({ data, title = "Turnover Rates by Category", classN
       return "bg-red-100 text-red-800"; // Above benchmark (worse performance)
     } else {
       return "bg-green-100 text-green-800"; // Below benchmark (better performance) with green background
-    }
-  };
-
-  // Format change indicator with arrow
-  const formatChange = (change) => {
-    if (change < 0) {
-      return (
-        <span className="text-green-600 font-medium flex items-center gap-1">
-          <TrendingDown size={14} />
-          {change}%
-        </span>
-      );
-    } else {
-      return (
-        <span className="text-red-600 font-medium flex items-center gap-1">
-          <TrendingUp size={14} />
-          +{change}%
-        </span>
-      );
     }
   };
 

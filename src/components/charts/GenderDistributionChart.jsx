@@ -1,5 +1,5 @@
 import React from 'react';
-import { PieChart, Pie, Cell, Legend, ResponsiveContainer, Label } from 'recharts';
+import { PieChart, Pie, Cell, Legend, ResponsiveContainer } from 'recharts';
 
 const GenderDistributionChart = ({ data }) => {
   if (!data || !data.gender) return null;

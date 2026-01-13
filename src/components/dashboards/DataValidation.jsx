@@ -10,7 +10,6 @@ import {
   XCircle,
   RefreshCw,
   Database,
-  FileSpreadsheet,
   Clock,
   Download,
   Shield,
@@ -20,7 +19,6 @@ import {
   FileText,
   Hash,
   User,
-  Info,
   Play,
   History,
   Package,
@@ -40,9 +38,7 @@ const DataValidation = () => {
   const [isValidating, setIsValidating] = useState(false);
   const [auditLog, setAuditLog] = useState([]);
   const [activeTab, setActiveTab] = useState('overview');
-  const [selectedDataSource, setSelectedDataSource] = useState('all');
   const [validationResults, setValidationResults] = useState(null);
-  const [selectedDate] = useState('2025-06-30'); // Fixed to June 30, 2025 as requested
   const [selectedYear, setSelectedYear] = useState('2025');
 
   // Load audit log from localStorage
@@ -316,19 +312,6 @@ const DataValidation = () => {
         return <AlertTriangle className="h-5 w-5 text-yellow-500" />;
       default:
         return <AlertCircle className="h-5 w-5 text-gray-400" />;
-    }
-  };
-
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'passed':
-        return 'text-green-600 bg-green-50';
-      case 'failed':
-        return 'text-red-600 bg-red-50';
-      case 'warning':
-        return 'text-yellow-600 bg-yellow-50';
-      default:
-        return 'text-gray-600 bg-gray-50';
     }
   };
 

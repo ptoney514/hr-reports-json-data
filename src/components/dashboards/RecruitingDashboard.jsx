@@ -11,17 +11,6 @@ import HiringCompetitivenessChart from '../charts/HiringCompetitivenessChart';
 import StaffHiringInsightsCard from '../charts/StaffHiringInsightsCard';
 // Quarter filter removed - using fixed reporting period
 
-// Fallback data to ensure the dashboard always works
-const FALLBACK_DATA = {
-  recruitingData: {
-    totalOpenPositions: 93,
-    postedPositions: 65,
-    notPostedPositions: 28,
-    newHiresYTD: 228,
-    costPerHire: 4200
-  }
-};
-
 const RecruitingDashboard = () => {
   // FY 2025 vs FY 2024 comparison
   const currentData = getRecruitingData("2025-06-30"); // FY 2025 end

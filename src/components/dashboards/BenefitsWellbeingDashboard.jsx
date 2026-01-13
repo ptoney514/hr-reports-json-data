@@ -1,27 +1,23 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import ErrorBoundary from '../ui/ErrorBoundary';
-import { 
+import {
   Heart,
   Shield,
   Users,
   DollarSign,
-  Sparkles,
   Brain,
   TrendingUp,
   Award,
-  ArrowRight,
   UserCheck,
   HeartHandshake,
-  Target,
   Briefcase,
   Activity,
   Gift,
   BookOpen,
-  Zap,
-  Star,
   ArrowUpRight,
-  Layers
+  Layers,
+  Zap
 } from 'lucide-react';
 
 const BenefitsWellbeingDashboard = () => {

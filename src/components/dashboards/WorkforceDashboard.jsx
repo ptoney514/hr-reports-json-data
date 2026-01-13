@@ -1,42 +1,20 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 import SummaryCard from '../ui/SummaryCard';
 import ErrorBoundary from '../ui/ErrorBoundary';
 import GenderDistributionChart from '../charts/GenderDistributionChart';
 import EthnicityBreakdownChart from '../charts/EthnicityBreakdownChart';
-import AgeDistributionChart from '../charts/AgeDistributionChart';
-import AgeDistributionCurve from '../charts/AgeDistributionCurve';
 import AgeGenderPyramid from '../charts/AgeGenderPyramid';
 import { DataDebugOverlay } from '../ui/DataDebugOverlay';
-import { getWorkforceData, getAllSchoolOrgData, getTempTotal } from '../../data/staticData';
-import { 
-  Users, 
-  BookOpen,
-  Building2,
-  Heart,
-  GraduationCap,
-  BarChart3,
-  Clock,
-  TrendingUp,
-  MapPin,
-  Calculator
-} from 'lucide-react';
+import { getWorkforceData, getTempTotal } from '../../data/staticData';
+import { Users, BookOpen, Building2, Heart, GraduationCap, TrendingUp } from 'lucide-react';
 
 
 const WorkforceDashboard = () => {
   // Year-over-Year comparison data
   const currentData = getWorkforceData("2025-06-30"); // Current year (6/30/25)
-  const previousData = getWorkforceData("2024-06-30"); // Prior year (6/30/24) for YoY comparison
-  
+
   // Get corrected temp totals
   const currentTempTotal = getTempTotal("2025-06-30");
-  const previousTempTotal = getTempTotal("2024-06-30");
-  
-  // Calculate Year-over-Year percentage changes
-  const calculateChange = (current, previous) => {
-    if (!previous || previous === 0) return 0;
-    return ((current - previous) / previous * 100);
-  };
   
   // Process static data for display - values are used directly from currentData
 

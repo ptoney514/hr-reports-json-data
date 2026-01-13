@@ -1,5 +1,5 @@
 import React, { memo } from 'react';
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { Users, UserCheck } from 'lucide-react';
 
 const InternalExternalComparisonChart = memo(({ 
@@ -39,20 +39,6 @@ const InternalExternalComparisonChart = memo(({
       value: externalHired, 
       color: '#6B7280',
       percentage: (externalHired / (internalHired + externalHired) * 100).toFixed(1)
-    }
-  ];
-
-  // Success Rate Comparison for Bar Chart
-  const successRateData = [
-    {
-      category: 'Internal Candidates',
-      rate: (internalHired / internalApplicants * 100).toFixed(1),
-      color: '#10B981'
-    },
-    {
-      category: 'External Candidates',
-      rate: (externalHired / externalApplicants * 100).toFixed(1),
-      color: '#6B7280'
     }
   ];
 

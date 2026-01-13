@@ -137,10 +137,12 @@ export const captureDashboardFromCurrentPage = async (dashboardId) => {
   return null;
 };
 
-export default {
+const dashboardCaptureHelper = {
   createHiddenDashboardFrame,
   removeFrame,
   waitForDashboardElement,
   waitForCharts,
   captureDashboardFromCurrentPage
 };
+
+export default dashboardCaptureHelper;

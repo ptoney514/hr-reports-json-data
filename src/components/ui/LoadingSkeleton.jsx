@@ -281,11 +281,13 @@ export const PulseLoader = ({
   );
 };
 
-export default {
+const loadingSkeletons = {
   CardSkeleton,
   ChartSkeleton,
   SummaryCardSkeleton,
   DashboardSkeleton,
   PulseLoader,
   SkeletonBase
-}; 
+};
+
+export default loadingSkeletons; 

@@ -1,5 +1,5 @@
 // Real Data Validation Service for HR Reports
-import { WORKFORCE_DATA, TURNOVER_DATA, EXIT_SURVEY_DATA, RECRUITING_DATA } from '../data/staticData';
+import { WORKFORCE_DATA, TURNOVER_DATA, EXIT_SURVEY_DATA } from '../data/staticData';
 
 class DataValidationService {
   constructor() {
@@ -410,4 +410,6 @@ class DataValidationService {
   }
 }
 
-export default new DataValidationService();
+const dataValidationService = new DataValidationService();
+
+export default dataValidationService;

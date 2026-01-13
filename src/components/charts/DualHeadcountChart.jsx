@@ -41,8 +41,7 @@ const DualHeadcountChart = memo(({
   }, [hoveredDataKey, hoveredPeriod]);
 
   return (
-    <section 
-      role="region" 
+    <section
       aria-labelledby="dual-headcount-title"
       aria-describedby="dual-headcount-description"
       className={`space-y-4 ${className}`}
