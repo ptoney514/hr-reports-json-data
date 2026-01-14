@@ -19,7 +19,8 @@ import {
   ChevronDown,
   ChevronRight,
   FileText,
-  LineChart
+  LineChart,
+  BookOpen
 } from 'lucide-react';
 import { announceToScreenReader } from '../../utils/accessibilityUtils';
 import SyncStatusIndicator from './SyncStatusIndicator';
@@ -172,12 +173,20 @@ const Navigation = () => {
       isActive: isActive('/dashboards/demographics-q1')
     },
     {
-      id: 'job-changes-q1-fy26',
-      label: 'Q1 FY26 Job Changes',
-      shortLabel: 'Q1 Jobs',
-      path: '/dashboards/internal-mobility-q1',
+      id: 'promotions-q1-fy26',
+      label: 'Q1 FY26 Promotions',
+      shortLabel: 'Q1 Promo',
+      path: '/dashboards/promotions-q1',
       icon: TrendingUp,
-      isActive: isActive('/dashboards/internal-mobility-q1')
+      isActive: isActive('/dashboards/promotions-q1')
+    },
+    {
+      id: 'promotion-reasons',
+      label: 'Promotion Reasons Guide',
+      shortLabel: 'Guide',
+      path: '/dashboards/promotion-reasons',
+      icon: BookOpen,
+      isActive: isActive('/dashboards/promotion-reasons')
     },
     {
       id: 'job-changes-testing',
