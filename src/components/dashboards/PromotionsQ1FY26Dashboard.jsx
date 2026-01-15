@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { TrendingUp, ArrowUp, BarChart3, Calendar, Building2, Activity, HelpCircle } from 'lucide-react';
+import { TrendingUp, ArrowUp, BarChart3, Calendar, Activity, HelpCircle } from 'lucide-react';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { internalMobilityData } from '../../data/internalMobilityData';
 
@@ -13,10 +13,8 @@ import { internalMobilityData } from '../../data/internalMobilityData';
 
 // Updated color scheme for promotion reasons (WCAG AA compliant)
 const promotionColors = {
-  PROGRESSION: '#7C3AED',  // Purple - Career Ladder (most common)
-  RECLASS: '#F59E0B',      // Amber - Reclassification
-  APPLIED: '#0054A6',      // Blue - Applied for Position (brand color)
-  MERIT: '#10B981',        // Emerald - Merit/Performance
+  INCREASE: '#7C3AED',  // Purple - Salary/Grade Increase (most common)
+  APPLIED: '#0054A6',   // Blue - Applied for Position (brand color)
 };
 
 // Format date as M/D/YY
@@ -269,7 +267,6 @@ const PromotionsQ1FY26Dashboard = () => {
 
   // Calculate derived metrics
   const mostCommonReason = promotionsByReason.reduce((a, b) => a.count > b.count ? a : b);
-  const topDepartments = [...promotionsBySchool].sort((a, b) => b.total - a.total).slice(0, 2);
   const promotionsPerMonth = (summary.totalPromotions / 3).toFixed(1); // Q1 = 3 months
 
   // Chart data with color mapping
@@ -281,9 +278,7 @@ const PromotionsQ1FY26Dashboard = () => {
   // Column definitions for table
   const promotionColumns = [
     { key: 'applied', label: 'Applied', color: promotionColors.APPLIED },
-    { key: 'merit', label: 'Merit', color: promotionColors.MERIT },
-    { key: 'reclass', label: 'Reclass', color: promotionColors.RECLASS },
-    { key: 'progression', label: 'Progression', color: promotionColors.PROGRESSION },
+    { key: 'increase', label: 'Increase', color: promotionColors.INCREASE },
   ];
 
   return (
@@ -321,8 +316,8 @@ const PromotionsQ1FY26Dashboard = () => {
           </div>
         </div>
 
-        {/* Summary Cards - 4 cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+        {/* Summary Cards - 3 cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
 
           {/* Total Promotions */}
           <div className="bg-white p-6 rounded-lg shadow-sm border">
@@ -353,26 +348,6 @@ const PromotionsQ1FY26Dashboard = () => {
             <div className="text-xs text-gray-600 font-medium mb-2">{mostCommonReason.label}</div>
             <div className="text-xs text-gray-500">
               {((mostCommonReason.count / summary.totalPromotions) * 100).toFixed(0)}% of all promotions
-            </div>
-          </div>
-
-          {/* Top Departments */}
-          <div className="bg-white p-6 rounded-lg shadow-sm border">
-            <div className="flex items-center justify-between mb-4">
-              <Building2 style={{ color: '#0054A6' }} size={20} />
-              <span className="text-xs px-2 py-1 rounded-full font-medium uppercase"
-                style={{ backgroundColor: '#0054A615', color: '#0054A6' }}>
-                TOP AREAS
-              </span>
-            </div>
-            <div className="text-xl font-bold text-gray-900 mb-1">
-              {topDepartments[0]?.area?.split(' ').slice(0, 2).join(' ')}
-            </div>
-            <div className="text-xs text-gray-600 font-medium mb-2">
-              {topDepartments.map(d => d.total).join(' & ')} each
-            </div>
-            <div className="text-xs text-gray-500">
-              {((topDepartments.reduce((sum, d) => sum + d.total, 0) / summary.totalPromotions) * 100).toFixed(0)}% of total
             </div>
           </div>
 
@@ -515,10 +490,8 @@ const PromotionsQ1FY26Dashboard = () => {
         {/* Note Box */}
         <div className="rounded-lg p-4 text-sm bg-gray-100 text-gray-600">
           <strong>Note:</strong> All counts represent benefit-eligible employees only (F12, F09-F11).{' '}
-          <strong className="text-[#7C3AED]">Progression</strong> = career ladder advancement (title pattern).{' '}
-          <strong className="text-[#F59E0B]">Reclass</strong> = significant title change in same department.{' '}
-          <strong className="text-[#0054A6]">Applied</strong> = employee moved to different department.{' '}
-          <strong className="text-[#10B981]">Merit</strong> = promotion in place (same title).
+          <strong className="text-[#7C3AED]">Increase</strong> = salary/grade advancement, title update, or performance recognition within same department.{' '}
+          <strong className="text-[#0054A6]">Applied</strong> = employee moved to a different department.
         </div>
 
         {/* Data Source Info */}

@@ -4,26 +4,23 @@ import { BookOpen, ArrowLeft, ArrowRight } from 'lucide-react';
 
 /**
  * Promotion Reasons Reference Page
- * Explains the 4 promotion reason codes with definitions and examples
+ * Explains the 2 promotion reason codes with definitions and examples
  */
 
 // Color palette matching the Promotions Dashboard
 const promotionColors = {
-  PROGRESSION: '#7C3AED',  // Purple
-  RECLASS: '#F59E0B',      // Amber
-  APPLIED: '#0054A6',      // Blue (brand)
-  MERIT: '#10B981',        // Emerald
+  INCREASE: '#7C3AED',  // Purple
+  APPLIED: '#0054A6',   // Blue (brand)
 };
 
 // Promotion reason data
 const promotionReasons = [
   {
-    code: 'PROGRESSION',
-    label: 'Career Ladder',
-    color: promotionColors.PROGRESSION,
-    definition: 'Career advancement within your current role through salary/grade increases',
+    code: 'INCREASE',
+    label: 'Salary/Grade Increase',
+    color: promotionColors.INCREASE,
+    definition: 'Career advancement within your current department through salary/grade increases',
     indicators: [
-      'Same or similar job title',
       'Same department',
       'Salary grade advancement (e.g., D → C → B)',
     ],
@@ -32,26 +29,8 @@ const promotionReasons = [
       after: 'Director (Grade C)',
       note: 'Same department, recognized progression',
     },
-    count: 35,
-    percentage: 54,
-  },
-  {
-    code: 'RECLASS',
-    label: 'Reclassification',
-    color: promotionColors.RECLASS,
-    definition: 'Significant title change within your current department',
-    indicators: [
-      'Meaningful title change (not just grade)',
-      'Same department',
-      'Reflects evolved responsibilities',
-    ],
-    example: {
-      before: 'Coordinator',
-      after: 'Manager',
-      note: 'Same cost center, role evolved',
-    },
-    count: 13,
-    percentage: 20,
+    count: 51,
+    percentage: 78,
   },
   {
     code: 'APPLIED',
@@ -68,26 +47,8 @@ const promotionReasons = [
       after: 'Director Alumni Relations',
       note: 'Cross-department career move',
     },
-    count: 11,
-    percentage: 17,
-  },
-  {
-    code: 'MERIT',
-    label: 'Merit/Performance',
-    color: promotionColors.MERIT,
-    definition: 'Promotion in place for exceptional performance without title change',
-    indicators: [
-      'Same job title',
-      'Salary/grade increase',
-      'Same department',
-    ],
-    example: {
-      before: 'Senior Analyst (Grade C)',
-      after: 'Senior Analyst (Grade B)',
-      note: 'Recognition without title change',
-    },
-    count: 6,
-    percentage: 9,
+    count: 14,
+    percentage: 22,
   },
 ];
 
