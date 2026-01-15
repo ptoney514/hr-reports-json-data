@@ -63,13 +63,13 @@ const PromotionsTable = ({ title, data, columns }) => {
           <span className="font-semibold" style={{ color: '#0054A6' }}>{title}</span>
         </div>
       </div>
-      <table className="w-full text-sm">
+      <table className="w-full text-sm table-fixed">
         <thead>
           <tr style={{ backgroundColor: '#0054A6' }}>
             <th className="text-left py-3 px-4 text-white font-medium w-48">School/Area</th>
             <th className="text-center py-3 px-4 text-white font-medium w-32">Total</th>
             {columns.map((col, i) => (
-              <th key={i} className="text-center py-3 px-4 text-white font-medium">{col.label}</th>
+              <th key={i} className="text-center py-3 px-4 text-white font-medium w-24">{col.label}</th>
             ))}
             <th className="text-right py-3 px-4 text-white font-medium w-16">%</th>
           </tr>
@@ -97,7 +97,7 @@ const PromotionsTable = ({ title, data, columns }) => {
                 </div>
               </td>
               {columns.map((col, j) => (
-                <td key={j} className="py-3 px-4 text-center">
+                <td key={j} className="py-3 px-4 text-center w-24">
                   {row[col.key] > 0 ? (
                     <ReasonBadge value={row[col.key]} color={col.color} />
                   ) : (
@@ -116,7 +116,7 @@ const PromotionsTable = ({ title, data, columns }) => {
             <td className="py-3 px-4 font-bold text-gray-900">Total</td>
             <td className="py-3 px-4 text-center font-bold text-lg text-gray-900">{grandTotal}</td>
             {columns.map((col, i) => (
-              <td key={i} className="py-3 px-4 text-center">
+              <td key={i} className="py-3 px-4 text-center w-24">
                 <ReasonBadge value={totals[col.key]} color={col.color} />
               </td>
             ))}
@@ -275,6 +275,29 @@ const PromotionsQ1FY26Dashboard = () => {
     color: promotionColors[item.code] || '#9ca3af'
   }));
 
+  // Custom label renderer for external pie labels (print-friendly)
+  const renderCustomLabel = ({ cx, cy, midAngle, outerRadius, count, color }) => {
+    const RADIAN = Math.PI / 180;
+    const radius = outerRadius + 25;
+    const x = cx + radius * Math.cos(-midAngle * RADIAN);
+    const y = cy + radius * Math.sin(-midAngle * RADIAN);
+    const percent = ((count / summary.totalPromotions) * 100).toFixed(0);
+
+    return (
+      <text
+        x={x}
+        y={y}
+        fill={color}
+        textAnchor={x > cx ? 'start' : 'end'}
+        dominantBaseline="central"
+        fontSize={13}
+        fontWeight={600}
+      >
+        {`${count} (${percent}%)`}
+      </text>
+    );
+  };
+
   // Column definitions for table
   const promotionColumns = [
     { key: 'applied', label: 'Applied', color: promotionColors.APPLIED },
@@ -392,23 +415,24 @@ const PromotionsQ1FY26Dashboard = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Donut Chart */}
             <div className="relative">
-              <ResponsiveContainer width="100%" height={280}>
+              <ResponsiveContainer width="100%" height={320}>
                 <PieChart>
                   <Pie
                     data={chartData}
                     dataKey="count"
                     nameKey="label"
                     cx="50%"
-                    cy="50%"
-                    innerRadius={70}
-                    outerRadius={100}
+                    cy="45%"
+                    innerRadius={60}
+                    outerRadius={85}
                     paddingAngle={2}
+                    label={renderCustomLabel}
+                    labelLine={{ stroke: '#9ca3af', strokeWidth: 1 }}
                   >
                     {chartData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.color} />
                     ))}
                   </Pie>
-                  <Tooltip content={<CustomTooltip />} />
                   <Legend
                     verticalAlign="bottom"
                     height={36}
@@ -418,7 +442,7 @@ const PromotionsQ1FY26Dashboard = () => {
                 </PieChart>
               </ResponsiveContainer>
               {/* Center label */}
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none" style={{ marginBottom: '36px' }}>
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none" style={{ marginBottom: '70px' }}>
                 <div className="text-center">
                   <div className="text-3xl font-bold text-gray-900">{summary.totalPromotions}</div>
                   <div className="text-xs text-gray-500">Total</div>
@@ -437,8 +461,8 @@ const PromotionsQ1FY26Dashboard = () => {
                   <CartesianGrid strokeDasharray="3 3" horizontal={false} />
                   <XAxis
                     type="number"
-                    domain={[0, 40]}
-                    ticks={[0, 10, 20, 30, 40]}
+                    domain={[0, 70]}
+                    ticks={[0, 10, 20, 30, 40, 50, 60, 70]}
                   />
                   <YAxis
                     type="category"
