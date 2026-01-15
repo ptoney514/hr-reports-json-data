@@ -23,16 +23,6 @@ const formatDate = (dateString) => {
   return `${date.getMonth() + 1}/${date.getDate()}/${String(date.getFullYear()).slice(-2)}`;
 };
 
-// Reason Badge Component
-const ReasonBadge = ({ value, color }) => (
-  <span
-    className="inline-flex items-center justify-center w-9 h-7 rounded text-sm font-semibold text-white"
-    style={{ backgroundColor: color }}
-  >
-    {value}
-  </span>
-);
-
 // Reason Code Badge Component (for detail table)
 const ReasonCodeBadge = ({ code }) => {
   const color = promotionColors[code] || '#9ca3af';
@@ -46,7 +36,7 @@ const ReasonCodeBadge = ({ code }) => {
   );
 };
 
-// Enhanced Promotions Table Component with Progress Bars
+// Enhanced Promotions Table Component - Matches Turnover by School/Area styling
 const PromotionsTable = ({ title, data, columns }) => {
   const totals = columns.reduce((acc, col) => {
     acc[col.key] = data.reduce((sum, row) => sum + (row[col.key] || 0), 0);
@@ -56,74 +46,121 @@ const PromotionsTable = ({ title, data, columns }) => {
   const maxTotal = Math.max(...data.map(row => row.total));
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-      <div className="p-4 pb-0">
-        <div className="flex items-center gap-2 mb-4 px-1">
-          <BarChart3 size={20} style={{ color: '#0054A6' }} />
-          <span className="font-semibold" style={{ color: '#0054A6' }}>{title}</span>
-        </div>
-      </div>
-      <table className="w-full text-sm table-fixed">
-        <thead>
-          <tr style={{ backgroundColor: '#0054A6' }}>
-            <th className="text-left py-3 px-4 text-white font-medium w-48">School/Area</th>
-            <th className="text-center py-3 px-4 text-white font-medium w-32">Total</th>
-            {columns.map((col, i) => (
-              <th key={i} className="text-center py-3 px-4 text-white font-medium w-24">{col.label}</th>
-            ))}
-            <th className="text-right py-3 px-4 text-white font-medium w-16">%</th>
-          </tr>
-        </thead>
-        <tbody>
-          {data.map((row, i) => (
-            <tr
-              key={i}
-              className={i % 2 !== 0 ? 'bg-gray-50' : 'bg-white'}
-              style={{ borderBottom: '1px solid #e5e7eb' }}
-            >
-              <td className="py-3 px-4 font-medium text-gray-900">{row.area}</td>
-              <td className="py-3 px-4">
-                <div className="flex items-center gap-2">
-                  <div className="flex-1 h-2 bg-gray-100 rounded-full">
-                    <div
-                      className="h-2 rounded-full transition-all duration-500"
-                      style={{
-                        width: `${(row.total / maxTotal) * 100}%`,
-                        backgroundColor: '#0054A6'
-                      }}
-                    />
-                  </div>
-                  <span className="font-bold text-gray-900 w-8 text-right">{row.total}</span>
-                </div>
+    <div className="bg-white rounded-lg shadow-sm border p-6">
+      <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+        <BarChart3 style={{ color: '#0054A6' }} size={20} />
+        {title}
+      </h2>
+
+      {/* Table */}
+      <div className="overflow-x-auto">
+        <table className="w-full">
+          <thead>
+            <tr className="border-b border-gray-200">
+              <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">School/Area</th>
+              <th className="text-center py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Total</th>
+              {columns.map((col, i) => (
+                <th
+                  key={i}
+                  className="text-center py-3 px-4 text-xs font-semibold uppercase tracking-wider"
+                  style={{ color: col.color }}
+                >
+                  {col.label}
+                </th>
+              ))}
+              <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Distribution</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.map((row, i) => {
+              const percentage = ((row.total / grandTotal) * 100).toFixed(1);
+              const barWidthPercent = (row.total / maxTotal) * 100;
+
+              return (
+                <tr key={i} className={`border-b border-gray-100 ${i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}>
+                  <td className="py-3 px-4">
+                    <div className="text-sm font-medium text-gray-900">{row.area}</div>
+                  </td>
+                  <td className="py-3 px-4 text-center">
+                    <div className="text-lg font-bold text-gray-900">{row.total}</div>
+                  </td>
+                  {columns.map((col, j) => (
+                    <td key={j} className="py-3 px-4 text-center">
+                      <span
+                        className={`inline-flex items-center justify-center px-3 py-1 rounded-lg text-sm font-semibold ${row[col.key] > 0 ? 'text-white' : 'bg-gray-100 text-gray-400'}`}
+                        style={row[col.key] > 0 ? { backgroundColor: col.color } : {}}
+                      >
+                        {row[col.key]}
+                      </span>
+                    </td>
+                  ))}
+                  <td className="py-3 px-4">
+                    <div className="flex items-center gap-2">
+                      <div className="flex h-4 bg-gray-100 rounded overflow-hidden" style={{ width: '120px' }}>
+                        {/* Applied portion */}
+                        {row.applied > 0 && (
+                          <div
+                            className="h-full"
+                            style={{
+                              width: `${(row.applied / row.total) * barWidthPercent}%`,
+                              backgroundColor: columns[0].color
+                            }}
+                          />
+                        )}
+                        {/* Increase portion */}
+                        {row.increase > 0 && (
+                          <div
+                            className="h-full"
+                            style={{
+                              width: `${(row.increase / row.total) * barWidthPercent}%`,
+                              backgroundColor: columns[1].color
+                            }}
+                          />
+                        )}
+                      </div>
+                      <span className="text-xs text-gray-500 w-10">{percentage}%</span>
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+          <tfoot>
+            <tr className="border-t-2 border-gray-300 bg-gray-50">
+              <td className="py-4 px-4 font-semibold text-gray-900">Total</td>
+              <td className="py-4 px-4 text-center">
+                <div className="text-xl font-bold text-gray-900">{grandTotal}</div>
               </td>
-              {columns.map((col, j) => (
-                <td key={j} className="py-3 px-4 text-center w-24">
-                  {row[col.key] > 0 ? (
-                    <ReasonBadge value={row[col.key]} color={col.color} />
-                  ) : (
-                    <span className="text-gray-400">–</span>
-                  )}
+              {columns.map((col, i) => (
+                <td key={i} className="py-4 px-4 text-center">
+                  <span
+                    className="inline-flex items-center justify-center px-4 py-2 rounded-lg text-white text-sm font-bold"
+                    style={{ backgroundColor: col.color }}
+                  >
+                    {totals[col.key]}
+                  </span>
                 </td>
               ))}
-              <td className="py-3 px-4 text-right text-gray-600">
-                {((row.total / grandTotal) * 100).toFixed(0)}%
-              </td>
+              <td className="py-4 px-4"></td>
             </tr>
-          ))}
-        </tbody>
-        <tfoot>
-          <tr className="bg-gray-100" style={{ borderTop: '2px solid #9ca3af' }}>
-            <td className="py-3 px-4 font-bold text-gray-900">Total</td>
-            <td className="py-3 px-4 text-center font-bold text-lg text-gray-900">{grandTotal}</td>
-            {columns.map((col, i) => (
-              <td key={i} className="py-3 px-4 text-center w-24">
-                <ReasonBadge value={totals[col.key]} color={col.color} />
-              </td>
-            ))}
-            <td className="py-3 px-4 text-right font-bold text-gray-900">100%</td>
-          </tr>
-        </tfoot>
-      </table>
+          </tfoot>
+        </table>
+      </div>
+
+      {/* Legend */}
+      <div className="mt-4 flex justify-center gap-6 text-sm">
+        {columns.map((col, i) => (
+          <div key={i} className="flex items-center gap-2">
+            <div className="w-4 h-4 rounded" style={{ backgroundColor: col.color }}></div>
+            <span className="text-gray-700">{col.label}</span>
+          </div>
+        ))}
+      </div>
+
+      {/* Data Note */}
+      <div className="text-xs text-gray-600 mt-4 bg-blue-50 p-3 rounded border border-blue-200 text-center">
+        <span className="font-semibold">Note:</span> All counts represent benefit-eligible employees only. Sorted by total promotions descending.
+      </div>
     </div>
   );
 };
