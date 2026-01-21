@@ -1949,6 +1949,66 @@ export const QUARTERLY_HEADCOUNT_TRENDS = [
 ];
 
 // ============================================================================
+// QUARTERLY TURNOVER RATES BY CATEGORY
+// Annualized turnover rates by category for quarterly comparison
+// ============================================================================
+// Calculated from: (Quarterly Terminations / Headcount) * 4 * 100
+// Source Data: QUARTERLY_TURNOVER_TRENDS (terminations) + QUARTERLY_HEADCOUNT_TRENDS (headcount)
+//
+// NOTES:
+// - Rates are ANNUALIZED (quarterly rate * 4) for comparison with yearly benchmarks
+// - Q1 FY26 Staff Exempt/Non-Exempt: ✅ ACTUAL from QUARTERLY_TURNOVER_DATA
+// - Q2-Q4 FY25 Staff Exempt/Non-Exempt: ⚠️ ESTIMATED based on Q1 FY26 proportions (44% exempt, 56% non-exempt)
+// - Benchmarks are from CUPA Higher Education data (same as yearly table)
+
+export const QUARTERLY_TURNOVER_RATES_BY_CATEGORY = [
+  {
+    quarter: "Q2 FY25",
+    period: "Oct-Dec 2024",
+    faculty: { terminations: 4, headcount: 689, rate: 2.3 },
+    staffExempt: { terminations: 15, headcount: 580, rate: 10.3 },      // Estimated split
+    staffNonExempt: { terminations: 19, headcount: 861, rate: 8.8 },   // Estimated split
+    staff: { terminations: 34, headcount: 1441, rate: 9.4 },
+    total: { terminations: 38, headcount: 2130, rate: 7.1 }
+  },
+  {
+    quarter: "Q3 FY25",
+    period: "Jan-Mar 2025",
+    faculty: { terminations: 8, headcount: 684, rate: 4.7 },
+    staffExempt: { terminations: 19, headcount: 576, rate: 13.2 },     // Estimated split
+    staffNonExempt: { terminations: 24, headcount: 863, rate: 11.1 }, // Estimated split
+    staff: { terminations: 43, headcount: 1439, rate: 12.0 },
+    total: { terminations: 51, headcount: 2123, rate: 9.6 }
+  },
+  {
+    quarter: "Q4 FY25",
+    period: "Apr-Jun 2025",
+    faculty: { terminations: 10, headcount: 689, rate: 5.8 },
+    staffExempt: { terminations: 18, headcount: 580, rate: 12.4 },     // Estimated split
+    staffNonExempt: { terminations: 23, headcount: 868, rate: 10.6 }, // Estimated split
+    staff: { terminations: 41, headcount: 1448, rate: 11.3 },
+    total: { terminations: 51, headcount: 2137, rate: 9.5 }
+  },
+  {
+    quarter: "Q1 FY26",
+    period: "Jul-Sep 2025",
+    faculty: { terminations: 4, headcount: 698, rate: 2.3 },
+    staffExempt: { terminations: 24, headcount: 582, rate: 16.5 },     // ✅ ACTUAL
+    staffNonExempt: { terminations: 30, headcount: 869, rate: 13.8 }, // ✅ ACTUAL
+    staff: { terminations: 54, headcount: 1451, rate: 14.9 },
+    total: { terminations: 58, headcount: 2149, rate: 10.8 }           // Excludes 15 HSP
+  }
+];
+
+// Benchmarks for quarterly comparison (CUPA Higher Education data)
+export const QUARTERLY_TURNOVER_BENCHMARKS = {
+  faculty: 8.7,         // Higher Ed Avg 2024-25
+  staffExempt: 15.0,    // Higher Ed Avg 2024-25 (Professional Staff)
+  staffNonExempt: 20.7, // Higher Ed Avg 2024-25 (Support Staff)
+  total: 13.8           // Higher Ed Avg 2024-25 (Overall)
+};
+
+// ============================================================================
 // QUARTERLY TURNOVER DATA (Detailed by Quarter)
 // Detailed termination data for quarterly turnover dashboards
 // ============================================================================
@@ -2360,6 +2420,13 @@ export const getQuarterlyTurnoverData = (date = "2025-09-30") => {
 
 export const getQuarterlyWorkforceData = (date = "2025-09-30") => {
   return QUARTERLY_WORKFORCE_DATA[date] || QUARTERLY_WORKFORCE_DATA["2025-09-30"];
+};
+
+export const getQuarterlyTurnoverRatesByCategory = () => {
+  return {
+    rates: QUARTERLY_TURNOVER_RATES_BY_CATEGORY,
+    benchmarks: QUARTERLY_TURNOVER_BENCHMARKS
+  };
 };
 
 export const getTop15SchoolOrgData = (date = "2025-06-30") => {

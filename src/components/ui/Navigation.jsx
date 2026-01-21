@@ -157,6 +157,14 @@ const Navigation = () => {
       isActive: isActive('/dashboards/turnover-trends')
     },
     {
+      id: 'quarterly-turnover-rates',
+      label: 'Quarterly Turnover Rates',
+      shortLabel: 'Q Rates',
+      path: '/dashboards/quarterly-turnover-rates',
+      icon: BarChart3,
+      isActive: isActive('/dashboards/quarterly-turnover-rates')
+    },
+    {
       id: 'workforce-q1-fy26',
       label: 'Q1 FY26 Workforce',
       shortLabel: 'Q1 Work',
