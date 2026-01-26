@@ -2009,6 +2009,33 @@ export const QUARTERLY_TURNOVER_BENCHMARKS = {
 };
 
 // ============================================================================
+// ANNUAL TURNOVER RATES BY CATEGORY (Historical with CUPA Benchmarks)
+// ============================================================================
+// Source: HR data and CUPA Higher Education benchmarks
+// Display: Alternating benchmark/FY columns for annual comparison
+// Used by: QuarterlyTurnoverRatesTable.jsx (annual view)
+
+export const ANNUAL_TURNOVER_RATES_BY_CATEGORY = {
+  years: [
+    { fiscalYear: "FY 2023", benchmarkYear: "2022-23" },
+    { fiscalYear: "FY 2024", benchmarkYear: "2023-24" },
+    { fiscalYear: "FY 2025", benchmarkYear: "2024-25" },
+    { fiscalYear: "FY26 Annualized", benchmarkYear: null, subLabel: "12/31/2025" }
+  ],
+  benchmarks: {
+    "2022-23": { faculty: 6.7, staffExempt: 15.1, staffNonExempt: 17.3, total: 13.0 },
+    "2023-24": { faculty: 9.1, staffExempt: 16.7, staffNonExempt: 19.9, total: 14.1 },
+    "2024-25": { faculty: 8.7, staffExempt: 15.0, staffNonExempt: 20.7, total: 13.8 }
+  },
+  rates: {
+    "FY 2023": { faculty: 7.9, staffExempt: 15.5, staffNonExempt: 22.4, total: 14.9 },
+    "FY 2024": { faculty: 7.7, staffExempt: 13.6, staffNonExempt: 17.8, total: 12.8 },
+    "FY 2025": { faculty: 6.1, staffExempt: 12.6, staffNonExempt: 15.3, total: 11.2 },
+    "FY26 Annualized": { faculty: 2.6, staffExempt: 8.0, staffNonExempt: 17.9, total: 8.7 }
+  }
+};
+
+// ============================================================================
 // QUARTERLY TURNOVER DATA (Detailed by Quarter)
 // Detailed termination data for quarterly turnover dashboards
 // ============================================================================
@@ -2427,6 +2454,10 @@ export const getQuarterlyTurnoverRatesByCategory = () => {
     rates: QUARTERLY_TURNOVER_RATES_BY_CATEGORY,
     benchmarks: QUARTERLY_TURNOVER_BENCHMARKS
   };
+};
+
+export const getAnnualTurnoverRatesByCategory = () => {
+  return ANNUAL_TURNOVER_RATES_BY_CATEGORY;
 };
 
 export const getTop15SchoolOrgData = (date = "2025-06-30") => {
