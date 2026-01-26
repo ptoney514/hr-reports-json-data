@@ -41,6 +41,8 @@ const RecruitingNBEQ1Dashboard = lazy(() => import('./components/dashboards/Recr
 const PromotionsQ1Dashboard = lazy(() => import('./components/dashboards/PromotionsQ1FY26Dashboard'));
 const PromotionReasonsReference = lazy(() => import('./components/dashboards/PromotionReasonsReference'));
 const JobChangesTestingDashboard = lazy(() => import('./components/dashboards/JobChangesTestingDashboard'));
+// Operational Risk Dashboard
+const OperationalRiskDashboard = lazy(() => import('./components/dashboards/OperationalRiskDashboard'));
 // Report Generator
 const ReportGenerator = lazy(() => import('./components/reports/ReportGenerator'));
 // Print Layout (Report Builder)
@@ -193,6 +195,9 @@ function App() {
               <Route path="/dashboards/promotions-q1" element={<PromotionsQ1Dashboard />} />
               <Route path="/dashboards/promotion-reasons" element={<PromotionReasonsReference />} />
               <Route path="/dashboards/job-changes-testing" element={<JobChangesTestingDashboard />} />
+
+              {/* Operational Risk Dashboard */}
+              <Route path="/dashboards/operational-risk" element={<OperationalRiskDashboard />} />
 
               {/* Testing routes removed - using static data approach */}
               
