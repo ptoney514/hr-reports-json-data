@@ -1957,50 +1957,76 @@ export const QUARTERLY_HEADCOUNT_TRENDS = [
 //
 // NOTES:
 // - Rates are ANNUALIZED (quarterly rate * 4) for comparison with yearly benchmarks
-// - Q1 FY26 Staff Exempt/Non-Exempt: ✅ ACTUAL from QUARTERLY_TURNOVER_DATA
-// - Q2-Q4 FY25 Staff Exempt/Non-Exempt: ⚠️ ESTIMATED based on Q1 FY26 proportions (44% exempt, 56% non-exempt)
-// - Benchmarks are from CUPA Higher Education data (same as yearly table)
+// ============================================================================
+// ANNUAL TURNOVER RATES BY CATEGORY
+// Annual and Q1 FY26 turnover rates with corresponding CUPA benchmarks
+// Used by QuarterlyTurnoverRatesDashboard for visual comparison
+// ============================================================================
+// Data Structure:
+// - FY 2024 rates compared against CUPA 2023-24 benchmarks
+// - FY 2025 rates compared against CUPA 2024-25 benchmarks
+// - Q1 FY26 rates compared against CUPA 2024-25 benchmarks
 
+// Annual turnover rates by fiscal year
+export const ANNUAL_TURNOVER_RATES_BY_CATEGORY = {
+  fy2024: {
+    label: "FY 2024",
+    period: "Jul 2023 - Jun 2024",
+    faculty: 7.7,
+    staffExempt: 13.6,
+    staffNonExempt: 17.8,
+    total: 12.8
+  },
+  fy2025: {
+    label: "FY 2025",
+    period: "Jul 2024 - Jun 2025",
+    faculty: 6.1,
+    staffExempt: 12.6,
+    staffNonExempt: 15.3,
+    total: 11.2
+  },
+  q1fy26: {
+    label: "Q1 FY26",
+    period: "Jul-Sep 2025",
+    faculty: 2.3,
+    staffExempt: 16.5,
+    staffNonExempt: 13.8,
+    total: 10.8
+  }
+};
+
+// CUPA Higher Education benchmarks by fiscal year
+export const TURNOVER_BENCHMARKS = {
+  fy2324: {
+    label: "Higher Ed. Avg.* 2023-24",
+    faculty: 9.1,
+    staffExempt: 16.7,
+    staffNonExempt: 19.9,
+    total: 14.1
+  },
+  fy2425: {
+    label: "Higher Ed. Avg.* 2024-25",
+    faculty: 8.7,
+    staffExempt: 15.0,
+    staffNonExempt: 20.7,
+    total: 13.8
+  }
+};
+
+// Legacy quarterly data kept for reference (Q1 FY26 actual values)
 export const QUARTERLY_TURNOVER_RATES_BY_CATEGORY = [
-  {
-    quarter: "Q2 FY25",
-    period: "Oct-Dec 2024",
-    faculty: { terminations: 4, headcount: 689, rate: 2.3 },
-    staffExempt: { terminations: 15, headcount: 580, rate: 10.3 },      // Estimated split
-    staffNonExempt: { terminations: 19, headcount: 861, rate: 8.8 },   // Estimated split
-    staff: { terminations: 34, headcount: 1441, rate: 9.4 },
-    total: { terminations: 38, headcount: 2130, rate: 7.1 }
-  },
-  {
-    quarter: "Q3 FY25",
-    period: "Jan-Mar 2025",
-    faculty: { terminations: 8, headcount: 684, rate: 4.7 },
-    staffExempt: { terminations: 19, headcount: 576, rate: 13.2 },     // Estimated split
-    staffNonExempt: { terminations: 24, headcount: 863, rate: 11.1 }, // Estimated split
-    staff: { terminations: 43, headcount: 1439, rate: 12.0 },
-    total: { terminations: 51, headcount: 2123, rate: 9.6 }
-  },
-  {
-    quarter: "Q4 FY25",
-    period: "Apr-Jun 2025",
-    faculty: { terminations: 10, headcount: 689, rate: 5.8 },
-    staffExempt: { terminations: 18, headcount: 580, rate: 12.4 },     // Estimated split
-    staffNonExempt: { terminations: 23, headcount: 868, rate: 10.6 }, // Estimated split
-    staff: { terminations: 41, headcount: 1448, rate: 11.3 },
-    total: { terminations: 51, headcount: 2137, rate: 9.5 }
-  },
   {
     quarter: "Q1 FY26",
     period: "Jul-Sep 2025",
     faculty: { terminations: 4, headcount: 698, rate: 2.3 },
-    staffExempt: { terminations: 24, headcount: 582, rate: 16.5 },     // ✅ ACTUAL
-    staffNonExempt: { terminations: 30, headcount: 869, rate: 13.8 }, // ✅ ACTUAL
+    staffExempt: { terminations: 24, headcount: 582, rate: 16.5 },
+    staffNonExempt: { terminations: 30, headcount: 869, rate: 13.8 },
     staff: { terminations: 54, headcount: 1451, rate: 14.9 },
-    total: { terminations: 58, headcount: 2149, rate: 10.8 }           // Excludes 15 HSP
+    total: { terminations: 58, headcount: 2149, rate: 10.8 }
   }
 ];
 
-// Benchmarks for quarterly comparison (CUPA Higher Education data)
+// Legacy benchmarks for backward compatibility
 export const QUARTERLY_TURNOVER_BENCHMARKS = {
   faculty: 8.7,         // Higher Ed Avg 2024-25
   staffExempt: 15.0,    // Higher Ed Avg 2024-25 (Professional Staff)
@@ -2426,6 +2452,14 @@ export const getQuarterlyTurnoverRatesByCategory = () => {
   return {
     rates: QUARTERLY_TURNOVER_RATES_BY_CATEGORY,
     benchmarks: QUARTERLY_TURNOVER_BENCHMARKS
+  };
+};
+
+// New function for annual turnover rates with benchmarks comparison
+export const getAnnualTurnoverRatesByCategory = () => {
+  return {
+    annualRates: ANNUAL_TURNOVER_RATES_BY_CATEGORY,
+    benchmarks: TURNOVER_BENCHMARKS
   };
 };
 

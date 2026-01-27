@@ -1,250 +1,212 @@
 /**
- * Quarterly Turnover Rates Data Validation Test Suite
+ * Annual and Quarterly Turnover Rates Data Validation Test Suite
  *
- * Validates QUARTERLY_TURNOVER_RATES_BY_CATEGORY data structure and calculations.
+ * Validates ANNUAL_TURNOVER_RATES_BY_CATEGORY and TURNOVER_BENCHMARKS data structures.
  * Ensures data integrity and consistency with source data.
  *
- * Data Source: QUARTERLY_TURNOVER_TRENDS + QUARTERLY_HEADCOUNT_TRENDS
- * Rate Calculation: (Quarterly Terminations / Headcount) * 4 * 100 (annualized)
+ * Data Structure:
+ * - FY 2024 rates compared against CUPA 2023-24 benchmarks
+ * - FY 2025 rates compared against CUPA 2024-25 benchmarks
+ * - Q1 FY26 rates (annualized) compared against CUPA 2024-25 benchmarks
  */
 
 import {
+  ANNUAL_TURNOVER_RATES_BY_CATEGORY,
+  TURNOVER_BENCHMARKS,
   QUARTERLY_TURNOVER_RATES_BY_CATEGORY,
   QUARTERLY_TURNOVER_BENCHMARKS,
+  getAnnualTurnoverRatesByCategory,
   getQuarterlyTurnoverRatesByCategory
 } from '../staticData';
 
-describe('Quarterly Turnover Rates Data Validation', () => {
-  const { rates, benchmarks } = getQuarterlyTurnoverRatesByCategory();
+describe('Annual Turnover Rates Data Validation', () => {
+  const { annualRates, benchmarks } = getAnnualTurnoverRatesByCategory();
 
   describe('Data Structure Validation', () => {
-    it('should have exactly 4 quarters of data', () => {
-      expect(rates).toHaveLength(4);
+    it('should have all required fiscal year periods', () => {
+      expect(annualRates).toHaveProperty('fy2024');
+      expect(annualRates).toHaveProperty('fy2025');
+      expect(annualRates).toHaveProperty('q1fy26');
     });
 
-    it('should have all required quarters', () => {
-      const expectedQuarters = ['Q2 FY25', 'Q3 FY25', 'Q4 FY25', 'Q1 FY26'];
-      const actualQuarters = rates.map(q => q.quarter);
-      expect(actualQuarters).toEqual(expectedQuarters);
-    });
+    it('should have all required fields for each period', () => {
+      const periods = ['fy2024', 'fy2025', 'q1fy26'];
+      const requiredFields = ['label', 'period', 'faculty', 'staffExempt', 'staffNonExempt', 'total'];
 
-    it('should have all required fields for each quarter', () => {
-      rates.forEach(quarter => {
-        expect(quarter).toHaveProperty('quarter');
-        expect(quarter).toHaveProperty('period');
-        expect(quarter).toHaveProperty('faculty');
-        expect(quarter).toHaveProperty('staffExempt');
-        expect(quarter).toHaveProperty('staffNonExempt');
-        expect(quarter).toHaveProperty('staff');
-        expect(quarter).toHaveProperty('total');
+      periods.forEach(period => {
+        requiredFields.forEach(field => {
+          expect(annualRates[period]).toHaveProperty(field);
+        });
       });
     });
 
-    it('should have all required fields for each category', () => {
-      rates.forEach(quarter => {
-        ['faculty', 'staffExempt', 'staffNonExempt', 'staff', 'total'].forEach(category => {
-          expect(quarter[category]).toHaveProperty('terminations');
-          expect(quarter[category]).toHaveProperty('headcount');
-          expect(quarter[category]).toHaveProperty('rate');
+    it('should have correct labels for each period', () => {
+      expect(annualRates.fy2024.label).toBe('FY 2024');
+      expect(annualRates.fy2025.label).toBe('FY 2025');
+      expect(annualRates.q1fy26.label).toBe('Q1 FY26');
+    });
+  });
+
+  describe('Annual Rate Values Validation', () => {
+    it('should have correct FY 2024 rates', () => {
+      expect(annualRates.fy2024.faculty).toBe(7.7);
+      expect(annualRates.fy2024.staffExempt).toBe(13.6);
+      expect(annualRates.fy2024.staffNonExempt).toBe(17.8);
+      expect(annualRates.fy2024.total).toBe(12.8);
+    });
+
+    it('should have correct FY 2025 rates', () => {
+      expect(annualRates.fy2025.faculty).toBe(6.1);
+      expect(annualRates.fy2025.staffExempt).toBe(12.6);
+      expect(annualRates.fy2025.staffNonExempt).toBe(15.3);
+      expect(annualRates.fy2025.total).toBe(11.2);
+    });
+
+    it('should have correct Q1 FY26 rates (annualized)', () => {
+      expect(annualRates.q1fy26.faculty).toBe(2.3);
+      expect(annualRates.q1fy26.staffExempt).toBe(16.5);
+      expect(annualRates.q1fy26.staffNonExempt).toBe(13.8);
+      expect(annualRates.q1fy26.total).toBe(10.8);
+    });
+
+    it('should have all rates within expected range (0-100%)', () => {
+      const periods = ['fy2024', 'fy2025', 'q1fy26'];
+      const categories = ['faculty', 'staffExempt', 'staffNonExempt', 'total'];
+
+      periods.forEach(period => {
+        categories.forEach(category => {
+          expect(annualRates[period][category]).toBeGreaterThanOrEqual(0);
+          expect(annualRates[period][category]).toBeLessThanOrEqual(100);
         });
       });
     });
   });
 
   describe('Benchmark Data Validation', () => {
-    it('should have all required benchmark categories', () => {
-      expect(benchmarks).toHaveProperty('faculty');
-      expect(benchmarks).toHaveProperty('staffExempt');
-      expect(benchmarks).toHaveProperty('staffNonExempt');
-      expect(benchmarks).toHaveProperty('total');
+    it('should have both fiscal year benchmarks', () => {
+      expect(benchmarks).toHaveProperty('fy2324');
+      expect(benchmarks).toHaveProperty('fy2425');
     });
 
-    it('should have correct benchmark values from CUPA data', () => {
-      expect(benchmarks.faculty).toBe(8.7);
-      expect(benchmarks.staffExempt).toBe(15.0);
-      expect(benchmarks.staffNonExempt).toBe(20.7);
-      expect(benchmarks.total).toBe(13.8);
+    it('should have all required categories for each benchmark year', () => {
+      const years = ['fy2324', 'fy2425'];
+      const requiredFields = ['label', 'faculty', 'staffExempt', 'staffNonExempt', 'total'];
+
+      years.forEach(year => {
+        requiredFields.forEach(field => {
+          expect(benchmarks[year]).toHaveProperty(field);
+        });
+      });
+    });
+
+    it('should have correct 2023-24 CUPA benchmark values', () => {
+      expect(benchmarks.fy2324.label).toBe('Higher Ed. Avg.* 2023-24');
+      expect(benchmarks.fy2324.faculty).toBe(9.1);
+      expect(benchmarks.fy2324.staffExempt).toBe(16.7);
+      expect(benchmarks.fy2324.staffNonExempt).toBe(19.9);
+      expect(benchmarks.fy2324.total).toBe(14.1);
+    });
+
+    it('should have correct 2024-25 CUPA benchmark values', () => {
+      expect(benchmarks.fy2425.label).toBe('Higher Ed. Avg.* 2024-25');
+      expect(benchmarks.fy2425.faculty).toBe(8.7);
+      expect(benchmarks.fy2425.staffExempt).toBe(15.0);
+      expect(benchmarks.fy2425.staffNonExempt).toBe(20.7);
+      expect(benchmarks.fy2425.total).toBe(13.8);
     });
 
     it('should have positive benchmark values', () => {
-      Object.values(benchmarks).forEach(value => {
-        expect(value).toBeGreaterThan(0);
-      });
-    });
-  });
+      const years = ['fy2324', 'fy2425'];
+      const categories = ['faculty', 'staffExempt', 'staffNonExempt', 'total'];
 
-  describe('Rate Calculation Validation', () => {
-    it('should calculate rates correctly: (terminations / headcount) * 4 * 100', () => {
-      rates.forEach(quarter => {
-        ['faculty', 'staffExempt', 'staffNonExempt', 'staff', 'total'].forEach(category => {
-          const { terminations, headcount, rate } = quarter[category];
-          const calculatedRate = (terminations / headcount) * 4 * 100;
-          // Allow for rounding to 1 decimal place
-          expect(Math.abs(rate - calculatedRate)).toBeLessThan(0.2);
+      years.forEach(year => {
+        categories.forEach(category => {
+          expect(benchmarks[year][category]).toBeGreaterThan(0);
         });
-      });
-    });
-
-    it('should verify Q1 FY26 Faculty rate calculation', () => {
-      const q1fy26 = rates.find(q => q.quarter === 'Q1 FY26');
-      // (4/698)*4*100 = 2.29% ≈ 2.3%
-      expect(q1fy26.faculty.terminations).toBe(4);
-      expect(q1fy26.faculty.headcount).toBe(698);
-      expect(q1fy26.faculty.rate).toBe(2.3);
-    });
-
-    it('should verify Q1 FY26 Total rate calculation', () => {
-      const q1fy26 = rates.find(q => q.quarter === 'Q1 FY26');
-      // (58/2149)*4*100 = 10.79% ≈ 10.8%
-      expect(q1fy26.total.terminations).toBe(58);
-      expect(q1fy26.total.headcount).toBe(2149);
-      expect(q1fy26.total.rate).toBe(10.8);
-    });
-
-    it('should have all rates within expected range (0-100%)', () => {
-      rates.forEach(quarter => {
-        ['faculty', 'staffExempt', 'staffNonExempt', 'staff', 'total'].forEach(category => {
-          expect(quarter[category].rate).toBeGreaterThanOrEqual(0);
-          expect(quarter[category].rate).toBeLessThanOrEqual(100);
-        });
-      });
-    });
-  });
-
-  describe('Staff Category Consistency', () => {
-    it('should have staff terminations = staffExempt + staffNonExempt terminations', () => {
-      rates.forEach(quarter => {
-        const staffSum = quarter.staffExempt.terminations + quarter.staffNonExempt.terminations;
-        expect(staffSum).toBe(quarter.staff.terminations);
-      });
-    });
-
-    it('should have Q1 FY26 staff exempt/non-exempt as ACTUAL values', () => {
-      const q1fy26 = rates.find(q => q.quarter === 'Q1 FY26');
-      // Q1 FY26 actual values: 24 exempt, 30 non-exempt
-      expect(q1fy26.staffExempt.terminations).toBe(24);
-      expect(q1fy26.staffNonExempt.terminations).toBe(30);
-      expect(q1fy26.staff.terminations).toBe(54);
-    });
-  });
-
-  describe('Total Category Consistency', () => {
-    it('should have total terminations = faculty + staff terminations for non-HSP quarters', () => {
-      // Q1 FY26 excludes HSP (15) from total, so faculty + staff = total - HSP context
-      rates.forEach(quarter => {
-        const categorySum = quarter.faculty.terminations + quarter.staff.terminations;
-        // Total represents faculty + staff (excluding HSP for reporting purposes)
-        expect(categorySum).toBe(quarter.total.terminations);
       });
     });
   });
 
   describe('Benchmark Comparison Analysis', () => {
-    it('should identify Faculty rates are all below benchmark', () => {
-      rates.forEach(quarter => {
-        expect(quarter.faculty.rate).toBeLessThan(benchmarks.faculty);
-      });
+    it('should identify FY 2024 rates are below 2023-24 benchmarks', () => {
+      expect(annualRates.fy2024.faculty).toBeLessThan(benchmarks.fy2324.faculty);
+      expect(annualRates.fy2024.staffExempt).toBeLessThan(benchmarks.fy2324.staffExempt);
+      expect(annualRates.fy2024.staffNonExempt).toBeLessThan(benchmarks.fy2324.staffNonExempt);
+      expect(annualRates.fy2024.total).toBeLessThan(benchmarks.fy2324.total);
     });
 
-    it('should identify at least one Staff Exempt rate above benchmark', () => {
-      const aboveBenchmark = rates.filter(q => q.staffExempt.rate > benchmarks.staffExempt);
-      expect(aboveBenchmark.length).toBeGreaterThan(0);
+    it('should identify FY 2025 rates are below 2024-25 benchmarks', () => {
+      expect(annualRates.fy2025.faculty).toBeLessThan(benchmarks.fy2425.faculty);
+      expect(annualRates.fy2025.staffExempt).toBeLessThan(benchmarks.fy2425.staffExempt);
+      expect(annualRates.fy2025.staffNonExempt).toBeLessThan(benchmarks.fy2425.staffNonExempt);
+      expect(annualRates.fy2025.total).toBeLessThan(benchmarks.fy2425.total);
     });
 
-    it('should identify Staff Non-Exempt rates are all below benchmark', () => {
-      rates.forEach(quarter => {
-        expect(quarter.staffNonExempt.rate).toBeLessThan(benchmarks.staffNonExempt);
-      });
-    });
-  });
-
-  describe('Quarterly Progression', () => {
-    it('should have quarters in chronological order', () => {
-      const expectedOrder = ['Q2 FY25', 'Q3 FY25', 'Q4 FY25', 'Q1 FY26'];
-      rates.forEach((quarter, index) => {
-        expect(quarter.quarter).toBe(expectedOrder[index]);
-      });
+    it('should identify Q1 FY26 Staff Exempt is above benchmark (needs attention)', () => {
+      // 16.5% is above 15.0% benchmark - this should be RED in the UI
+      expect(annualRates.q1fy26.staffExempt).toBeGreaterThan(benchmarks.fy2425.staffExempt);
     });
 
-    it('should have increasing headcount trend (growing organization)', () => {
-      const totalHeadcounts = rates.map(q => q.total.headcount);
-      // Allow for small decreases but general trend should be upward
-      expect(totalHeadcounts[totalHeadcounts.length - 1]).toBeGreaterThanOrEqual(totalHeadcounts[0]);
+    it('should identify Q1 FY26 Faculty, Staff Non-Exempt, and Total are below benchmark', () => {
+      expect(annualRates.q1fy26.faculty).toBeLessThan(benchmarks.fy2425.faculty);
+      expect(annualRates.q1fy26.staffNonExempt).toBeLessThan(benchmarks.fy2425.staffNonExempt);
+      expect(annualRates.q1fy26.total).toBeLessThan(benchmarks.fy2425.total);
     });
   });
 
-  describe('Data Export Function', () => {
-    it('should return both rates and benchmarks', () => {
+  describe('Year-over-Year Trends', () => {
+    it('should show improvement from FY 2024 to FY 2025 in all categories', () => {
+      expect(annualRates.fy2025.faculty).toBeLessThan(annualRates.fy2024.faculty);
+      expect(annualRates.fy2025.staffExempt).toBeLessThan(annualRates.fy2024.staffExempt);
+      expect(annualRates.fy2025.staffNonExempt).toBeLessThan(annualRates.fy2024.staffNonExempt);
+      expect(annualRates.fy2025.total).toBeLessThan(annualRates.fy2024.total);
+    });
+  });
+
+  describe('Data Export Functions', () => {
+    it('should return annualRates and benchmarks from getAnnualTurnoverRatesByCategory', () => {
+      const result = getAnnualTurnoverRatesByCategory();
+      expect(result).toHaveProperty('annualRates');
+      expect(result).toHaveProperty('benchmarks');
+    });
+
+    it('should return correct data references from getAnnualTurnoverRatesByCategory', () => {
+      const result = getAnnualTurnoverRatesByCategory();
+      expect(result.annualRates).toBe(ANNUAL_TURNOVER_RATES_BY_CATEGORY);
+      expect(result.benchmarks).toBe(TURNOVER_BENCHMARKS);
+    });
+  });
+});
+
+// Legacy tests for backward compatibility
+describe('Legacy Quarterly Turnover Data (Backward Compatibility)', () => {
+  describe('Legacy Data Structure', () => {
+    it('should still export QUARTERLY_TURNOVER_RATES_BY_CATEGORY', () => {
+      expect(QUARTERLY_TURNOVER_RATES_BY_CATEGORY).toBeDefined();
+      expect(Array.isArray(QUARTERLY_TURNOVER_RATES_BY_CATEGORY)).toBe(true);
+    });
+
+    it('should still export QUARTERLY_TURNOVER_BENCHMARKS', () => {
+      expect(QUARTERLY_TURNOVER_BENCHMARKS).toBeDefined();
+      expect(QUARTERLY_TURNOVER_BENCHMARKS.faculty).toBe(8.7);
+      expect(QUARTERLY_TURNOVER_BENCHMARKS.staffExempt).toBe(15.0);
+      expect(QUARTERLY_TURNOVER_BENCHMARKS.staffNonExempt).toBe(20.7);
+      expect(QUARTERLY_TURNOVER_BENCHMARKS.total).toBe(13.8);
+    });
+
+    it('should still export getQuarterlyTurnoverRatesByCategory function', () => {
       const result = getQuarterlyTurnoverRatesByCategory();
       expect(result).toHaveProperty('rates');
       expect(result).toHaveProperty('benchmarks');
     });
 
-    it('should return correct data references', () => {
-      const result = getQuarterlyTurnoverRatesByCategory();
-      expect(result.rates).toBe(QUARTERLY_TURNOVER_RATES_BY_CATEGORY);
-      expect(result.benchmarks).toBe(QUARTERLY_TURNOVER_BENCHMARKS);
-    });
-  });
-
-  describe('Specific Quarter Data Validation', () => {
-    describe('Q2 FY25 (Oct-Dec 2024)', () => {
-      const q2fy25 = QUARTERLY_TURNOVER_RATES_BY_CATEGORY.find(q => q.quarter === 'Q2 FY25');
-
-      it('should have correct period', () => {
-        expect(q2fy25.period).toBe('Oct-Dec 2024');
-      });
-
-      it('should have correct total terminations and rate', () => {
-        expect(q2fy25.total.terminations).toBe(38);
-        expect(q2fy25.total.rate).toBe(7.1);
-      });
-    });
-
-    describe('Q3 FY25 (Jan-Mar 2025)', () => {
-      const q3fy25 = QUARTERLY_TURNOVER_RATES_BY_CATEGORY.find(q => q.quarter === 'Q3 FY25');
-
-      it('should have correct period', () => {
-        expect(q3fy25.period).toBe('Jan-Mar 2025');
-      });
-
-      it('should have correct total terminations and rate', () => {
-        expect(q3fy25.total.terminations).toBe(51);
-        expect(q3fy25.total.rate).toBe(9.6);
-      });
-    });
-
-    describe('Q4 FY25 (Apr-Jun 2025)', () => {
-      const q4fy25 = QUARTERLY_TURNOVER_RATES_BY_CATEGORY.find(q => q.quarter === 'Q4 FY25');
-
-      it('should have correct period', () => {
-        expect(q4fy25.period).toBe('Apr-Jun 2025');
-      });
-
-      it('should have correct total terminations and rate', () => {
-        expect(q4fy25.total.terminations).toBe(51);
-        expect(q4fy25.total.rate).toBe(9.5);
-      });
-    });
-
-    describe('Q1 FY26 (Jul-Sep 2025)', () => {
+    it('should have Q1 FY26 data in legacy quarterly format', () => {
       const q1fy26 = QUARTERLY_TURNOVER_RATES_BY_CATEGORY.find(q => q.quarter === 'Q1 FY26');
-
-      it('should have correct period', () => {
-        expect(q1fy26.period).toBe('Jul-Sep 2025');
-      });
-
-      it('should have correct total terminations and rate', () => {
-        expect(q1fy26.total.terminations).toBe(58);
-        expect(q1fy26.total.rate).toBe(10.8);
-      });
-
-      it('should have correct staff breakdown (ACTUAL values)', () => {
-        expect(q1fy26.staffExempt.terminations).toBe(24);
-        expect(q1fy26.staffExempt.rate).toBe(16.5);
-        expect(q1fy26.staffNonExempt.terminations).toBe(30);
-        expect(q1fy26.staffNonExempt.rate).toBe(13.8);
-      });
+      expect(q1fy26).toBeDefined();
+      expect(q1fy26.faculty.rate).toBe(2.3);
+      expect(q1fy26.staffExempt.rate).toBe(16.5);
+      expect(q1fy26.staffNonExempt.rate).toBe(13.8);
+      expect(q1fy26.total.rate).toBe(10.8);
     });
   });
 });

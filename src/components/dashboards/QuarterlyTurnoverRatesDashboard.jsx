@@ -3,7 +3,7 @@ import SummaryCard from '../ui/SummaryCard';
 import QuarterlyTurnoverRatesTable from '../charts/QuarterlyTurnoverRatesTable';
 import ErrorBoundary from '../ui/ErrorBoundary';
 import PDFExportButton from '../ui/PDFExportButton';
-import { getQuarterlyTurnoverRatesByCategory } from '../../data/staticData';
+import { getAnnualTurnoverRatesByCategory } from '../../data/staticData';
 import {
   TrendingDown,
   BookOpen,
@@ -12,12 +12,13 @@ import {
 } from 'lucide-react';
 
 const QuarterlyTurnoverRatesDashboard = () => {
-  // Get data for summary cards (use latest quarter - Q1 FY26)
-  const { rates, benchmarks } = getQuarterlyTurnoverRatesByCategory();
-  const latestQuarter = rates[rates.length - 1]; // Q1 FY26
+  // Get data for summary cards (compare FY 2025 vs FY 2024)
+  const { annualRates, benchmarks } = getAnnualTurnoverRatesByCategory();
+  const currentYear = annualRates.fy2025;
+  const previousYear = annualRates.fy2024;
+  const currentBenchmarks = benchmarks.fy2425;
 
-  // Calculate change from previous quarter
-  const previousQuarter = rates[rates.length - 2]; // Q4 FY25
+  // Calculate year-over-year change
   const calculateChange = (current, previous) => {
     return (current - previous).toFixed(1);
   };
@@ -35,9 +36,9 @@ const QuarterlyTurnoverRatesDashboard = () => {
                   <div className="flex items-center gap-3">
                     <TrendingDown style={{color: '#0054A6'}} size={24} />
                     <div>
-                      <h1 className="text-2xl font-bold text-gray-900">Quarterly Turnover Analysis</h1>
+                      <h1 className="text-2xl font-bold text-gray-900">Turnover Analysis by Category</h1>
                       <p className="text-gray-600 text-sm mt-1">
-                        Turnover Rates by Category - Q2 FY25 through Q1 FY26
+                        Annual Turnover Rates - FY 2024, FY 2025 & Q1 FY26 with CUPA Benchmarks
                       </p>
                     </div>
                   </div>
@@ -49,8 +50,8 @@ const QuarterlyTurnoverRatesDashboard = () => {
                       defaultOrientation="landscape"
                       title="Export PDF"
                       customHeader={{
-                        title: "Quarterly Turnover Rates by Category",
-                        subtitle: "Q2 FY25 - Q1 FY26"
+                        title: "Turnover Rates by Category",
+                        subtitle: "FY 2024, FY 2025 & Q1 FY26 with CUPA Benchmarks"
                       }}
                     />
                   </div>
@@ -69,61 +70,61 @@ const QuarterlyTurnoverRatesDashboard = () => {
                     Data Coverage Information
                   </h3>
                   <p className="text-sm text-blue-700 print:text-black leading-relaxed">
-                    Turnover rates are annualized (quarterly rate × 4) for comparison with CUPA benchmarks.
+                    FY 2024 and FY 2025 rates are annual turnover percentages. Q1 FY26 rates are annualized (quarterly × 4) for comparison with CUPA benchmarks.
                     Data includes benefit-eligible Full-Time and Part-Time employees only.
                   </p>
                 </div>
               </div>
             </div>
 
-            {/* Summary Cards - Latest Quarter (Q1 FY26) */}
+            {/* Summary Cards - FY 2025 Performance */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 print:gap-2 mb-6 print:mb-4">
               <SummaryCard
-                title="Total Turnover"
-                value={`${latestQuarter.total.rate}%`}
-                change={parseFloat(calculateChange(latestQuarter.total.rate, previousQuarter.total.rate))}
+                title="Total Turnover (FY25)"
+                value={`${currentYear.total}%`}
+                change={parseFloat(calculateChange(currentYear.total, previousYear.total))}
                 changeType="percentage"
-                subtitle={`Benchmark: ${benchmarks.total}%`}
+                subtitle={`Benchmark: ${currentBenchmarks.total}%`}
                 icon={TrendingDown}
-                trend={latestQuarter.total.rate < benchmarks.total ? "positive" : "negative"}
+                trend={currentYear.total < currentBenchmarks.total ? "positive" : "negative"}
               />
 
               <SummaryCard
-                title="Faculty Turnover"
-                value={`${latestQuarter.faculty.rate}%`}
-                change={parseFloat(calculateChange(latestQuarter.faculty.rate, previousQuarter.faculty.rate))}
+                title="Faculty Turnover (FY25)"
+                value={`${currentYear.faculty}%`}
+                change={parseFloat(calculateChange(currentYear.faculty, previousYear.faculty))}
                 changeType="percentage"
-                subtitle={`Benchmark: ${benchmarks.faculty}%`}
+                subtitle={`Benchmark: ${currentBenchmarks.faculty}%`}
                 icon={BookOpen}
-                trend={latestQuarter.faculty.rate < benchmarks.faculty ? "positive" : "negative"}
+                trend={currentYear.faculty < currentBenchmarks.faculty ? "positive" : "negative"}
               />
 
               <SummaryCard
-                title="Staff Exempt"
-                value={`${latestQuarter.staffExempt.rate}%`}
-                change={parseFloat(calculateChange(latestQuarter.staffExempt.rate, previousQuarter.staffExempt.rate))}
+                title="Staff Exempt (FY25)"
+                value={`${currentYear.staffExempt}%`}
+                change={parseFloat(calculateChange(currentYear.staffExempt, previousYear.staffExempt))}
                 changeType="percentage"
-                subtitle={`Benchmark: ${benchmarks.staffExempt}%`}
+                subtitle={`Benchmark: ${currentBenchmarks.staffExempt}%`}
                 icon={Building2}
-                trend={latestQuarter.staffExempt.rate < benchmarks.staffExempt ? "positive" : "negative"}
+                trend={currentYear.staffExempt < currentBenchmarks.staffExempt ? "positive" : "negative"}
               />
 
               <SummaryCard
-                title="Staff Non-Exempt"
-                value={`${latestQuarter.staffNonExempt.rate}%`}
-                change={parseFloat(calculateChange(latestQuarter.staffNonExempt.rate, previousQuarter.staffNonExempt.rate))}
+                title="Staff Non-Exempt (FY25)"
+                value={`${currentYear.staffNonExempt}%`}
+                change={parseFloat(calculateChange(currentYear.staffNonExempt, previousYear.staffNonExempt))}
                 changeType="percentage"
-                subtitle={`Benchmark: ${benchmarks.staffNonExempt}%`}
+                subtitle={`Benchmark: ${currentBenchmarks.staffNonExempt}%`}
                 icon={Building2}
-                trend={latestQuarter.staffNonExempt.rate < benchmarks.staffNonExempt ? "positive" : "negative"}
+                trend={currentYear.staffNonExempt < currentBenchmarks.staffNonExempt ? "positive" : "negative"}
               />
             </div>
 
-            {/* Quarterly Turnover Rates Table */}
+            {/* Turnover Rates Table */}
             <div className="mb-6 print:mb-4 chart-container" data-chart-type="table">
-              <div id="quarterly-turnover-rates-table" data-chart-title="Quarterly Turnover Rates by Category" data-chart-ready="false">
+              <div id="quarterly-turnover-rates-table" data-chart-title="Turnover Rates by Category" data-chart-ready="false">
                 <QuarterlyTurnoverRatesTable
-                  title="Quarterly Turnover Rates by Category"
+                  title="Turnover Rates by Category"
                 />
               </div>
             </div>
@@ -132,10 +133,10 @@ const QuarterlyTurnoverRatesDashboard = () => {
             <div className="bg-white rounded-lg shadow-sm border p-4">
               <h4 className="text-sm font-semibold text-gray-700 mb-2">Notes</h4>
               <ul className="text-xs text-gray-600 space-y-1">
-                <li>• <strong>Annualized Rate:</strong> (Quarterly Terminations / Headcount) × 4 × 100</li>
-                <li>• <strong>Benchmark Source:</strong> CUPA Higher Education data (2024-25)</li>
-                <li>• <strong>Q1 FY26 Staff Data:</strong> Actual termination counts from HR system</li>
-                <li>• <strong>Q2-Q4 FY25 Staff Split:</strong> Estimated based on Q1 FY26 exempt/non-exempt proportions (44%/56%)</li>
+                <li>• <strong>FY 2024/2025 Rates:</strong> Annual turnover percentage for the full fiscal year</li>
+                <li>• <strong>Q1 FY26 Rate:</strong> Annualized (Quarterly Terminations / Headcount) × 4 × 100</li>
+                <li>• <strong>Benchmark Source:</strong> CUPA Higher Education data (2023-24 and 2024-25)</li>
+                <li>• <strong>Comparison Logic:</strong> FY 2024 compares to 2023-24 benchmark; FY 2025 and Q1 FY26 compare to 2024-25 benchmark</li>
                 <li>• <strong>Color Coding:</strong> Green indicates performance better than benchmark; Red indicates performance needs attention</li>
               </ul>
             </div>
