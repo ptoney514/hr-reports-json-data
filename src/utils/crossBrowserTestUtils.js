@@ -132,7 +132,7 @@ export const browserCompatibility = {
       performanceObserver: typeof PerformanceObserver !== 'undefined',
       requestIdleCallback: typeof requestIdleCallback !== 'undefined',
       webComponents: typeof customElements !== 'undefined',
-      modules: typeof import !== 'undefined',
+      modules: 'noModule' in HTMLScriptElement.prototype,
       workers: typeof Worker !== 'undefined'
     };
 
