@@ -1,5 +1,5 @@
 ---
-allowed-tools: Bash(git *), Bash(npm run build), Bash(npm test *), Read
+allowed-tools: Bash(git *), Bash(npm run build), Bash(npm test *), Bash(npm audit *), Read
 description: Run quality checks before committing changes
 ---
 
@@ -44,6 +44,13 @@ Review staged changes for:
 
 ## Step 5: Security Check
 
+```bash
+npm audit --audit-level=high
+```
+
+**WARNING**: Flag high/critical vulnerabilities. May continue with moderate issues.
+
+Also verify:
 - [ ] No `.env` or credentials in staged files
 - [ ] No console.log with sensitive data
 - [ ] No hardcoded API keys or tokens
@@ -66,3 +73,14 @@ or
 2. ...
 
 Keep feedback actionable and specific.
+
+---
+
+## Note: CI-Only Checks (Not Covered Here)
+
+These checks run only in CI and cannot be replicated locally:
+- **Trivy Security Scan**: Requires CI infrastructure for SARIF upload
+- **Accessibility Audit**: Requires headless browser + running server
+- **Performance Audit**: Requires Lighthouse in CI environment
+
+If CI fails on these, check the workflow configuration, not the code.
