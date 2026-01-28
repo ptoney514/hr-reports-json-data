@@ -89,7 +89,9 @@ describe('DemographicsQ1FY26Dashboard', () => {
 
     test('displays benefit eligible employee count in header', () => {
       renderComponent();
-      expect(screen.getByText(/Benefit Eligible Employees/i)).toBeInTheDocument();
+      // Use getAllByText since "Benefit Eligible Employees" appears in multiple places
+      const matches = screen.getAllByText(/Benefit Eligible Employees/i);
+      expect(matches.length).toBeGreaterThan(0);
     });
   });
 
@@ -119,7 +121,9 @@ describe('DemographicsQ1FY26Dashboard', () => {
   describe('Age/Gender Distribution', () => {
     test('renders age/gender distribution title', () => {
       renderComponent();
-      expect(screen.getByText(/Age\/Gender Distribution/i)).toBeInTheDocument();
+      // Use getAllByText since "Age/Gender Distribution" appears in multiple places (Faculty and Staff sections)
+      const matches = screen.getAllByText(/Age\/Gender Distribution/i);
+      expect(matches.length).toBeGreaterThan(0);
     });
 
     test('displays faculty age/gender section', () => {
