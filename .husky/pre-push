@@ -1,0 +1,29 @@
+#!/usr/bin/env sh
+
+# HR Reports - Pre-push Hook
+# Runs CI-equivalent checks before allowing push to remote
+# Skip with: git push --no-verify
+
+echo "🔍 Running pre-push checks..."
+
+# Step 1: Build check
+echo "📦 Building application..."
+npm run build
+if [ $? -ne 0 ]; then
+    echo "❌ Build failed. Fix errors before pushing."
+    exit 1
+fi
+
+# Step 2: Run tests
+echo "🧪 Running tests..."
+npm test -- --watchAll=false
+if [ $? -ne 0 ]; then
+    echo "❌ Tests failed. Fix failing tests before pushing."
+    exit 1
+fi
+
+# Step 3: Security audit (warning only, doesn't block)
+echo "🔒 Running security audit..."
+npm audit --audit-level=high || echo "⚠️ Security warnings found (not blocking)"
+
+echo "✅ Pre-push checks passed!"

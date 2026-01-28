@@ -746,4 +746,4 @@ class SecurityManager {
 const securityManager = new SecurityManager();
 
 export default securityManager;
-export { SecurityManager, CSP_CONFIG, SECURITY_HEADERS };
+export { SecurityManager };
