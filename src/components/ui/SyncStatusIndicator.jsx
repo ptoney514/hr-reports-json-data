@@ -8,6 +8,18 @@ const SyncStatusIndicator = ({ className = '', showDetails = false }) => {
   
   // Determine status color and icon
   const getStatusDisplay = () => {
+    // Guard against undefined syncStatus
+    if (!syncStatus) {
+      return {
+        icon: <Database className="w-4 h-4" />,
+        color: 'text-gray-400',
+        bgColor: 'bg-gray-50',
+        borderColor: 'border-gray-200',
+        text: 'Not Synced',
+        detail: 'No sync data'
+      };
+    }
+
     if (syncStatus.inProgress) {
       return {
         icon: <RefreshCw className="w-4 h-4 animate-spin" />,
@@ -114,7 +126,7 @@ const SyncStatusIndicator = ({ className = '', showDetails = false }) => {
           </div>
         </div>
         
-        {syncStatus.lastSync && (
+        {syncStatus?.lastSync && (
           <div className="text-right">
             <p className="text-xs text-gray-500">Last sync</p>
             <p className="text-xs font-medium text-gray-700">
@@ -124,7 +136,7 @@ const SyncStatusIndicator = ({ className = '', showDetails = false }) => {
         )}
       </div>
       
-      {syncStatus.totalSources > 0 && (
+      {syncStatus?.totalSources > 0 && (
         <div className="mt-4 space-y-2">
           <div className="flex items-center justify-between text-xs">
             <span className="text-gray-600">Sources synced</span>
@@ -144,7 +156,7 @@ const SyncStatusIndicator = ({ className = '', showDetails = false }) => {
         </div>
       )}
       
-      {syncStatus.errors && syncStatus.errors.length > 0 && (
+      {syncStatus?.errors && syncStatus.errors.length > 0 && (
         <div className="mt-3 p-2 bg-amber-50 rounded border border-amber-200">
           <p className="text-xs font-medium text-amber-700 mb-1">
             Recent Errors:
