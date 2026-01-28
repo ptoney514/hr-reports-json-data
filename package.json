@@ -2,7 +2,6 @@
   "name": "hr-reports-json-data",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://ptoney514.github.io/hr-reports-json-data",
   "dependencies": {
     "@tanstack/react-query": "^5.84.2",
     "@testing-library/dom": "^10.4.0",

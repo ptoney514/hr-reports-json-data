@@ -138,7 +138,7 @@ function App() {
             onRetry={handleAppRetry}
             showHomeButton={false}
           >
-          <Router basename={process.env.PUBLIC_URL}>
+          <Router>
             <AppLayout>
               {/* Main Content with Suspense for lazy loading */}
               <Suspense fallback={
