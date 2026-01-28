@@ -1,0 +1,15 @@
+#!/usr/bin/env sh
+
+# HR Reports - Pre-commit Hook
+# Runs quick checks before allowing commit
+# Skip with: git commit --no-verify
+
+# Quick build check (catches syntax errors)
+echo "🔍 Running quick build check..."
+npm run build > /dev/null 2>&1
+if [ $? -ne 0 ]; then
+    echo "❌ Build failed. Run 'npm run build' to see errors."
+    exit 1
+fi
+
+echo "✅ Pre-commit checks passed!"
