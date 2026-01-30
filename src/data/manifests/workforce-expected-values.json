@@ -1,0 +1,116 @@
+{
+  "description": "Expected values for Workforce Summary Card metrics by fiscal period",
+  "methodology": "source-metrics/workforce/WORKFORCE_METHODOLOGY.md",
+  "lastUpdated": "2026-01-30",
+  "periods": {
+    "2025-06-30": {
+      "label": "FY25 Q4",
+      "reportingDate": "6/30/25",
+      "isYearEnd": true,
+      "metrics": {
+        "staff": {
+          "label": "Benefit Eligible Staff",
+          "value": 1448,
+          "calculation": "Person Type = 'STAFF' AND Benefit Eligible = 'Yes' AND Assignment Category != 'HSR'"
+        },
+        "faculty": {
+          "label": "Benefit Eligible Faculty",
+          "value": 689,
+          "calculation": "Person Type = 'FACULTY' AND Benefit Eligible = 'Yes'"
+        },
+        "hsp": {
+          "label": "Benefit Eligible HSP",
+          "value": 612,
+          "calculation": "Assignment Category = 'HSR' OR Grade Code = 'R'"
+        },
+        "students": {
+          "label": "Student Workers",
+          "value": 1714,
+          "calculation": "Assignment Category IN ('SUE', 'CWS')"
+        },
+        "temp": {
+          "label": "Non-Benefit Eligible",
+          "value": 574,
+          "calculation": "Assignment Category IN ('TEMP', 'NBE', 'PRN')"
+        },
+        "total": {
+          "label": "Total Workforce",
+          "value": 5037,
+          "calculation": "SUM(staff + faculty + hsp + students + temp)"
+        }
+      },
+      "locations": {
+        "omaha": {
+          "label": "Omaha Campus",
+          "total": 4287,
+          "faculty": 649,
+          "staff": 1344,
+          "hsp": 268,
+          "students": 1604,
+          "temp": 422
+        },
+        "phoenix": {
+          "label": "Phoenix Campus",
+          "total": 750,
+          "faculty": 40,
+          "staff": 104,
+          "hsp": 344,
+          "students": 110,
+          "temp": 152
+        }
+      },
+      "validationRanges": {
+        "total": { "min": 4500, "max": 6000 },
+        "staff": { "min": 1200, "max": 1800 },
+        "faculty": { "min": 500, "max": 900 },
+        "hsp": { "min": 500, "max": 800 },
+        "students": { "min": 1400, "max": 2200 },
+        "temp": { "min": 400, "max": 800 }
+      }
+    },
+    "2024-06-30": {
+      "label": "FY24 Q4",
+      "reportingDate": "6/30/24",
+      "isYearEnd": true,
+      "metrics": {
+        "staff": { "label": "Benefit Eligible Staff", "value": 1431 },
+        "faculty": { "label": "Benefit Eligible Faculty", "value": 678 },
+        "hsp": { "label": "Benefit Eligible HSP", "value": 608 },
+        "students": { "label": "Student Workers", "value": 1491 },
+        "temp": { "label": "Non-Benefit Eligible", "value": 566 },
+        "total": { "label": "Total Workforce", "value": 4774 }
+      }
+    },
+    "2025-09-30": {
+      "label": "FY26 Q1",
+      "reportingDate": "9/30/25",
+      "isYearEnd": false,
+      "metrics": {
+        "staff": { "label": "Benefit Eligible Staff", "value": 1419 },
+        "faculty": { "label": "Benefit Eligible Faculty", "value": 697 },
+        "hsp": { "label": "Benefit Eligible HSP", "value": 625 },
+        "students": { "label": "Student Workers", "value": 2157 },
+        "temp": { "label": "Non-Benefit Eligible", "value": 630 },
+        "total": { "label": "Total Workforce", "value": 5528 }
+      }
+    }
+  },
+  "excelSchema": {
+    "requiredColumns": [
+      "Employee ID",
+      "Person Type",
+      "Assignment Category Code",
+      "Benefit Eligible",
+      "Location",
+      "End Date"
+    ],
+    "assignmentCategoryCodes": {
+      "benefitEligible": ["F12", "F11", "F10", "F09", "PT12", "PT11", "PT10", "PT9"],
+      "houseStaff": ["HSR"],
+      "students": ["SUE", "CWS"],
+      "nonBenefit": ["TEMP", "NBE", "PRN"]
+    },
+    "personTypes": ["STAFF", "FACULTY"],
+    "locations": ["OMA", "PHX", "Omaha", "Phoenix"]
+  }
+}
