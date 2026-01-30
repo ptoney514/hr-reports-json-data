@@ -86,6 +86,53 @@
 - **Solution**: Add JSDoc comments, create component library docs
 - **Estimate**: 2-3 days
 
+## Security Vulnerabilities (npm audit)
+
+**Last Updated**: January 2025
+**Status**: 12 vulnerabilities (reduced from 21 after `npm audit fix`)
+
+### Remaining Vulnerabilities
+
+| Package | Severity | Issue | Status |
+|---------|----------|-------|--------|
+| **xlsx** | HIGH | Prototype Pollution, ReDoS | **NO FIX AVAILABLE** |
+| **jspdf** | CRITICAL | Path Traversal (CVE) | Requires breaking change (v4.0.0) |
+| eslint | Moderate | Stack Overflow | Nested in react-scripts |
+| nth-check/svgo | High | ReDoS | Nested in react-scripts |
+| postcss | Moderate | Parsing error | Nested in react-scripts |
+| webpack-dev-server | Moderate | Source code exposure | Nested in react-scripts |
+
+### Risk Assessment & Mitigations
+
+#### xlsx (HIGH - No Fix Available)
+- **Usage**: Excel export/import in data processing scripts
+- **Risk**: Prototype pollution when parsing untrusted XLSX files
+- **Mitigation**: Only parse trusted internal HR data files (not user uploads)
+- **Future**: Consider migrating to `exceljs` package (GitHub Issue needed)
+
+#### jspdf (CRITICAL)
+- **Usage**: PDF report generation
+- **Risk**: Local file inclusion/path traversal vulnerability
+- **Mitigation**: Only generates PDFs client-side from controlled data, no file path inputs
+- **Future**: Evaluate jspdf v4.0.0 for breaking changes compatibility
+
+#### react-scripts Dependencies (Moderate/High)
+- **Usage**: Development tooling only
+- **Risk**: Limited to dev environment, NOT shipped to production
+- **Mitigation**: Dev-only dependencies don't affect end users
+- **Future**: Consider migrating to Vite (would eliminate these)
+
+### Packages Successfully Updated (Jan 2025)
+- glob: 10.4.5 → 10.5.0
+- react-router-dom: 6.30.2 → 6.30.3
+- react-router: 6.30.2 → 6.30.3
+- @remix-run/router: 1.23.1 → 1.23.2
+- qs: 6.13.0 → 6.14.1
+- node-forge: 1.3.1 → 1.3.3
+- lodash: 4.17.21 → 4.17.23
+- express: 4.21.2 → 4.22.1
+- body-parser: 1.20.3 → 1.20.4
+
 ## Accepted Debt
 
 ### External Data Dependencies
