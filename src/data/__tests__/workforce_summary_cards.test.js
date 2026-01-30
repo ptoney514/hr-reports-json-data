@@ -111,8 +111,9 @@ describe('Workforce Summary Card Metrics - FY25 Q4 (6/30/2025)', () => {
 
   describe('Category Sum Validation', () => {
     it('all categories should sum to total workforce', () => {
+      // Use getTempTotal() to match UI calculation (TEMP + NBE + PRN)
       const categorySum = data.staff + data.faculty + data.hsp +
-        data.studentCount.total + data.temp;
+        data.studentCount.total + getTempTotal('2025-06-30');
       expect(categorySum).toBe(data.totalEmployees);
     });
   });
@@ -201,8 +202,11 @@ describe('Methodology Compliance Checks', () => {
     });
 
     it('Phoenix should have higher HSP concentration than Omaha', () => {
-      // Per methodology: Phoenix medical center operations
-      expect(data.locationDetails.phoenix.hsp).toBeGreaterThan(data.locationDetails.omaha.hsp);
+      // Per methodology: Phoenix medical center operations have higher HSP proportion
+      const phoenixHspConcentration = data.locationDetails.phoenix.hsp / data.locations['Phoenix Campus'];
+      const omahaHspConcentration = data.locationDetails.omaha.hsp / data.locations['Omaha Campus'];
+      expect(phoenixHspConcentration).toBeGreaterThan(omahaHspConcentration);
+      // Phoenix: 344/750 = 45.9% vs Omaha: 268/4287 = 6.3%
     });
 
     it('Omaha should be the larger campus (~85% of total)', () => {

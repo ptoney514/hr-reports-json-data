@@ -1,5 +1,4 @@
 {
-  "$schema": "./workforce-manifest-schema.json",
   "description": "Expected values for Workforce Summary Card metrics by fiscal period",
   "methodology": "source-metrics/workforce/WORKFORCE_METHODOLOGY.md",
   "lastUpdated": "2026-01-30",
