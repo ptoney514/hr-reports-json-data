@@ -1,7 +1,7 @@
 import React from 'react';
 import { Users, UserCheck, Briefcase, GraduationCap, Stethoscope, FileText, TrendingDown, CheckCircle, AlertCircle, Info, BarChart3, MapPin } from 'lucide-react';
 import { ResponsiveContainer, Tooltip, LineChart, Line, XAxis, YAxis, CartesianGrid, Legend } from 'recharts';
-import { getQuarterlyWorkforceData, QUARTERLY_HEADCOUNT_TRENDS } from '../../data/staticData';
+import { getQuarterlyWorkforceData, QUARTERLY_HEADCOUNT_TRENDS } from '../../services/dataService';
 
 /**
  * Q1 FY26 Workforce and Headcount Dashboard

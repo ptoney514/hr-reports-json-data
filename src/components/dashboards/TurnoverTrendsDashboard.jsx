@@ -1,7 +1,7 @@
 import React from 'react';
 import { TrendingDown, AlertCircle } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
-import { QUARTERLY_TURNOVER_TRENDS } from '../../data/staticData';
+import { QUARTERLY_TURNOVER_TRENDS } from '../../services/dataService';
 
 /**
  * Turnover Trends Dashboard

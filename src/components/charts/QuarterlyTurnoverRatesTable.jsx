@@ -1,5 +1,5 @@
 import React from 'react';
-import { getAnnualTurnoverRatesByCategory } from '../../data/staticData';
+import { getAnnualTurnoverRatesByCategory } from '../../services/dataService';
 
 const QuarterlyTurnoverRatesTable = ({ title = "Turnover Rates by Category", className = "" }) => {
   // Get data from static data

@@ -5,7 +5,7 @@ import GenderDistributionChart from '../charts/GenderDistributionChart';
 import EthnicityBreakdownChart from '../charts/EthnicityBreakdownChart';
 import AgeGenderPyramid from '../charts/AgeGenderPyramid';
 import { DataDebugOverlay } from '../ui/DataDebugOverlay';
-import { getWorkforceData, getTempTotal } from '../../data/staticData';
+import { getWorkforceData, getTempTotal } from '../../services/dataService';
 import { Users, BookOpen, Building2, Heart, GraduationCap, TrendingUp } from 'lucide-react';
 
 

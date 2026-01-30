@@ -1,7 +1,7 @@
 import React from 'react';
 import { Users, FileText } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
-import { getQuarterlyWorkforceData } from '../../data/staticData';
+import { getQuarterlyWorkforceData } from '../../services/dataService';
 
 /**
  * Q1 FY26 Workforce Demographics Dashboard

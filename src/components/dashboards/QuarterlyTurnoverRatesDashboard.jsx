@@ -3,7 +3,7 @@ import SummaryCard from '../ui/SummaryCard';
 import QuarterlyTurnoverRatesTable from '../charts/QuarterlyTurnoverRatesTable';
 import ErrorBoundary from '../ui/ErrorBoundary';
 import PDFExportButton from '../ui/PDFExportButton';
-import { getAnnualTurnoverRatesByCategory } from '../../data/staticData';
+import { getAnnualTurnoverRatesByCategory } from '../../services/dataService';
 import {
   TrendingDown,
   BookOpen,

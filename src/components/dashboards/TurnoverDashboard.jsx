@@ -13,7 +13,7 @@ import RetirementsByFiscalYear from '../charts/RetirementsByFiscalYear';
 // Quarter filter removed - using fixed reporting period
 import ErrorBoundary from '../ui/ErrorBoundary';
 import PDFExportButton from '../ui/PDFExportButton';
-import { getTurnoverData } from '../../data/staticData';
+import { getTurnoverData } from '../../services/dataService';
 import {
   TrendingDown,
   BookOpen,

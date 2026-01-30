@@ -4,7 +4,7 @@
  * Used for data quality auditing and self-service analytics
  */
 
-import { QUARTERLY_WORKFORCE_DATA, QUARTERLY_TURNOVER_DATA } from '../data/staticData';
+import { QUARTERLY_WORKFORCE_DATA, QUARTERLY_TURNOVER_DATA } from './dataService';
 
 /**
  * Get workforce breakdown by Grade and Assignment Category

@@ -1,7 +1,7 @@
 import React from 'react';
 import { BarChart, Bar, LineChart, Line, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { TrendingDown, UserX, FileText, AlertCircle } from 'lucide-react';
-import { getExitSurveyData } from '../../data/staticData';
+import { getExitSurveyData } from '../../services/dataService';
 
 const ExitSurveyQ2Dashboard = () => {
   const surveyData = getExitSurveyData("2024-12-31");

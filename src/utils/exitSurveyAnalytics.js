@@ -4,7 +4,7 @@
  * Focus: Complete quarters only, no predictions
  */
 
-import { EXIT_SURVEY_DATA, AVAILABLE_DATES } from '../data/staticData';
+import { EXIT_SURVEY_DATA, AVAILABLE_DATES } from '../services/dataService';
 
 /**
  * Calculate Turnover Velocity Index (TVI) between two periods

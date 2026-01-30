@@ -1,7 +1,7 @@
 import React from 'react';
 import { UserPlus, Users, GraduationCap, Stethoscope, Clock, MapPin } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { QUARTERLY_HEADCOUNT_TRENDS } from '../../data/staticData';
+import { QUARTERLY_HEADCOUNT_TRENDS } from '../../services/dataService';
 
 // Chart styling constants
 const CHART_MAX_SCALE = 4000;

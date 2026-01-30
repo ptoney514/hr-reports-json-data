@@ -1,6 +1,6 @@
 import React from 'react';
 import { LogOut, Calendar, TrendingUp, Users, Target } from 'lucide-react';
-import { getExitSurveyData } from '../../data/staticData';
+import { getExitSurveyData } from '../../services/dataService';
 import FY2025ExitComparison from '../charts/FY2025ExitComparison';
 import FY2025LessonsLearnedPanel from '../panels/FY2025LessonsLearnedPanel';
 import FY2026PlanningMatrix from '../planning/FY2026PlanningMatrix';

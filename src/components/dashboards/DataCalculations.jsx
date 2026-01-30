@@ -8,7 +8,7 @@ import {
   CheckCircle2,
   Info
 } from 'lucide-react';
-import { getWorkforceData } from '../../data/staticData';
+import { getWorkforceData } from '../../services/dataService';
 
 const DataCalculations = ({ date, dateLabel }) => {
   const workforceData = getWorkforceData(date);

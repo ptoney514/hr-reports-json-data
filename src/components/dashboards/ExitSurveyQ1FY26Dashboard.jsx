@@ -1,6 +1,6 @@
 import React from 'react';
 import { FileText, Users, BarChart3, ThumbsUp, Star, AlertTriangle, Activity, TrendingDown } from 'lucide-react';
-import { getExitSurveyData } from '../../data/staticData';
+import { getExitSurveyData } from '../../services/dataService';
 
 /**
  * Q1 FY26 Exit Survey Dashboard

@@ -1,6 +1,6 @@
 import React from 'react';
 import { UserPlus, TrendingUp, Briefcase, Users } from 'lucide-react';
-import { getRecruitingData, getPhoenixHeadcountData, getOmahaHeadcountData } from '../../data/staticData';
+import { getRecruitingData, getPhoenixHeadcountData, getOmahaHeadcountData } from '../../services/dataService';
 import SummaryCard from '../ui/SummaryCard';
 import DualHeadcountChart from '../charts/DualHeadcountChart';
 import FacultyHireRateCard from '../charts/FacultyHireRateCard';

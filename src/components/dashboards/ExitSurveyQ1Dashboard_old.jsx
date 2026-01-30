@@ -1,6 +1,6 @@
 import React from 'react';
 import { Calendar, TrendingUp, Users, AlertTriangle, Building2, Clock } from 'lucide-react';
-import { getExitSurveyData } from '../../data/staticData';
+import { getExitSurveyData } from '../../services/dataService';
 import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, LineChart, Line } from 'recharts';
 
 const ExitSurveyQ1Dashboard = () => {

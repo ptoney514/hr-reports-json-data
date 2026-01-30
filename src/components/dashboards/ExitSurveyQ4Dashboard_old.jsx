@@ -1,6 +1,6 @@
 import React from 'react';
 import { FileText, ThumbsUp, AlertCircle, TrendingDown, Target, Users, BarChart3, Lightbulb, CheckCircle, XCircle } from 'lucide-react';
-import { getExitSurveyData } from '../../data/staticData';
+import { getExitSurveyData } from '../../services/dataService';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 
 const ExitSurveyQ4Dashboard = () => {

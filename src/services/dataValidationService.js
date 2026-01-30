@@ -1,5 +1,5 @@
 // Real Data Validation Service for HR Reports
-import { WORKFORCE_DATA, TURNOVER_DATA, EXIT_SURVEY_DATA } from '../data/staticData';
+import { WORKFORCE_DATA, TURNOVER_DATA, EXIT_SURVEY_DATA } from './dataService';
 
 class DataValidationService {
   constructor() {

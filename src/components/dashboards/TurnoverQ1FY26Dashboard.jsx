@@ -1,7 +1,7 @@
 import React from 'react';
 import { TrendingDown, Users, UserCheck, Briefcase, BarChart3, Clock, Calendar, PieChart } from 'lucide-react';
 import { PieChart as RechartsPie, Pie, Cell, ResponsiveContainer } from 'recharts';
-import { getQuarterlyTurnoverData } from '../../data/staticData';
+import { getQuarterlyTurnoverData } from '../../services/dataService';
 
 /**
  * Q1 FY26 Terminations & Turnover Dashboard

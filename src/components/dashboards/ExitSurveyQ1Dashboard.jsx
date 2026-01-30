@@ -1,7 +1,7 @@
 import React from 'react';
 import { BarChart, Bar, Line, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { TrendingUp, UserX, FileText, AlertCircle } from 'lucide-react';
-import { getExitSurveyData } from '../../data/staticData';
+import { getExitSurveyData } from '../../services/dataService';
 
 const ExitSurveyQ1Dashboard = () => {
   const surveyData = getExitSurveyData("2025-09-30"); // Q1 FY26

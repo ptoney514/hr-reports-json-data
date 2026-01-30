@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { MessageSquare, Calendar, FileText, ArrowRight, TrendingDown, Users, Target, BarChart3, ThumbsUp, AlertTriangle } from 'lucide-react';
-import { getExitSurveyData } from '../../data/staticData';
+import { getExitSurveyData } from '../../services/dataService';
 
 const ExitSurveyOverview = () => {
   const q1Data = getExitSurveyData("2024-06-30");
