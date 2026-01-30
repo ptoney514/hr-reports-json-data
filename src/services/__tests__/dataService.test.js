@@ -244,6 +244,58 @@ describe('dataService', () => {
       expect(staticData.getAnnualTurnoverRatesByCategory).toHaveBeenCalled();
       expect(result).toEqual(mockAnnualTurnoverRates);
     });
+
+    it('getQuarterlyTurnoverDataAsync returns staticData when USE_API=false', async () => {
+      const result = await dataService.getQuarterlyTurnoverDataAsync("2025-09-30");
+      expect(staticData.getQuarterlyTurnoverData).toHaveBeenCalledWith("2025-09-30");
+      expect(result).toEqual(mockQuarterlyTurnoverData["2025-09-30"]);
+    });
+
+    it('getQuarterlyWorkforceDataAsync returns staticData when USE_API=false', async () => {
+      const result = await dataService.getQuarterlyWorkforceDataAsync("2025-09-30");
+      expect(staticData.getQuarterlyWorkforceData).toHaveBeenCalledWith("2025-09-30");
+      expect(result).toEqual(mockQuarterlyWorkforceData["2025-09-30"]);
+    });
+
+    it('getRecruitingDataAsync returns staticData when USE_API=false', async () => {
+      const result = await dataService.getRecruitingDataAsync("2025-06-30");
+      expect(staticData.getRecruitingData).toHaveBeenCalledWith("2025-06-30");
+      expect(result).toHaveProperty('reportingDate');
+    });
+
+    it('getQuarterlyTurnoverRatesByCategoryAsync returns staticData when USE_API=false', async () => {
+      const result = await dataService.getQuarterlyTurnoverRatesByCategoryAsync();
+      expect(staticData.getQuarterlyTurnoverRatesByCategory).toHaveBeenCalled();
+    });
+
+    it('getAllSchoolOrgDataAsync returns staticData when USE_API=false', async () => {
+      const result = await dataService.getAllSchoolOrgDataAsync("2025-06-30");
+      expect(staticData.getAllSchoolOrgData).toHaveBeenCalledWith("2025-06-30");
+    });
+
+    it('getStartersLeaversDataAsync returns staticData when USE_API=false', async () => {
+      const result = await dataService.getStartersLeaversDataAsync();
+      expect(staticData.getStartersLeaversData).toHaveBeenCalled();
+      expect(result).toHaveProperty('starters');
+      expect(result).toHaveProperty('leavers');
+    });
+
+    it('getHeadcountTrendsDataAsync returns staticData when USE_API=false', async () => {
+      const result = await dataService.getHeadcountTrendsDataAsync();
+      expect(staticData.getHeadcountTrendsData).toHaveBeenCalled();
+    });
+
+    it('getPhoenixHeadcountDataAsync returns staticData when USE_API=false', async () => {
+      const result = await dataService.getPhoenixHeadcountDataAsync();
+      expect(staticData.getPhoenixHeadcountData).toHaveBeenCalled();
+      expect(result).toHaveProperty('total');
+    });
+
+    it('getOmahaHeadcountDataAsync returns staticData when USE_API=false', async () => {
+      const result = await dataService.getOmahaHeadcountDataAsync();
+      expect(staticData.getOmahaHeadcountData).toHaveBeenCalled();
+      expect(result).toHaveProperty('total');
+    });
   });
 
   describe('Feature Flag Behavior', () => {
@@ -363,6 +415,15 @@ describe('dataService', () => {
       expect(defaultExport.getExitSurveyDataAsync).toBeDefined();
       expect(defaultExport.getAnnualTurnoverRatesByCategoryAsync).toBeDefined();
       expect(defaultExport.getTop15SchoolOrgDataAsync).toBeDefined();
+      expect(defaultExport.getQuarterlyTurnoverDataAsync).toBeDefined();
+      expect(defaultExport.getQuarterlyWorkforceDataAsync).toBeDefined();
+      expect(defaultExport.getRecruitingDataAsync).toBeDefined();
+      expect(defaultExport.getQuarterlyTurnoverRatesByCategoryAsync).toBeDefined();
+      expect(defaultExport.getAllSchoolOrgDataAsync).toBeDefined();
+      expect(defaultExport.getStartersLeaversDataAsync).toBeDefined();
+      expect(defaultExport.getHeadcountTrendsDataAsync).toBeDefined();
+      expect(defaultExport.getPhoenixHeadcountDataAsync).toBeDefined();
+      expect(defaultExport.getOmahaHeadcountDataAsync).toBeDefined();
     });
 
     it('default export contains utility functions', () => {

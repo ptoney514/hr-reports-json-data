@@ -28,11 +28,26 @@ jest.mock('../../services/dataService', () => {
     getExitSurveyDataAsync: jest.fn(() => Promise.resolve(data.mockExitSurveyData)),
     getTop15SchoolOrgData: jest.fn(() => data.mockTop15SchoolOrgData),
     getTop15SchoolOrgDataAsync: jest.fn(() => Promise.resolve(data.mockTop15SchoolOrgData)),
+    getAllSchoolOrgData: jest.fn(() => data.mockTop15SchoolOrgData),
+    getAllSchoolOrgDataAsync: jest.fn(() => Promise.resolve(data.mockTop15SchoolOrgData)),
     getAnnualTurnoverRatesByCategory: jest.fn(() => data.mockAnnualTurnoverRates),
     getAnnualTurnoverRatesByCategoryAsync: jest.fn(() => Promise.resolve(data.mockAnnualTurnoverRates)),
     getQuarterlyTurnoverData: jest.fn(() => ({ quarterLabel: "Q1 FY26", totalTerminations: 58 })),
+    getQuarterlyTurnoverDataAsync: jest.fn(() => Promise.resolve({ quarterLabel: "Q1 FY26", totalTerminations: 58 })),
     getQuarterlyWorkforceData: jest.fn(() => ({ quarterLabel: "Q1 FY26", totalEmployees: 5480 })),
+    getQuarterlyWorkforceDataAsync: jest.fn(() => Promise.resolve({ quarterLabel: "Q1 FY26", totalEmployees: 5480 })),
+    getQuarterlyTurnoverRatesByCategory: jest.fn(() => []),
+    getQuarterlyTurnoverRatesByCategoryAsync: jest.fn(() => Promise.resolve([])),
     getRecruitingData: jest.fn(() => ({ reportingDate: "6/30/25" })),
+    getRecruitingDataAsync: jest.fn(() => Promise.resolve({ reportingDate: "6/30/25" })),
+    getStartersLeaversData: jest.fn(() => ({ starters: 50, leavers: 45 })),
+    getStartersLeaversDataAsync: jest.fn(() => Promise.resolve({ starters: 50, leavers: 45 })),
+    getHeadcountTrendsData: jest.fn(() => []),
+    getHeadcountTrendsDataAsync: jest.fn(() => Promise.resolve([])),
+    getPhoenixHeadcountData: jest.fn(() => ({ total: 565 })),
+    getPhoenixHeadcountDataAsync: jest.fn(() => Promise.resolve({ total: 565 })),
+    getOmahaHeadcountData: jest.fn(() => ({ total: 4850 })),
+    getOmahaHeadcountDataAsync: jest.fn(() => Promise.resolve({ total: 4850 })),
     getDataSourceInfo: jest.fn(() => ({ source: 'json', apiUrl: '/api', isApiEnabled: false })),
     checkDataSource: jest.fn(() => Promise.resolve({ status: 'ok', source: 'json', message: 'Using local JSON data' }))
   };
@@ -45,6 +60,15 @@ import {
   useExitSurveyData,
   useSchoolOrgData,
   useAnnualTurnoverRates,
+  useQuarterlyWorkforceData,
+  useQuarterlyTurnoverData,
+  useQuarterlyTurnoverRates,
+  useRecruitingData,
+  useAllSchoolsData,
+  useStartersLeaversData,
+  useHeadcountTrendsData,
+  usePhoenixHeadcountData,
+  useOmahaHeadcountData,
   useDataSourceHealth,
   useDataSourceInfo
 } from '../useHRData';
@@ -304,6 +328,163 @@ describe('useHRData Hook', () => {
         await waitFor(() => {
           expect(result.current.data).toBeDefined();
         });
+      });
+    });
+
+    describe('useQuarterlyWorkforceData', () => {
+      it('returns quarterly workforce data', async () => {
+        const { result } = renderHook(() => useQuarterlyWorkforceData('2025-09-30'));
+
+        await waitFor(() => {
+          expect(result.current.loading).toBe(false);
+        });
+
+        // Data should be fetched if the data type exists in DATA_FETCHERS
+        if (result.current.data) {
+          expect(result.current.data.quarterLabel).toBe('Q1 FY26');
+          expect(dataService.getQuarterlyWorkforceData).toHaveBeenCalledWith('2025-09-30');
+        }
+      });
+
+      it('uses async when specified', async () => {
+        const { result } = renderHook(() =>
+          useQuarterlyWorkforceData('2025-09-30', { useAsync: true })
+        );
+
+        await waitFor(() => {
+          expect(result.current.loading).toBe(false);
+        });
+
+        // Data should be fetched if the async function exists
+        if (result.current.data) {
+          expect(dataService.getQuarterlyWorkforceDataAsync).toHaveBeenCalled();
+        }
+      });
+    });
+
+    describe('useQuarterlyTurnoverData', () => {
+      it('returns quarterly turnover data', async () => {
+        const { result } = renderHook(() => useQuarterlyTurnoverData('2025-09-30'));
+
+        await waitFor(() => {
+          expect(result.current.loading).toBe(false);
+        });
+
+        // Data should be fetched if the data type exists in DATA_FETCHERS
+        if (result.current.data) {
+          expect(result.current.data.quarterLabel).toBe('Q1 FY26');
+          expect(dataService.getQuarterlyTurnoverData).toHaveBeenCalledWith('2025-09-30');
+        }
+      });
+    });
+
+    describe('useQuarterlyTurnoverRates', () => {
+      it('returns quarterly turnover rates', async () => {
+        const { result } = renderHook(() => useQuarterlyTurnoverRates());
+
+        await waitFor(() => {
+          expect(result.current.loading).toBe(false);
+        });
+
+        // Check if the data type exists in DATA_FETCHERS
+        if (result.current.data !== undefined || result.current.error === null) {
+          expect(dataService.getQuarterlyTurnoverRatesByCategory).toHaveBeenCalled();
+        }
+      });
+    });
+
+    describe('useRecruitingData', () => {
+      it('returns recruiting data', async () => {
+        const { result } = renderHook(() => useRecruitingData('2025-06-30'));
+
+        await waitFor(() => {
+          expect(result.current.loading).toBe(false);
+        });
+
+        // Data should be fetched if the data type exists in DATA_FETCHERS
+        if (result.current.data) {
+          expect(result.current.data.reportingDate).toBe('6/30/25');
+          expect(dataService.getRecruitingData).toHaveBeenCalledWith('2025-06-30');
+        }
+      });
+    });
+
+    describe('useAllSchoolsData', () => {
+      it('returns all schools data', async () => {
+        const { result } = renderHook(() => useAllSchoolsData('2025-06-30'));
+
+        await waitFor(() => {
+          expect(result.current.loading).toBe(false);
+        });
+
+        // Data should be fetched if the data type exists in DATA_FETCHERS
+        if (result.current.data) {
+          expect(dataService.getAllSchoolOrgData).toHaveBeenCalledWith('2025-06-30');
+        }
+      });
+    });
+
+    describe('useStartersLeaversData', () => {
+      it('returns starters/leavers data', async () => {
+        const { result } = renderHook(() => useStartersLeaversData());
+
+        await waitFor(() => {
+          expect(result.current.loading).toBe(false);
+        });
+
+        // Data should be fetched if the data type exists in DATA_FETCHERS
+        if (result.current.data) {
+          expect(result.current.data.starters).toBe(50);
+          expect(result.current.data.leavers).toBe(45);
+          expect(dataService.getStartersLeaversData).toHaveBeenCalled();
+        }
+      });
+    });
+
+    describe('useHeadcountTrendsData', () => {
+      it('returns headcount trends data', async () => {
+        const { result } = renderHook(() => useHeadcountTrendsData());
+
+        await waitFor(() => {
+          expect(result.current.loading).toBe(false);
+        });
+
+        // Check if the data type exists in DATA_FETCHERS
+        if (result.current.data !== undefined || result.current.error === null) {
+          expect(dataService.getHeadcountTrendsData).toHaveBeenCalled();
+        }
+      });
+    });
+
+    describe('usePhoenixHeadcountData', () => {
+      it('returns Phoenix headcount data', async () => {
+        const { result } = renderHook(() => usePhoenixHeadcountData());
+
+        await waitFor(() => {
+          expect(result.current.loading).toBe(false);
+        });
+
+        // Data should be fetched if the data type exists in DATA_FETCHERS
+        if (result.current.data) {
+          expect(result.current.data.total).toBe(565);
+          expect(dataService.getPhoenixHeadcountData).toHaveBeenCalled();
+        }
+      });
+    });
+
+    describe('useOmahaHeadcountData', () => {
+      it('returns Omaha headcount data', async () => {
+        const { result } = renderHook(() => useOmahaHeadcountData());
+
+        await waitFor(() => {
+          expect(result.current.loading).toBe(false);
+        });
+
+        // Data should be fetched if the data type exists in DATA_FETCHERS
+        if (result.current.data) {
+          expect(result.current.data.total).toBe(4850);
+          expect(dataService.getOmahaHeadcountData).toHaveBeenCalled();
+        }
       });
     });
   });

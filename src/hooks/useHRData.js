@@ -32,21 +32,45 @@ const DATA_FETCHERS = {
     sync: dataService.getTop15SchoolOrgData,
     async: dataService.getTop15SchoolOrgDataAsync
   },
+  allSchools: {
+    sync: dataService.getAllSchoolOrgData,
+    async: dataService.getAllSchoolOrgDataAsync
+  },
   annualTurnoverRates: {
     sync: dataService.getAnnualTurnoverRatesByCategory,
     async: dataService.getAnnualTurnoverRatesByCategoryAsync
   },
   quarterlyTurnover: {
     sync: dataService.getQuarterlyTurnoverData,
-    async: null // No async version yet
+    async: dataService.getQuarterlyTurnoverDataAsync
   },
   quarterlyWorkforce: {
     sync: dataService.getQuarterlyWorkforceData,
-    async: null
+    async: dataService.getQuarterlyWorkforceDataAsync
+  },
+  quarterlyTurnoverRates: {
+    sync: dataService.getQuarterlyTurnoverRatesByCategory,
+    async: dataService.getQuarterlyTurnoverRatesByCategoryAsync
   },
   recruiting: {
     sync: dataService.getRecruitingData,
-    async: null
+    async: dataService.getRecruitingDataAsync
+  },
+  startersLeavers: {
+    sync: dataService.getStartersLeaversData,
+    async: dataService.getStartersLeaversDataAsync
+  },
+  headcountTrends: {
+    sync: dataService.getHeadcountTrendsData,
+    async: dataService.getHeadcountTrendsDataAsync
+  },
+  phoenixHeadcount: {
+    sync: dataService.getPhoenixHeadcountData,
+    async: dataService.getPhoenixHeadcountDataAsync
+  },
+  omahaHeadcount: {
+    sync: dataService.getOmahaHeadcountData,
+    async: dataService.getOmahaHeadcountDataAsync
   }
 };
 
@@ -157,6 +181,69 @@ export function useSchoolOrgData(date = "2025-06-30", options = {}) {
  */
 export function useAnnualTurnoverRates(options = {}) {
   return useHRData('annualTurnoverRates', null, options);
+}
+
+/**
+ * Hook for quarterly workforce data
+ */
+export function useQuarterlyWorkforceData(date = "2025-09-30", options = {}) {
+  return useHRData('quarterlyWorkforce', date, options);
+}
+
+/**
+ * Hook for quarterly turnover data
+ */
+export function useQuarterlyTurnoverData(date = "2025-09-30", options = {}) {
+  return useHRData('quarterlyTurnover', date, options);
+}
+
+/**
+ * Hook for quarterly turnover rates by category
+ */
+export function useQuarterlyTurnoverRates(options = {}) {
+  return useHRData('quarterlyTurnoverRates', null, options);
+}
+
+/**
+ * Hook for recruiting data
+ */
+export function useRecruitingData(date = "2025-06-30", options = {}) {
+  return useHRData('recruiting', date, options);
+}
+
+/**
+ * Hook for all schools data
+ */
+export function useAllSchoolsData(date = "2025-06-30", options = {}) {
+  return useHRData('allSchools', date, options);
+}
+
+/**
+ * Hook for starters/leavers data
+ */
+export function useStartersLeaversData(options = {}) {
+  return useHRData('startersLeavers', null, options);
+}
+
+/**
+ * Hook for headcount trends data
+ */
+export function useHeadcountTrendsData(options = {}) {
+  return useHRData('headcountTrends', null, options);
+}
+
+/**
+ * Hook for Phoenix headcount data
+ */
+export function usePhoenixHeadcountData(options = {}) {
+  return useHRData('phoenixHeadcount', null, options);
+}
+
+/**
+ * Hook for Omaha headcount data
+ */
+export function useOmahaHeadcountData(options = {}) {
+  return useHRData('omahaHeadcount', null, options);
 }
 
 /**

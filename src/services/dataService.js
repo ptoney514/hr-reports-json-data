@@ -84,6 +84,17 @@ export const getRecruitingData = (date = "2025-06-30") => {
 };
 
 /**
+ * Async version of getRecruitingData for components that can handle promises
+ * Note: Uses workforce endpoint since recruiting data is derived from workforce metrics
+ */
+export const getRecruitingDataAsync = async (date = "2025-06-30") => {
+  return withFallback(
+    () => apiService.getWorkforceData(date),
+    () => staticData.getRecruitingData(date)
+  );
+};
+
+/**
  * Get exit survey data for a specific date
  */
 export const getExitSurveyData = (date = "2025-06-30") => {
@@ -105,6 +116,16 @@ export const getQuarterlyTurnoverData = (date = "2025-09-30") => {
 };
 
 /**
+ * Async version of getQuarterlyTurnoverData for components that can handle promises
+ */
+export const getQuarterlyTurnoverDataAsync = async (date = "2025-09-30") => {
+  return withFallback(
+    () => apiService.getTurnoverData(date),
+    () => staticData.getQuarterlyTurnoverData(date)
+  );
+};
+
+/**
  * Get quarterly workforce data
  */
 export const getQuarterlyWorkforceData = (date = "2025-09-30") => {
@@ -112,10 +133,30 @@ export const getQuarterlyWorkforceData = (date = "2025-09-30") => {
 };
 
 /**
+ * Async version of getQuarterlyWorkforceData for components that can handle promises
+ */
+export const getQuarterlyWorkforceDataAsync = async (date = "2025-09-30") => {
+  return withFallback(
+    () => apiService.getWorkforceData(date),
+    () => staticData.getQuarterlyWorkforceData(date)
+  );
+};
+
+/**
  * Get quarterly turnover rates by category
  */
 export const getQuarterlyTurnoverRatesByCategory = () => {
   return staticData.getQuarterlyTurnoverRatesByCategory();
+};
+
+/**
+ * Async version of getQuarterlyTurnoverRatesByCategory for components that can handle promises
+ */
+export const getQuarterlyTurnoverRatesByCategoryAsync = async () => {
+  return withFallback(
+    () => apiService.getAnnualTurnoverRates(),
+    () => staticData.getQuarterlyTurnoverRatesByCategory()
+  );
 };
 
 /**
@@ -154,10 +195,34 @@ export const getAllSchoolOrgData = (date = "2025-06-30") => {
 };
 
 /**
+ * Async version of getAllSchoolOrgData for components that can handle promises
+ */
+export const getAllSchoolOrgDataAsync = async (date = "2025-06-30") => {
+  return withFallback(
+    async () => {
+      const response = await apiService.getSchoolOrgData(date, 100);
+      return response.schools;
+    },
+    () => staticData.getAllSchoolOrgData(date)
+  );
+};
+
+/**
  * Get starters/leavers data
  */
 export const getStartersLeaversData = () => {
   return staticData.getStartersLeaversData();
+};
+
+/**
+ * Async version of getStartersLeaversData for components that can handle promises
+ * Note: Uses mobility endpoint since starters/leavers is related to mobility data
+ */
+export const getStartersLeaversDataAsync = async (date = "2025-06-30") => {
+  return withFallback(
+    () => apiService.getMobilityData(date),
+    () => staticData.getStartersLeaversData()
+  );
 };
 
 /**
@@ -168,6 +233,17 @@ export const getHeadcountTrendsData = () => {
 };
 
 /**
+ * Async version of getHeadcountTrendsData for components that can handle promises
+ * Note: Uses workforce endpoint since headcount trends derive from workforce data
+ */
+export const getHeadcountTrendsDataAsync = async (date = "2025-06-30") => {
+  return withFallback(
+    () => apiService.getWorkforceData(date),
+    () => staticData.getHeadcountTrendsData()
+  );
+};
+
+/**
  * Get Phoenix headcount data
  */
 export const getPhoenixHeadcountData = () => {
@@ -175,10 +251,32 @@ export const getPhoenixHeadcountData = () => {
 };
 
 /**
+ * Async version of getPhoenixHeadcountData for components that can handle promises
+ * Note: Uses workforce endpoint with Phoenix location filter
+ */
+export const getPhoenixHeadcountDataAsync = async (date = "2025-06-30") => {
+  return withFallback(
+    () => apiService.getWorkforceData(date),
+    () => staticData.getPhoenixHeadcountData()
+  );
+};
+
+/**
  * Get Omaha headcount data
  */
 export const getOmahaHeadcountData = () => {
   return staticData.getOmahaHeadcountData();
+};
+
+/**
+ * Async version of getOmahaHeadcountData for components that can handle promises
+ * Note: Uses workforce endpoint with Omaha location filter
+ */
+export const getOmahaHeadcountDataAsync = async (date = "2025-06-30") => {
+  return withFallback(
+    () => apiService.getWorkforceData(date),
+    () => staticData.getOmahaHeadcountData()
+  );
 };
 
 /**
@@ -304,6 +402,15 @@ export default {
   getExitSurveyDataAsync,
   getAnnualTurnoverRatesByCategoryAsync,
   getTop15SchoolOrgDataAsync,
+  getQuarterlyTurnoverDataAsync,
+  getQuarterlyWorkforceDataAsync,
+  getRecruitingDataAsync,
+  getQuarterlyTurnoverRatesByCategoryAsync,
+  getAllSchoolOrgDataAsync,
+  getStartersLeaversDataAsync,
+  getHeadcountTrendsDataAsync,
+  getPhoenixHeadcountDataAsync,
+  getOmahaHeadcountDataAsync,
 
   // Utilities
   getDataSourceInfo,
