@@ -147,6 +147,144 @@ export async function getDemographicsData(date) {
   return fetchFromAPI(`/demographics/${date}`);
 }
 
+// ==============================================
+// RECRUITING METRICS API ENDPOINTS
+// ==============================================
+
+/**
+ * Get recruiting summary for a fiscal year and quarter
+ *
+ * @param {string} fiscalYear - Fiscal year (e.g., 'FY2026')
+ * @param {number} quarter - Quarter (1-4)
+ * @returns {Promise<Object>} Recruiting summary data
+ *
+ * @example
+ * const data = await getRecruitingSummary('FY2026', 1);
+ * console.log(data.total_hires); // 69
+ */
+export async function getRecruitingSummary(fiscalYear, quarter) {
+  return fetchFromAPI(`/recruiting/summary/${fiscalYear}/${quarter}`);
+}
+
+/**
+ * Get hire rates for a fiscal year and quarter
+ *
+ * @param {string} fiscalYear - Fiscal year (e.g., 'FY2026')
+ * @param {number} quarter - Quarter (1-4)
+ * @returns {Promise<Array>} Hire rates by source/channel
+ */
+export async function getHireRates(fiscalYear, quarter) {
+  return fetchFromAPI(`/recruiting/hire-rates/${fiscalYear}/${quarter}`);
+}
+
+/**
+ * Get staff pipeline metrics (myJobs/ORC)
+ *
+ * @param {string} fiscalYear - Fiscal year (e.g., 'FY2026')
+ * @param {number} quarter - Quarter (1-4)
+ * @returns {Promise<Object>} Staff pipeline metrics
+ */
+export async function getPipelineStaff(fiscalYear, quarter) {
+  return fetchFromAPI(`/recruiting/pipeline-staff/${fiscalYear}/${quarter}`);
+}
+
+/**
+ * Get faculty pipeline metrics (Interfolio)
+ *
+ * @param {string} fiscalYear - Fiscal year (e.g., 'FY2026')
+ * @param {number} quarter - Quarter (1-4)
+ * @returns {Promise<Object>} Faculty pipeline metrics
+ */
+export async function getPipelineFaculty(fiscalYear, quarter) {
+  return fetchFromAPI(`/recruiting/pipeline-faculty/${fiscalYear}/${quarter}`);
+}
+
+/**
+ * Get new hires for a fiscal year and quarter
+ *
+ * @param {string} fiscalYear - Fiscal year (e.g., 'FY2026')
+ * @param {number} quarter - Quarter (1-4)
+ * @returns {Promise<Array>} New hire records
+ */
+export async function getNewHires(fiscalYear, quarter) {
+  return fetchFromAPI(`/recruiting/new-hires/${fiscalYear}/${quarter}`);
+}
+
+/**
+ * Get hires by school for a fiscal year and quarter
+ *
+ * @param {string} fiscalYear - Fiscal year (e.g., 'FY2026')
+ * @param {number} quarter - Quarter (1-4)
+ * @returns {Promise<Array>} Hires aggregated by school
+ */
+export async function getHiresBySchool(fiscalYear, quarter) {
+  return fetchFromAPI(`/recruiting/by-school/${fiscalYear}/${quarter}`);
+}
+
+/**
+ * Get application sources for a fiscal year and quarter
+ *
+ * @param {string} fiscalYear - Fiscal year (e.g., 'FY2026')
+ * @param {number} quarter - Quarter (1-4)
+ * @returns {Promise<Array>} Application source data
+ */
+export async function getApplicationSources(fiscalYear, quarter) {
+  return fetchFromAPI(`/recruiting/application-sources/${fiscalYear}/${quarter}`);
+}
+
+/**
+ * Get top jobs by applications
+ *
+ * @param {string} fiscalYear - Fiscal year (e.g., 'FY2026')
+ * @param {number} quarter - Quarter (1-4)
+ * @returns {Promise<Array>} Top jobs by application count
+ */
+export async function getTopJobs(fiscalYear, quarter) {
+  return fetchFromAPI(`/recruiting/top-jobs/${fiscalYear}/${quarter}`);
+}
+
+/**
+ * Get requisition aging data
+ *
+ * @param {string} fiscalYear - Fiscal year (e.g., 'FY2026')
+ * @param {number} quarter - Quarter (1-4)
+ * @returns {Promise<Array>} Requisition aging distribution
+ */
+export async function getRequisitionAging(fiscalYear, quarter) {
+  return fetchFromAPI(`/recruiting/requisition-aging/${fiscalYear}/${quarter}`);
+}
+
+/**
+ * Get new hire demographics
+ *
+ * @param {string} fiscalYear - Fiscal year (e.g., 'FY2026')
+ * @param {number} quarter - Quarter (1-4)
+ * @returns {Promise<Array>} Demographics breakdown
+ */
+export async function getNewHireDemographics(fiscalYear, quarter) {
+  return fetchFromAPI(`/recruiting/demographics/${fiscalYear}/${quarter}`);
+}
+
+/**
+ * Get hiring trends (historical quarterly data)
+ *
+ * @returns {Promise<Array>} Historical hiring trends
+ */
+export async function getHiringTrends() {
+  return fetchFromAPI('/recruiting/hiring-trends');
+}
+
+/**
+ * Get all recruiting metrics for a quarter (combined endpoint)
+ *
+ * @param {string} fiscalYear - Fiscal year (e.g., 'FY2026')
+ * @param {number} quarter - Quarter (1-4)
+ * @returns {Promise<Object>} All recruiting metrics
+ */
+export async function getRecruitingMetrics(fiscalYear, quarter) {
+  return fetchFromAPI(`/recruiting/metrics/${fiscalYear}/${quarter}`);
+}
+
 /**
  * Health check endpoint
  *
@@ -221,6 +359,20 @@ const apiService = {
   getTop15SchoolOrgData,
   getMobilityData,
   getDemographicsData,
+  // Recruiting endpoints
+  getRecruitingSummary,
+  getHireRates,
+  getPipelineStaff,
+  getPipelineFaculty,
+  getNewHires,
+  getHiresBySchool,
+  getApplicationSources,
+  getTopJobs,
+  getRequisitionAging,
+  getNewHireDemographics,
+  getHiringTrends,
+  getRecruitingMetrics,
+  // Utility functions
   checkAPIHealth,
   getAvailablePeriods,
   isAPIAvailable,

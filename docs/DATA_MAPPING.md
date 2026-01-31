@@ -956,4 +956,309 @@ The validation service (`src/services/workforceValidationService.js`) compares J
 | Workforce | 43 | 100% |
 | Demographics | 52 | 100% |
 | Turnover | 80 | 100% |
-| **Total** | **175** | **100%** |
+| Recruiting | 70 | 100% |
+| **Total** | **245** | **100%** |
+
+---
+
+## 6. Recruiting & Hiring (70 metrics)
+
+Recruiting data covers quarterly hiring metrics from multiple source systems (Oracle HCM, Oracle Recruiting Cloud/myJobs, Interfolio).
+
+### 6.1 Data Flow Overview
+
+```
+┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
+│  Excel Source   │ --> │   ETL Script    │ --> │   Neon DB       │ --> │   REST API      │
+│  (HR Systems)   │     │ recruiting-     │     │ fact_recruiting │     │ /recruiting/    │
+│ HCM + myJobs +  │     │ metrics-to-     │     │ * tables        │     │ metrics/:fy/:q  │
+│ Interfolio      │     │ postgres.js     │     │                 │     │                 │
+└─────────────────┘     └─────────────────┘     └─────────────────┘     └─────────────────┘
+     ↓                        ↓                       ↓                       ↓
+  Oracle HCM Data         Hash PII,              11 fact tables          useRecruitingData
+  myJobs Pipeline         Aggregate              Fiscal period           hook transforms
+  Interfolio Faculty      Transform              indexing                to dashboard format
+```
+
+### 6.2 Excel Source Structure
+
+**Source File:** `source-metrics/recruiting/Recruiting_Metrics_Master.xlsx`
+
+**Methodology:** `source-metrics/recruiting/RECRUITING_METHODOLOGY.md`
+
+| Sheet | Purpose | Source System | Key Columns |
+|-------|---------|---------------|-------------|
+| Metadata | Period info | Manual | fiscal_year, quarter, data_as_of, preparer |
+| Summary_Metrics | Card metrics | Combined | total_hires, faculty_hires, staff_hires |
+| Hire_Rates | Success rates | Taleo + Interfolio | source_system, channel, rate |
+| Pipeline_Staff | myJobs metrics | Oracle Recruiting Cloud | open_reqs, apps, time_to_fill |
+| Pipeline_Faculty | Interfolio metrics | Interfolio | active_searches, hires_by_type |
+| New_Hires_Detail | Individual hires | Oracle HCM | hire_date, position, department, school |
+| Hires_By_School | School aggregation | Derived | school_name, faculty_hires, staff_hires |
+| Application_Sources | Channel counts | Taleo | source_name, application_count, percentage |
+| Top_Jobs | Top 10 by apps | Taleo | rank, job_title, application_count |
+| Requisition_Aging | Open req ages | Taleo | age_range, requisition_count, percentage |
+| New_Hire_Demographics | Demographics | Oracle HCM | demo_type, demo_value, count, percentage |
+| Hiring_Trends | Historical | Derived | quarter, faculty_hires, staff_hires |
+
+### 6.3 Database Schema
+
+**Migration:** `database/migrations/006_create_recruiting_metrics_tables.sql`
+
+#### Dimension Tables
+
+```sql
+-- Application source channels
+CREATE TABLE dim_application_sources (
+    source_id SERIAL PRIMARY KEY,
+    source_name VARCHAR(100) UNIQUE NOT NULL,
+    source_category VARCHAR(50),
+    display_color VARCHAR(20)
+);
+
+-- Job family categories
+CREATE TABLE dim_job_families (
+    job_family_id SERIAL PRIMARY KEY,
+    job_family_name VARCHAR(100) UNIQUE NOT NULL,
+    category VARCHAR(50)
+);
+```
+
+#### Fact Tables (11 tables)
+
+| Table | Purpose | Row Count (Q1 FY26) |
+|-------|---------|---------------------|
+| `fact_recruiting_summary` | Summary card metrics | 1 |
+| `fact_hire_rates` | Hire rates by system/channel | 2 |
+| `fact_pipeline_metrics_staff` | myJobs pipeline data | 1 |
+| `fact_pipeline_metrics_faculty` | Interfolio pipeline data | 1 |
+| `fact_new_hires` | Individual hire records | 69 |
+| `fact_hires_by_school` | School aggregations | 9 |
+| `fact_application_sources` | Source channel counts | 6 |
+| `fact_top_jobs` | Top jobs by applications | 10 |
+| `fact_requisition_aging` | Aging distribution | 5 |
+| `fact_new_hire_demographics` | Demographics breakdown | 13 |
+| `fact_hiring_trends` | Historical quarterly trends | 10 |
+
+### 6.4 Summary Metrics (7 checks)
+
+| Metric | Excel Column | Database Column | Q1 FY26 Value |
+|--------|--------------|-----------------|---------------|
+| Total Hires | total_hires | total_hires | **69** |
+| Faculty Hires | faculty_hires | faculty_hires | **31** |
+| Staff Hires | staff_hires | staff_hires | **38** |
+| Omaha Hires | omaha_hires | omaha_hires | **68** |
+| Phoenix Hires | phoenix_hires | phoenix_hires | **1** |
+| Open Requisitions | open_requisitions | open_requisitions | **143** |
+| Active Applications | active_applications | active_applications | **767** |
+
+**Validation:**
+```
+Faculty (31) + Staff (38) = Total (69) ✓
+Omaha (68) + Phoenix (1) = Total (69) ✓
+```
+
+### 6.5 Pipeline Staff Metrics (13 checks)
+
+myJobs/Oracle Recruiting Cloud metrics:
+
+| Metric | Q1 FY26 Value | Unit |
+|--------|---------------|------|
+| Open Requisitions | 143 | count |
+| Reqs per Recruiter | 28.6 | ratio |
+| Avg Days Open | 71 | days |
+| Avg Time to Fill | 35.5 | days |
+| Active Applications | 767 | count |
+| New Applications | 2,000 | count |
+| Apps per Requisition | 11.1 | ratio |
+| Internal App % | 3.0% | percent |
+| Referrals | 7 | count |
+| Total Staff Hires | 40 | count |
+| Internal Hires | 13 | count |
+| Internal Hire Rate | 32.5% | percent |
+| Offer Acceptance Rate | 97.7% | percent |
+
+### 6.6 Pipeline Faculty Metrics (7 checks)
+
+Interfolio metrics:
+
+| Metric | Q1 FY26 Value | Unit |
+|--------|---------------|------|
+| Active Searches | 15 | count |
+| Completed Searches | 6 | count |
+| Total Faculty Hires | 6 | count |
+| Tenure Track | 3 | count |
+| Non-Tenure | 1 | count |
+| Instructor | 1 | count |
+| Special Faculty | 1 | count |
+
+**Validation:**
+```
+Tenure Track (3) + Non-Tenure (1) + Instructor (1) + Special Faculty (1) = Total (6) ✓
+```
+
+### 6.7 Application Sources (6 checks)
+
+| Source | Applications | Percentage | Color |
+|--------|--------------|------------|-------|
+| LinkedIn | 800 | 40% | #0A66C2 |
+| Creighton Careers | 400 | 20% | #0054A6 |
+| External Career Site | 380 | 19% | #10B981 |
+| jobright | 120 | 6% | #F59E0B |
+| Internal Career Site | 100 | 5% | #8B5CF6 |
+| Other | 200 | 10% | #9CA3AF |
+
+### 6.8 Top Jobs by Applications (10 checks)
+
+| Rank | Job Title | Applications |
+|------|-----------|--------------|
+| 1 | Facilities Maintenance | 165 |
+| 2 | Administrative Assistant | 140 |
+| 3 | Research Associate | 95 |
+| 4 | Clinical Coordinator | 85 |
+| 5 | Program Coordinator | 72 |
+| 6 | Office Coordinator | 65 |
+| 7 | Lab Technician | 58 |
+| 8 | Teaching Assistant | 52 |
+| 9 | Data Analyst | 48 |
+| 10 | Marketing Specialist | 42 |
+
+### 6.9 Demographics (13 checks)
+
+#### Gender Distribution
+
+| Gender | Count | Percentage |
+|--------|-------|------------|
+| Female | 34 | 49.3% |
+| Male | 35 | 50.7% |
+
+#### Ethnicity Distribution
+
+| Ethnicity | Count | Percentage |
+|-----------|-------|------------|
+| White | 34 | 49.3% |
+| Not Disclosed | 14 | 20.3% |
+| Asian | 10 | 14.5% |
+| More than one Ethnicity | 6 | 8.7% |
+| Hispanic or Latino | 3 | 4.3% |
+| Black or African American | 2 | 2.9% |
+
+#### Age Band Distribution
+
+| Age Band | Count | Percentage |
+|----------|-------|------------|
+| 21-30 | 21 | 30.4% |
+| 31-40 | 28 | 40.6% |
+| 41-50 | 11 | 15.9% |
+| 51-60 | 6 | 8.7% |
+| 61+ | 3 | 4.3% |
+
+### 6.10 Requisition Aging (5 checks)
+
+| Age Range | Count | Percentage |
+|-----------|-------|------------|
+| 0-30 Days | 45 | 31.5% |
+| 31-60 Days | 38 | 26.6% |
+| 61-90 Days | 28 | 19.6% |
+| 91-120 Days | 18 | 12.6% |
+| >120 Days | 14 | 9.8% |
+
+### 6.11 Hires by School (9 checks)
+
+| School | Faculty | Staff | Total |
+|--------|---------|-------|-------|
+| Arts & Sciences | 8 | 9 | 17 |
+| Medicine | 5 | 3 | 8 |
+| Facilities | 0 | 8 | 8 |
+| Dentistry | 4 | 3 | 7 |
+| Heider College of Business | 3 | 2 | 5 |
+| Nursing | 2 | 2 | 4 |
+| Athletics | 0 | 3 | 3 |
+| Law School | 2 | 1 | 3 |
+| Other | 7 | 7 | 14 |
+
+### 6.12 API Endpoints
+
+**Base Path:** `/api/recruiting/`
+
+| Endpoint | Method | Returns |
+|----------|--------|---------|
+| `/summary/:fiscalYear/:quarter` | GET | Summary card metrics |
+| `/hire-rates/:fiscalYear/:quarter` | GET | Hire rates by source |
+| `/pipeline-staff/:fiscalYear/:quarter` | GET | myJobs pipeline metrics |
+| `/pipeline-faculty/:fiscalYear/:quarter` | GET | Interfolio pipeline metrics |
+| `/new-hires/:fiscalYear/:quarter` | GET | Individual hire records |
+| `/by-school/:fiscalYear/:quarter` | GET | School aggregations |
+| `/application-sources/:fiscalYear/:quarter` | GET | Source channel data |
+| `/top-jobs/:fiscalYear/:quarter` | GET | Top jobs by applications |
+| `/requisition-aging/:fiscalYear/:quarter` | GET | Aging distribution |
+| `/demographics/:fiscalYear/:quarter` | GET | Demographics breakdown |
+| `/hiring-trends` | GET | Historical trends |
+| `/metrics/:fiscalYear/:quarter` | GET | Combined all metrics |
+
+### 6.13 React Hook
+
+**File:** `src/hooks/useRecruitingData.js`
+
+```javascript
+const { data, isLoading, error, refetch, apiAvailable } = useRecruitingData('FY2026', 1);
+
+// Data structure
+data.summary           // Total/faculty/staff/campus breakdown
+data.pipelineStaff     // myJobs metrics
+data.pipelineFaculty   // Interfolio metrics
+data.hireRates         // Hire rates by source
+data.bySchool          // School breakdown
+data.applicationSources // LinkedIn, Indeed, etc.
+data.topJobs           // Top 10 jobs
+data.requisitionAging  // Age distribution
+data.demographics      // Gender, ethnicity, age band
+data.newHires          // Individual hire records
+data.hiringTrends      // Historical quarterly trends
+```
+
+### 6.14 ETL Command
+
+```bash
+# Generate Excel template with Q1 FY26 data
+npm run etl:recruiting:generate
+
+# Load recruiting data to Neon
+npm run etl:recruiting
+
+# Dry run (preview without database writes)
+npm run etl:recruiting -- --dry-run
+
+# Specify custom input file and quarter
+npm run etl:recruiting -- --input file.xlsx --quarter FY26_Q1 --verbose
+```
+
+### 6.15 File References
+
+| Purpose | File Path |
+|---------|-----------|
+| Excel Template | `source-metrics/recruiting/Recruiting_Metrics_Master.xlsx` |
+| Methodology | `source-metrics/recruiting/RECRUITING_METHODOLOGY.md` |
+| Database Migration | `database/migrations/006_create_recruiting_metrics_tables.sql` |
+| ETL Script | `scripts/etl/recruiting-metrics-to-postgres.js` |
+| Template Generator | `scripts/generate-recruiting-excel-template.js` |
+| API Service | `src/services/apiService.js` (lines 150-286) |
+| API Server | `server/api-dev.js` (recruiting routes) |
+| Data Hook | `src/hooks/useRecruitingData.js` |
+| Validation Service | `src/services/recruitingValidationService.js` |
+| Dashboard | `src/components/dashboards/RecruitingQ1FY26Dashboard.jsx` |
+| Test Dashboard | `src/components/dashboards/RecruitingTestDashboard.jsx` |
+
+### 6.16 PII Protection
+
+Employee identifiers are hashed before storage:
+
+```javascript
+function hashEmployeeId(name, hireDate) {
+  const input = `${name}|${hireDate}`;
+  return crypto.createHash('sha256').update(input).digest('hex').substring(0, 16);
+}
+```
+
+**Stored:** `employee_hash` (16-char hex string)
+**Not Stored:** Name, Employee ID, SSN, or other PII
