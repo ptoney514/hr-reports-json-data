@@ -201,7 +201,7 @@ export function normalizeDate(dateStr) {
   return date.toISOString().split('T')[0];
 }
 
-export default {
+const apiService = {
   getWorkforceData,
   getTurnoverData,
   getAnnualTurnoverRates,
@@ -216,3 +216,5 @@ export default {
   useAPIDataSource,
   normalizeDate
 };
+
+export default apiService;

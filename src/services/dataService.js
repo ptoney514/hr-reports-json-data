@@ -373,7 +373,7 @@ export const checkDataSource = async () => {
 };
 
 // Default export for convenience
-export default {
+const dataService = {
   // Sync functions (JSON only)
   getWorkforceData,
   getTurnoverData,
@@ -416,3 +416,5 @@ export default {
   getDataSourceInfo,
   checkDataSource
 };
+
+export default dataService;
