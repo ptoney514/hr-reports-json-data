@@ -161,77 +161,77 @@ export const VALIDATION_RULES = {
     }
   ],
 
-  // Demographics - JSON-only (needs future ETL to Neon)
+  // Demographics - Now backed by Neon via demographics ETL
   gender: [
     {
       id: 'faculty_male',
       label: 'Faculty Male',
       jsonPath: 'demographics.gender.faculty.male',
-      apiPath: null,
+      apiPath: 'demographics.gender.faculty.male',
       expected: 321
     },
     {
       id: 'faculty_female',
       label: 'Faculty Female',
       jsonPath: 'demographics.gender.faculty.female',
-      apiPath: null,
+      apiPath: 'demographics.gender.faculty.female',
       expected: 368
     },
     {
       id: 'staff_male',
       label: 'Staff Male',
       jsonPath: 'demographics.gender.staff.male',
-      apiPath: null,
+      apiPath: 'demographics.gender.staff.male',
       expected: 534
     },
     {
       id: 'staff_female',
       label: 'Staff Female',
       jsonPath: 'demographics.gender.staff.female',
-      apiPath: null,
+      apiPath: 'demographics.gender.staff.female',
       expected: 914
     }
   ],
 
   ethnicityFaculty: [
-    { id: 'faculty_white', label: 'White', jsonPath: 'demographics.ethnicity.faculty["White"]', apiPath: null, expected: 536 },
-    { id: 'faculty_asian', label: 'Asian', jsonPath: 'demographics.ethnicity.faculty["Asian"]', apiPath: null, expected: 51 },
-    { id: 'faculty_not_disclosed', label: 'Not Disclosed', jsonPath: 'demographics.ethnicity.faculty["Not Disclosed"]', apiPath: null, expected: 45 },
-    { id: 'faculty_black', label: 'Black/African American', jsonPath: 'demographics.ethnicity.faculty["Black or African American"]', apiPath: null, expected: 18 },
-    { id: 'faculty_multi', label: 'More than one Ethnicity', jsonPath: 'demographics.ethnicity.faculty["More than one Ethnicity"]', apiPath: null, expected: 13 },
-    { id: 'faculty_hispanic', label: 'Hispanic/Latino', jsonPath: 'demographics.ethnicity.faculty["Hispanic or Latino"]', apiPath: null, expected: 12 },
-    { id: 'faculty_not_disclosed2', label: 'Not disclosed (alternate)', jsonPath: 'demographics.ethnicity.faculty["Not disclosed"]', apiPath: null, expected: 7 },
-    { id: 'faculty_two_races', label: 'Two or more races', jsonPath: 'demographics.ethnicity.faculty["Two or more races"]', apiPath: null, expected: 4 },
-    { id: 'faculty_native', label: 'American Indian/Alaska Native', jsonPath: 'demographics.ethnicity.faculty["American Indian or Alaska Native"]', apiPath: null, expected: 3 }
+    { id: 'faculty_white', label: 'White', jsonPath: 'demographics.ethnicity.faculty["White"]', apiPath: 'demographics.ethnicity.faculty["White"]', expected: 536 },
+    { id: 'faculty_asian', label: 'Asian', jsonPath: 'demographics.ethnicity.faculty["Asian"]', apiPath: 'demographics.ethnicity.faculty["Asian"]', expected: 51 },
+    { id: 'faculty_not_disclosed', label: 'Not Disclosed', jsonPath: 'demographics.ethnicity.faculty["Not Disclosed"]', apiPath: 'demographics.ethnicity.faculty["Not Disclosed"]', expected: 45 },
+    { id: 'faculty_black', label: 'Black/African American', jsonPath: 'demographics.ethnicity.faculty["Black or African American"]', apiPath: 'demographics.ethnicity.faculty["Black or African American"]', expected: 18 },
+    { id: 'faculty_multi', label: 'More than one Ethnicity', jsonPath: 'demographics.ethnicity.faculty["More than one Ethnicity"]', apiPath: 'demographics.ethnicity.faculty["More than one Ethnicity"]', expected: 13 },
+    { id: 'faculty_hispanic', label: 'Hispanic/Latino', jsonPath: 'demographics.ethnicity.faculty["Hispanic or Latino"]', apiPath: 'demographics.ethnicity.faculty["Hispanic or Latino"]', expected: 12 },
+    { id: 'faculty_not_disclosed2', label: 'Not disclosed (alternate)', jsonPath: 'demographics.ethnicity.faculty["Not disclosed"]', apiPath: 'demographics.ethnicity.faculty["Not disclosed"]', expected: 7 },
+    { id: 'faculty_two_races', label: 'Two or more races', jsonPath: 'demographics.ethnicity.faculty["Two or more races"]', apiPath: 'demographics.ethnicity.faculty["Two or more races"]', expected: 4 },
+    { id: 'faculty_native', label: 'American Indian/Alaska Native', jsonPath: 'demographics.ethnicity.faculty["American Indian or Alaska Native"]', apiPath: 'demographics.ethnicity.faculty["American Indian or Alaska Native"]', expected: 3 }
   ],
 
   ethnicityStaff: [
-    { id: 'staff_white', label: 'White', jsonPath: 'demographics.ethnicity.staff["White"]', apiPath: null, expected: 998 },
-    { id: 'staff_not_disclosed', label: 'Not Disclosed', jsonPath: 'demographics.ethnicity.staff["Not Disclosed"]', apiPath: null, expected: 123 },
-    { id: 'staff_asian', label: 'Asian', jsonPath: 'demographics.ethnicity.staff["Asian"]', apiPath: null, expected: 105 },
-    { id: 'staff_black', label: 'Black/African American', jsonPath: 'demographics.ethnicity.staff["Black or African American"]', apiPath: null, expected: 86 },
-    { id: 'staff_hispanic', label: 'Hispanic/Latino', jsonPath: 'demographics.ethnicity.staff["Hispanic or Latino"]', apiPath: null, expected: 63 },
-    { id: 'staff_multi', label: 'More than one Ethnicity', jsonPath: 'demographics.ethnicity.staff["More than one Ethnicity"]', apiPath: null, expected: 41 },
-    { id: 'staff_two_races', label: 'Two or more races', jsonPath: 'demographics.ethnicity.staff["Two or more races"]', apiPath: null, expected: 18 },
-    { id: 'staff_native', label: 'American Indian/Alaska Native', jsonPath: 'demographics.ethnicity.staff["American Indian or Alaska Native"]', apiPath: null, expected: 6 },
-    { id: 'staff_not_disclosed2', label: 'Not disclosed (alternate)', jsonPath: 'demographics.ethnicity.staff["Not disclosed"]', apiPath: null, expected: 5 },
-    { id: 'staff_pacific', label: 'Pacific Islander', jsonPath: 'demographics.ethnicity.staff["Native Hawaiian or other Pacific Islander"]', apiPath: null, expected: 3 }
+    { id: 'staff_white', label: 'White', jsonPath: 'demographics.ethnicity.staff["White"]', apiPath: 'demographics.ethnicity.staff["White"]', expected: 998 },
+    { id: 'staff_not_disclosed', label: 'Not Disclosed', jsonPath: 'demographics.ethnicity.staff["Not Disclosed"]', apiPath: 'demographics.ethnicity.staff["Not Disclosed"]', expected: 123 },
+    { id: 'staff_asian', label: 'Asian', jsonPath: 'demographics.ethnicity.staff["Asian"]', apiPath: 'demographics.ethnicity.staff["Asian"]', expected: 105 },
+    { id: 'staff_black', label: 'Black/African American', jsonPath: 'demographics.ethnicity.staff["Black or African American"]', apiPath: 'demographics.ethnicity.staff["Black or African American"]', expected: 86 },
+    { id: 'staff_hispanic', label: 'Hispanic/Latino', jsonPath: 'demographics.ethnicity.staff["Hispanic or Latino"]', apiPath: 'demographics.ethnicity.staff["Hispanic or Latino"]', expected: 63 },
+    { id: 'staff_multi', label: 'More than one Ethnicity', jsonPath: 'demographics.ethnicity.staff["More than one Ethnicity"]', apiPath: 'demographics.ethnicity.staff["More than one Ethnicity"]', expected: 41 },
+    { id: 'staff_two_races', label: 'Two or more races', jsonPath: 'demographics.ethnicity.staff["Two or more races"]', apiPath: 'demographics.ethnicity.staff["Two or more races"]', expected: 18 },
+    { id: 'staff_native', label: 'American Indian/Alaska Native', jsonPath: 'demographics.ethnicity.staff["American Indian or Alaska Native"]', apiPath: 'demographics.ethnicity.staff["American Indian or Alaska Native"]', expected: 6 },
+    { id: 'staff_not_disclosed2', label: 'Not disclosed (alternate)', jsonPath: 'demographics.ethnicity.staff["Not disclosed"]', apiPath: 'demographics.ethnicity.staff["Not disclosed"]', expected: 5 },
+    { id: 'staff_pacific', label: 'Pacific Islander', jsonPath: 'demographics.ethnicity.staff["Native Hawaiian or other Pacific Islander"]', apiPath: 'demographics.ethnicity.staff["Native Hawaiian or other Pacific Islander"]', expected: 3 }
   ],
 
   ageBandsFaculty: [
-    { id: 'faculty_20_30', label: '20-30', jsonPath: 'demographics.ageBands.faculty["20-30"]', apiPath: null, expected: 10 },
-    { id: 'faculty_31_40', label: '31-40', jsonPath: 'demographics.ageBands.faculty["31-40"]', apiPath: null, expected: 143 },
-    { id: 'faculty_41_50', label: '41-50', jsonPath: 'demographics.ageBands.faculty["41-50"]', apiPath: null, expected: 193 },
-    { id: 'faculty_51_60', label: '51-60', jsonPath: 'demographics.ageBands.faculty["51-60"]', apiPath: null, expected: 165 },
-    { id: 'faculty_61_plus', label: '61 Plus', jsonPath: 'demographics.ageBands.faculty["61 Plus"]', apiPath: null, expected: 178 }
+    { id: 'faculty_20_30', label: '20-30', jsonPath: 'demographics.ageBands.faculty["20-30"]', apiPath: 'demographics.ageBands.faculty["20-30"]', expected: 10 },
+    { id: 'faculty_31_40', label: '31-40', jsonPath: 'demographics.ageBands.faculty["31-40"]', apiPath: 'demographics.ageBands.faculty["31-40"]', expected: 143 },
+    { id: 'faculty_41_50', label: '41-50', jsonPath: 'demographics.ageBands.faculty["41-50"]', apiPath: 'demographics.ageBands.faculty["41-50"]', expected: 193 },
+    { id: 'faculty_51_60', label: '51-60', jsonPath: 'demographics.ageBands.faculty["51-60"]', apiPath: 'demographics.ageBands.faculty["51-60"]', expected: 165 },
+    { id: 'faculty_61_plus', label: '61 Plus', jsonPath: 'demographics.ageBands.faculty["61 Plus"]', apiPath: 'demographics.ageBands.faculty["61 Plus"]', expected: 178 }
   ],
 
   ageBandsStaff: [
-    { id: 'staff_20_30', label: '20-30', jsonPath: 'demographics.ageBands.staff["20-30"]', apiPath: null, expected: 236 },
-    { id: 'staff_31_40', label: '31-40', jsonPath: 'demographics.ageBands.staff["31-40"]', apiPath: null, expected: 302 },
-    { id: 'staff_41_50', label: '41-50', jsonPath: 'demographics.ageBands.staff["41-50"]', apiPath: null, expected: 333 },
-    { id: 'staff_51_60', label: '51-60', jsonPath: 'demographics.ageBands.staff["51-60"]', apiPath: null, expected: 343 },
-    { id: 'staff_61_plus', label: '61 Plus', jsonPath: 'demographics.ageBands.staff["61 Plus"]', apiPath: null, expected: 234 }
+    { id: 'staff_20_30', label: '20-30', jsonPath: 'demographics.ageBands.staff["20-30"]', apiPath: 'demographics.ageBands.staff["20-30"]', expected: 236 },
+    { id: 'staff_31_40', label: '31-40', jsonPath: 'demographics.ageBands.staff["31-40"]', apiPath: 'demographics.ageBands.staff["31-40"]', expected: 302 },
+    { id: 'staff_41_50', label: '41-50', jsonPath: 'demographics.ageBands.staff["41-50"]', apiPath: 'demographics.ageBands.staff["41-50"]', expected: 333 },
+    { id: 'staff_51_60', label: '51-60', jsonPath: 'demographics.ageBands.staff["51-60"]', apiPath: 'demographics.ageBands.staff["51-60"]', expected: 343 },
+    { id: 'staff_61_plus', label: '61 Plus', jsonPath: 'demographics.ageBands.staff["61 Plus"]', apiPath: 'demographics.ageBands.staff["61 Plus"]', expected: 234 }
   ]
 };
 
@@ -354,15 +354,29 @@ export async function validateWorkforceData(date = '2025-06-30') {
   // Get JSON data (synchronous)
   const jsonData = staticData.getWorkforceData(date);
 
-  // Get API data (asynchronous)
+  // Get API data (asynchronous) - both workforce and demographics
   let apiData = null;
+  let demographicsData = null;
   let apiError = null;
 
   try {
     apiData = await apiService.getWorkforceData(date);
   } catch (error) {
     apiError = error.message;
-    console.warn('[WorkforceValidation] API unavailable:', error.message);
+    console.warn('[WorkforceValidation] Workforce API unavailable:', error.message);
+  }
+
+  try {
+    demographicsData = await apiService.getDemographicsData(date);
+    // Merge demographics into apiData for validation
+    if (apiData) {
+      apiData.demographics = demographicsData;
+    } else if (demographicsData) {
+      apiData = { demographics: demographicsData };
+    }
+  } catch (error) {
+    console.warn('[WorkforceValidation] Demographics API unavailable:', error.message);
+    if (!apiError) apiError = error.message;
   }
 
   // Run validations by category

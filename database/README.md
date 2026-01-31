@@ -45,6 +45,12 @@ npm run db:seed
 # Load workforce data from Excel
 npm run etl:workforce -- --input source-metrics/workforce/raw/file.xlsx --quarter FY25_Q2
 
+# Load demographics from Excel (gender, ethnicity, age bands for benefit-eligible)
+npm run etl:demographics -- --date 2025-06-30
+
+# Export demographics from Neon to JSON
+npm run etl:demographics:export -- --date 2025-06-30
+
 # Load terminations from Excel
 npm run etl:terminations -- --input source-metrics/terminations/raw/file.xlsx --fiscal-year 2025
 
@@ -72,6 +78,7 @@ npm run etl:mobility -- --from-json --file mobility.json --quarter FY25_Q2
 | Table | Description |
 |-------|-------------|
 | `fact_workforce_snapshots` | Point-in-time headcount by period/location/school/category |
+| `fact_workforce_demographics` | Demographics (gender, ethnicity, age bands) for benefit-eligible employees |
 | `fact_terminations` | Individual termination records |
 | `fact_exit_surveys` | Exit survey responses |
 | `fact_mobility_events` | Promotions, transfers, demotions |
@@ -82,6 +89,10 @@ npm run etl:mobility -- --from-json --file mobility.json --quarter FY25_Q2
 | View | Replaces |
 |------|----------|
 | `v_workforce_summary` | `getWorkforceData(date)` |
+| `v_workforce_demographics` | `getDemographicsData(date)` |
+| `v_demographics_gender` | Gender breakdown pivot |
+| `v_demographics_age_bands` | Age bands breakdown pivot |
+| `v_demographics_totals` | Validation totals |
 | `v_turnover_summary` | `getTurnoverData(date)` |
 | `v_turnover_rates` | `getAnnualTurnoverRatesByCategory()` |
 | `v_exit_survey_metrics` | `getExitSurveyData(date)` |
@@ -95,7 +106,8 @@ database/
 ├── migrations/           # SQL migration files (run in order)
 │   ├── 001_create_dimension_tables.sql
 │   ├── 002_create_fact_tables.sql
-│   └── 003_create_views.sql
+│   ├── 003_create_views.sql
+│   └── 004_create_demographics_tables.sql
 ├── seeds/               # Reference data inserts
 │   ├── 001_seed_assignment_categories.sql
 │   ├── 002_seed_schools.sql
@@ -110,7 +122,8 @@ Once the API is deployed to Vercel, these endpoints are available:
 
 | Endpoint | Description |
 |----------|-------------|
-| `GET /api/workforce/:date` | Workforce summary |
+| `GET /api/workforce/:date` | Workforce summary (headcount by category/location) |
+| `GET /api/demographics/:date` | Demographics (gender, ethnicity, age bands) |
 | `GET /api/turnover/:date` | Turnover summary |
 | `GET /api/turnover-rates` | Annual turnover rates |
 | `GET /api/exit-surveys/:date` | Exit survey metrics |
@@ -167,6 +180,13 @@ SELECT period_date, SUM(headcount) as total
 FROM fact_workforce_snapshots
 GROUP BY period_date
 ORDER BY period_date;
+
+-- Check demographics (FY25 Q4: Faculty=689, Staff=1448)
+SELECT category_type, demographic_type, COUNT(*) as values, SUM(count) as total
+FROM fact_workforce_demographics
+WHERE period_date = '2025-06-30' AND location = 'combined'
+GROUP BY category_type, demographic_type
+ORDER BY category_type, demographic_type;
 ```
 
 ## Data Flow
@@ -177,16 +197,24 @@ Excel (source-metrics/)
     ▼
 ETL Scripts (scripts/etl/)
     │  - Remove PII
-    │  - Categorize
-    │  - Aggregate
+    │  - Categorize/Aggregate
+    │  - workforce-to-postgres.js     → fact_workforce_snapshots
+    │  - demographics-to-postgres.js  → fact_workforce_demographics
+    │  - terminations-to-postgres.js  → fact_terminations
+    │  - exit-surveys-to-postgres.js  → fact_exit_surveys
     ▼
 Neon Postgres
     │
-    ▼
-REST API (api/)
+    ├─► JSON Export (etl:demographics:export)
+    │       → src/data/workforce-demographics.json
     │
     ▼
-3 Apps (React x2, Python x1)
+REST API (api/)
+    │  /api/workforce/:date     → v_workforce_summary
+    │  /api/demographics/:date  → v_workforce_demographics
+    │  /api/turnover/:date      → v_turnover_summary
+    ▼
+React Dashboard (localhost:3000)
 ```
 
 ## Security

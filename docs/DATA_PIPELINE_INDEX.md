@@ -14,6 +14,36 @@
 | **[Architecture Overview](DATA_PIPELINE_ARCHITECTURE.md)** | Visual system architecture | Developers, Architects | 15 min |
 | **[Technical Design](DATA_INGESTION_PIPELINE.md)** | Comprehensive technical spec | Developers, Technical Leads | 45 min |
 | **[Implementation Roadmap](DATA_PIPELINE_IMPLEMENTATION_ROADMAP.md)** | Step-by-step build plan | Developers, Project Managers | 20 min |
+| **[Database README](../database/README.md)** | Neon PostgreSQL integration | Developers | 10 min |
+
+---
+
+## 🗄️ Data Pipeline Options
+
+This project supports **two data pipeline approaches**:
+
+### Option 1: Local JSON Pipeline (Original)
+Excel → Node.js Scripts → JSON files → staticData.js → React Dashboard
+
+**Best for:** Simple deployments, offline use, no database dependency
+**Commands:** `npm run data:import`, `npm run clean:workforce`
+
+### Option 2: Neon PostgreSQL Pipeline (Recommended for Production)
+Excel → ETL Scripts → Neon PostgreSQL → REST API → React Dashboard
+
+**Best for:** Production deployments, data validation, API access, multi-user
+**Commands:** `npm run etl:workforce`, `npm run etl:demographics`, `npm run etl:terminations`
+
+| Feature | Local JSON | Neon PostgreSQL |
+|---------|------------|-----------------|
+| Setup complexity | Low | Medium |
+| Real-time validation | No | Yes |
+| API endpoints | No | Yes |
+| Multi-user access | No | Yes |
+| Offline capability | Yes | No |
+| Data portability | JSON export | JSON export + SQL |
+
+**See:** [Database README](../database/README.md) for Neon PostgreSQL setup
 
 ---
 
@@ -63,6 +93,39 @@ npm run data:import exit-surveys ~/OneDrive/surveys_Q2.csv
 **Then read:** [Technical Design](DATA_INGESTION_PIPELINE.md)
 
 **Next step:** [Implementation Roadmap](DATA_PIPELINE_IMPLEMENTATION_ROADMAP.md)
+
+---
+
+### I want to use Neon PostgreSQL...
+
+**You want to:** Load data into Neon database with API access
+
+**Start here:** [Database README](../database/README.md)
+
+**Key commands:**
+```bash
+# Set up database
+npm run db:migrate
+
+# Load demographics (gender, ethnicity, age bands)
+npm run etl:demographics -- --date 2025-06-30
+
+# Export demographics to JSON
+npm run etl:demographics:export -- --date 2025-06-30
+
+# Load workforce headcount
+npm run etl:workforce -- --input source-metrics/workforce/raw/file.xlsx --quarter FY25_Q2
+
+# Load terminations
+npm run etl:terminations -- --input source-metrics/terminations/raw/file.xlsx --fiscal-year 2025
+```
+
+**Workflow:**
+1. Set DATABASE_URL in .env
+2. Run migrations (`npm run db:migrate`)
+3. Load data with ETL scripts
+4. Access via REST API (`/api/demographics/:date`)
+5. Optionally export to JSON for local backup
 
 ---
 
@@ -247,7 +310,36 @@ npm run data:import workforce ~/OneDrive/FY25_Q3_workforce.xlsx
 
 ---
 
-### Use Case 4: Security Audit
+### Use Case 4: Loading Demographics to Neon
+
+**Scenario:** Load FY25 Q4 demographics into Neon PostgreSQL
+
+**Documents to reference:**
+1. [Database README](../database/README.md) - ETL commands and schema
+
+**Process:**
+```bash
+# Ensure DATABASE_URL is set
+export DATABASE_URL=postgresql://...
+
+# Run demographics ETL
+npm run etl:demographics -- --date 2025-06-30
+
+# Verify data loaded
+# SELECT COUNT(*) FROM fact_workforce_demographics WHERE period_date = '2025-06-30';
+# Expected: 93 records (33 combined location metrics)
+
+# Export to JSON for local backup
+npm run etl:demographics:export -- --date 2025-06-30
+```
+
+**Validation:**
+- Gender totals: Faculty=689 (321M, 368F), Staff=1448 (534M, 914F)
+- View dashboard at `/dashboards/workforce-test` - Demographics tab shows "Passed"
+
+---
+
+### Use Case 5: Security Audit
 
 **Scenario:** Ensuring no PII in git
 
@@ -493,6 +585,7 @@ Cleaned JSON → Merge Script → staticData.js (backup created)
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 1.1.0 | 2026-01-30 | Added Neon PostgreSQL pipeline documentation |
 | 1.0.0 | 2025-11-14 | Initial design and documentation suite |
 
 ---
@@ -520,5 +613,5 @@ Before implementation, ensure you've reviewed:
 
 ---
 
-*Last Updated: November 14, 2025*
+*Last Updated: January 30, 2026*
 *Maintained by: Development Team*

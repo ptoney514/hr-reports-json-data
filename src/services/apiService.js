@@ -124,6 +124,20 @@ export async function getMobilityData(date) {
 }
 
 /**
+ * Get demographics data for a specific date
+ *
+ * @param {string} date - Date in YYYY-MM-DD format
+ * @returns {Promise<Object>} Demographics data (gender, ethnicity, age bands)
+ *
+ * @example
+ * const data = await getDemographicsData('2025-06-30');
+ * console.log(data.gender.faculty.male); // 321
+ */
+export async function getDemographicsData(date) {
+  return fetchFromAPI(`/demographics/${date}`);
+}
+
+/**
  * Health check endpoint
  *
  * @returns {Promise<Object>} API health status
@@ -187,7 +201,7 @@ export function normalizeDate(dateStr) {
   return date.toISOString().split('T')[0];
 }
 
-export default {
+const apiService = {
   getWorkforceData,
   getTurnoverData,
   getAnnualTurnoverRates,
@@ -195,9 +209,12 @@ export default {
   getSchoolOrgData,
   getTop15SchoolOrgData,
   getMobilityData,
+  getDemographicsData,
   checkAPIHealth,
   getAvailablePeriods,
   isAPIAvailable,
   useAPIDataSource,
   normalizeDate
 };
+
+export default apiService;

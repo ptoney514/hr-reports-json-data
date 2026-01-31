@@ -1,6 +1,6 @@
 # Project Status
 
-## Last Updated: January 1, 2026
+## Last Updated: January 30, 2026
 
 ## Current Sprint/Phase
 **Phase**: Print Layout / Report Builder Development
@@ -71,8 +71,24 @@ The "Component Demo - Cards & Charts" at localhost:5173 shows 4 working page typ
 - FY25 comprehensive analysis (222 exits, 31.1% response rate)
 - Automated sync workflows (`npm run data:update`)
 - Real-time file monitoring for changes
+- **Neon PostgreSQL Integration**:
+  - Demographics ETL: gender, ethnicity, age bands (93 records)
+  - Workforce snapshots: headcount by location/category
+  - Terminations: individual exit records
+  - REST API endpoints for all data
+  - JSON export for data portability
 
-### Recent Accomplishments (November 2025)
+### Recent Accomplishments (January 2026)
+- **✅ Demographics ETL Pipeline COMPLETE** (January 30): Full Excel → Neon → JSON workflow
+  - Created `fact_workforce_demographics` table with 4 views in Neon PostgreSQL
+  - ETL script: `npm run etl:demographics -- --date 2025-06-30`
+  - JSON export: `npm run etl:demographics:export -- --date 2025-06-30`
+  - API endpoint: `/api/demographics/:date`
+  - Validation: 33 demographics metrics now validated against Neon (was "JSON-only")
+  - Dashboard: WorkforceTestDashboard shows NEON column with "Passed" status
+- **✅ Locations Validation COMPLETE** (January 2026): Location data ETL and validation
+
+### Accomplishments (November 2025)
 - **✅ Package Updates COMPLETE** (November 15): Updated 17/19 outdated packages (89%)
   - Safe updates (PR #5): 13 packages (React 19.2.0, Recharts 3.4.1, TanStack Query 5.90.9, etc.)
   - Major updates: 4 packages (lucide-react 0.553.0, web-vitals 5.1.0, date-fns 4.1.0, TypeScript 5.9.3)
@@ -160,9 +176,10 @@ The "Component Demo - Cards & Charts" at localhost:5173 shows 4 working page typ
 ## Recent Decisions 📝
 
 ### Architecture Decisions
-- **Decision**: Maintain pure JSON architecture
-  - **Why**: Simplicity, portability, no database overhead
-  - **Impact**: Fast development, easy deployment
+- **Decision**: Hybrid JSON + Neon PostgreSQL architecture
+  - **Why**: JSON for portability, Neon for validation and API access
+  - **Impact**: Best of both worlds - local JSON backup + production database
+  - **ETL Pipeline**: Excel → Neon PostgreSQL → JSON export → React Dashboard
 
 - **Decision**: Remove Docker/Firebase dependencies
   - **Why**: Unnecessary complexity for current needs
