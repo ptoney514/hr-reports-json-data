@@ -44,6 +44,7 @@ const JobChangesTestingDashboard = lazy(() => import('./components/dashboards/Jo
 // Validation Test Pages
 const WorkforceTestDashboard = lazy(() => import('./components/dashboards/WorkforceTestDashboard'));
 const TurnoverTestDashboard = lazy(() => import('./components/dashboards/TurnoverTestDashboard'));
+const RecruitingTestDashboard = lazy(() => import('./components/dashboards/RecruitingTestDashboard'));
 // Report Generator
 const ReportGenerator = lazy(() => import('./components/reports/ReportGenerator'));
 // Print Layout (Report Builder)
@@ -200,6 +201,7 @@ function App() {
               {/* Validation Test Pages */}
               <Route path="/dashboards/workforce-test" element={<WorkforceTestDashboard />} />
               <Route path="/dashboards/turnover-test" element={<TurnoverTestDashboard />} />
+              <Route path="/dashboards/recruiting-test" element={<RecruitingTestDashboard />} />
 
               {/* Testing routes removed - using static data approach */}
               

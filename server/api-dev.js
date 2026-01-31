@@ -444,10 +444,283 @@ app.get('/api/turnover-metrics/:fiscalYear', async (req, res) => {
   }
 });
 
+// ==============================================
+// RECRUITING METRICS API ENDPOINTS
+// ==============================================
+
+// Recruiting summary endpoint
+app.get('/api/recruiting/summary/:fiscalYear/:quarter', async (req, res) => {
+  const { fiscalYear, quarter } = req.params;
+
+  try {
+    const result = await sql`
+      SELECT * FROM fact_recruiting_summary
+      WHERE fiscal_year = ${fiscalYear} AND fiscal_quarter = ${parseInt(quarter)}
+    `;
+
+    if (result.length === 0) {
+      return res.status(404).json({
+        error: 'No recruiting summary found',
+        fiscalYear,
+        quarter
+      });
+    }
+
+    res.json(result[0]);
+  } catch (error) {
+    console.error('Recruiting Summary API Error:', error);
+    res.status(500).json({ error: 'Internal server error', message: error.message });
+  }
+});
+
+// Hire rates endpoint
+app.get('/api/recruiting/hire-rates/:fiscalYear/:quarter', async (req, res) => {
+  const { fiscalYear, quarter } = req.params;
+
+  try {
+    const result = await sql`
+      SELECT * FROM fact_hire_rates
+      WHERE fiscal_year = ${fiscalYear} AND fiscal_quarter = ${parseInt(quarter)}
+      ORDER BY source_system, channel
+    `;
+
+    res.json(result);
+  } catch (error) {
+    console.error('Hire Rates API Error:', error);
+    res.status(500).json({ error: 'Internal server error', message: error.message });
+  }
+});
+
+// Pipeline staff (myJobs) endpoint
+app.get('/api/recruiting/pipeline-staff/:fiscalYear/:quarter', async (req, res) => {
+  const { fiscalYear, quarter } = req.params;
+
+  try {
+    const result = await sql`
+      SELECT * FROM fact_pipeline_metrics_staff
+      WHERE fiscal_year = ${fiscalYear} AND fiscal_quarter = ${parseInt(quarter)}
+    `;
+
+    if (result.length === 0) {
+      return res.status(404).json({
+        error: 'No staff pipeline data found',
+        fiscalYear,
+        quarter
+      });
+    }
+
+    res.json(result[0]);
+  } catch (error) {
+    console.error('Pipeline Staff API Error:', error);
+    res.status(500).json({ error: 'Internal server error', message: error.message });
+  }
+});
+
+// Pipeline faculty (Interfolio) endpoint
+app.get('/api/recruiting/pipeline-faculty/:fiscalYear/:quarter', async (req, res) => {
+  const { fiscalYear, quarter } = req.params;
+
+  try {
+    const result = await sql`
+      SELECT * FROM fact_pipeline_metrics_faculty
+      WHERE fiscal_year = ${fiscalYear} AND fiscal_quarter = ${parseInt(quarter)}
+    `;
+
+    if (result.length === 0) {
+      return res.status(404).json({
+        error: 'No faculty pipeline data found',
+        fiscalYear,
+        quarter
+      });
+    }
+
+    res.json(result[0]);
+  } catch (error) {
+    console.error('Pipeline Faculty API Error:', error);
+    res.status(500).json({ error: 'Internal server error', message: error.message });
+  }
+});
+
+// New hires endpoint
+app.get('/api/recruiting/new-hires/:fiscalYear/:quarter', async (req, res) => {
+  const { fiscalYear, quarter } = req.params;
+
+  try {
+    const result = await sql`
+      SELECT * FROM fact_new_hires
+      WHERE fiscal_year = ${fiscalYear} AND fiscal_quarter = ${parseInt(quarter)}
+      ORDER BY hire_date, employee_hash
+    `;
+
+    res.json(result);
+  } catch (error) {
+    console.error('New Hires API Error:', error);
+    res.status(500).json({ error: 'Internal server error', message: error.message });
+  }
+});
+
+// Hires by school endpoint
+app.get('/api/recruiting/by-school/:fiscalYear/:quarter', async (req, res) => {
+  const { fiscalYear, quarter } = req.params;
+
+  try {
+    const result = await sql`
+      SELECT * FROM fact_hires_by_school
+      WHERE fiscal_year = ${fiscalYear} AND fiscal_quarter = ${parseInt(quarter)}
+      ORDER BY total_hires DESC
+    `;
+
+    res.json(result);
+  } catch (error) {
+    console.error('Hires By School API Error:', error);
+    res.status(500).json({ error: 'Internal server error', message: error.message });
+  }
+});
+
+// Application sources endpoint
+app.get('/api/recruiting/application-sources/:fiscalYear/:quarter', async (req, res) => {
+  const { fiscalYear, quarter } = req.params;
+
+  try {
+    const result = await sql`
+      SELECT * FROM fact_application_sources
+      WHERE fiscal_year = ${fiscalYear} AND fiscal_quarter = ${parseInt(quarter)}
+      ORDER BY application_count DESC
+    `;
+
+    res.json(result);
+  } catch (error) {
+    console.error('Application Sources API Error:', error);
+    res.status(500).json({ error: 'Internal server error', message: error.message });
+  }
+});
+
+// Top jobs endpoint
+app.get('/api/recruiting/top-jobs/:fiscalYear/:quarter', async (req, res) => {
+  const { fiscalYear, quarter } = req.params;
+
+  try {
+    const result = await sql`
+      SELECT * FROM fact_top_jobs
+      WHERE fiscal_year = ${fiscalYear} AND fiscal_quarter = ${parseInt(quarter)}
+      ORDER BY rank
+    `;
+
+    res.json(result);
+  } catch (error) {
+    console.error('Top Jobs API Error:', error);
+    res.status(500).json({ error: 'Internal server error', message: error.message });
+  }
+});
+
+// Requisition aging endpoint
+app.get('/api/recruiting/requisition-aging/:fiscalYear/:quarter', async (req, res) => {
+  const { fiscalYear, quarter } = req.params;
+
+  try {
+    const result = await sql`
+      SELECT * FROM fact_requisition_aging
+      WHERE fiscal_year = ${fiscalYear} AND fiscal_quarter = ${parseInt(quarter)}
+      ORDER BY aging_id
+    `;
+
+    res.json(result);
+  } catch (error) {
+    console.error('Requisition Aging API Error:', error);
+    res.status(500).json({ error: 'Internal server error', message: error.message });
+  }
+});
+
+// New hire demographics endpoint
+app.get('/api/recruiting/demographics/:fiscalYear/:quarter', async (req, res) => {
+  const { fiscalYear, quarter } = req.params;
+
+  try {
+    const result = await sql`
+      SELECT * FROM fact_new_hire_demographics
+      WHERE fiscal_year = ${fiscalYear} AND fiscal_quarter = ${parseInt(quarter)}
+      ORDER BY demo_type, count DESC
+    `;
+
+    res.json(result);
+  } catch (error) {
+    console.error('New Hire Demographics API Error:', error);
+    res.status(500).json({ error: 'Internal server error', message: error.message });
+  }
+});
+
+// Hiring trends endpoint
+app.get('/api/recruiting/hiring-trends', async (req, res) => {
+  try {
+    const result = await sql`
+      SELECT * FROM fact_hiring_trends
+      ORDER BY trend_id
+    `;
+
+    res.json(result);
+  } catch (error) {
+    console.error('Hiring Trends API Error:', error);
+    res.status(500).json({ error: 'Internal server error', message: error.message });
+  }
+});
+
+// Combined recruiting metrics endpoint
+app.get('/api/recruiting/metrics/:fiscalYear/:quarter', async (req, res) => {
+  const { fiscalYear, quarter } = req.params;
+  const q = parseInt(quarter);
+
+  try {
+    const [
+      summary,
+      hireRates,
+      pipelineStaff,
+      pipelineFaculty,
+      newHires,
+      bySchool,
+      appSources,
+      topJobs,
+      reqAging,
+      demographics,
+      trends
+    ] = await Promise.all([
+      sql`SELECT * FROM fact_recruiting_summary WHERE fiscal_year = ${fiscalYear} AND fiscal_quarter = ${q}`,
+      sql`SELECT * FROM fact_hire_rates WHERE fiscal_year = ${fiscalYear} AND fiscal_quarter = ${q}`,
+      sql`SELECT * FROM fact_pipeline_metrics_staff WHERE fiscal_year = ${fiscalYear} AND fiscal_quarter = ${q}`,
+      sql`SELECT * FROM fact_pipeline_metrics_faculty WHERE fiscal_year = ${fiscalYear} AND fiscal_quarter = ${q}`,
+      sql`SELECT * FROM fact_new_hires WHERE fiscal_year = ${fiscalYear} AND fiscal_quarter = ${q} ORDER BY hire_date`,
+      sql`SELECT * FROM fact_hires_by_school WHERE fiscal_year = ${fiscalYear} AND fiscal_quarter = ${q} ORDER BY total_hires DESC`,
+      sql`SELECT * FROM fact_application_sources WHERE fiscal_year = ${fiscalYear} AND fiscal_quarter = ${q} ORDER BY application_count DESC`,
+      sql`SELECT * FROM fact_top_jobs WHERE fiscal_year = ${fiscalYear} AND fiscal_quarter = ${q} ORDER BY rank`,
+      sql`SELECT * FROM fact_requisition_aging WHERE fiscal_year = ${fiscalYear} AND fiscal_quarter = ${q}`,
+      sql`SELECT * FROM fact_new_hire_demographics WHERE fiscal_year = ${fiscalYear} AND fiscal_quarter = ${q}`,
+      sql`SELECT * FROM fact_hiring_trends ORDER BY trend_id`
+    ]);
+
+    res.json({
+      summary: summary[0] || null,
+      hireRates,
+      pipelineStaff: pipelineStaff[0] || null,
+      pipelineFaculty: pipelineFaculty[0] || null,
+      newHires,
+      bySchool,
+      applicationSources: appSources,
+      topJobs,
+      requisitionAging: reqAging,
+      demographics,
+      hiringTrends: trends
+    });
+  } catch (error) {
+    console.error('Recruiting Metrics API Error:', error);
+    res.status(500).json({ error: 'Internal server error', message: error.message });
+  }
+});
+
 // Start server
 app.listen(PORT, () => {
   console.log(`API server running on http://localhost:${PORT}`);
   console.log(`Health check:       http://localhost:${PORT}/api/health`);
   console.log(`Workforce:          http://localhost:${PORT}/api/workforce/2025-06-30`);
   console.log(`Turnover Metrics:   http://localhost:${PORT}/api/turnover-metrics/FY2025`);
+  console.log(`Recruiting Summary: http://localhost:${PORT}/api/recruiting/summary/FY2026/1`);
+  console.log(`Recruiting Metrics: http://localhost:${PORT}/api/recruiting/metrics/FY2026/1`);
 });
