@@ -83,121 +83,157 @@ export const VALIDATION_RULES = {
   ],
 
   turnoverRatesTable: [
-    { id: 'faculty_fy2023', label: 'Faculty FY2023', jsonPath: 'turnoverRatesTable[0].fy2023', apiPath: 'turnoverRatesTable[0].fy2023', expected: 7.9 },
-    { id: 'faculty_fy2024', label: 'Faculty FY2024', jsonPath: 'turnoverRatesTable[0].fy2024', apiPath: 'turnoverRatesTable[0].fy2024', expected: 7.7 },
-    { id: 'faculty_fy2025', label: 'Faculty FY2025', jsonPath: 'turnoverRatesTable[0].fy2025', apiPath: 'turnoverRatesTable[0].fy2025', expected: 6.1 },
-    { id: 'staff_exempt_fy2023', label: 'Staff Exempt FY2023', jsonPath: 'turnoverRatesTable[1].fy2023', apiPath: 'turnoverRatesTable[1].fy2023', expected: 15.5 },
-    { id: 'staff_exempt_fy2024', label: 'Staff Exempt FY2024', jsonPath: 'turnoverRatesTable[1].fy2024', apiPath: 'turnoverRatesTable[1].fy2024', expected: 13.6 },
-    { id: 'staff_exempt_fy2025', label: 'Staff Exempt FY2025', jsonPath: 'turnoverRatesTable[1].fy2025', apiPath: 'turnoverRatesTable[1].fy2025', expected: 12.6 },
-    { id: 'staff_non_exempt_fy2023', label: 'Staff Non-Exempt FY2023', jsonPath: 'turnoverRatesTable[2].fy2023', apiPath: 'turnoverRatesTable[2].fy2023', expected: 22.4 },
-    { id: 'staff_non_exempt_fy2024', label: 'Staff Non-Exempt FY2024', jsonPath: 'turnoverRatesTable[2].fy2024', apiPath: 'turnoverRatesTable[2].fy2024', expected: 17.8 },
-    { id: 'staff_non_exempt_fy2025', label: 'Staff Non-Exempt FY2025', jsonPath: 'turnoverRatesTable[2].fy2025', apiPath: 'turnoverRatesTable[2].fy2025', expected: 15.3 },
-    { id: 'total_fy2023', label: 'Total FY2023', jsonPath: 'turnoverRatesTable[3].fy2023', apiPath: 'turnoverRatesTable[3].fy2023', expected: 14.9 },
-    { id: 'total_fy2024', label: 'Total FY2024', jsonPath: 'turnoverRatesTable[3].fy2024', apiPath: 'turnoverRatesTable[3].fy2024', expected: 12.8 },
-    { id: 'total_fy2025', label: 'Total FY2025', jsonPath: 'turnoverRatesTable[3].fy2025', apiPath: 'turnoverRatesTable[3].fy2025', expected: 11.2 }
+    { id: 'faculty_fy2023', label: 'Faculty FY2023', jsonPath: 'turnoverRatesTable[category=Faculty].fy2023', apiPath: 'turnoverRatesTable[category=Faculty].fy2023', expected: 7.9 },
+    { id: 'faculty_fy2024', label: 'Faculty FY2024', jsonPath: 'turnoverRatesTable[category=Faculty].fy2024', apiPath: 'turnoverRatesTable[category=Faculty].fy2024', expected: 7.7 },
+    { id: 'faculty_fy2025', label: 'Faculty FY2025', jsonPath: 'turnoverRatesTable[category=Faculty].fy2025', apiPath: 'turnoverRatesTable[category=Faculty].fy2025', expected: 6.1 },
+    { id: 'staff_exempt_fy2023', label: 'Staff Exempt FY2023', jsonPath: 'turnoverRatesTable[category=Staff Exempt].fy2023', apiPath: 'turnoverRatesTable[category=Staff Exempt].fy2023', expected: 15.5 },
+    { id: 'staff_exempt_fy2024', label: 'Staff Exempt FY2024', jsonPath: 'turnoverRatesTable[category=Staff Exempt].fy2024', apiPath: 'turnoverRatesTable[category=Staff Exempt].fy2024', expected: 13.6 },
+    { id: 'staff_exempt_fy2025', label: 'Staff Exempt FY2025', jsonPath: 'turnoverRatesTable[category=Staff Exempt].fy2025', apiPath: 'turnoverRatesTable[category=Staff Exempt].fy2025', expected: 12.6 },
+    { id: 'staff_non_exempt_fy2023', label: 'Staff Non-Exempt FY2023', jsonPath: 'turnoverRatesTable[category=Staff Non-Exempt].fy2023', apiPath: 'turnoverRatesTable[category=Staff Non-Exempt].fy2023', expected: 22.4 },
+    { id: 'staff_non_exempt_fy2024', label: 'Staff Non-Exempt FY2024', jsonPath: 'turnoverRatesTable[category=Staff Non-Exempt].fy2024', apiPath: 'turnoverRatesTable[category=Staff Non-Exempt].fy2024', expected: 17.8 },
+    { id: 'staff_non_exempt_fy2025', label: 'Staff Non-Exempt FY2025', jsonPath: 'turnoverRatesTable[category=Staff Non-Exempt].fy2025', apiPath: 'turnoverRatesTable[category=Staff Non-Exempt].fy2025', expected: 15.3 },
+    { id: 'total_fy2023', label: 'Total FY2023', jsonPath: 'turnoverRatesTable[category=Total].fy2023', apiPath: 'turnoverRatesTable[category=Total].fy2023', expected: 14.9 },
+    { id: 'total_fy2024', label: 'Total FY2024', jsonPath: 'turnoverRatesTable[category=Total].fy2024', apiPath: 'turnoverRatesTable[category=Total].fy2024', expected: 12.8 },
+    { id: 'total_fy2025', label: 'Total FY2025', jsonPath: 'turnoverRatesTable[category=Total].fy2025', apiPath: 'turnoverRatesTable[category=Total].fy2025', expected: 11.2 }
   ],
 
   turnoverBreakdown: [
-    { id: 'staff_exempt_voluntary', label: 'Staff Exempt Voluntary', jsonPath: 'turnoverBreakdown[0].voluntary', apiPath: 'turnoverBreakdown[0].voluntary', expected: 10.8 },
-    { id: 'staff_exempt_involuntary', label: 'Staff Exempt Involuntary', jsonPath: 'turnoverBreakdown[0].involuntary', apiPath: 'turnoverBreakdown[0].involuntary', expected: 0.8 },
-    { id: 'staff_exempt_retirement', label: 'Staff Exempt Retirement', jsonPath: 'turnoverBreakdown[0].retirement', apiPath: 'turnoverBreakdown[0].retirement', expected: 1.0 },
-    { id: 'staff_non_exempt_voluntary', label: 'Staff Non-Exempt Voluntary', jsonPath: 'turnoverBreakdown[1].voluntary', apiPath: 'turnoverBreakdown[1].voluntary', expected: 12.9 },
-    { id: 'staff_non_exempt_involuntary', label: 'Staff Non-Exempt Involuntary', jsonPath: 'turnoverBreakdown[1].involuntary', apiPath: 'turnoverBreakdown[1].involuntary', expected: 1.5 },
-    { id: 'staff_non_exempt_retirement', label: 'Staff Non-Exempt Retirement', jsonPath: 'turnoverBreakdown[1].retirement', apiPath: 'turnoverBreakdown[1].retirement', expected: 0.9 },
-    { id: 'faculty_voluntary', label: 'Faculty Voluntary', jsonPath: 'turnoverBreakdown[2].voluntary', apiPath: 'turnoverBreakdown[2].voluntary', expected: 3.3 },
-    { id: 'faculty_involuntary', label: 'Faculty Involuntary', jsonPath: 'turnoverBreakdown[2].involuntary', apiPath: 'turnoverBreakdown[2].involuntary', expected: 0.3 },
-    { id: 'faculty_retirement', label: 'Faculty Retirement', jsonPath: 'turnoverBreakdown[2].retirement', apiPath: 'turnoverBreakdown[2].retirement', expected: 2.5 }
+    { id: 'staff_exempt_voluntary', label: 'Staff Exempt Voluntary', jsonPath: 'turnoverBreakdown[category=Staff Exempt].voluntary', apiPath: 'turnoverBreakdown[category=Staff Exempt].voluntary', expected: 10.8 },
+    { id: 'staff_exempt_involuntary', label: 'Staff Exempt Involuntary', jsonPath: 'turnoverBreakdown[category=Staff Exempt].involuntary', apiPath: 'turnoverBreakdown[category=Staff Exempt].involuntary', expected: 0.8 },
+    { id: 'staff_exempt_retirement', label: 'Staff Exempt Retirement', jsonPath: 'turnoverBreakdown[category=Staff Exempt].retirement', apiPath: 'turnoverBreakdown[category=Staff Exempt].retirement', expected: 1.0 },
+    { id: 'staff_non_exempt_voluntary', label: 'Staff Non-Exempt Voluntary', jsonPath: 'turnoverBreakdown[category=Staff Non-Exempt].voluntary', apiPath: 'turnoverBreakdown[category=Staff Non-Exempt].voluntary', expected: 12.9 },
+    { id: 'staff_non_exempt_involuntary', label: 'Staff Non-Exempt Involuntary', jsonPath: 'turnoverBreakdown[category=Staff Non-Exempt].involuntary', apiPath: 'turnoverBreakdown[category=Staff Non-Exempt].involuntary', expected: 1.5 },
+    { id: 'staff_non_exempt_retirement', label: 'Staff Non-Exempt Retirement', jsonPath: 'turnoverBreakdown[category=Staff Non-Exempt].retirement', apiPath: 'turnoverBreakdown[category=Staff Non-Exempt].retirement', expected: 0.9 },
+    { id: 'faculty_voluntary', label: 'Faculty Voluntary', jsonPath: 'turnoverBreakdown[category=Faculty].voluntary', apiPath: 'turnoverBreakdown[category=Faculty].voluntary', expected: 3.3 },
+    { id: 'faculty_involuntary', label: 'Faculty Involuntary', jsonPath: 'turnoverBreakdown[category=Faculty].involuntary', apiPath: 'turnoverBreakdown[category=Faculty].involuntary', expected: 0.3 },
+    { id: 'faculty_retirement', label: 'Faculty Retirement', jsonPath: 'turnoverBreakdown[category=Faculty].retirement', apiPath: 'turnoverBreakdown[category=Faculty].retirement', expected: 2.5 }
   ],
 
   staffDeviation: [
-    { id: 'staff_dev_student_services', label: 'Student Services', jsonPath: 'staffDeviation[0].rate', apiPath: 'staffDeviation[0].rate', expected: 30.9 },
-    { id: 'staff_dev_pro_cont_education', label: 'Pro. & Cont Education', jsonPath: 'staffDeviation[1].rate', apiPath: 'staffDeviation[1].rate', expected: 26.1 },
-    { id: 'staff_dev_pharmacy', label: 'Pharmacy & Health Professions', jsonPath: 'staffDeviation[2].rate', apiPath: 'staffDeviation[2].rate', expected: 25.9 },
-    { id: 'staff_dev_clinical_affairs', label: 'Clinical Affairs', jsonPath: 'staffDeviation[3].rate', apiPath: 'staffDeviation[3].rate', expected: 22.2 },
-    { id: 'staff_dev_nursing', label: 'College of Nursing', jsonPath: 'staffDeviation[4].rate', apiPath: 'staffDeviation[4].rate', expected: 21.6 },
-    { id: 'staff_dev_law', label: 'Law School', jsonPath: 'staffDeviation[5].rate', apiPath: 'staffDeviation[5].rate', expected: 19.6 },
-    { id: 'staff_dev_dentistry', label: 'Dentistry', jsonPath: 'staffDeviation[6].rate', apiPath: 'staffDeviation[6].rate', expected: 19.4 },
-    { id: 'staff_dev_general_counsel', label: 'General Counsel', jsonPath: 'staffDeviation[7].rate', apiPath: 'staffDeviation[7].rate', expected: 19.0 },
-    { id: 'staff_dev_communications', label: 'Communications', jsonPath: 'staffDeviation[8].rate', apiPath: 'staffDeviation[8].rate', expected: 18.7 },
-    { id: 'staff_dev_academic_affairs', label: 'Academic Affairs', jsonPath: 'staffDeviation[9].rate', apiPath: 'staffDeviation[9].rate', expected: 18.2 },
-    { id: 'staff_dev_athletics', label: 'Athletics', jsonPath: 'staffDeviation[10].rate', apiPath: 'staffDeviation[10].rate', expected: 17.9 },
+    { id: 'staff_dev_student_services', label: 'Student Services', jsonPath: 'staffDeviation[department=Student Services].rate', apiPath: 'staffDeviation[department=Student Services].rate', expected: 30.9 },
+    { id: 'staff_dev_pro_cont_education', label: 'Pro. & Cont Education', jsonPath: 'staffDeviation[department=Pro. & Cont Education].rate', apiPath: 'staffDeviation[department=Pro. & Cont Education].rate', expected: 26.1 },
+    { id: 'staff_dev_pharmacy', label: 'Pharmacy & Health Professions', jsonPath: 'staffDeviation[department=Pharmacy & Health Professions].rate', apiPath: 'staffDeviation[department=Pharmacy & Health Professions].rate', expected: 25.9 },
+    { id: 'staff_dev_clinical_affairs', label: 'Clinical Affairs', jsonPath: 'staffDeviation[department=Clinical Affairs].rate', apiPath: 'staffDeviation[department=Clinical Affairs].rate', expected: 22.2 },
+    { id: 'staff_dev_nursing', label: 'College of Nursing', jsonPath: 'staffDeviation[department=College of Nursing].rate', apiPath: 'staffDeviation[department=College of Nursing].rate', expected: 21.6 },
+    { id: 'staff_dev_law', label: 'Law School', jsonPath: 'staffDeviation[department=Law School].rate', apiPath: 'staffDeviation[department=Law School].rate', expected: 19.6 },
+    { id: 'staff_dev_dentistry', label: 'Dentistry', jsonPath: 'staffDeviation[department=Dentistry].rate', apiPath: 'staffDeviation[department=Dentistry].rate', expected: 19.4 },
+    { id: 'staff_dev_general_counsel', label: 'General Counsel', jsonPath: 'staffDeviation[department=General Counsel].rate', apiPath: 'staffDeviation[department=General Counsel].rate', expected: 19.0 },
+    { id: 'staff_dev_communications', label: 'Communications', jsonPath: 'staffDeviation[department=Communications].rate', apiPath: 'staffDeviation[department=Communications].rate', expected: 18.7 },
+    { id: 'staff_dev_academic_affairs', label: 'Academic Affairs', jsonPath: 'staffDeviation[department=Academic Affairs].rate', apiPath: 'staffDeviation[department=Academic Affairs].rate', expected: 18.2 },
+    { id: 'staff_dev_athletics', label: 'Athletics', jsonPath: 'staffDeviation[department=Athletics].rate', apiPath: 'staffDeviation[department=Athletics].rate', expected: 17.9 },
     { id: 'staff_dev_total', label: 'Total Staff Turnover (Avg)', jsonPath: 'staffAverageRate', apiPath: 'staffAverageRate', expected: 13.6 }
   ],
 
   facultyDeviation: [
-    { id: 'faculty_dev_nursing', label: 'College of Nursing', jsonPath: 'facultyDeviation[0].rate', apiPath: 'facultyDeviation[0].rate', expected: 13.7 },
-    { id: 'faculty_dev_pharmacy', label: 'Pharmacy & Health Professions', jsonPath: 'facultyDeviation[1].rate', apiPath: 'facultyDeviation[1].rate', expected: 7.5 },
-    { id: 'faculty_dev_dentistry', label: 'School of Dentistry', jsonPath: 'facultyDeviation[2].rate', apiPath: 'facultyDeviation[2].rate', expected: 6.9 },
+    { id: 'faculty_dev_nursing', label: 'College of Nursing', jsonPath: 'facultyDeviation[school=College of Nursing].rate', apiPath: 'facultyDeviation[school=College of Nursing].rate', expected: 13.7 },
+    { id: 'faculty_dev_pharmacy', label: 'Pharmacy & Health Professions', jsonPath: 'facultyDeviation[school=Pharmacy & Health Professions].rate', apiPath: 'facultyDeviation[school=Pharmacy & Health Professions].rate', expected: 7.5 },
+    { id: 'faculty_dev_dentistry', label: 'School of Dentistry', jsonPath: 'facultyDeviation[school=School of Dentistry].rate', apiPath: 'facultyDeviation[school=School of Dentistry].rate', expected: 6.9 },
     { id: 'faculty_dev_total', label: 'Total Faculty Turnover (Avg)', jsonPath: 'facultyAverageRate', apiPath: 'facultyAverageRate', expected: 6.3 },
-    { id: 'faculty_dev_arts_sciences', label: 'College of Arts & Sciences', jsonPath: 'facultyDeviation[4].rate', apiPath: 'facultyDeviation[4].rate', expected: 6.0 },
-    { id: 'faculty_dev_medicine', label: 'School of Medicine', jsonPath: 'facultyDeviation[5].rate', apiPath: 'facultyDeviation[5].rate', expected: 5.6 },
-    { id: 'faculty_dev_law', label: 'Law School', jsonPath: 'facultyDeviation[6].rate', apiPath: 'facultyDeviation[6].rate', expected: 3.7 },
-    { id: 'faculty_dev_business', label: 'Heider College of Business', jsonPath: 'facultyDeviation[7].rate', apiPath: 'facultyDeviation[7].rate', expected: 1.6 },
-    { id: 'faculty_dev_pro_studies', label: 'Coll of Pro Studies and Cont Ed', jsonPath: 'facultyDeviation[8].rate', apiPath: 'facultyDeviation[8].rate', expected: 0.0 }
+    { id: 'faculty_dev_arts_sciences', label: 'College of Arts & Sciences', jsonPath: 'facultyDeviation[school=College of Arts & Sciences].rate', apiPath: 'facultyDeviation[school=College of Arts & Sciences].rate', expected: 6.0 },
+    { id: 'faculty_dev_medicine', label: 'School of Medicine', jsonPath: 'facultyDeviation[school=School of Medicine].rate', apiPath: 'facultyDeviation[school=School of Medicine].rate', expected: 5.6 },
+    { id: 'faculty_dev_law', label: 'Law School', jsonPath: 'facultyDeviation[school=Law School].rate', apiPath: 'facultyDeviation[school=Law School].rate', expected: 3.7 },
+    { id: 'faculty_dev_business', label: 'Heider College of Business', jsonPath: 'facultyDeviation[school=Heider College of Business].rate', apiPath: 'facultyDeviation[school=Heider College of Business].rate', expected: 1.6 },
+    { id: 'faculty_dev_pro_studies', label: 'Coll of Pro Studies and Cont Ed', jsonPath: 'facultyDeviation[school=Coll of Pro Studies and Cont Ed].rate', apiPath: 'facultyDeviation[school=Coll of Pro Studies and Cont Ed].rate', expected: 0.0 }
   ],
 
   lengthOfService: [
-    { id: 'los_faculty_less_than_one', label: 'Faculty - Less Than One Year', jsonPath: 'lengthOfService.faculty[0].percentage', apiPath: 'lengthOfService.faculty[0].percentage', expected: 13.8 },
-    { id: 'los_faculty_1_to_5', label: 'Faculty - 1 to 5 Years', jsonPath: 'lengthOfService.faculty[1].percentage', apiPath: 'lengthOfService.faculty[1].percentage', expected: 7.2 },
-    { id: 'los_faculty_5_to_10', label: 'Faculty - 5 to 10 Years', jsonPath: 'lengthOfService.faculty[2].percentage', apiPath: 'lengthOfService.faculty[2].percentage', expected: 5.5 },
-    { id: 'los_faculty_10_to_20', label: 'Faculty - 10 to 20 Years', jsonPath: 'lengthOfService.faculty[3].percentage', apiPath: 'lengthOfService.faculty[3].percentage', expected: 4.0 },
-    { id: 'los_faculty_20_plus', label: 'Faculty - 20+ Years', jsonPath: 'lengthOfService.faculty[4].percentage', apiPath: 'lengthOfService.faculty[4].percentage', expected: 6.2 },
-    { id: 'los_staff_less_than_one', label: 'Staff - Less Than One Year', jsonPath: 'lengthOfService.staff[0].percentage', apiPath: 'lengthOfService.staff[0].percentage', expected: 29.8 },
-    { id: 'los_staff_1_to_5', label: 'Staff - 1 to 5 Years', jsonPath: 'lengthOfService.staff[1].percentage', apiPath: 'lengthOfService.staff[1].percentage', expected: 14.2 },
-    { id: 'los_staff_5_to_10', label: 'Staff - 5 to 10 Years', jsonPath: 'lengthOfService.staff[2].percentage', apiPath: 'lengthOfService.staff[2].percentage', expected: 11.6 },
-    { id: 'los_staff_10_to_20', label: 'Staff - 10 to 20 Years', jsonPath: 'lengthOfService.staff[3].percentage', apiPath: 'lengthOfService.staff[3].percentage', expected: 9.0 },
-    { id: 'los_staff_20_plus', label: 'Staff - 20+ Years', jsonPath: 'lengthOfService.staff[4].percentage', apiPath: 'lengthOfService.staff[4].percentage', expected: 5.3 }
+    { id: 'los_faculty_less_than_one', label: 'Faculty - Less Than One Year', jsonPath: 'lengthOfService.faculty[name=Less Than One].percentage', apiPath: 'lengthOfService.faculty[name=Less Than One].percentage', expected: 13.8 },
+    { id: 'los_faculty_1_to_5', label: 'Faculty - 1 to 5 Years', jsonPath: 'lengthOfService.faculty[name=1 to 5].percentage', apiPath: 'lengthOfService.faculty[name=1 to 5].percentage', expected: 7.2 },
+    { id: 'los_faculty_5_to_10', label: 'Faculty - 5 to 10 Years', jsonPath: 'lengthOfService.faculty[name=5 to 10].percentage', apiPath: 'lengthOfService.faculty[name=5 to 10].percentage', expected: 5.5 },
+    { id: 'los_faculty_10_to_20', label: 'Faculty - 10 to 20 Years', jsonPath: 'lengthOfService.faculty[name=10 to 20].percentage', apiPath: 'lengthOfService.faculty[name=10 to 20].percentage', expected: 4.0 },
+    { id: 'los_faculty_20_plus', label: 'Faculty - 20+ Years', jsonPath: 'lengthOfService.faculty[name=20 Plus].percentage', apiPath: 'lengthOfService.faculty[name=20 Plus].percentage', expected: 6.2 },
+    { id: 'los_staff_less_than_one', label: 'Staff - Less Than One Year', jsonPath: 'lengthOfService.staff[name=Less Than One].percentage', apiPath: 'lengthOfService.staff[name=Less Than One].percentage', expected: 29.8 },
+    { id: 'los_staff_1_to_5', label: 'Staff - 1 to 5 Years', jsonPath: 'lengthOfService.staff[name=1 to 5].percentage', apiPath: 'lengthOfService.staff[name=1 to 5].percentage', expected: 14.2 },
+    { id: 'los_staff_5_to_10', label: 'Staff - 5 to 10 Years', jsonPath: 'lengthOfService.staff[name=5 to 10].percentage', apiPath: 'lengthOfService.staff[name=5 to 10].percentage', expected: 11.6 },
+    { id: 'los_staff_10_to_20', label: 'Staff - 10 to 20 Years', jsonPath: 'lengthOfService.staff[name=10 to 20].percentage', apiPath: 'lengthOfService.staff[name=10 to 20].percentage', expected: 9.0 },
+    { id: 'los_staff_20_plus', label: 'Staff - 20+ Years', jsonPath: 'lengthOfService.staff[name=20 Plus].percentage', apiPath: 'lengthOfService.staff[name=20 Plus].percentage', expected: 5.3 }
   ],
 
   retirementsByFY: [
-    { id: 'ret_fy2018_total', label: 'FY2018 Total Retirements', jsonPath: 'retirementsByFY[0].total', apiPath: 'retirementsByFY[0].total', expected: 30 },
-    { id: 'ret_fy2019_total', label: 'FY2019 Total Retirements', jsonPath: 'retirementsByFY[1].total', apiPath: 'retirementsByFY[1].total', expected: 48 },
-    { id: 'ret_fy2020_total', label: 'FY2020 Total Retirements', jsonPath: 'retirementsByFY[2].total', apiPath: 'retirementsByFY[2].total', expected: 41 },
-    { id: 'ret_fy2021_total', label: 'FY2021 Total Retirements', jsonPath: 'retirementsByFY[3].total', apiPath: 'retirementsByFY[3].total', expected: 42 },
-    { id: 'ret_fy2022_total', label: 'FY2022 Total Retirements', jsonPath: 'retirementsByFY[4].total', apiPath: 'retirementsByFY[4].total', expected: 42 },
-    { id: 'ret_fy2023_total', label: 'FY2023 Total Retirements', jsonPath: 'retirementsByFY[5].total', apiPath: 'retirementsByFY[5].total', expected: 49 },
-    { id: 'ret_fy2024_total', label: 'FY2024 Total Retirements', jsonPath: 'retirementsByFY[6].total', apiPath: 'retirementsByFY[6].total', expected: 36 },
-    { id: 'ret_fy2025_total', label: 'FY2025 Total Retirements', jsonPath: 'retirementsByFY[7].total', apiPath: 'retirementsByFY[7].total', expected: 40 }
+    { id: 'ret_fy2018_total', label: 'FY2018 Total Retirements', jsonPath: 'retirementsByFY[fiscalYear=FY2018].total', apiPath: 'retirementsByFY[fiscalYear=FY2018].total', expected: 30, unit: 'count' },
+    { id: 'ret_fy2019_total', label: 'FY2019 Total Retirements', jsonPath: 'retirementsByFY[fiscalYear=FY2019].total', apiPath: 'retirementsByFY[fiscalYear=FY2019].total', expected: 48, unit: 'count' },
+    { id: 'ret_fy2020_total', label: 'FY2020 Total Retirements', jsonPath: 'retirementsByFY[fiscalYear=FY2020].total', apiPath: 'retirementsByFY[fiscalYear=FY2020].total', expected: 41, unit: 'count' },
+    { id: 'ret_fy2021_total', label: 'FY2021 Total Retirements', jsonPath: 'retirementsByFY[fiscalYear=FY2021].total', apiPath: 'retirementsByFY[fiscalYear=FY2021].total', expected: 42, unit: 'count' },
+    { id: 'ret_fy2022_total', label: 'FY2022 Total Retirements', jsonPath: 'retirementsByFY[fiscalYear=FY2022].total', apiPath: 'retirementsByFY[fiscalYear=FY2022].total', expected: 42, unit: 'count' },
+    { id: 'ret_fy2023_total', label: 'FY2023 Total Retirements', jsonPath: 'retirementsByFY[fiscalYear=FY2023].total', apiPath: 'retirementsByFY[fiscalYear=FY2023].total', expected: 49, unit: 'count' },
+    { id: 'ret_fy2024_total', label: 'FY2024 Total Retirements', jsonPath: 'retirementsByFY[fiscalYear=FY2024].total', apiPath: 'retirementsByFY[fiscalYear=FY2024].total', expected: 36, unit: 'count' },
+    { id: 'ret_fy2025_total', label: 'FY2025 Total Retirements', jsonPath: 'retirementsByFY[fiscalYear=FY2025].total', apiPath: 'retirementsByFY[fiscalYear=FY2025].total', expected: 40, unit: 'count' }
   ],
 
   facultyRetirementTrends: [
-    { id: 'faculty_ret_2019_age', label: 'Faculty 2019 Avg Age', jsonPath: 'facultyRetirement.trends[0].avgAge', apiPath: 'facultyRetirement.trends[0].avgAge', expected: 71.4 },
-    { id: 'faculty_ret_2019_los', label: 'Faculty 2019 Avg LOS', jsonPath: 'facultyRetirement.trends[0].avgLOS', apiPath: 'facultyRetirement.trends[0].avgLOS', expected: 31.9 },
-    { id: 'faculty_ret_2024_age', label: 'Faculty 2024 Avg Age', jsonPath: 'facultyRetirement.trends[5].avgAge', apiPath: 'facultyRetirement.trends[5].avgAge', expected: 69.3 },
-    { id: 'faculty_ret_2024_los', label: 'Faculty 2024 Avg LOS', jsonPath: 'facultyRetirement.trends[5].avgLOS', apiPath: 'facultyRetirement.trends[5].avgLOS', expected: 28.1 },
-    { id: 'faculty_ret_2025_age', label: 'Faculty 2025 Avg Age', jsonPath: 'facultyRetirement.trends[6].avgAge', apiPath: 'facultyRetirement.trends[6].avgAge', expected: 69.4 },
-    { id: 'faculty_ret_2025_los', label: 'Faculty 2025 Avg LOS', jsonPath: 'facultyRetirement.trends[6].avgLOS', apiPath: 'facultyRetirement.trends[6].avgLOS', expected: 26.7 }
+    { id: 'faculty_ret_2019_age', label: 'Faculty 2019 Avg Age', jsonPath: 'facultyRetirement.trends[year=2019].avgAge', apiPath: 'facultyRetirement.trends[year=2019].avgAge', expected: 71.4, unit: 'years' },
+    { id: 'faculty_ret_2019_los', label: 'Faculty 2019 Avg LOS', jsonPath: 'facultyRetirement.trends[year=2019].avgLOS', apiPath: 'facultyRetirement.trends[year=2019].avgLOS', expected: 31.9, unit: 'years' },
+    { id: 'faculty_ret_2024_age', label: 'Faculty 2024 Avg Age', jsonPath: 'facultyRetirement.trends[year=2024].avgAge', apiPath: 'facultyRetirement.trends[year=2024].avgAge', expected: 69.3, unit: 'years' },
+    { id: 'faculty_ret_2024_los', label: 'Faculty 2024 Avg LOS', jsonPath: 'facultyRetirement.trends[year=2024].avgLOS', apiPath: 'facultyRetirement.trends[year=2024].avgLOS', expected: 28.1, unit: 'years' },
+    { id: 'faculty_ret_2025_age', label: 'Faculty 2025 Avg Age', jsonPath: 'facultyRetirement.trends[year=2025].avgAge', apiPath: 'facultyRetirement.trends[year=2025].avgAge', expected: 69.4, unit: 'years' },
+    { id: 'faculty_ret_2025_los', label: 'Faculty 2025 Avg LOS', jsonPath: 'facultyRetirement.trends[year=2025].avgLOS', apiPath: 'facultyRetirement.trends[year=2025].avgLOS', expected: 26.7, unit: 'years' }
   ],
 
   staffRetirementTrends: [
-    { id: 'staff_ret_2019_age', label: 'Staff 2019 Avg Age', jsonPath: 'staffRetirement.trends[0].avgAge', apiPath: 'staffRetirement.trends[0].avgAge', expected: 63.7 },
-    { id: 'staff_ret_2019_los', label: 'Staff 2019 Avg LOS', jsonPath: 'staffRetirement.trends[0].avgLOS', apiPath: 'staffRetirement.trends[0].avgLOS', expected: 21.7 },
-    { id: 'staff_ret_2024_age', label: 'Staff 2024 Avg Age', jsonPath: 'staffRetirement.trends[5].avgAge', apiPath: 'staffRetirement.trends[5].avgAge', expected: 67.1 },
-    { id: 'staff_ret_2024_los', label: 'Staff 2024 Avg LOS', jsonPath: 'staffRetirement.trends[5].avgLOS', apiPath: 'staffRetirement.trends[5].avgLOS', expected: 24.5 },
-    { id: 'staff_ret_2025_age', label: 'Staff 2025 Avg Age', jsonPath: 'staffRetirement.trends[6].avgAge', apiPath: 'staffRetirement.trends[6].avgAge', expected: 68.1 },
-    { id: 'staff_ret_2025_los', label: 'Staff 2025 Avg LOS', jsonPath: 'staffRetirement.trends[6].avgLOS', apiPath: 'staffRetirement.trends[6].avgLOS', expected: 21.5 }
+    { id: 'staff_ret_2019_age', label: 'Staff 2019 Avg Age', jsonPath: 'staffRetirement.trends[year=2019].avgAge', apiPath: 'staffRetirement.trends[year=2019].avgAge', expected: 63.7, unit: 'years' },
+    { id: 'staff_ret_2019_los', label: 'Staff 2019 Avg LOS', jsonPath: 'staffRetirement.trends[year=2019].avgLOS', apiPath: 'staffRetirement.trends[year=2019].avgLOS', expected: 21.7, unit: 'years' },
+    { id: 'staff_ret_2024_age', label: 'Staff 2024 Avg Age', jsonPath: 'staffRetirement.trends[year=2024].avgAge', apiPath: 'staffRetirement.trends[year=2024].avgAge', expected: 67.1, unit: 'years' },
+    { id: 'staff_ret_2024_los', label: 'Staff 2024 Avg LOS', jsonPath: 'staffRetirement.trends[year=2024].avgLOS', apiPath: 'staffRetirement.trends[year=2024].avgLOS', expected: 24.5, unit: 'years' },
+    { id: 'staff_ret_2025_age', label: 'Staff 2025 Avg Age', jsonPath: 'staffRetirement.trends[year=2025].avgAge', apiPath: 'staffRetirement.trends[year=2025].avgAge', expected: 68.1, unit: 'years' },
+    { id: 'staff_ret_2025_los', label: 'Staff 2025 Avg LOS', jsonPath: 'staffRetirement.trends[year=2025].avgLOS', apiPath: 'staffRetirement.trends[year=2025].avgLOS', expected: 21.5, unit: 'years' }
   ]
 };
 
 /**
  * Get value from object using dot notation path
- * Supports bracket notation for array indices
+ * Supports:
+ * - Dot notation: 'summaryRates.total.rate'
+ * - Numeric array indices: 'turnoverRatesTable[0].fy2023'
+ * - Key-based array lookups: 'turnoverRatesTable[category=Faculty].fy2023'
  *
  * @param {Object} obj - Source object
- * @param {string} path - Dot notation path (e.g., 'summaryRates.total.rate')
+ * @param {string} path - Dot notation path
  * @returns {*} Value at path or undefined
  */
 export function getValueByPath(obj, path) {
   if (!obj || !path) return undefined;
 
-  // Handle array bracket notation (e.g., turnoverRatesTable[0].fy2023)
-  const normalizedPath = path.replace(/\[(\d+)\]/g, '.$1');
-  const parts = normalizedPath.split('.');
   let current = obj;
+  let remaining = path;
 
-  for (const part of parts) {
-    if (current === undefined || current === null) return undefined;
-    current = current[part];
+  while (remaining) {
+    // Match key-based array lookup: array[key=value]
+    const keyMatch = remaining.match(/^([^.[]+)\[([^=\]]+)=([^\]]+)\]/);
+    if (keyMatch) {
+      const [fullMatch, arrayName, key, value] = keyMatch;
+      current = current[arrayName];
+      if (!Array.isArray(current)) return undefined;
+      current = current.find(item => String(item[key]) === value);
+      remaining = remaining.slice(fullMatch.length);
+      if (remaining.startsWith('.')) remaining = remaining.slice(1);
+      continue;
+    }
+
+    // Match numeric array index: array[0]
+    const indexMatch = remaining.match(/^([^.[]+)\[(\d+)\]/);
+    if (indexMatch) {
+      const [fullMatch, arrayName, index] = indexMatch;
+      current = current[arrayName];
+      if (!Array.isArray(current)) return undefined;
+      current = current[parseInt(index, 10)];
+      remaining = remaining.slice(fullMatch.length);
+      if (remaining.startsWith('.')) remaining = remaining.slice(1);
+      continue;
+    }
+
+    // Match simple property: prop or prop.rest
+    const propMatch = remaining.match(/^([^.[]+)/);
+    if (propMatch) {
+      const [fullMatch, propName] = propMatch;
+      if (current === undefined || current === null) return undefined;
+      current = current[propName];
+      remaining = remaining.slice(fullMatch.length);
+      if (remaining.startsWith('.')) remaining = remaining.slice(1);
+      continue;
+    }
+
+    // No match - malformed path
+    return undefined;
   }
 
   return current;
@@ -225,16 +261,29 @@ export function compareValues(jsonValue, apiValue) {
 /**
  * Format value for display
  * @param {*} value - Value to format
+ * @param {string} [unit] - Optional unit type: 'percent', 'count', 'years', or undefined (auto-detect)
  * @returns {string} Formatted value
  */
-export function formatValue(value) {
+export function formatValue(value, unit) {
   if (value === undefined || value === null) return '--';
   if (typeof value === 'number') {
-    // Format percentages with 1 decimal
-    if (value < 100) {
+    // Use explicit unit if provided
+    if (unit === 'count') {
+      return value.toLocaleString();
+    }
+    if (unit === 'years') {
+      return value.toFixed(1) + ' yrs';
+    }
+    if (unit === 'percent') {
       return value.toFixed(1) + '%';
     }
-    return value.toLocaleString();
+    // Auto-detect: rates are typically small decimals (< 50), counts are larger integers
+    // This heuristic assumes turnover rates are under 50% and counts are whole numbers >= 100
+    if (Number.isInteger(value) && value >= 30) {
+      return value.toLocaleString();  // Likely a count
+    }
+    // Default to percent format for small numbers (likely rates)
+    return value.toFixed(1) + '%';
   }
   return String(value);
 }
@@ -280,7 +329,8 @@ export function validateCategory(rules, jsonData, apiData = null) {
       expected: rule.expected,
       match,
       status,
-      isJsonOnly
+      isJsonOnly,
+      unit: rule.unit || null  // Pass unit for proper formatting (count, years, percent)
     };
   });
 }

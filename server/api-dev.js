@@ -158,6 +158,17 @@ function formatDateShort(dateStr) {
   return `${month}/${day}/${year}`;
 }
 
+/**
+ * Convert value to number, preserving null for missing data
+ * Unlike Number(), this returns null instead of 0 for null/undefined values
+ * This ensures api_missing detection works correctly in validation
+ */
+function toNumberOrNull(value) {
+  if (value === null || value === undefined) return null;
+  const num = Number(value);
+  return isNaN(num) ? null : num;
+}
+
 // Demographics data endpoint
 app.get('/api/demographics/:date', async (req, res) => {
   const { date } = req.params;
@@ -296,6 +307,7 @@ app.get('/api/turnover-metrics/:fiscalYear', async (req, res) => {
     });
 
     // Build turnover rates table
+    // Using toNumberOrNull to preserve null for missing data (enables api_missing detection)
     const categories = ['Faculty', 'Staff Exempt', 'Staff Non-Exempt', 'Total'];
     const turnoverRatesTableArr = categories.map(category => {
       const rows = turnoverRatesTable.filter(r => r.category === category);
@@ -304,12 +316,12 @@ app.get('/api/turnover-metrics/:fiscalYear', async (req, res) => {
       const fy25 = rows.find(r => r.fiscal_year === 'FY2025');
       return {
         category,
-        fy2023: fy23 ? Number(fy23.turnover_rate) : 0,
-        heAvg2023: fy23 ? Number(fy23.higher_ed_avg) : 0,
-        fy2024: fy24 ? Number(fy24.turnover_rate) : 0,
-        heAvg2024: fy24 ? Number(fy24.higher_ed_avg) : 0,
-        fy2025: fy25 ? Number(fy25.turnover_rate) : 0,
-        change: fy25 ? Number(fy25.change) : 0
+        fy2023: fy23 ? toNumberOrNull(fy23.turnover_rate) : null,
+        heAvg2023: fy23 ? toNumberOrNull(fy23.higher_ed_avg) : null,
+        fy2024: fy24 ? toNumberOrNull(fy24.turnover_rate) : null,
+        heAvg2024: fy24 ? toNumberOrNull(fy24.higher_ed_avg) : null,
+        fy2025: fy25 ? toNumberOrNull(fy25.turnover_rate) : null,
+        change: fy25 ? toNumberOrNull(fy25.change) : null
       };
     });
 

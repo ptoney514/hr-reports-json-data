@@ -159,19 +159,19 @@ const TurnoverTestDashboard = () => {
                     {result.label}
                   </td>
                   <td className="px-4 py-2 text-sm text-gray-900 text-right font-mono">
-                    {formatValue(result.jsonValue)}
+                    {formatValue(result.jsonValue, result.unit)}
                   </td>
                   {showApi && (
                     <td className="px-4 py-2 text-sm text-gray-900 text-right font-mono">
                       {result.isJsonOnly ? (
                         <span className="text-gray-400 text-xs">--</span>
                       ) : (
-                        formatValue(result.apiValue)
+                        formatValue(result.apiValue, result.unit)
                       )}
                     </td>
                   )}
                   <td className="px-4 py-2 text-sm text-gray-500 text-right font-mono">
-                    {formatValue(result.expected)}
+                    {formatValue(result.expected, result.unit)}
                   </td>
                   <td className="px-4 py-2 text-center">
                     <div className="flex items-center justify-center gap-1">
@@ -479,11 +479,11 @@ const TurnoverTestDashboard = () => {
                                   {mismatch.label}
                                 </div>
                                 <div className="text-sm text-gray-600">
-                                  JSON: <span className="font-mono">{formatValue(mismatch.jsonValue)}</span>
+                                  JSON: <span className="font-mono">{formatValue(mismatch.jsonValue, mismatch.unit)}</span>
                                   {' | '}
-                                  Neon: <span className="font-mono">{formatValue(mismatch.apiValue)}</span>
+                                  Neon: <span className="font-mono">{formatValue(mismatch.apiValue, mismatch.unit)}</span>
                                   {' | '}
-                                  Expected: <span className="font-mono">{formatValue(mismatch.expected)}</span>
+                                  Expected: <span className="font-mono">{formatValue(mismatch.expected, mismatch.unit)}</span>
                                 </div>
                               </div>
                               <XCircle className="h-5 w-5 text-red-500" />

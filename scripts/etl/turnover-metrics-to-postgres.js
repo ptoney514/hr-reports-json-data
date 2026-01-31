@@ -60,6 +60,7 @@ function parseArgs() {
   const args = process.argv.slice(2);
   const options = {
     input: null,
+    fiscalYear: null,  // Derived from Metadata sheet if not provided
     dryRun: false,
     verbose: false
   };
@@ -69,6 +70,10 @@ function parseArgs() {
       case '--input':
       case '-i':
         options.input = args[++i];
+        break;
+      case '--fiscal-year':
+      case '-fy':
+        options.fiscalYear = args[++i];
         break;
       case '--dry-run':
         options.dryRun = true;
@@ -100,9 +105,10 @@ ${colors.yellow}Usage:${colors.reset}
   node scripts/etl/turnover-metrics-to-postgres.js --input file.xlsx
 
 ${colors.yellow}Options:${colors.reset}
-  -i, --input FILE      Input Excel file path (default: auto-detect)
-  --dry-run             Preview without database writes
-  -v, --verbose         Show detailed output
+  -i, --input FILE         Input Excel file path (default: auto-detect)
+  -fy, --fiscal-year FY    Fiscal year (e.g., FY2025). Default: read from Metadata sheet
+  --dry-run                Preview without database writes
+  -v, --verbose            Show detailed output
   -h, --help            Show this help message
 
 ${colors.yellow}Examples:${colors.reset}
@@ -155,6 +161,29 @@ function loadWorkbook(filePath) {
   }
 
   return { workbook, sheetNames };
+}
+
+/**
+ * Extract fiscal year from Metadata sheet
+ * @param {Object} workbook - Excel workbook
+ * @returns {string|null} Fiscal year (e.g., 'FY2025') or null if not found
+ */
+function extractFiscalYearFromMetadata(workbook) {
+  try {
+    const rows = sheetToJSON(workbook, 'Metadata');
+    const fyRow = rows.find(r => r.field === 'fiscal_year');
+    if (fyRow && fyRow.value) {
+      const fy = fyRow.value.toString().trim();
+      // Validate format: FY followed by 4 digits
+      if (/^FY\d{4}$/.test(fy)) {
+        return fy;
+      }
+      console.warn(`${colors.yellow}Warning: Invalid fiscal_year format in Metadata: ${fy}${colors.reset}`);
+    }
+  } catch (error) {
+    console.warn(`${colors.yellow}Warning: Could not read Metadata sheet: ${error.message}${colors.reset}`);
+  }
+  return null;
 }
 
 /**
@@ -651,10 +680,18 @@ async function upsertRetirementTrends(workbook, sourceFile, dryRun) {
 
 /**
  * Upsert Age Distribution (Faculty + Staff)
+ * @param {Object} workbook - Excel workbook
+ * @param {string} sourceFile - Source file name
+ * @param {boolean} dryRun - Dry run mode
+ * @param {string} fiscalYear - Fiscal year (e.g., 'FY2025')
  */
-async function upsertAgeDistribution(workbook, sourceFile, dryRun) {
+async function upsertAgeDistribution(workbook, sourceFile, dryRun, fiscalYear) {
   let inserted = 0, updated = 0, errored = 0;
-  const fiscalYear = 'FY2025';  // Current year
+
+  if (!fiscalYear) {
+    console.error(`  ${colors.red}Error: fiscalYear is required for age distribution${colors.reset}`);
+    return { inserted: 0, updated: 0, errored: 1 };
+  }
 
   // Faculty distribution
   const facultyRows = sheetToJSON(workbook, 'Faculty_Age_Distribution');
@@ -729,12 +766,20 @@ async function upsertAgeDistribution(workbook, sourceFile, dryRun) {
 
 /**
  * Upsert Faculty Retirement by School
+ * @param {Object} workbook - Excel workbook
+ * @param {string} sourceFile - Source file name
+ * @param {boolean} dryRun - Dry run mode
+ * @param {string} fiscalYear - Fiscal year (e.g., 'FY2025')
  */
-async function upsertFacultyRetirementBySchool(workbook, sourceFile, dryRun) {
+async function upsertFacultyRetirementBySchool(workbook, sourceFile, dryRun, fiscalYear) {
   const sheetName = 'Faculty_Retirement_School';
   const rows = sheetToJSON(workbook, sheetName);
   let inserted = 0, updated = 0, errored = 0;
-  const fiscalYear = 'FY2025';
+
+  if (!fiscalYear) {
+    console.error(`  ${colors.red}Error: fiscalYear is required for faculty retirement by school${colors.reset}`);
+    return { inserted: 0, updated: 0, errored: 1 };
+  }
 
   console.log(`  ${sheetName}: ${rows.length} rows`);
 
@@ -813,6 +858,21 @@ async function main() {
   const { workbook, sheetNames } = loadWorkbook(sourceFile);
   console.log(`${colors.green}✓${colors.reset} Loaded ${sheetNames.length} sheets\n`);
 
+  // Determine fiscal year (CLI arg takes precedence, then Metadata sheet)
+  let fiscalYear = options.fiscalYear;
+  if (!fiscalYear) {
+    fiscalYear = extractFiscalYearFromMetadata(workbook);
+    if (fiscalYear) {
+      console.log(`${colors.blue}Fiscal year from Metadata sheet: ${fiscalYear}${colors.reset}`);
+    } else {
+      console.error(`${colors.red}Error: No fiscal year specified. Use --fiscal-year or add fiscal_year to Metadata sheet.${colors.reset}`);
+      process.exit(1);
+    }
+  } else {
+    console.log(`${colors.blue}Fiscal year from CLI: ${fiscalYear}${colors.reset}`);
+  }
+  console.log('');
+
   // Start audit log
   let loadId = null;
   if (!options.dryRun) {
@@ -820,7 +880,7 @@ async function main() {
       loadType: 'turnover_metrics',
       sourceFile: path.basename(sourceFile),
       periodDate: new Date().toISOString().split('T')[0],
-      fiscalPeriod: 'FY25'
+      fiscalPeriod: fiscalYear
     });
     console.log(`${colors.blue}Audit log started (ID: ${loadId})${colors.reset}\n`);
   }
@@ -896,13 +956,13 @@ async function main() {
   results.totalErrored += r.errored;
 
   // Age Distribution
-  r = await upsertAgeDistribution(workbook, sourceFileName, options.dryRun);
+  r = await upsertAgeDistribution(workbook, sourceFileName, options.dryRun, fiscalYear);
   results.totalInserted += r.inserted;
   results.totalUpdated += r.updated;
   results.totalErrored += r.errored;
 
   // Faculty Retirement by School
-  r = await upsertFacultyRetirementBySchool(workbook, sourceFileName, options.dryRun);
+  r = await upsertFacultyRetirementBySchool(workbook, sourceFileName, options.dryRun, fiscalYear);
   results.totalInserted += r.inserted;
   results.totalUpdated += r.updated;
   results.totalErrored += r.errored;
