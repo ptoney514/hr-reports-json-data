@@ -5,11 +5,120 @@ This guide ensures data consistency between turnover metrics and exit survey dat
 
 ## Data Flow Architecture
 
+### Local JSON Flow (Legacy)
 ```
 Source Excel/CSV → processTurnoverData.js → fy25TurnoverData.json → syncTurnoverToStaticData.js → staticData.js
                                                 ↓
                                         Dashboard Components
 ```
+
+### Turnover Metrics ETL Flow (Current)
+```
+Turnover_Metrics_Master.xlsx → turnover-metrics-to-postgres.js → Neon PostgreSQL
+                                                                       ↓
+                                                              API (/api/turnover-metrics)
+                                                                       ↓
+                                                              Dashboard Components
+                                                                       ↓ (fallback)
+                                                              staticData.js (TURNOVER_METRICS)
+```
+
+---
+
+## Turnover Metrics ETL Pipeline
+
+The Turnover Dashboard uses a dedicated ETL pipeline that loads metrics from an Excel template to Neon PostgreSQL.
+
+### Source File
+- **Location**: `source-metrics/turnover/Turnover_Metrics_Master.xlsx`
+- **Sheets**: 15 sheets containing all turnover metrics
+- **Data**: Summary rates, deviation charts, retirement analysis, length of service
+
+### Excel Template Sheets
+
+| Sheet | Purpose | Rows |
+|-------|---------|------|
+| Summary_Rates | Dashboard summary cards (Total, Faculty, Staff Exempt, Staff Non-Exempt) | 4 |
+| Turnover_Rates_Table | FY23-FY25 rates by category with Higher Ed benchmarks | 12 |
+| Higher_Ed_Averages | CUPA benchmark data by fiscal year | 12 |
+| Turnover_Breakdown | Voluntary/Involuntary/Retirement by category | 3 |
+| Staff_Deviation | 33 departments with turnover rates | 33 |
+| Faculty_Deviation | 9 schools with turnover rates | 9 |
+| Historical_Rates | FY22-FY25 total turnover rates | 4 |
+| Length_of_Service | Tenure band breakdown (Faculty & Staff) | 10 |
+| Retirements_by_FY | FY18-FY25 retirement counts by category | 8 |
+| Faculty_Retirement_Trends | Average age/LOS by year (2019-2025) | 7 |
+| Faculty_Age_Distribution | Retirement age categories | 5 |
+| Faculty_Retirement_School | Retirements by school | 7 |
+| Staff_Retirement_Trends | Average age/LOS by year (2019-2025) | 7 |
+| Staff_Age_Distribution | Retirement age categories | 5 |
+| Metadata | Fiscal year, version, notes | ~6 |
+
+### ETL Commands
+
+```bash
+# Load turnover metrics to PostgreSQL
+npm run etl:turnover
+
+# Dry run (preview without database writes)
+npm run etl:turnover -- --dry-run
+
+# Specify custom input file
+npm run etl:turnover -- --input path/to/file.xlsx
+
+# Generate Excel template (if starting fresh)
+npm run etl:turnover:generate
+```
+
+### Database Tables
+
+The ETL populates these Neon PostgreSQL tables:
+
+| Table | Purpose |
+|-------|---------|
+| `fact_turnover_summary_rates` | Summary card metrics |
+| `fact_turnover_breakdown` | Voluntary/Involuntary/Retirement |
+| `fact_staff_turnover_deviation` | Department-level staff turnover |
+| `fact_faculty_turnover_deviation` | School-level faculty turnover |
+| `fact_turnover_length_of_service` | Tenure band breakdown |
+| `fact_historical_turnover_rates` | Multi-year trend data |
+| `fact_retirements_by_fy` | Annual retirement counts |
+| `fact_retirement_trends` | Faculty/Staff retirement trends |
+| `fact_retirement_age_distribution` | Age category distribution |
+| `fact_faculty_retirement_by_school` | School-level retirements |
+| `fact_higher_ed_benchmarks` | CUPA benchmark data |
+
+### API Endpoint
+
+```bash
+# Fetch turnover metrics from Neon
+GET /api/turnover-metrics/FY2025
+
+# Start local API server
+npm run api:dev
+```
+
+### Validation Dashboard
+
+Access the Turnover Test Dashboard at `/turnover-test` to:
+- Compare JSON data vs Neon database data
+- Verify all 80+ metrics match before cutover
+- Export validation results as JSON
+
+### Workflow: Updating Turnover Metrics
+
+1. **Update Excel template**: Edit `source-metrics/turnover/Turnover_Metrics_Master.xlsx`
+2. **Run ETL**: `npm run etl:turnover`
+3. **Verify data**: Visit `/turnover-test` in the app
+4. **Check dashboard**: Confirm values display correctly
+
+### Fallback Behavior
+
+If the API is unavailable, dashboard components automatically fall back to `staticData.js`:
+- **Data service**: `getTurnoverMetrics()` returns static data when API fails
+- **Static data location**: `src/data/staticData.js` → `TURNOVER_METRICS` constant
+
+---
 
 ## Quick Commands
 

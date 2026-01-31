@@ -1,37 +1,27 @@
 import React, { memo, useMemo } from 'react';
 import { AlertCircle } from 'lucide-react';
 import ChartErrorBoundary from '../ui/ChartErrorBoundary';
+import { getTurnoverMetrics } from '../../services/dataService';
 
-const VoluntaryInvoluntaryTurnoverChart = memo(({ 
+const VoluntaryInvoluntaryTurnoverChart = memo(({
   title = "Creighton University Turnover - Voluntary/Involuntary/Retirement",
   subtitle = "Fiscal Year Ending June 30, 2025*",
   height = 400,
   className = ""
 }) => {
-  // Static data based on user requirements
-  const chartData = useMemo(() => [
-    {
-      category: "Staff Exempt",
-      involuntary: 0.8,
-      voluntary: 10.8,
-      retire: 1.0,
-      total: 12.6
-    },
-    {
-      category: "Staff Non-Exempt",
-      involuntary: 1.5,
-      voluntary: 12.9,
-      retire: 0.9,
-      total: 15.3
-    },
-    {
-      category: "Faculty",
-      involuntary: 0.3,
-      voluntary: 3.3,
-      retire: 2.5,
-      total: 6.1
-    }
-  ], []);
+  // Get turnover metrics from data service (supports future API integration)
+  const turnoverMetrics = getTurnoverMetrics('FY2025');
+
+  // Transform breakdown data from metrics
+  const chartData = useMemo(() => {
+    return turnoverMetrics.turnoverBreakdown.map(item => ({
+      category: item.category,
+      involuntary: item.involuntary,
+      voluntary: item.voluntary,
+      retire: item.retirement,
+      total: item.total
+    }));
+  }, [turnoverMetrics.turnoverBreakdown]);
 
   // Color scheme using brand colors from image
   const colors = {

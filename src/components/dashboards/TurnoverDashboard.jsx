@@ -13,7 +13,7 @@ import RetirementsByFiscalYear from '../charts/RetirementsByFiscalYear';
 // Quarter filter removed - using fixed reporting period
 import ErrorBoundary from '../ui/ErrorBoundary';
 import PDFExportButton from '../ui/PDFExportButton';
-import { getTurnoverData } from '../../services/dataService';
+import { getTurnoverData, getTurnoverMetrics } from '../../services/dataService';
 import {
   TrendingDown,
   BookOpen,
@@ -23,22 +23,25 @@ import {
 
 const TurnoverDashboard = () => {
   // Static data for 6/30/25 reporting period only
-  const currentData = getTurnoverData("2025-06-30"); // Current period  
+  const currentData = getTurnoverData("2025-06-30"); // Current period
   const previousData = getTurnoverData("2025-03-31"); // For percentage calculations
+
+  // Get turnover metrics from data service (supports future API integration)
+  const turnoverMetrics = getTurnoverMetrics('FY2025');
 
   // Calculate percentage changes using previous period
   const calculateChange = (current, previous) => {
     if (!previous || previous === 0) return 0;
     return ((current - previous) / previous * 100);
   };
-  
+
   // Transform static data to match dashboard structure
   const data = {
     summary: {
       totalDepartures: currentData.terminations,
-      overallTurnoverRate: currentData.totalTurnoverRate,
+      overallTurnoverRate: turnoverMetrics.summaryRates.total.rate,
       turnoverRateChange: calculateChange(currentData.terminations, previousData.terminations),
-      facultyTurnoverRate: currentData.facultyTurnoverRate,
+      facultyTurnoverRate: turnoverMetrics.summaryRates.faculty.rate,
       facultyDepartures: Math.round(currentData.terminations * 0.3), // Estimate based on faculty percentage
       facultyTurnoverChange: calculateChange(currentData.facultyTurnoverRate, previousData.facultyTurnoverRate),
       staffTurnoverRate: currentData.staffTurnoverRate,
@@ -56,14 +59,14 @@ const TurnoverDashboard = () => {
         value: school.departures
       })),
       facultyTurnoverByDivision: currentData.facultyTurnoverByDivision || [],
-      facultyStaffTurnoverByFY: [
-        { fiscalYear: 'FY2022', rate: 14.5 },
-        { fiscalYear: 'FY2023', rate: 14.9 },
-        { fiscalYear: 'FY2024', rate: 12.8 },
-        { fiscalYear: 'FY2025', rate: 11.2 }
-      ],
+      // Use historical rates from turnover metrics
+      facultyStaffTurnoverByFY: turnoverMetrics.historicalRates.map(h => ({
+        fiscalYear: h.fiscalYear,
+        rate: h.rate
+      })),
       monthlyTrends: currentData.monthlyTrends,
-      turnoverByLengthOfService: currentData.turnoverByLengthOfService || { faculty: [], staff: [] }
+      // Use length of service from turnover metrics
+      turnoverByLengthOfService: turnoverMetrics.lengthOfService
     }
   };
 
@@ -135,46 +138,46 @@ const TurnoverDashboard = () => {
             </div>
           </div>
 
-          {/* Summary Cards */}
+          {/* Summary Cards - Using turnover metrics from data service */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 print:gap-2 mb-6 print:mb-4">
         <SummaryCard
           title="Total Turnover"
-          value="11.2%"
-          change={-1.6}
+          value={`${turnoverMetrics.summaryRates.total.rate}%`}
+          change={turnoverMetrics.summaryRates.total.change}
           changeType="percentage"
-          subtitle="12.8% in FY 2024"
+          subtitle={`${turnoverMetrics.summaryRates.total.priorYear}% in FY 2024`}
           icon={TrendingDown}
-          trend="positive"
+          trend={turnoverMetrics.summaryRates.total.trend}
         />
-        
+
         <SummaryCard
           title="Faculty Turnover"
-          value="6.1%"
-          change={-1.6}
+          value={`${turnoverMetrics.summaryRates.faculty.rate}%`}
+          change={turnoverMetrics.summaryRates.faculty.change}
           changeType="percentage"
-          subtitle="7.7% in FY 2024"
+          subtitle={`${turnoverMetrics.summaryRates.faculty.priorYear}% in FY 2024`}
           icon={BookOpen}
-          trend="positive"
+          trend={turnoverMetrics.summaryRates.faculty.trend}
         />
-        
+
         <SummaryCard
           title="Staff Exempt Turnover"
-          value="12.6%"
-          change={-1.0}
+          value={`${turnoverMetrics.summaryRates.staffExempt.rate}%`}
+          change={turnoverMetrics.summaryRates.staffExempt.change}
           changeType="percentage"
-          subtitle="13.6% in FY 2024"
+          subtitle={`${turnoverMetrics.summaryRates.staffExempt.priorYear}% in FY 2024`}
           icon={Building2}
-          trend="positive"
+          trend={turnoverMetrics.summaryRates.staffExempt.trend}
         />
-        
+
         <SummaryCard
           title="Staff Non-Exempt Turnover"
-          value="15.3%"
-          change={-2.5}
+          value={`${turnoverMetrics.summaryRates.staffNonExempt.rate}%`}
+          change={turnoverMetrics.summaryRates.staffNonExempt.change}
           changeType="percentage"
-          subtitle="12.8% in FY 2024"
+          subtitle={`${turnoverMetrics.summaryRates.staffNonExempt.priorYear}% in FY 2024`}
           icon={Building2}
-          trend="positive"
+          trend={turnoverMetrics.summaryRates.staffNonExempt.trend}
         />
       </div>
 

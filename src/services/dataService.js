@@ -77,6 +77,30 @@ export const getTurnoverDataAsync = async (date = "2025-06-30") => {
 };
 
 /**
+ * Get turnover metrics data for dashboard visualizations
+ * @param {string} fiscalYear - Fiscal year (e.g., 'FY2025')
+ * @returns {Object} Turnover metrics data
+ */
+export const getTurnoverMetrics = (fiscalYear = 'FY2025') => {
+  return staticData.getTurnoverMetrics(fiscalYear);
+};
+
+/**
+ * Async version of getTurnoverMetrics for components that can handle promises
+ * Falls back to staticData if API is unavailable
+ */
+export const getTurnoverMetricsAsync = async (fiscalYear = 'FY2025') => {
+  return withFallback(
+    async () => {
+      // Future: fetch from API when turnover metrics endpoint is available
+      // For now, return static data
+      return staticData.getTurnoverMetrics(fiscalYear);
+    },
+    () => staticData.getTurnoverMetrics(fiscalYear)
+  );
+};
+
+/**
  * Get recruiting data for a specific date
  */
 export const getRecruitingData = (date = "2025-06-30") => {
@@ -324,6 +348,7 @@ export const getFiscalPeriod = (fiscalQuarter) => {
 // Re-export constants for backward compatibility
 export const WORKFORCE_DATA = staticData.WORKFORCE_DATA;
 export const TURNOVER_DATA = staticData.TURNOVER_DATA;
+export const TURNOVER_METRICS = staticData.TURNOVER_METRICS;
 export const RECRUITING_DATA = staticData.RECRUITING_DATA;
 export const EXIT_SURVEY_DATA = staticData.EXIT_SURVEY_DATA;
 export const QUARTERLY_TURNOVER_TRENDS = staticData.QUARTERLY_TURNOVER_TRENDS;
@@ -377,6 +402,7 @@ const dataService = {
   // Sync functions (JSON only)
   getWorkforceData,
   getTurnoverData,
+  getTurnoverMetrics,
   getRecruitingData,
   getExitSurveyData,
   getQuarterlyTurnoverData,
@@ -399,6 +425,7 @@ const dataService = {
   // Async functions (API with JSON fallback)
   getWorkforceDataAsync,
   getTurnoverDataAsync,
+  getTurnoverMetricsAsync,
   getExitSurveyDataAsync,
   getAnnualTurnoverRatesByCategoryAsync,
   getTop15SchoolOrgDataAsync,

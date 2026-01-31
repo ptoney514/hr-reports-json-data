@@ -43,6 +43,7 @@ const PromotionReasonsReference = lazy(() => import('./components/dashboards/Pro
 const JobChangesTestingDashboard = lazy(() => import('./components/dashboards/JobChangesTestingDashboard'));
 // Validation Test Pages
 const WorkforceTestDashboard = lazy(() => import('./components/dashboards/WorkforceTestDashboard'));
+const TurnoverTestDashboard = lazy(() => import('./components/dashboards/TurnoverTestDashboard'));
 // Report Generator
 const ReportGenerator = lazy(() => import('./components/reports/ReportGenerator'));
 // Print Layout (Report Builder)
@@ -198,6 +199,7 @@ function App() {
 
               {/* Validation Test Pages */}
               <Route path="/dashboards/workforce-test" element={<WorkforceTestDashboard />} />
+              <Route path="/dashboards/turnover-test" element={<TurnoverTestDashboard />} />
 
               {/* Testing routes removed - using static data approach */}
               

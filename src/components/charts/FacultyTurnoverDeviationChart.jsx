@@ -1,22 +1,19 @@
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, ReferenceLine, LabelList } from 'recharts';
+import { getTurnoverMetrics } from '../../services/dataService';
 
 const FacultyTurnoverDeviationChart = ({ data = [], title = "Faculty Turnover Rate Deviation from Average" }) => {
-  // FY25 YTD Faculty Turnover data from the image
-  const facultyTurnoverRates = [
-    { name: 'College of Nursing', rate: 13.7 },
-    { name: 'Pharmacy & Health Professions', rate: 7.5 },
-    { name: 'School of Dentistry', rate: 6.9 },
-    { name: 'Total Faculty Turnover', rate: 6.3 }, // This is the average
-    { name: 'College of Arts & Sciences', rate: 6.0 },
-    { name: 'School of Medicine', rate: 5.6 },
-    { name: 'Law School', rate: 3.7 },
-    { name: 'Heider College of Business', rate: 1.6 },
-    { name: 'Coll of Pro Studies and Cont Ed', rate: 0.0 }
-  ];
+  // Get turnover metrics from data service (supports future API integration)
+  const turnoverMetrics = getTurnoverMetrics('FY2025');
 
-  // Calculate the average turnover rate (Total Faculty Turnover)
-  const averageRate = 6.3;
+  // Transform faculty deviation data from metrics
+  const facultyTurnoverRates = turnoverMetrics.facultyDeviation.map(school => ({
+    name: school.school,
+    rate: school.rate
+  }));
+
+  // Get the average turnover rate from metrics
+  const averageRate = turnoverMetrics.facultyAverageRate;
   
   // Calculate deviations and sort by deviation
   const deviationData = facultyTurnoverRates

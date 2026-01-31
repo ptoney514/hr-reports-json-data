@@ -1,41 +1,31 @@
-import React, { memo } from 'react';
+import React, { memo, useMemo } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { Users } from 'lucide-react';
 import ChartErrorBoundary from '../ui/ChartErrorBoundary';
+import { getTurnoverMetrics } from '../../services/dataService';
 
-const FacultyRetirementAnalysis = memo(({ 
+const FacultyRetirementAnalysis = memo(({
   title = "Faculty Retirement Analysis",
   height = 400,
   className = ""
 }) => {
-  // Static data based on the image provided
-  const retirementData = {
-    averageData: [
-      { year: '2019', avgAge: 71.4, avgLOS: 31.9 },
-      { year: '2020', avgAge: 69.3, avgLOS: 28.2 },
-      { year: '2021', avgAge: 66.5, avgLOS: 26.7 },
-      { year: '2022', avgAge: 67.6, avgLOS: 30.5 },
-      { year: '2023', avgAge: 70.9, avgLOS: 28.5 },
-      { year: '2024', avgAge: 69.3, avgLOS: 28.1 },
-      { year: '2025', avgAge: 69.4, avgLOS: 26.7 }
-    ],
-    retirementDistribution: [
-      { name: 'Under 69', value: 85.9, color: '#0054A6' },
-      { name: 'Over 69', value: 7.8, color: '#FFC627' },
-      { name: 'Three-Year', value: 2.6, color: '#95D2F3' },
-      { name: 'Two-Year', value: 2.0, color: '#00245D' },
-      { name: 'One-Year', value: 1.7, color: '#1F74DB' }
-    ],
-    schoolBreakdown: [
-      { school: 'College of Arts & Sciences', count: 14 },
-      { school: 'School of Dentistry', count: 11 },
-      { school: 'School of Medicine', count: 10 },
-      { school: 'School of Pharmacy & Health Professions', count: 6 },
-      { school: 'Heider College of Business', count: 5 },
-      { school: 'School of Law', count: 5 },
-      { school: 'College of Nursing', count: 3 }
-    ]
-  };
+  // Get turnover metrics from data service (supports future API integration)
+  const turnoverMetrics = getTurnoverMetrics('FY2025');
+
+  // Transform retirement data from metrics
+  const retirementData = useMemo(() => ({
+    averageData: turnoverMetrics.facultyRetirement.trends.map(t => ({
+      year: t.year.toString(),
+      avgAge: t.avgAge,
+      avgLOS: t.avgLOS
+    })),
+    retirementDistribution: turnoverMetrics.facultyRetirement.ageDistribution.map(d => ({
+      name: d.name,
+      value: d.value,
+      color: d.color
+    })),
+    schoolBreakdown: turnoverMetrics.facultyRetirement.bySchool
+  }), [turnoverMetrics.facultyRetirement]);
 
   // Custom tooltip for line chart
   const CustomTooltip = ({ active, payload, label }) => {

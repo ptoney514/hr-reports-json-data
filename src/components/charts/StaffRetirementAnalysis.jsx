@@ -1,32 +1,30 @@
-import React, { memo } from 'react';
+import React, { memo, useMemo } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { Users } from 'lucide-react';
 import ChartErrorBoundary from '../ui/ChartErrorBoundary';
+import { getTurnoverMetrics } from '../../services/dataService';
 
-const StaffRetirementAnalysis = memo(({ 
+const StaffRetirementAnalysis = memo(({
   title = "Staff Retirement Analysis",
   height = 400,
   className = ""
 }) => {
-  // Static data based on the image provided
-  const retirementData = {
-    averageData: [
-      { year: '2019', avgAge: 63.7, avgLOS: 21.7 },
-      { year: '2020', avgAge: 64.8, avgLOS: 23.3 },
-      { year: '2021', avgAge: 66.5, avgLOS: 23.3 },
-      { year: '2022', avgAge: 64.8, avgLOS: 22.6 },
-      { year: '2023', avgAge: 65.4, avgLOS: 21.7 },
-      { year: '2024', avgAge: 67.1, avgLOS: 24.5 },
-      { year: '2025', avgAge: 68.1, avgLOS: 21.5 }
-    ],
-    retirementDistribution: [
-      { name: 'Under', value: 85.9, color: '#0054A6' },
-      { name: 'Over', value: 7.8, color: '#FFC627' },
-      { name: 'Three-Year', value: 2.6, color: '#95D2F3' },
-      { name: 'Two-Year', value: 2.0, color: '#FF6B35' },
-      { name: 'One-Year', value: 1.7, color: '#00245D' }
-    ]
-  };
+  // Get turnover metrics from data service (supports future API integration)
+  const turnoverMetrics = getTurnoverMetrics('FY2025');
+
+  // Transform retirement data from metrics
+  const retirementData = useMemo(() => ({
+    averageData: turnoverMetrics.staffRetirement.trends.map(t => ({
+      year: t.year.toString(),
+      avgAge: t.avgAge,
+      avgLOS: t.avgLOS
+    })),
+    retirementDistribution: turnoverMetrics.staffRetirement.ageDistribution.map(d => ({
+      name: d.name,
+      value: d.value,
+      color: d.color
+    }))
+  }), [turnoverMetrics.staffRetirement]);
 
   // Custom tooltip for line chart
   const CustomTooltip = ({ active, payload, label }) => {
