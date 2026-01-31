@@ -2,6 +2,7 @@
   "name": "hr-reports-json-data",
   "version": "0.1.0",
   "private": true,
+  "proxy": "http://localhost:3001",
   "dependencies": {
     "@neondatabase/serverless": "^0.9.5",
     "@tanstack/react-query": "^5.84.2",
@@ -42,6 +43,7 @@
     "optimize": "npm run build:production && npm run analyze",
     "size-check": "bundlesize",
     "dev": "npm start",
+    "api:dev": "node server/api-dev.js",
     "dev:test": "npm test -- --watchAll=false",
     "dev:build": "npm run build:production",
     "data:process": "node scripts/processTurnoverData.js",
@@ -101,6 +103,7 @@
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
     "autoprefixer": "^10.4.21",
+    "cors": "^2.8.6",
     "husky": "^9.1.7",
     "jest-axe": "^10.0.0",
     "postcss": "^8.5.6",

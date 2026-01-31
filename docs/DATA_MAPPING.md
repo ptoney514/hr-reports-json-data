@@ -9,7 +9,7 @@ This document captures the exact data flow for each metric displayed on the Work
 - Documentation for quarterly data refresh procedures
 - Guide for extending the data pipeline to new metrics
 
-**Last Updated:** 2026-01-30
+**Last Updated:** 2026-01-30 (Location validation fix)
 **Primary Methodology:** `source-metrics/workforce/WORKFORCE_METHODOLOGY.md`
 **Test Manifest:** `src/data/manifests/workforce-expected-values.json`
 
@@ -350,11 +350,24 @@ omaha_faculty, omaha_staff, omaha_hsp, omaha_students
 
 -- Phoenix breakdown
 phoenix_faculty, phoenix_staff, phoenix_hsp, phoenix_students
+
+-- NOTE: omaha_temp and phoenix_temp are NOT in the view
+-- These are calculated by the API layer
 ```
 
 ### 2.3 API Response Structure
 
 **Endpoint:** `GET /api/workforce/:date`
+
+**Files:** `server/api-dev.js` (local), `api/workforce/[date].js` (Vercel)
+
+**API Calculation for Temp:**
+The Neon view does not include per-location temp counts. The API calculates these:
+```javascript
+// Temp = Total - (Faculty + Staff + HSP + Students)
+omahaTemp = omahaTotal - (omahaFaculty + omahaStaff + omahaHsp + omahaStudents)
+phoenixTemp = phoenixTotal - (phoenixFaculty + phoenixStaff + phoenixHsp + phoenixStudents)
+```
 
 ```javascript
 {
@@ -367,19 +380,21 @@ phoenix_faculty, phoenix_staff, phoenix_hsp, phoenix_students
       faculty: 649,
       staff: 1344,
       hsp: 268,
-      students: 1604
+      students: 1604,
+      temp: 422,
+      total: 4287
     },
     phoenix: {
       faculty: 40,
       staff: 104,
       hsp: 344,
-      students: 110
+      students: 110,
+      temp: 152,
+      total: 750
     }
   }
 }
 ```
-
-**Note:** API does not include `temp` in locationDetails. Temp is available in staticData.js only.
 
 ### 2.4 React Component Usage
 
@@ -474,6 +489,57 @@ Phoenix has a higher HSP concentration than Omaha due to medical center operatio
 
 ---
 
+## 5. Validation Service API Path Mappings
+
+The validation service (`src/services/workforceValidationService.js`) compares JSON data against Neon API data. The `apiPath` values must match the actual API response structure.
+
+### 5.1 Data Lineage
+
+```
+┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
+│  Excel Source   │ --> │    JSON File    │ --> │   Neon DB       │ --> │   REST API      │
+│  (HR Export)    │     │ (staticData.js) │     │  (Postgres)     │     │  (Express)      │
+└─────────────────┘     └─────────────────┘     └─────────────────┘     └─────────────────┘
+     ↓                        ↓                       ↓                       ↓
+  True Source           Local Dev Data          Raw DB Data            Calculated Fields
+  Quarterly Export      Manual Sync             ETL Pipeline           (temp, total)
+```
+
+**Note:** The API layer calculates `temp` and `total` per location since these are not stored in the Neon view.
+
+### 5.2 Location Validation Rules
+
+| Rule ID | JSON Path | API Path | Expected (FY25 Q4) |
+|---------|-----------|----------|-------------------|
+| omaha_total | `locations["Omaha Campus"]` | `locationDetails.omaha.total` | 4,287 |
+| omaha_faculty | `locationDetails.omaha.faculty` | `locationDetails.omaha.faculty` | 649 |
+| omaha_staff | `locationDetails.omaha.staff` | `locationDetails.omaha.staff` | 1,344 |
+| omaha_hsp | `locationDetails.omaha.hsp` | `locationDetails.omaha.hsp` | 268 |
+| omaha_students | `locationDetails.omaha.students` | `locationDetails.omaha.students` | 1,604 |
+| omaha_temp | `locationDetails.omaha.temp` | `locationDetails.omaha.temp` | 422 |
+| phoenix_total | `locations["Phoenix Campus"]` | `locationDetails.phoenix.total` | 750 |
+| phoenix_faculty | `locationDetails.phoenix.faculty` | `locationDetails.phoenix.faculty` | 40 |
+| phoenix_staff | `locationDetails.phoenix.staff` | `locationDetails.phoenix.staff` | 104 |
+| phoenix_hsp | `locationDetails.phoenix.hsp` | `locationDetails.phoenix.hsp` | 344 |
+| phoenix_students | `locationDetails.phoenix.students` | `locationDetails.phoenix.students` | 110 |
+| phoenix_temp | `locationDetails.phoenix.temp` | `locationDetails.phoenix.temp` | 152 |
+
+### 5.3 Test Coverage
+
+| Test File | Tests | Description |
+|-----------|-------|-------------|
+| `workforceValidationService.test.js` | 43 | API path mappings, value extraction, category validation |
+
+### 5.4 Important Implementation Notes
+
+1. **API calculates temp per location**: The Neon view `v_workforce_summary` does not include `omaha_temp` or `phoenix_temp`. The API calculates these as: `temp = total - (faculty + staff + hsp + students)`
+
+2. **Total is included for convenience**: While `locations["Omaha Campus"]` provides the total, `locationDetails.omaha.total` is also included for consistent access patterns in validation.
+
+3. **All 12 location metrics validated**: The validation dashboard compares JSON vs API for all location breakdown metrics.
+
+---
+
 ## Appendix A: Assignment Category Codes Reference
 
 | Code | Description | Category Type | Benefit Eligible |
@@ -503,11 +569,14 @@ Phoenix has a higher HSP concentration than Omaha due to medical center operatio
 | Methodology | `source-metrics/workforce/WORKFORCE_METHODOLOGY.md` |
 | JSON Data | `src/data/staticData.js` |
 | Test Manifest | `src/data/manifests/workforce-expected-values.json` |
-| Validation Tests | `src/data/__tests__/workforce_summary_cards.test.js` |
+| Data Validation Tests | `src/data/__tests__/workforce_summary_cards.test.js` |
+| Service Validation Tests | `src/services/__tests__/workforceValidationService.test.js` |
+| Validation Service | `src/services/workforceValidationService.js` |
 | Neon Schema | `database/migrations/001_create_tables.sql` |
 | Neon Views | `database/migrations/003_create_views.sql` |
 | API Endpoint | `api/workforce/[date].js`, `server/api-dev.js` |
 | Dashboard | `src/components/dashboards/WorkforceDashboard.jsx` |
+| Validation Dashboard | `src/components/dashboards/WorkforceTestDashboard.jsx` |
 
 ---
 
@@ -520,3 +589,6 @@ Phoenix has a higher HSP concentration than Omaha due to medical center operatio
 | Year-over-Year | 4 change validations | ✅ Validated |
 | Data Quality | 6 integrity checks | ✅ Validated |
 | Methodology Compliance | 5 ratio checks | ✅ Validated |
+| Validation Service API Paths | 12 path mapping tests | ✅ Validated |
+| Value Extraction (getValueByPath) | 10 unit tests | ✅ Validated |
+| API Response Structure | 6 integration tests | ✅ Validated |

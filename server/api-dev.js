@@ -1,35 +1,74 @@
 /**
- * API: Get Workforce Summary by Date
+ * Local Development API Server
  *
- * GET /api/workforce/:date
+ * Runs the Neon API endpoints locally for development.
+ * Start with: node server/api-dev.js
  *
- * Returns workforce headcount summary for a specific period date.
- * Replaces getWorkforceData() from staticData.js
- *
- * Example: GET /api/workforce/2025-03-31
+ * This allows testing the API without needing Vercel CLI.
  */
 
-import { neon } from '@neondatabase/serverless';
+require('dotenv').config();
+const express = require('express');
+const cors = require('cors');
+const { neon } = require('@neondatabase/serverless');
 
+const app = express();
+const PORT = process.env.API_PORT || 3001;
+
+// Initialize Neon connection
 const sql = neon(process.env.DATABASE_URL);
 
-export default async function handler(req, res) {
-  // Only allow GET requests
-  if (req.method !== 'GET') {
-    return res.status(405).json({ error: 'Method not allowed' });
+// Middleware
+app.use(cors());
+app.use(express.json());
+
+// Health check endpoint
+app.get('/api/health', async (req, res) => {
+  try {
+    const dbResult = await sql`
+      SELECT current_database() as database, NOW() as server_time
+    `;
+
+    const counts = await sql`
+      SELECT
+        (SELECT COUNT(*) FROM dim_fiscal_periods) as fiscal_periods,
+        (SELECT COUNT(*) FROM fact_workforce_snapshots) as workforce_snapshots
+    `;
+
+    res.json({
+      status: 'healthy',
+      timestamp: new Date().toISOString(),
+      database: {
+        connected: true,
+        name: dbResult[0].database,
+        serverTime: dbResult[0].server_time
+      },
+      data: {
+        fiscalPeriods: Number(counts[0].fiscal_periods),
+        workforceSnapshots: Number(counts[0].workforce_snapshots)
+      }
+    });
+  } catch (error) {
+    console.error('Health Check Error:', error);
+    res.status(503).json({
+      status: 'unhealthy',
+      timestamp: new Date().toISOString(),
+      database: { connected: false, error: error.message }
+    });
   }
+});
 
-  const { date } = req.query;
+// Workforce data endpoint
+app.get('/api/workforce/:date', async (req, res) => {
+  const { date } = req.params;
 
-  // Validate date format
   if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
     return res.status(400).json({
-      error: 'Invalid date format. Use YYYY-MM-DD (e.g., 2025-03-31)'
+      error: 'Invalid date format. Use YYYY-MM-DD'
     });
   }
 
   try {
-    // Get workforce summary from view
     const result = await sql`
       SELECT * FROM v_workforce_summary
       WHERE period_date = ${date}
@@ -61,25 +100,22 @@ export default async function handler(req, res) {
     // Temp = Total - (Faculty + Staff + HSP + Students)
     const phoenixTemp = phoenixTotal - (phoenixFaculty + phoenixStaff + phoenixHsp + phoenixStudents);
 
-    // Transform to match existing staticData.js format
+    // Transform to match staticData.js format
     const response = {
       reportingDate: formatDateShort(data.period_date),
       quarterLabel: data.quarter_label,
       fiscalYear: data.fiscal_year,
       fiscalQuarter: data.fiscal_quarter,
-
       totalEmployees: Number(data.total_employees),
       faculty: Number(data.faculty),
       staff: Number(data.staff),
       hsp: Number(data.hsp),
       students: Number(data.students),
       temp: Number(data.temp),
-
       locations: {
         "Omaha Campus": omahaTotal,
         "Phoenix Campus": phoenixTotal
       },
-
       locationDetails: {
         omaha: {
           faculty: omahaFaculty,
@@ -100,19 +136,15 @@ export default async function handler(req, res) {
       }
     };
 
-    // Set cache headers (1 hour for workforce data)
-    res.setHeader('Cache-Control', 's-maxage=3600, stale-while-revalidate');
-
-    return res.status(200).json(response);
-
+    res.json(response);
   } catch (error) {
     console.error('Workforce API Error:', error);
-    return res.status(500).json({
+    res.status(500).json({
       error: 'Internal server error',
-      message: process.env.NODE_ENV === 'development' ? error.message : undefined
+      message: error.message
     });
   }
-}
+});
 
 /**
  * Format date as short string (M/D/YY)
@@ -125,3 +157,10 @@ function formatDateShort(dateStr) {
   const year = date.getUTCFullYear().toString().slice(-2);
   return `${month}/${day}/${year}`;
 }
+
+// Start server
+app.listen(PORT, () => {
+  console.log(`API server running on http://localhost:${PORT}`);
+  console.log(`Health check: http://localhost:${PORT}/api/health`);
+  console.log(`Workforce:    http://localhost:${PORT}/api/workforce/2025-06-30`);
+});
