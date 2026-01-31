@@ -385,37 +385,63 @@ const WorkforceTestDashboard = () => {
           {/* Demographics Tab */}
           {activeTab === 'demographics' && (
             <>
-              {/* Info Banner - Show success or pending status */}
-              {validationResults.results.gender.some(r => r.status === 'passed') ? (
-                <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
-                  <div className="flex items-start gap-3">
-                    <CheckCircle2 className="h-5 w-5 text-green-500 mt-0.5" />
-                    <div>
-                      <h4 className="text-sm font-medium text-green-800">
-                        Demographics Data Validated
-                      </h4>
-                      <p className="text-sm text-green-700 mt-1">
-                        Demographics data is now stored in Neon (fact_workforce_demographics) and validated against JSON.
-                      </p>
+              {/* Info Banner - Show status based on API availability and validation results */}
+              {(() => {
+                const hasApiResponse = validationResults.results.gender.some(r => r.apiValue !== undefined && r.apiValue !== null);
+                const allPassed = validationResults.results.gender.every(r => r.status === 'passed');
+                const hasMismatch = hasApiResponse && !allPassed;
+
+                if (allPassed) {
+                  return (
+                    <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+                      <div className="flex items-start gap-3">
+                        <CheckCircle2 className="h-5 w-5 text-green-500 mt-0.5" />
+                        <div>
+                          <h4 className="text-sm font-medium text-green-800">
+                            Demographics Data Validated
+                          </h4>
+                          <p className="text-sm text-green-700 mt-1">
+                            Demographics data is now stored in Neon (fact_workforce_demographics) and validated against JSON.
+                          </p>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
-              ) : (
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-                  <div className="flex items-start gap-3">
-                    <Info className="h-5 w-5 text-blue-500 mt-0.5" />
-                    <div>
-                      <h4 className="text-sm font-medium text-blue-800">
-                        Demographics API Unavailable
-                      </h4>
-                      <p className="text-sm text-blue-700 mt-1">
-                        Demographics API is not responding. Showing JSON data only.
-                        Run the API server: <code className="bg-blue-100 px-1 rounded">npm run api:dev</code>
-                      </p>
+                  );
+                } else if (hasMismatch) {
+                  return (
+                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+                      <div className="flex items-start gap-3">
+                        <AlertTriangle className="h-5 w-5 text-yellow-500 mt-0.5" />
+                        <div>
+                          <h4 className="text-sm font-medium text-yellow-800">
+                            Demographics Validation Mismatch
+                          </h4>
+                          <p className="text-sm text-yellow-700 mt-1">
+                            API is responding but some values don&apos;t match. Review the table below for details.
+                          </p>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
-              )}
+                  );
+                } else {
+                  return (
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                      <div className="flex items-start gap-3">
+                        <Info className="h-5 w-5 text-blue-500 mt-0.5" />
+                        <div>
+                          <h4 className="text-sm font-medium text-blue-800">
+                            Demographics API Unavailable
+                          </h4>
+                          <p className="text-sm text-blue-700 mt-1">
+                            Demographics API is not responding. Showing JSON data only.
+                            Run the API server: <code className="bg-blue-100 px-1 rounded">npm run api:dev</code>
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                }
+              })()}
 
               <ValidationTable
                 title="Gender Distribution"

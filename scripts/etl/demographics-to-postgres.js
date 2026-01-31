@@ -234,9 +234,9 @@ function aggregateDemographics(rows, periodDate) {
       aggregations.gender[combinedKey].count++;
     }
 
-    // Aggregate ethnicity
-    if (demo.ethnicity) {
-      const ethnicity = normalizeEthnicity(demo.ethnicity);
+    // Aggregate ethnicity (normalize blank/null to "Not Disclosed")
+    {
+      const ethnicity = normalizeEthnicity(demo.ethnicity || '');
       const ethnicityKey = `${location}|${category}|${ethnicity}`;
       if (!aggregations.ethnicity[ethnicityKey]) {
         aggregations.ethnicity[ethnicityKey] = {

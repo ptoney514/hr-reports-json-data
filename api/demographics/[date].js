@@ -84,6 +84,8 @@ export default async function handler(req, res) {
         } else if (value === 'F') {
           demographics.gender[category].female = count;
         }
+        // Include all gender values in totals (M, F, and any non-binary/unknown)
+        demographics.totals[category] = (demographics.totals[category] || 0) + count;
       } else if (type === 'ethnicity') {
         demographics.ethnicity[category][value] = count;
       } else if (type === 'age_band') {
@@ -91,9 +93,7 @@ export default async function handler(req, res) {
       }
     });
 
-    // Calculate totals from gender (which should always be complete)
-    demographics.totals.faculty = demographics.gender.faculty.male + demographics.gender.faculty.female;
-    demographics.totals.staff = demographics.gender.staff.male + demographics.gender.staff.female;
+    // Calculate combined total from category totals (includes all genders, not just M/F)
     demographics.totals.combined = demographics.totals.faculty + demographics.totals.staff;
 
     // Set cache headers (1 hour for demographics data)
