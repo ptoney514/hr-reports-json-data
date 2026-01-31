@@ -1,6 +1,7 @@
 {
   "reportDate": "2025-06-30",
   "source": "Neon PostgreSQL (fact_workforce_demographics)",
+  "exportedAt": "2026-01-31T00:47:22.504Z",
   "totals": {
     "faculty": 689,
     "staff": 1448,

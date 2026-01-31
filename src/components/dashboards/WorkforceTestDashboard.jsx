@@ -27,8 +27,8 @@ import {
  * for the Workforce Dashboard to ensure parity before cutover.
  *
  * Validates:
- * - 18 headcount metrics (JSON vs Neon)
- * - 34 demographics metrics (JSON-only, displayed for future ETL reference)
+ * - 18 headcount metrics (JSON vs Neon via v_workforce_summary)
+ * - 33 demographics metrics (JSON vs Neon via fact_workforce_demographics)
  */
 const WorkforceTestDashboard = () => {
   const [validationResults, setValidationResults] = useState(null);
@@ -385,38 +385,51 @@ const WorkforceTestDashboard = () => {
           {/* Demographics Tab */}
           {activeTab === 'demographics' && (
             <>
-              {/* Info Banner */}
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-                <div className="flex items-start gap-3">
-                  <Info className="h-5 w-5 text-blue-500 mt-0.5" />
-                  <div>
-                    <h4 className="text-sm font-medium text-blue-800">
-                      JSON-Only Data (Future ETL Target)
-                    </h4>
-                    <p className="text-sm text-blue-700 mt-1">
-                      Demographics data is currently stored only in JSON. These metrics show what
-                      data needs to be extracted from Excel and migrated to Neon database tables.
-                    </p>
+              {/* Info Banner - Show success or pending status */}
+              {validationResults.results.gender.some(r => r.status === 'passed') ? (
+                <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+                  <div className="flex items-start gap-3">
+                    <CheckCircle2 className="h-5 w-5 text-green-500 mt-0.5" />
+                    <div>
+                      <h4 className="text-sm font-medium text-green-800">
+                        Demographics Data Validated
+                      </h4>
+                      <p className="text-sm text-green-700 mt-1">
+                        Demographics data is now stored in Neon (fact_workforce_demographics) and validated against JSON.
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
+              ) : (
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                  <div className="flex items-start gap-3">
+                    <Info className="h-5 w-5 text-blue-500 mt-0.5" />
+                    <div>
+                      <h4 className="text-sm font-medium text-blue-800">
+                        Demographics API Unavailable
+                      </h4>
+                      <p className="text-sm text-blue-700 mt-1">
+                        Demographics API is not responding. Showing JSON data only.
+                        Run the API server: <code className="bg-blue-100 px-1 rounded">npm run api:dev</code>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               <ValidationTable
                 title="Gender Distribution"
                 results={validationResults.results.gender}
-                showApi={false}
               />
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <ValidationTable
                   title="Ethnicity - Faculty"
                   results={validationResults.results.ethnicityFaculty}
-                  showApi={false}
                 />
                 <ValidationTable
                   title="Ethnicity - Staff"
                   results={validationResults.results.ethnicityStaff}
-                  showApi={false}
                 />
               </div>
 
@@ -424,12 +437,10 @@ const WorkforceTestDashboard = () => {
                 <ValidationTable
                   title="Age Bands - Faculty"
                   results={validationResults.results.ageBandsFaculty}
-                  showApi={false}
                 />
                 <ValidationTable
                   title="Age Bands - Staff"
                   results={validationResults.results.ageBandsStaff}
-                  showApi={false}
                 />
               </div>
             </>
@@ -524,7 +535,7 @@ const WorkforceTestDashboard = () => {
             <div>
               <span className="font-medium">Neon:</span>{' '}
               <code className="text-xs bg-gray-100 px-1 rounded">
-                v_workforce_summary
+                v_workforce_summary, fact_workforce_demographics
               </code>
             </div>
           </div>
