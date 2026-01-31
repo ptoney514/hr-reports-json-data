@@ -96,7 +96,7 @@ function transformNewHires(hiresData) {
     type: hire.employee_type,
     hireDate: hire.hire_date,
     assignmentCode: hire.assignment_code,
-    assignmentType: hire.assignment_code?.startsWith('F') ? 'FT' : 'PT',
+    assignmentType: hire.assignment_code ? (hire.assignment_code.startsWith('F') ? 'FT' : 'PT') : null,
     inInterfolio: hire.in_interfolio,
     inORC: hire.in_orc_ats
   }));
@@ -217,11 +217,33 @@ export function useRecruitingData(fiscalYear = 'FY2026', quarter = 1) {
         dataAsOf: summary?.loaded_at || new Date().toISOString(),
 
         // Summary metrics
-        summary: summary ? {
-          total: { count: summary.total_hires, oma: summary.omaha_hires, phx: summary.phoenix_hires },
-          faculty: { count: summary.faculty_hires, oma: summary.faculty_hires, phx: 0 },
-          staff: { count: summary.staff_hires, oma: summary.omaha_hires - (summary.faculty_hires || 0), phx: summary.phoenix_hires }
-        } : null,
+        // Derive faculty/staff by campus from newHires array when available,
+        // otherwise fall back to summary-based estimates
+        summary: summary ? (() => {
+          // Check if newHires loaded successfully and has data
+          const newHiresLoaded = newHiresResult.status === 'fulfilled' && newHires.length > 0;
+
+          if (newHiresLoaded) {
+            // Count hires by employee_type and location from the detailed records
+            const omaFaculty = newHires.filter(h => h.employee_type === 'FACULTY' && h.location === 'OMA').length;
+            const phxFaculty = newHires.filter(h => h.employee_type === 'FACULTY' && h.location === 'PHX').length;
+            const omaStaff = newHires.filter(h => h.employee_type === 'STAFF' && h.location === 'OMA').length;
+            const phxStaff = newHires.filter(h => h.employee_type === 'STAFF' && h.location === 'PHX').length;
+
+            return {
+              total: { count: summary.total_hires, oma: summary.omaha_hires, phx: summary.phoenix_hires },
+              faculty: { count: summary.faculty_hires, oma: omaFaculty, phx: phxFaculty },
+              staff: { count: summary.staff_hires, oma: omaStaff, phx: phxStaff }
+            };
+          }
+
+          // Fallback: use summary totals, set campus breakdown to null (unknown)
+          return {
+            total: { count: summary.total_hires, oma: summary.omaha_hires, phx: summary.phoenix_hires },
+            faculty: { count: summary.faculty_hires, oma: null, phx: null },
+            staff: { count: summary.staff_hires, oma: null, phx: null }
+          };
+        })() : null,
 
         // Pipeline data
         pipelineStaff: pipelineStaff ? {

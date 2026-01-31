@@ -229,8 +229,8 @@ async function upsertSummaryMetrics(workbook, sourceFile, dryRun, metadata) {
         VALUES (
           ${fiscalYear}, ${fiscalQuarter}, ${row.total_hires || 0}, ${row.faculty_hires || 0},
           ${row.staff_hires || 0}, ${row.omaha_hires || 0}, ${row.phoenix_hires || 0},
-          ${row.open_requisitions || null}, ${row.active_applications || null},
-          ${row.new_applications || null}, ${sourceFile}
+          ${row.open_requisitions ?? null}, ${row.active_applications ?? null},
+          ${row.new_applications ?? null}, ${sourceFile}
         )
         ON CONFLICT (fiscal_year, fiscal_quarter)
         DO UPDATE SET
@@ -284,7 +284,7 @@ async function upsertHireRates(workbook, sourceFile, dryRun, metadata) {
         )
         VALUES (
           ${fiscalYear}, ${fiscalQuarter}, ${row.source_system}, ${row.channel},
-          ${row.applications || 0}, ${row.hires || 0}, ${row.hire_rate || null}, ${sourceFile}
+          ${row.applications || 0}, ${row.hires || 0}, ${row.hire_rate ?? null}, ${sourceFile}
         )
         ON CONFLICT (fiscal_year, fiscal_quarter, source_system, channel)
         DO UPDATE SET
@@ -335,14 +335,14 @@ async function upsertPipelineStaff(workbook, sourceFile, dryRun, metadata) {
           offer_acceptance_rate, source_file
         )
         VALUES (
-          ${fiscalYear}, ${fiscalQuarter}, ${row.open_requisitions || null},
-          ${row.reqs_per_recruiter || null}, ${row.avg_days_open || null},
-          ${row.avg_time_to_fill || null}, ${row.active_applications || null},
-          ${row.new_applications || null}, ${row.apps_per_req || null},
-          ${row.internal_app_percentage || null}, ${row.referrals || null},
-          ${row.total_hires || null}, ${row.internal_hires || null},
-          ${row.internal_hire_rate || null}, ${row.avg_days_to_hire || null},
-          ${row.hr_processing_time || null}, ${row.offer_acceptance_rate || null},
+          ${fiscalYear}, ${fiscalQuarter}, ${row.open_requisitions ?? null},
+          ${row.reqs_per_recruiter ?? null}, ${row.avg_days_open ?? null},
+          ${row.avg_time_to_fill ?? null}, ${row.active_applications ?? null},
+          ${row.new_applications ?? null}, ${row.apps_per_req ?? null},
+          ${row.internal_app_percentage ?? null}, ${row.referrals ?? null},
+          ${row.total_hires ?? null}, ${row.internal_hires ?? null},
+          ${row.internal_hire_rate ?? null}, ${row.avg_days_to_hire ?? null},
+          ${row.hr_processing_time ?? null}, ${row.offer_acceptance_rate ?? null},
           ${sourceFile}
         )
         ON CONFLICT (fiscal_year, fiscal_quarter)
@@ -404,10 +404,10 @@ async function upsertPipelineFaculty(workbook, sourceFile, dryRun, metadata) {
           special_faculty_hires, source_file
         )
         VALUES (
-          ${fiscalYear}, ${fiscalQuarter}, ${row.active_searches || null},
-          ${row.completed_searches || null}, ${row.total_hires || null},
-          ${row.tenure_track_hires || null}, ${row.non_tenure_hires || null},
-          ${row.instructor_hires || null}, ${row.special_faculty_hires || null},
+          ${fiscalYear}, ${fiscalQuarter}, ${row.active_searches ?? null},
+          ${row.completed_searches ?? null}, ${row.total_hires ?? null},
+          ${row.tenure_track_hires ?? null}, ${row.non_tenure_hires ?? null},
+          ${row.instructor_hires ?? null}, ${row.special_faculty_hires ?? null},
           ${sourceFile}
         )
         ON CONFLICT (fiscal_year, fiscal_quarter)
@@ -585,7 +585,7 @@ async function upsertApplicationSources(workbook, sourceFile, dryRun, metadata) 
         )
         VALUES (
           ${fiscalYear}, ${fiscalQuarter}, ${row.source_name},
-          ${row.applications || 0}, ${row.percentage || null}, ${sourceFile}
+          ${row.applications || 0}, ${row.percentage ?? null}, ${sourceFile}
         )
         ON CONFLICT (fiscal_year, fiscal_quarter, source_name)
         DO UPDATE SET
@@ -691,7 +691,7 @@ async function upsertRequisitionAging(workbook, sourceFile, dryRun, metadata) {
         )
         VALUES (
           ${fiscalYear}, ${fiscalQuarter}, ${row.age_range},
-          ${row.requisition_count || 0}, ${row.percentage || null},
+          ${row.requisition_count || 0}, ${row.percentage ?? null},
           ${displayColor}, ${sourceFile}
         )
         ON CONFLICT (fiscal_year, fiscal_quarter, age_range)
@@ -762,7 +762,7 @@ async function upsertNewHireDemographics(workbook, sourceFile, dryRun, metadata)
         )
         VALUES (
           ${fiscalYear}, ${fiscalQuarter}, ${row.demo_type}, ${row.demo_value},
-          ${row.count || 0}, ${row.percentage || null}, ${displayColor}, ${sourceFile}
+          ${row.count || 0}, ${row.percentage ?? null}, ${displayColor}, ${sourceFile}
         )
         ON CONFLICT (fiscal_year, fiscal_quarter, demo_type, demo_value)
         DO UPDATE SET
