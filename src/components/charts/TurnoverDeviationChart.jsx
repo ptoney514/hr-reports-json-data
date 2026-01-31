@@ -1,46 +1,19 @@
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, ReferenceLine, LabelList } from 'recharts';
+import { getTurnoverMetrics } from '../../services/dataService';
 
 const TurnoverDeviationChart = ({ data = [], title = "FY2025 YTD Benefit Eligible Staff Turnover Rate Deviation from Average" }) => {
-  // FY25 YTD Turnover data from the image (Staff percentages)
-  const departmentTurnoverRates = [
-    { name: 'Student Services', rate: 30.9 },
-    { name: 'Pro. & Cont Education', rate: 26.1 },
-    { name: 'Pharmacy & Health Professions', rate: 25.9 },
-    { name: 'Clinical Affairs', rate: 22.2 },
-    { name: 'College of Nursing', rate: 21.6 },
-    { name: 'Law School', rate: 19.6 },
-    { name: 'Dentistry', rate: 19.4 },
-    { name: 'General Counsel', rate: 19.0 },
-    { name: 'Communications', rate: 18.7 },
-    { name: 'Academic Affairs', rate: 18.2 },
-    { name: 'Athletics', rate: 17.9 },
-    { name: 'Center for Excellence', rate: 16.2 },
-    { name: 'Public Safety', rate: 16.0 },
-    { name: 'Student Life', rate: 15.2 },
-    { name: 'EDI', rate: 14.3 },
-    { name: 'Global Engagement', rate: 13.6 },
-    { name: 'Total Staff Turnover', rate: 13.6 },  // This is the average
-    { name: 'Facilities', rate: 13.4 },
-    { name: 'IT', rate: 13.3 },
-    { name: 'School of Medicine', rate: 12.5 },
-    { name: 'Arts & Sciences', rate: 10.9 },
-    { name: 'Heider College of Business', rate: 10.7 },
-    { name: 'University Relations', rate: 10.5 },
-    { name: 'Enrollment Management', rate: 9.2 },
-    { name: 'Research', rate: 7.9 },
-    { name: 'Provost Office', rate: 4.9 },
-    { name: 'Human Resources', rate: 4.3 },
-    { name: 'Finance', rate: 3.8 },
-    { name: 'Phoenix Support', rate: 3.6 },
-    { name: 'Library Services', rate: 3.0 },
-    { name: 'Mission & Ministry', rate: 0 },
-    { name: 'Executive Vice President', rate: 0 },
-    { name: 'Presidents Office', rate: 0 }
-  ];
+  // Get turnover metrics from data service (supports future API integration)
+  const turnoverMetrics = getTurnoverMetrics('FY2025');
 
-  // Calculate the average turnover rate (Total Staff Turnover)
-  const averageRate = 13.6;
+  // Transform staff deviation data from metrics
+  const departmentTurnoverRates = turnoverMetrics.staffDeviation.map(dept => ({
+    name: dept.department,
+    rate: dept.rate
+  }));
+
+  // Get the average turnover rate from metrics
+  const averageRate = turnoverMetrics.staffAverageRate;
   
   // Calculate deviations and sort by deviation
   const deviationData = departmentTurnoverRates

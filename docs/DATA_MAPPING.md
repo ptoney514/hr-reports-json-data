@@ -9,7 +9,7 @@ This document captures the exact data flow for each metric displayed on the Work
 - Documentation for quarterly data refresh procedures
 - Guide for extending the data pipeline to new metrics
 
-**Last Updated:** 2026-01-30 (Location validation fix)
+**Last Updated:** 2026-01-31 (Added Demographics section)
 **Primary Methodology:** `source-metrics/workforce/WORKFORCE_METHODOLOGY.md`
 **Test Manifest:** `src/data/manifests/workforce-expected-values.json`
 
@@ -456,15 +456,323 @@ Phoenix has a higher HSP concentration than Omaha due to medical center operatio
 
 ---
 
-## 3. Demographics (Future)
+## 3. Demographics (52 metrics) ✅ VALIDATED
 
-*To be documented when demographics ETL is implemented.*
+Demographics data covers **benefit-eligible** Faculty and Staff only, broken down by gender, ethnicity, and age bands.
 
-### Planned Metrics
-- Age distribution
-- Tenure distribution
-- Gender breakdown
-- Ethnicity (optional, if collected)
+### 3.1 Data Flow Overview
+
+```
+┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
+│  Excel Source   │ --> │   ETL Script    │ --> │   Neon DB       │ --> │   REST API      │
+│  (HR Export)    │     │ demographics-   │     │ fact_workforce_ │     │ /demographics/  │
+│                 │     │ to-postgres.js  │     │ demographics    │     │ :date           │
+└─────────────────┘     └─────────────────┘     └─────────────────┘     └─────────────────┘
+     ↓                        ↓                       ↓                       ↓
+  Raw HR Data           Filter & Aggregate       Stored with %           JSON Response
+  All Employees         Benefit-eligible only    Per-category calcs      staticData format
+```
+
+### 3.2 Excel Source Columns
+
+| Column Name | Data Type | Purpose | Example Values |
+|-------------|-----------|---------|----------------|
+| **Gender** | Text | Gender classification | M, F |
+| **Employee Ethnicity** | Text | Ethnicity category | White, Black or African American, Asian, Hispanic or Latino |
+| **Age Band** | Text | Age range grouping | 20-30, 31-40, 41-50, 51-60, 61 Plus |
+| **Assignment Category Code** | Text | Employment terms (filters benefit-eligible) | F12, PT10, HSR, SUE, TEMP |
+| **Person Type** | Text | Employee classification | STAFF, FACULTY |
+| **Location** | Text | Campus location | Omaha, Phoenix |
+
+### 3.3 Benefit-Eligible Filter
+
+**Only benefit-eligible employees are included in demographics.** The ETL applies this filter:
+
+```javascript
+const BENEFIT_ELIGIBLE_CATEGORIES = ['F12', 'F11', 'F09', 'F10', 'PT12', 'PT10', 'PT9', 'PT11'];
+
+function isBenefitEligible(assignmentCategory) {
+  return BENEFIT_ELIGIBLE_CATEGORIES.includes(assignmentCategory);
+}
+```
+
+**Excluded from Demographics:**
+| Code | Description | Reason Excluded |
+|------|-------------|-----------------|
+| HSR | House Staff Residents | Not standard faculty/staff |
+| SUE | Student Employment | Students |
+| CWS | College Work Study | Students |
+| TEMP | Temporary | Non-benefit eligible |
+| NBE | Non-Benefit Eligible | By definition |
+| PRN | As Needed | Non-benefit eligible |
+
+### 3.4 Transformation Rules
+
+#### Person Type Mapping
+```javascript
+function getPersonType(row) {
+  const personType = row['Person Type'] || '';
+  return personType.toUpperCase() === 'FACULTY' ? 'faculty' : 'staff';
+}
+```
+
+#### Location Detection
+```javascript
+function getLocation(row) {
+  const location = row.Location || row.State || '';
+  return location.toLowerCase().includes('phoenix') ? 'phoenix' : 'omaha';
+}
+```
+
+#### Ethnicity Normalization
+The ETL normalizes ethnicity values for consistency with staticData.js:
+
+```javascript
+const ETHNICITY_NORMALIZATION = {
+  'i am hispanic or latino.': 'Hispanic or Latino'
+};
+
+function normalizeEthnicity(ethnicity) {
+  if (!ethnicity) return 'Not Disclosed';
+  const trimmed = ethnicity.trim();
+  return ETHNICITY_NORMALIZATION[trimmed.toLowerCase()] || trimmed;
+}
+```
+
+### 3.5 Aggregation Logic
+
+The ETL aggregates demographic counts by:
+- **Period Date** (snapshot date, e.g., 2025-06-30)
+- **Location** (omaha, phoenix, combined)
+- **Category Type** (faculty, staff)
+- **Demographic Type** (gender, ethnicity, age_band)
+- **Demographic Value** (e.g., M, F, White, 31-40)
+
+**Example Aggregation Key:** `combined|faculty|gender|M` → 321 (FY25 Q4)
+
+### 3.6 Percentage Calculation
+
+Percentages are calculated **within each category group**:
+
+```javascript
+function calculatePercentages(aggregations) {
+  // Group totals by location, category, and demographic type
+  const totals = {};
+  aggregations.forEach(agg => {
+    const key = `${agg.location}|${agg.categoryType}|${agg.demographicType}`;
+    totals[key] = (totals[key] || 0) + agg.count;
+  });
+
+  return aggregations.map(agg => {
+    const key = `${agg.location}|${agg.categoryType}|${agg.demographicType}`;
+    const total = totals[key];
+    const percentage = total > 0 ? Math.round((agg.count / total) * 10000) / 100 : 0;
+    return { ...agg, percentage };
+  });
+}
+```
+
+**Example:**
+- Faculty Male: 321 / 689 = 46.59%
+- Faculty Female: 368 / 689 = 53.41%
+
+### 3.7 Database Schema
+
+**Table:** `fact_workforce_demographics`
+
+```sql
+CREATE TABLE fact_workforce_demographics (
+    demo_id SERIAL PRIMARY KEY,
+    period_date DATE NOT NULL,                           -- e.g., 2025-06-30
+    location VARCHAR(20) NOT NULL,                       -- 'omaha', 'phoenix', 'combined'
+    category_type VARCHAR(20) NOT NULL,                  -- 'faculty', 'staff'
+    demographic_type VARCHAR(20) NOT NULL,               -- 'gender', 'ethnicity', 'age_band'
+    demographic_value VARCHAR(100) NOT NULL,             -- e.g., 'M', 'White', '31-40'
+    count INTEGER NOT NULL DEFAULT 0,                    -- Headcount
+    percentage NUMERIC(5,2),                             -- e.g., 46.59
+    source_file VARCHAR(255),                            -- Audit: source Excel file
+    loaded_at TIMESTAMPTZ DEFAULT NOW(),                 -- Audit: load timestamp
+    CONSTRAINT uq_workforce_demo UNIQUE (
+      period_date, location, category_type, demographic_type, demographic_value
+    )
+);
+```
+
+**Indexes:**
+- `idx_fact_demo_period` - Query by date
+- `idx_fact_demo_type` - Query by demographic type
+- `idx_fact_demo_category` - Query by faculty/staff
+- `idx_fact_demo_location` - Query by campus
+
+### 3.8 API Endpoint
+
+**Endpoint:** `GET /api/demographics/:date`
+
+**Files:** `server/api-dev.js` (local), `api/demographics/[date].js` (Vercel)
+
+**Query:**
+```sql
+SELECT category_type, demographic_type, demographic_value, count, percentage
+FROM v_workforce_demographics
+WHERE period_date = :date AND location = 'combined'
+ORDER BY demographic_type, category_type, count DESC
+```
+
+**Response Structure:**
+```javascript
+{
+  totals: {
+    faculty: 689,           // Sum of faculty gender counts
+    staff: 1448,            // Sum of staff gender counts
+    combined: 2137          // faculty + staff
+  },
+  gender: {
+    faculty: { male: 321, female: 368 },
+    staff: { male: 534, female: 914 }
+  },
+  ethnicity: {
+    faculty: {
+      "White": 457,
+      "Asian": 121,
+      "Hispanic or Latino": 45,
+      "Black or African American": 32,
+      "Two or More Races": 15,
+      "Not Disclosed": 19
+    },
+    staff: {
+      "White": 1089,
+      "Hispanic or Latino": 147,
+      "Black or African American": 96,
+      "Asian": 52,
+      "Two or More Races": 34,
+      "Not Disclosed": 30
+    }
+  },
+  ageBands: {
+    faculty: {
+      "20-30": 45,
+      "31-40": 156,
+      "41-50": 189,
+      "51-60": 178,
+      "61 Plus": 121
+    },
+    staff: {
+      "20-30": 287,
+      "31-40": 398,
+      "41-50": 356,
+      "51-60": 289,
+      "61 Plus": 118
+    }
+  }
+}
+```
+
+### 3.9 React Component Usage
+
+**File:** `src/components/dashboards/DemographicsQ1FY26Dashboard.jsx`
+
+```javascript
+// Access demographics data
+const { demographics } = staticData.getReportData('FY26_Q1');
+
+// Gender display
+demographics.gender.faculty.male     // 321
+demographics.gender.faculty.female   // 368
+demographics.gender.staff.male       // 534
+demographics.gender.staff.female     // 914
+
+// Ethnicity display (used in charts)
+Object.entries(demographics.ethnicity.faculty)
+  .map(([name, count]) => ({ name, count }))
+
+// Age band display
+Object.entries(demographics.ageBands.faculty)
+  .map(([name, count]) => ({ name, count }))
+```
+
+### 3.10 Expected Values (FY25 Q4)
+
+#### Gender Breakdown
+
+| Category | Male | Female | Total |
+|----------|------|--------|-------|
+| Faculty | 321 | 368 | 689 |
+| Staff | 534 | 914 | 1,448 |
+| **Combined** | **855** | **1,282** | **2,137** |
+
+#### Ethnicity Breakdown (Combined Location)
+
+| Ethnicity | Faculty | Staff | Total |
+|-----------|---------|-------|-------|
+| White | 457 | 1,089 | 1,546 |
+| Asian | 121 | 52 | 173 |
+| Hispanic or Latino | 45 | 147 | 192 |
+| Black or African American | 32 | 96 | 128 |
+| Two or More Races | 15 | 34 | 49 |
+| Not Disclosed | 19 | 30 | 49 |
+
+#### Age Band Breakdown (Combined Location)
+
+| Age Band | Faculty | Staff | Total |
+|----------|---------|-------|-------|
+| 20-30 | 45 | 287 | 332 |
+| 31-40 | 156 | 398 | 554 |
+| 41-50 | 189 | 356 | 545 |
+| 51-60 | 178 | 289 | 467 |
+| 61 Plus | 121 | 118 | 239 |
+
+### 3.11 Cross-Check Validations
+
+```
+Gender Faculty Sum: 321 + 368 = 689 ✓ (matches benefit-eligible faculty)
+Gender Staff Sum: 534 + 914 = 1,448 ✓ (matches benefit-eligible staff)
+Combined Total: 689 + 1,448 = 2,137 ✓
+
+Note: Demographics totals (2,137) differ from workforce totals (5,037)
+because demographics only includes benefit-eligible Faculty and Staff.
+Excluded: HSP (612) + Students (1,714) + Temp (574) = 2,900
+```
+
+### 3.12 Validation Service
+
+**File:** `src/services/demographicsValidationService.js`
+
+The demographics validation service includes **52 validation rules** across categories:
+
+| Category | Rules | Description |
+|----------|-------|-------------|
+| Gender Totals | 6 | Male/female counts for faculty/staff/combined |
+| Gender Faculty | 6 | Faculty gender breakdown (combined + by location) |
+| Gender Staff | 6 | Staff gender breakdown (combined + by location) |
+| Ethnicity Faculty | 12 | Faculty ethnicity counts by category |
+| Ethnicity Staff | 12 | Staff ethnicity counts by category |
+| Age Bands Faculty | 5 | Faculty age band distribution |
+| Age Bands Staff | 5 | Staff age band distribution |
+
+### 3.13 ETL Command
+
+```bash
+# Load demographics for FY25 Q4
+npm run etl:demographics -- --date 2025-06-30
+
+# Dry run (preview without database writes)
+npm run etl:demographics -- --date 2025-06-30 --dry-run
+
+# Specify custom input file
+npm run etl:demographics -- --input file.xlsx --date 2025-06-30 --verbose
+```
+
+### 3.14 File References
+
+| Purpose | File Path |
+|---------|-----------|
+| ETL Script | `scripts/etl/demographics-to-postgres.js` |
+| Database Migration | `database/migrations/004_create_demographics_tables.sql` |
+| Validation Service | `src/services/demographicsValidationService.js` |
+| API Endpoint | `server/api-dev.js` (lines 161-235) |
+| Dashboard | `src/components/dashboards/DemographicsQ1FY26Dashboard.jsx` |
+| Test Dashboard | `src/components/dashboards/WorkforceTestDashboard.jsx` |
+| JSON Data | `src/data/staticData.js` (demographics section) |
 
 ---
 
@@ -563,6 +871,7 @@ The validation service (`src/services/workforceValidationService.js`) compares J
 
 ## Appendix B: File References
 
+### Workforce Files
 | Purpose | File Path |
 |---------|-----------|
 | Excel Source | `source-metrics/workforce/*.xlsx` |
@@ -578,9 +887,30 @@ The validation service (`src/services/workforceValidationService.js`) compares J
 | Dashboard | `src/components/dashboards/WorkforceDashboard.jsx` |
 | Validation Dashboard | `src/components/dashboards/WorkforceTestDashboard.jsx` |
 
+### Demographics Files
+| Purpose | File Path |
+|---------|-----------|
+| ETL Script | `scripts/etl/demographics-to-postgres.js` |
+| Database Migration | `database/migrations/004_create_demographics_tables.sql` |
+| Validation Service | `src/services/demographicsValidationService.js` |
+| API Endpoint | `server/api-dev.js` (lines 161-235) |
+| Dashboard | `src/components/dashboards/DemographicsQ1FY26Dashboard.jsx` |
+
+### Turnover Files
+| Purpose | File Path |
+|---------|-----------|
+| ETL Script | `scripts/etl/turnover-metrics-to-postgres.js` |
+| Database Migration | `database/migrations/005_create_turnover_tables.sql` |
+| Validation Service | `src/services/turnoverValidationService.js` |
+| API Endpoint | `server/api-dev.js` (lines 237-433) |
+| Dashboard | `src/components/dashboards/TurnoverDashboard.jsx` |
+| Validation Dashboard | `src/components/dashboards/TurnoverTestDashboard.jsx` |
+
 ---
 
 ## Appendix C: Validation Test Coverage
+
+### Workforce Validation (43 rules)
 
 | Section | Tests | Status |
 |---------|-------|--------|
@@ -592,3 +922,38 @@ The validation service (`src/services/workforceValidationService.js`) compares J
 | Validation Service API Paths | 12 path mapping tests | ✅ Validated |
 | Value Extraction (getValueByPath) | 10 unit tests | ✅ Validated |
 | API Response Structure | 6 integration tests | ✅ Validated |
+
+### Demographics Validation (52 rules)
+
+| Section | Tests | Status |
+|---------|-------|--------|
+| Gender Totals | 6 rules | ✅ Validated |
+| Gender Faculty | 6 rules (combined + per-location) | ✅ Validated |
+| Gender Staff | 6 rules (combined + per-location) | ✅ Validated |
+| Ethnicity Faculty | 12 rules (6 categories × 2 locations) | ✅ Validated |
+| Ethnicity Staff | 12 rules (6 categories × 2 locations) | ✅ Validated |
+| Age Bands Faculty | 5 rules (5 bands) | ✅ Validated |
+| Age Bands Staff | 5 rules (5 bands) | ✅ Validated |
+
+### Turnover Validation (80 rules)
+
+| Section | Tests | Status |
+|---------|-------|--------|
+| Summary Rates | 8 rules | ✅ Validated |
+| Turnover Rates Table | 12 rules | ✅ Validated |
+| Turnover Breakdown | 9 rules | ✅ Validated |
+| Staff Deviation | 12 rules | ✅ Validated |
+| Faculty Deviation | 9 rules | ✅ Validated |
+| Length of Service | 10 rules | ✅ Validated |
+| Retirements by FY | 8 rules | ✅ Validated |
+| Faculty Retirement Trends | 6 rules | ✅ Validated |
+| Staff Retirement Trends | 6 rules | ✅ Validated |
+
+### Total Validation Coverage
+
+| Domain | Rules | Match Rate |
+|--------|-------|------------|
+| Workforce | 43 | 100% |
+| Demographics | 52 | 100% |
+| Turnover | 80 | 100% |
+| **Total** | **175** | **100%** |

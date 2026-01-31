@@ -82,6 +82,16 @@ export async function getAnnualTurnoverRates(year = null) {
 }
 
 /**
+ * Get turnover metrics for validation (from Neon database)
+ *
+ * @param {string} fiscalYear - Fiscal year (e.g., 'FY2025')
+ * @returns {Promise<Object>} Turnover metrics from Neon
+ */
+export async function getTurnoverMetrics(fiscalYear = 'FY2025') {
+  return fetchFromAPI(`/turnover-metrics/${fiscalYear}`);
+}
+
+/**
  * Get exit survey metrics for a specific date
  *
  * @param {string} date - Date in YYYY-MM-DD format
@@ -205,6 +215,7 @@ const apiService = {
   getWorkforceData,
   getTurnoverData,
   getAnnualTurnoverRates,
+  getTurnoverMetrics,
   getExitSurveyData,
   getSchoolOrgData,
   getTop15SchoolOrgData,

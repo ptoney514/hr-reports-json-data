@@ -1,24 +1,27 @@
-import React, { memo } from 'react';
+import React, { memo, useMemo } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { TrendingUp } from 'lucide-react';
 import ChartErrorBoundary from '../ui/ChartErrorBoundary';
+import { getTurnoverMetrics } from '../../services/dataService';
 
-const RetirementsByFiscalYear = memo(({ 
+const RetirementsByFiscalYear = memo(({
   title = "Retirements by Fiscal Year",
   height = 400,
   className = ""
 }) => {
-  // Static data based on the image provided
-  const retirementData = [
-    { year: '2018', faculty: 13, staffNonExempt: 9, staffExempt: 8, total: 30 },
-    { year: '2019', faculty: 20, staffNonExempt: 16, staffExempt: 12, total: 48 },
-    { year: '2020', faculty: 23, staffNonExempt: 10, staffExempt: 8, total: 41 },
-    { year: '2021', faculty: 19, staffNonExempt: 16, staffExempt: 7, total: 42 },
-    { year: '2022', faculty: 19, staffNonExempt: 13, staffExempt: 10, total: 42 },
-    { year: '2023', faculty: 21, staffNonExempt: 17, staffExempt: 11, total: 49 },
-    { year: '2024', faculty: 17, staffNonExempt: 5, staffExempt: 14, total: 36 },
-    { year: '2025', faculty: 20, staffNonExempt: 9, staffExempt: 11, total: 40 }
-  ];
+  // Get turnover metrics from data service (supports future API integration)
+  const turnoverMetrics = getTurnoverMetrics('FY2025');
+
+  // Transform retirements data from metrics
+  const retirementData = useMemo(() => {
+    return turnoverMetrics.retirementsByFY.map(fy => ({
+      year: fy.fiscalYear.replace('FY', ''),
+      faculty: fy.faculty,
+      staffNonExempt: fy.staffNonExempt,
+      staffExempt: fy.staffExempt,
+      total: fy.total
+    }));
+  }, [turnoverMetrics.retirementsByFY]);
 
   // Custom tooltip
   const CustomTooltip = ({ active, payload, label }) => {

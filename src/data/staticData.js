@@ -2646,6 +2646,188 @@ export const getBenefitEligibleBreakdown = (date = "2025-06-30") => {
 // ============================================================================
 
 /**
+ * Turnover Metrics Data
+ *
+ * Consolidated turnover dashboard data from HR PowerPoint slides.
+ * This is the fallback data used when the API/database is not available.
+ * Primary source: source-metrics/turnover/Turnover_Metrics_Master.xlsx
+ */
+export const TURNOVER_METRICS = {
+  "FY2025": {
+    // Summary rates (from TurnoverDashboard summary cards)
+    summaryRates: {
+      total: { rate: 11.2, priorYear: 12.8, change: -1.6, trend: 'positive' },
+      faculty: { rate: 6.1, priorYear: 7.7, change: -1.6, trend: 'positive' },
+      staffExempt: { rate: 12.6, priorYear: 13.6, change: -1.0, trend: 'positive' },
+      staffNonExempt: { rate: 15.3, priorYear: 12.8, change: -2.5, trend: 'positive' }
+    },
+    // Turnover rates table with benchmarks
+    turnoverRatesTable: [
+      { category: 'Faculty', fy2023: 7.9, heAvg2023: 9.10, fy2024: 7.7, heAvg2024: 8.70, fy2025: 6.1, change: -1.6 },
+      { category: 'Staff Exempt', fy2023: 15.5, heAvg2023: 16.70, fy2024: 13.6, heAvg2024: 15.00, fy2025: 12.6, change: -1.0 },
+      { category: 'Staff Non-Exempt', fy2023: 22.4, heAvg2023: 19.90, fy2024: 17.8, heAvg2024: 20.70, fy2025: 15.3, change: -2.5 },
+      { category: 'Total', fy2023: 14.9, heAvg2023: 14.10, fy2024: 12.8, heAvg2024: 13.80, fy2025: 11.2, change: -1.6 }
+    ],
+    // Voluntary/Involuntary/Retirement breakdown
+    turnoverBreakdown: [
+      { category: 'Staff Exempt', involuntary: 0.8, voluntary: 10.8, retirement: 1.0, total: 12.6 },
+      { category: 'Staff Non-Exempt', involuntary: 1.5, voluntary: 12.9, retirement: 0.9, total: 15.3 },
+      { category: 'Faculty', involuntary: 0.3, voluntary: 3.3, retirement: 2.5, total: 6.1 }
+    ],
+    // Staff turnover by department (deviation chart)
+    staffDeviation: [
+      { department: 'Student Services', rate: 30.9 },
+      { department: 'Pro. & Cont Education', rate: 26.1 },
+      { department: 'Pharmacy & Health Professions', rate: 25.9 },
+      { department: 'Clinical Affairs', rate: 22.2 },
+      { department: 'College of Nursing', rate: 21.6 },
+      { department: 'Law School', rate: 19.6 },
+      { department: 'Dentistry', rate: 19.4 },
+      { department: 'General Counsel', rate: 19.0 },
+      { department: 'Communications', rate: 18.7 },
+      { department: 'Academic Affairs', rate: 18.2 },
+      { department: 'Athletics', rate: 17.9 },
+      { department: 'Center for Excellence', rate: 16.2 },
+      { department: 'Public Safety', rate: 16.0 },
+      { department: 'Student Life', rate: 15.2 },
+      { department: 'EDI', rate: 14.3 },
+      { department: 'Global Engagement', rate: 13.6 },
+      { department: 'Total Staff Turnover', rate: 13.6, isAverage: true },
+      { department: 'Facilities', rate: 13.4 },
+      { department: 'IT', rate: 13.3 },
+      { department: 'School of Medicine', rate: 12.5 },
+      { department: 'Arts & Sciences', rate: 10.9 },
+      { department: 'Heider College of Business', rate: 10.7 },
+      { department: 'University Relations', rate: 10.5 },
+      { department: 'Enrollment Management', rate: 9.2 },
+      { department: 'Research', rate: 7.9 },
+      { department: 'Provost Office', rate: 4.9 },
+      { department: 'Human Resources', rate: 4.3 },
+      { department: 'Finance', rate: 3.8 },
+      { department: 'Phoenix Support', rate: 3.6 },
+      { department: 'Library Services', rate: 3.0 },
+      { department: 'Mission & Ministry', rate: 0 },
+      { department: 'Executive Vice President', rate: 0 },
+      { department: 'Presidents Office', rate: 0 }
+    ],
+    staffAverageRate: 13.6,
+    // Faculty turnover by school (deviation chart)
+    facultyDeviation: [
+      { school: 'College of Nursing', rate: 13.7 },
+      { school: 'Pharmacy & Health Professions', rate: 7.5 },
+      { school: 'School of Dentistry', rate: 6.9 },
+      { school: 'Total Faculty Turnover', rate: 6.3, isAverage: true },
+      { school: 'College of Arts & Sciences', rate: 6.0 },
+      { school: 'School of Medicine', rate: 5.6 },
+      { school: 'Law School', rate: 3.7 },
+      { school: 'Heider College of Business', rate: 1.6 },
+      { school: 'Coll of Pro Studies and Cont Ed', rate: 0.0 }
+    ],
+    facultyAverageRate: 6.3,
+    // Length of service breakdown
+    lengthOfService: {
+      faculty: [
+        { name: 'Less Than One', percentage: 13.8, count: 9 },
+        { name: '1 to 5', percentage: 7.2, count: 5 },
+        { name: '5 to 10', percentage: 5.5, count: 4 },
+        { name: '10 to 20', percentage: 4.0, count: 3 },
+        { name: '20 Plus', percentage: 6.2, count: 4 }
+      ],
+      staff: [
+        { name: 'Less Than One', percentage: 29.8, count: 18 },
+        { name: '1 to 5', percentage: 14.2, count: 9 },
+        { name: '5 to 10', percentage: 11.6, count: 7 },
+        { name: '10 to 20', percentage: 9.0, count: 6 },
+        { name: '20 Plus', percentage: 5.3, count: 3 }
+      ]
+    },
+    // Faculty retirement analysis
+    facultyRetirement: {
+      trends: [
+        { year: 2019, avgAge: 71.4, avgLOS: 31.9 },
+        { year: 2020, avgAge: 69.3, avgLOS: 28.2 },
+        { year: 2021, avgAge: 66.5, avgLOS: 26.7 },
+        { year: 2022, avgAge: 67.6, avgLOS: 30.5 },
+        { year: 2023, avgAge: 70.9, avgLOS: 28.5 },
+        { year: 2024, avgAge: 69.3, avgLOS: 28.1 },
+        { year: 2025, avgAge: 69.4, avgLOS: 26.7 }
+      ],
+      ageDistribution: [
+        { name: 'Under 69', value: 85.9, color: '#0054A6' },
+        { name: 'Over 69', value: 7.8, color: '#FFC627' },
+        { name: 'Three-Year', value: 2.6, color: '#95D2F3' },
+        { name: 'Two-Year', value: 2.0, color: '#00245D' },
+        { name: 'One-Year', value: 1.7, color: '#1F74DB' }
+      ],
+      bySchool: [
+        { school: 'College of Arts & Sciences', count: 14 },
+        { school: 'School of Dentistry', count: 11 },
+        { school: 'School of Medicine', count: 10 },
+        { school: 'School of Pharmacy & Health Professions', count: 6 },
+        { school: 'Heider College of Business', count: 5 },
+        { school: 'School of Law', count: 5 },
+        { school: 'College of Nursing', count: 3 }
+      ]
+    },
+    // Staff retirement analysis
+    staffRetirement: {
+      trends: [
+        { year: 2019, avgAge: 63.7, avgLOS: 21.7 },
+        { year: 2020, avgAge: 64.8, avgLOS: 23.3 },
+        { year: 2021, avgAge: 66.5, avgLOS: 23.3 },
+        { year: 2022, avgAge: 64.8, avgLOS: 22.6 },
+        { year: 2023, avgAge: 65.4, avgLOS: 21.7 },
+        { year: 2024, avgAge: 67.1, avgLOS: 24.5 },
+        { year: 2025, avgAge: 68.1, avgLOS: 21.5 }
+      ],
+      ageDistribution: [
+        { name: 'Under', value: 85.9, color: '#0054A6' },
+        { name: 'Over', value: 7.8, color: '#FFC627' },
+        { name: 'Three-Year', value: 2.6, color: '#95D2F3' },
+        { name: 'Two-Year', value: 2.0, color: '#FF6B35' },
+        { name: 'One-Year', value: 1.7, color: '#00245D' }
+      ]
+    }
+  },
+  // Historical turnover rates for trend chart
+  historicalRates: [
+    { fiscalYear: 'FY2022', rate: 14.5 },
+    { fiscalYear: 'FY2023', rate: 14.9 },
+    { fiscalYear: 'FY2024', rate: 12.8 },
+    { fiscalYear: 'FY2025', rate: 11.2 }
+  ],
+  // Retirements by fiscal year
+  retirementsByFY: [
+    { fiscalYear: 'FY2018', faculty: 13, staffNonExempt: 9, staffExempt: 8, total: 30 },
+    { fiscalYear: 'FY2019', faculty: 20, staffNonExempt: 16, staffExempt: 12, total: 48 },
+    { fiscalYear: 'FY2020', faculty: 23, staffNonExempt: 10, staffExempt: 8, total: 41 },
+    { fiscalYear: 'FY2021', faculty: 19, staffNonExempt: 16, staffExempt: 7, total: 42 },
+    { fiscalYear: 'FY2022', faculty: 19, staffNonExempt: 13, staffExempt: 10, total: 42 },
+    { fiscalYear: 'FY2023', faculty: 21, staffNonExempt: 17, staffExempt: 11, total: 49 },
+    { fiscalYear: 'FY2024', faculty: 17, staffNonExempt: 5, staffExempt: 14, total: 36 },
+    { fiscalYear: 'FY2025', faculty: 20, staffNonExempt: 9, staffExempt: 11, total: 40 }
+  ]
+};
+
+/**
+ * Get turnover metrics data for a specific fiscal year
+ * @param {string} fiscalYear - Fiscal year (e.g., 'FY2025')
+ * @returns {Object} Turnover metrics data
+ */
+export const getTurnoverMetrics = (fiscalYear = 'FY2025') => {
+  const yearData = TURNOVER_METRICS[fiscalYear];
+  if (!yearData) {
+    console.warn(`No turnover metrics found for ${fiscalYear}, using FY2025`);
+    return TURNOVER_METRICS['FY2025'];
+  }
+  return {
+    ...yearData,
+    historicalRates: TURNOVER_METRICS.historicalRates,
+    retirementsByFY: TURNOVER_METRICS.retirementsByFY
+  };
+};
+
+/**
  * Fiscal Period Metadata
  * Creighton University Fiscal Year: July 1 - June 30
  * - Q1: July - September (ends Sept 30)
