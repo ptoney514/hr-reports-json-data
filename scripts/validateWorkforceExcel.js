@@ -144,10 +144,12 @@ function validateStructure(excel, verbose = false) {
   }
 
   // Check required columns
+  // Normalize function removes all whitespace for consistent comparison
+  const normalize = (str) => str.toLowerCase().replace(/\s+/g, '');
   const missingColumns = [];
   for (const required of schema.requiredColumns) {
     const found = excel.columns.some(col =>
-      col.toLowerCase().includes(required.toLowerCase().replace(' ', ''))
+      normalize(col).includes(normalize(required))
     );
     if (!found) {
       missingColumns.push(required);

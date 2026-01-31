@@ -146,11 +146,15 @@ app.get('/api/workforce/:date', async (req, res) => {
   }
 });
 
+/**
+ * Format date as short string (M/D/YY)
+ * Uses UTC getters to prevent timezone-related off-by-one errors
+ */
 function formatDateShort(dateStr) {
   const date = new Date(dateStr);
-  const month = date.getMonth() + 1;
-  const day = date.getDate();
-  const year = date.getFullYear().toString().slice(-2);
+  const month = date.getUTCMonth() + 1;
+  const day = date.getUTCDate();
+  const year = date.getUTCFullYear().toString().slice(-2);
   return `${month}/${day}/${year}`;
 }
 
