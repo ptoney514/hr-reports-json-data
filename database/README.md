@@ -61,6 +61,74 @@ npm run etl:exit-surveys -- --from-json --file data.json --quarter FY25_Q2
 npm run etl:mobility -- --from-json --file mobility.json --quarter FY25_Q2
 ```
 
+## Turnover Rates ETL - Detailed Guide
+
+### Overview
+Simple ETL for quarterly turnover rate percentages received from HR. Loads to `fact_turnover_summary_rates` with Higher Ed benchmarks.
+
+### Source File
+**Excel Template**: `source-metrics/turnover/turnover-rates-input.xlsx`
+
+Generate the template:
+```bash
+npm run etl:turnover-rates:generate
+```
+
+### Excel Format
+Single sheet with 5 columns:
+
+| Column | Description | Example Values |
+|--------|-------------|----------------|
+| Category | Employee category | Faculty, Staff Exempt, Staff Non-Exempt, Total |
+| Period | Fiscal period | FY24, FY25, Q1_FY26, Q2_FY26 |
+| Rate | Turnover rate % | 7.7, 12.6, 15.3 |
+| Benchmark | Higher Ed benchmark % | 9.1, 15.0, 20.7 |
+| Benchmark_Year | Academic year | 2023-24, 2024-25 |
+
+### Running the ETL
+
+```bash
+# Generate template (first time only)
+npm run etl:turnover-rates:generate
+
+# Dry run to preview changes
+npm run etl:turnover-rates -- --dry-run
+
+# Load to Neon
+npm run etl:turnover-rates
+
+# Custom file
+npm run etl:turnover-rates -- --input custom-rates.xlsx
+```
+
+### User Workflow
+1. Receive quarterly turnover rates from HR
+2. Open `turnover-rates-input.xlsx`
+3. Add 4 new rows (Faculty, Staff Exempt, Staff Non-Exempt, Total) for the new period
+4. Run ETL: `npm run etl:turnover-rates`
+5. Verify in database
+
+### Verification SQL
+```sql
+SELECT fiscal_year, category, turnover_rate, higher_ed_avg, benchmark_source
+FROM fact_turnover_summary_rates
+ORDER BY fiscal_year,
+  CASE category
+    WHEN 'Faculty' THEN 1
+    WHEN 'Staff Exempt' THEN 2
+    WHEN 'Staff Non-Exempt' THEN 3
+    WHEN 'Total' THEN 4
+  END;
+```
+
+### Pre-Populated Data
+The template includes historical data:
+- **FY24**: Faculty 7.7%, Staff Exempt 13.6%, Staff Non-Exempt 17.8%, Total 12.8%
+- **FY25**: Faculty 6.1%, Staff Exempt 12.6%, Staff Non-Exempt 15.3%, Total 11.2%
+- **Q1_FY26**: Faculty 2.3%, Staff Exempt 16.5%, Staff Non-Exempt 13.8%, Total 10.8%
+
+---
+
 ## Workforce ETL - Detailed Guide
 
 ### Source File

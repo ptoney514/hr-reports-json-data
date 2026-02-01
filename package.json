@@ -73,6 +73,8 @@
     "etl:demographics:export": "node scripts/etl/export-demographics-json.js",
     "etl:turnover": "node scripts/etl/turnover-metrics-to-postgres.js",
     "etl:turnover:generate": "node scripts/generate-turnover-excel-template.js",
+    "etl:turnover-rates": "node scripts/etl/turnover-rates-to-postgres.js",
+    "etl:turnover-rates:generate": "node scripts/generate-turnover-rates-template.js",
     "etl:recruiting": "node scripts/etl/recruiting-metrics-to-postgres.js",
     "etl:recruiting:generate": "node scripts/generate-recruiting-excel-template.js",
     "etl:sample-data": "node scripts/etl/load-sample-data.js",
