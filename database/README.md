@@ -61,6 +61,83 @@ npm run etl:exit-surveys -- --from-json --file data.json --quarter FY25_Q2
 npm run etl:mobility -- --from-json --file mobility.json --quarter FY25_Q2
 ```
 
+## Workforce ETL - Detailed Guide
+
+### Source File
+**Authoritative Excel**: `source-metrics/workforce-headcount/New Emp List since FY20 to Q1FY25 1031 PT 12-9-2025.xlsx`
+
+### Employee Categorization Logic
+Uses Person Type + Assignment Category per WORKFORCE_METHODOLOGY.md v2.1:
+
+| Category | Logic |
+|----------|-------|
+| Faculty | Person Type = 'FACULTY' AND Assignment Code in (F12, F09, F10, F11, PT12, PT10, PT9, PT11) |
+| Staff | Person Type = 'STAFF' AND Assignment Code in (F12, F09, F10, F11, PT12, PT10, PT9, PT11) |
+| HSP | Assignment Code = 'HSR' OR Grade Code starts with 'R' |
+| Students | Assignment Code in (SUE, CWS) |
+| Temp | Assignment Code in (TEMP, NBE, PRN) |
+
+### Running the ETL
+
+```bash
+# Dry run first (preview without database writes)
+node scripts/etl/workforce-to-postgres.js \
+  --input "source-metrics/workforce-headcount/New Emp List since FY20 to Q1FY25 1031 PT 12-9-2025.xlsx" \
+  --quarter FY26_Q1 \
+  --dry-run
+
+# Load to Neon
+node scripts/etl/workforce-to-postgres.js \
+  --input "source-metrics/workforce-headcount/New Emp List since FY20 to Q1FY25 1031 PT 12-9-2025.xlsx" \
+  --quarter FY26_Q1
+```
+
+### Command Options
+| Option | Description |
+|--------|-------------|
+| `--input`, `-i` | Excel file path |
+| `--quarter`, `-q` | Fiscal period (e.g., FY26_Q1) |
+| `--date`, `-d` | Explicit date (YYYY-MM-DD) |
+| `--sheet`, `-s` | Excel sheet name (auto-detects largest if omitted) |
+| `--dry-run` | Preview without database writes |
+| `--from-json` | Load from JSON instead of Excel |
+
+### Expected Q1 FY26 Values
+| Metric | Total | Omaha | Phoenix |
+|--------|-------|-------|---------|
+| Faculty | 697 | 657 | 40 |
+| Staff | 1,419 | 1,318 | 101 |
+| HSP | 625 | 282 | 343 |
+| Students | 2,157 | 2,088 | 69 |
+| Temp | 630 | 489 | 141 |
+| **Total** | **5,528** | **4,834** | **694** |
+
+### Verification SQL
+```sql
+SELECT
+  COALESCE(location, 'TOTAL') AS location,
+  SUM(faculty_count) AS faculty,
+  SUM(staff_count) AS staff,
+  SUM(student_count) AS students,
+  SUM(hsp_count) AS hsp,
+  SUM(temp_count) AS temp
+FROM fact_workforce_snapshots
+WHERE period_date = '2025-09-30'
+GROUP BY ROLLUP(location);
+```
+
+### Troubleshooting
+
+**"No rows found with End Date"**
+- Excel file may not have data for that quarter
+- Check available dates in the source Excel file
+
+**Wrong counts**
+- Verify using `--dry-run` first
+- Check sheet selection (auto-detects largest sheet)
+- Review Person Type values in source Excel
+- Ensure categorization logic matches WORKFORCE_METHODOLOGY.md
+
 ## Database Schema
 
 ### Dimension Tables (Reference Data)

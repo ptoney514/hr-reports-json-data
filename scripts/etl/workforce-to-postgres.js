@@ -51,6 +51,50 @@ const STUDENT_CATEGORIES = ['SUE', 'CWS'];
 const SPECIAL_CATEGORIES = ['HSP', 'HSR', 'TEMP', 'NBE', 'PRN'];
 
 /**
+ * Filter rows by End Date matching the target quarter end date
+ * The Excel file contains historical data across multiple quarters
+ *
+ * @param {Array} rows - All rows from Excel
+ * @param {string} targetDate - Target date in YYYY-MM-DD format (e.g., '2025-09-30')
+ * @returns {Array} Filtered rows matching the target end date
+ */
+function filterByEndDate(rows, targetDate) {
+  return rows.filter(row => {
+    const endDate = row['END DATE'] || row['End Date'] || row['endDate'] || row['end_date'];
+
+    if (!endDate) return false;
+
+    let dateStr;
+
+    if (typeof endDate === 'string') {
+      if (endDate.includes('/')) {
+        // Format: M/D/YYYY or MM/DD/YYYY
+        const parts = endDate.split('/');
+        if (parts.length === 3) {
+          const [month, day, year] = parts;
+          dateStr = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+        }
+      } else if (endDate.includes('-')) {
+        // ISO format YYYY-MM-DD
+        dateStr = endDate.substring(0, 10);
+      }
+    } else if (typeof endDate === 'number') {
+      // Excel serial date number - convert using helper
+      try {
+        const jsDate = excelDateToJSDate(endDate);
+        dateStr = formatDate(jsDate);
+      } catch {
+        return false;
+      }
+    } else if (endDate instanceof Date) {
+      dateStr = formatDate(endDate);
+    }
+
+    return dateStr === targetDate;
+  });
+}
+
+/**
  * Parse command line arguments
  */
 function parseArgs() {
@@ -61,7 +105,8 @@ function parseArgs() {
     date: null,
     fromJson: false,
     file: null,
-    dryRun: false
+    dryRun: false,
+    sheet: null
   };
 
   for (let i = 0; i < args.length; i++) {
@@ -86,6 +131,10 @@ function parseArgs() {
         break;
       case '--dry-run':
         options.dryRun = true;
+        break;
+      case '--sheet':
+      case '-s':
+        options.sheet = args[++i];
         break;
       case '--help':
       case '-h':
@@ -112,6 +161,7 @@ ${colors.yellow}Options:${colors.reset}
   -i, --input FILE      Input Excel file path
   -q, --quarter PERIOD  Fiscal period (e.g., FY25_Q2)
   -d, --date DATE       Report date (YYYY-MM-DD format)
+  -s, --sheet NAME      Excel sheet name (auto-detects largest sheet if not specified)
   --from-json           Load from JSON instead of Excel
   --file FILE           JSON file path (with --from-json)
   --dry-run             Preview without database writes
@@ -119,31 +169,76 @@ ${colors.yellow}Options:${colors.reset}
 }
 
 /**
- * Categorize employee based on assignment category
+ * Categorize employee based on assignment category, person type, and grade code
+ * Uses WORKFORCE_METHODOLOGY.md v2.1 rules:
+ * - HSR code OR Grade R = House Staff Physicians
+ * - SUE, CWS = Student Workers
+ * - TEMP, NBE, PRN = Non-Benefit Eligible (Temp)
+ * - Benefit-eligible (F/PT codes): Use Person Type to determine Faculty vs Staff
+ *
+ * @param {Object} row - Full employee row with all fields
+ * @returns {Object} { type, isBenefitEligible, code }
  */
-function categorizeEmployee(assignmentCategory) {
-  if (!assignmentCategory) return { type: 'other', isBenefitEligible: false };
+function categorizeEmployee(row) {
+  if (!row) return { type: 'other', isBenefitEligible: false, code: 'UNKNOWN' };
 
-  const category = assignmentCategory.toString().trim().toUpperCase();
+  const assignmentCategory = (
+    row['Assignment Category Code'] ||
+    row['Assignment Category'] ||
+    row.assignment_category ||
+    row.assignment_category_code ||
+    row.assignmentCategoryCode ||
+    ''
+  ).toString().trim().toUpperCase();
 
-  if (BENEFIT_ELIGIBLE_CATEGORIES.includes(category)) {
-    const type = category.startsWith('F') ? 'faculty' : 'staff';
-    return { type, isBenefitEligible: true, code: category };
+  const personType = (
+    row['Person Type'] ||
+    row['personType'] ||
+    row.person_type ||
+    ''
+  ).toString().trim().toUpperCase();
+
+  const gradeCode = (
+    row['Grade Code'] ||
+    row['Grade'] ||
+    row.grade ||
+    row.gradeCode ||
+    ''
+  ).toString().trim().toUpperCase();
+
+  // 1. House Staff Physicians (HSR code OR Grade R)
+  if (assignmentCategory === 'HSR' || assignmentCategory === 'HSP') {
+    return { type: 'hsp', isBenefitEligible: true, code: assignmentCategory };
   }
 
-  if (STUDENT_CATEGORIES.includes(category)) {
-    return { type: 'student', isBenefitEligible: false, code: category };
+  // 2. Grade R employees go to HSP (Residents/Fellows)
+  if (gradeCode && gradeCode.startsWith('R')) {
+    return { type: 'hsp', isBenefitEligible: true, code: assignmentCategory || 'GRADE_R' };
   }
 
-  if (category === 'HSP' || category === 'HSR') {
-    return { type: 'hsp', isBenefitEligible: false, code: category };
+  // 3. Student Workers (SUE, CWS)
+  if (STUDENT_CATEGORIES.includes(assignmentCategory)) {
+    return { type: 'student', isBenefitEligible: false, code: assignmentCategory };
   }
 
-  if (category === 'TEMP' || category === 'NBE' || category === 'PRN') {
-    return { type: 'temp', isBenefitEligible: false, code: category };
+  // 4. Non-Benefit Eligible (TEMP, NBE, PRN)
+  if (assignmentCategory === 'TEMP' || assignmentCategory === 'NBE' || assignmentCategory === 'PRN') {
+    return { type: 'temp', isBenefitEligible: false, code: assignmentCategory };
   }
 
-  return { type: 'other', isBenefitEligible: false, code: category || 'UNKNOWN' };
+  // 5. Benefit-Eligible - Use Person Type to determine Faculty vs Staff
+  if (BENEFIT_ELIGIBLE_CATEGORIES.includes(assignmentCategory)) {
+    if (personType === 'FACULTY') {
+      return { type: 'faculty', isBenefitEligible: true, code: assignmentCategory };
+    } else if (personType === 'STAFF' || personType === 'EMPLOYEE') {
+      return { type: 'staff', isBenefitEligible: true, code: assignmentCategory };
+    } else {
+      // Unknown person type with benefit-eligible code - default to staff
+      return { type: 'staff', isBenefitEligible: true, code: assignmentCategory };
+    }
+  }
+
+  return { type: 'other', isBenefitEligible: false, code: assignmentCategory || 'UNKNOWN' };
 }
 
 /**
@@ -157,15 +252,11 @@ function aggregateWorkforceData(rows, periodDate) {
     const locationRaw = row.Location || row.location || row.LOCATION || row.State || '';
     const location = locationRaw.toString().toLowerCase().includes('phoenix') ? 'phoenix' : 'omaha';
 
-    // Get assignment category
-    const categoryCode = row['Assignment Category Code'] ||
-      row['Assignment Category'] ||
-      row.assignment_category ||
-      row.assignment_category_code ||
-      row.assignmentCategoryCode ||
-      'UNKNOWN';
+    // Categorize employee using full row (for Person Type, Grade Code access)
+    const { type, code } = categorizeEmployee(row);
 
-    const { type, isBenefitEligible } = categorizeEmployee(categoryCode);
+    // Use the code from categorization (may be assignment category or GRADE_R)
+    const categoryCode = code || 'UNKNOWN';
 
     // Get school/org
     const schoolRaw = row.School || row.school || row['VP Area'] || row.Department || '';
@@ -363,7 +454,30 @@ async function main() {
     console.log(`${colors.blue}Loading Excel: ${sourceFile}${colors.reset}`);
     const workbook = loadExcelFile(sourceFile);
     const sheetNames = getSheetNames(workbook);
-    const sheetName = sheetNames[0];
+
+    // Determine which sheet to use
+    let sheetName;
+    if (options.sheet) {
+      // User specified sheet
+      sheetName = options.sheet;
+      if (!sheetNames.includes(sheetName)) {
+        console.error(`${colors.red}Error: Sheet "${sheetName}" not found. Available: ${sheetNames.join(', ')}${colors.reset}`);
+        await endPool();
+        process.exit(1);
+      }
+    } else {
+      // Auto-detect: find sheet with most rows (likely the main data sheet)
+      let maxRows = 0;
+      sheetNames.forEach(name => {
+        const testRows = sheetToJSON(workbook, name);
+        if (testRows.length > maxRows) {
+          maxRows = testRows.length;
+          sheetName = name;
+        }
+      });
+      console.log(`${colors.cyan}Auto-detected sheet with most data: "${sheetName}"${colors.reset}`);
+    }
+
     rows = sheetToJSON(workbook, sheetName);
     console.log(`${colors.green}✓${colors.reset} Loaded ${rows.length} rows from sheet "${sheetName}"\n`);
 
@@ -371,6 +485,20 @@ async function main() {
     console.log(`${colors.blue}Removing PII...${colors.reset}`);
     rows = rows.map(row => removePII(row, { hashIds: true }));
     console.log(`${colors.green}✓${colors.reset} PII removed\n`);
+
+    // Filter by End Date to get snapshot for target quarter
+    console.log(`${colors.blue}Filtering to End Date: ${periodDate}...${colors.reset}`);
+    const originalCount = rows.length;
+    rows = filterByEndDate(rows, periodDate);
+    console.log(`${colors.green}✓${colors.reset} Filtered: ${rows.length} of ${originalCount} rows match End Date ${periodDate}\n`);
+
+    if (rows.length === 0) {
+      console.error(`${colors.red}Error: No rows found with End Date = ${periodDate}${colors.reset}`);
+      console.log(`\n${colors.yellow}Tip: Check that the Excel file contains data for this quarter.${colors.reset}`);
+      console.log(`${colors.yellow}Expected End Date format: YYYY-MM-DD or M/D/YYYY${colors.reset}\n`);
+      await endPool();
+      process.exit(1);
+    }
   }
 
   // Start audit log
@@ -390,7 +518,7 @@ async function main() {
   const aggregations = aggregateWorkforceData(rows, periodDate);
   console.log(`${colors.green}✓${colors.reset} Created ${aggregations.length} aggregations\n`);
 
-  // Calculate summary
+  // Calculate summary with location breakdown
   const summary = {
     total: rows.length,
     faculty: aggregations.reduce((sum, a) => sum + a.facultyCount, 0),
@@ -400,13 +528,41 @@ async function main() {
     temp: aggregations.reduce((sum, a) => sum + a.tempCount, 0)
   };
 
+  const locationBreakdown = {
+    omaha: {
+      faculty: aggregations.filter(a => a.location === 'omaha').reduce((sum, a) => sum + a.facultyCount, 0),
+      staff: aggregations.filter(a => a.location === 'omaha').reduce((sum, a) => sum + a.staffCount, 0),
+      hsp: aggregations.filter(a => a.location === 'omaha').reduce((sum, a) => sum + a.hspCount, 0),
+      students: aggregations.filter(a => a.location === 'omaha').reduce((sum, a) => sum + a.studentCount, 0),
+      temp: aggregations.filter(a => a.location === 'omaha').reduce((sum, a) => sum + a.tempCount, 0)
+    },
+    phoenix: {
+      faculty: aggregations.filter(a => a.location === 'phoenix').reduce((sum, a) => sum + a.facultyCount, 0),
+      staff: aggregations.filter(a => a.location === 'phoenix').reduce((sum, a) => sum + a.staffCount, 0),
+      hsp: aggregations.filter(a => a.location === 'phoenix').reduce((sum, a) => sum + a.hspCount, 0),
+      students: aggregations.filter(a => a.location === 'phoenix').reduce((sum, a) => sum + a.studentCount, 0),
+      temp: aggregations.filter(a => a.location === 'phoenix').reduce((sum, a) => sum + a.tempCount, 0)
+    }
+  };
+
   console.log(`${colors.cyan}Summary:${colors.reset}`);
   console.log(`  Total: ${summary.total}`);
-  console.log(`  Faculty: ${summary.faculty}`);
-  console.log(`  Staff: ${summary.staff}`);
-  console.log(`  HSP: ${summary.hsp}`);
-  console.log(`  Students: ${summary.students}`);
-  console.log(`  Temp: ${summary.temp}\n`);
+  console.log(`  Faculty: ${summary.faculty} (OMA: ${locationBreakdown.omaha.faculty}, PHX: ${locationBreakdown.phoenix.faculty})`);
+  console.log(`  Staff: ${summary.staff} (OMA: ${locationBreakdown.omaha.staff}, PHX: ${locationBreakdown.phoenix.staff})`);
+  console.log(`  HSP: ${summary.hsp} (OMA: ${locationBreakdown.omaha.hsp}, PHX: ${locationBreakdown.phoenix.hsp})`);
+  console.log(`  Students: ${summary.students} (OMA: ${locationBreakdown.omaha.students}, PHX: ${locationBreakdown.phoenix.students})`);
+  console.log(`  Temp: ${summary.temp} (OMA: ${locationBreakdown.omaha.temp}, PHX: ${locationBreakdown.phoenix.temp})\n`);
+
+  // Expected values for Q1 FY26 validation
+  if (periodDate === '2025-09-30') {
+    console.log(`${colors.yellow}Expected Q1 FY26 Values:${colors.reset}`);
+    console.log(`  Faculty: 697 (OMA: 657, PHX: 40)`);
+    console.log(`  Staff: 1419 (OMA: 1318, PHX: 101)`);
+    console.log(`  HSP: 625 (OMA: 282, PHX: 343)`);
+    console.log(`  Students: 2157 (OMA: 2088, PHX: 69)`);
+    console.log(`  Temp: 630 (OMA: 489, PHX: 141)`);
+    console.log(`  Total: 5528\n`);
+  }
 
   // Upsert to database
   console.log(`${colors.blue}${options.dryRun ? '[DRY RUN] ' : ''}Upserting to database...${colors.reset}`);
@@ -446,5 +602,6 @@ main().catch(async error => {
 
 module.exports = {
   categorizeEmployee,
-  aggregateWorkforceData
+  aggregateWorkforceData,
+  filterByEndDate
 };

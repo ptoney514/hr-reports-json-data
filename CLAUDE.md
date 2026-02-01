@@ -154,4 +154,5 @@ The project has 13 specialized agents in `.claude/agents/`:
 - **PR_WORKFLOW.md** - Pull request process and quality checklist
 - **TECHNICAL_DEBT.md** - Known issues and improvements
 - **ERROR_LOG.md** - Common errors and solutions
+- **database/README.md** - Neon PostgreSQL setup, ETL commands, and verification
 - **docs/assessments/TECHNICAL_ARCHITECTURE_REVIEW.md** - Comprehensive architecture assessment (B+ grade)
