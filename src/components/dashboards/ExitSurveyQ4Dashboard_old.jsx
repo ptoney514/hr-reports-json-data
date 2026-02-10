@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React from 'react';
 import { FileText, ThumbsUp, AlertCircle, TrendingDown, Target, Users, BarChart3, Lightbulb, CheckCircle, XCircle } from 'lucide-react';
 import { getExitSurveyData } from '../../services/dataService';

@@ -417,7 +417,7 @@ export async function checkCriticalParity(date = '2025-06-30') {
   };
 }
 
-export default {
+const dataComparisonService = {
   deepEqual,
   findDifferences,
   compareDataSources,
@@ -425,3 +425,5 @@ export default {
   generateComparisonReport,
   checkCriticalParity
 };
+
+export default dataComparisonService;

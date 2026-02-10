@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React from 'react';
 import { Calendar, TrendingUp, Users, AlertTriangle, Building2, Clock } from 'lucide-react';
 import { getExitSurveyData } from '../../services/dataService';

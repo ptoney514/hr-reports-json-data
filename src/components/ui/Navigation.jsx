@@ -1,249 +1,91 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   BarChart3,
   Users,
-  TrendingDown,
-  TrendingUp,
   Home,
   Menu,
   X,
-  UserPlus,
-  MessageSquare,
-  Database,
-  Shield,
-  Target,
-  GraduationCap,
-  DollarSign,
-  Heart,
   ChevronDown,
   ChevronRight,
-  FileText,
-  LineChart,
-  BookOpen
+  Map,
+  PieChart
 } from 'lucide-react';
 import { announceToScreenReader } from '../../utils/accessibilityUtils';
 import SyncStatusIndicator from './SyncStatusIndicator';
 
 const Navigation = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isAnnualExpanded, setIsAnnualExpanded] = useState(false);
-  const [isQuarterlyExpanded, setIsQuarterlyExpanded] = useState(false);
+  const [expandedSections, setExpandedSections] = useState({
+    ethnicity: false
+  });
   const location = useLocation();
 
-  // Check if current path is active
   const isActive = (path) => location.pathname === path;
 
-  // Core navigation items (always visible)
-  const coreNavigationItems = [
-    {
-      id: 'home',
-      label: 'Home',
-      shortLabel: 'Home',
+  // Navigation configuration
+  const navigationConfig = {
+    dashboard: {
+      id: 'dashboard',
+      label: 'Dashboard',
       path: '/dashboards',
-      icon: Home,
-      isActive: isActive('/dashboards')
+      icon: Home
     },
-    {
-      id: 'workforce',
-      label: 'Workforce Dashboard',
-      shortLabel: 'Work',
-      path: '/dashboards/workforce',
-      icon: Users,
-      isActive: isActive('/dashboards/workforce')
-    },
-    {
-      id: 'turnover',
-      label: 'Turnover Dashboard',
-      shortLabel: 'Turn',
-      path: '/dashboards/turnover',
-      icon: TrendingDown,
-      isActive: isActive('/dashboards/turnover')
-    },
-    {
-      id: 'recruiting',
-      label: 'Recruiting Dashboard',
-      shortLabel: 'Recruit',
-      path: '/dashboards/recruiting',
-      icon: UserPlus,
-      isActive: isActive('/dashboards/recruiting')
+    sections: [
+      {
+        id: 'employees',
+        label: 'Employees',
+        items: [
+          {
+            id: 'workforce',
+            label: 'Workforce',
+            path: '/dashboards/workforce-q1',
+            icon: Users
+          },
+          {
+            id: 'ethnicity',
+            label: 'Ethnicity',
+            icon: PieChart,
+            expandable: true,
+            sectionKey: 'ethnicity',
+            children: [
+              {
+                id: 'ethnicity-distribution',
+                label: 'Ethnicity Distribution',
+                path: '/dashboards/ethnicity-q1',
+                icon: PieChart
+              },
+              {
+                id: 'age-gender',
+                label: 'Age/Gender',
+                path: '/dashboards/age-gender-q1',
+                icon: Users
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    bottom: {
+      id: 'sitemap',
+      label: 'Sitemap',
+      path: '/sitemap',
+      icon: Map
     }
-  ];
+  };
 
-  // Annual Reports
-  const annualReportItems = [
-    {
-      id: 'exit-survey-fy25',
-      label: 'FY25 Exit Survey Analysis',
-      shortLabel: 'Exit FY25',
-      path: '/dashboards/exit-survey-fy25',
-      icon: MessageSquare,
-      isActive: isActive('/dashboards/exit-survey-fy25')
-    },
-    {
-      id: 'fy26-priorities',
-      label: 'FY26 Priorities',
-      shortLabel: 'FY26',
-      path: '/dashboards/fy26-priorities',
-      icon: Target,
-      isActive: isActive('/dashboards/fy26-priorities')
-    },
-    {
-      id: 'learning-development',
-      label: 'Learning & Development',
-      shortLabel: 'L&D',
-      path: '/dashboards/learning-development',
-      icon: GraduationCap,
-      isActive: isActive('/dashboards/learning-development')
-    },
-    {
-      id: 'total-rewards',
-      label: 'Total Rewards',
-      shortLabel: 'Rewards',
-      path: '/dashboards/total-rewards',
-      icon: DollarSign,
-      isActive: isActive('/dashboards/total-rewards')
-    },
-    {
-      id: 'benefits-wellbeing',
-      label: 'Benefits & Well-being',
-      shortLabel: 'Benefits',
-      path: '/dashboards/benefits-wellbeing',
-      icon: Heart,
-      isActive: isActive('/dashboards/benefits-wellbeing')
+  // Auto-expand active section on page load
+  useEffect(() => {
+    const ethnicityPaths = ['/dashboards/ethnicity-q1', '/dashboards/age-gender-q1'];
+    if (ethnicityPaths.includes(location.pathname)) {
+      setExpandedSections(prev => ({ ...prev, ethnicity: true }));
     }
-  ];
-
-  // Quarterly Reports
-  const quarterlyReportItems = [
-    {
-      id: 'exit-survey-q1-fy26',
-      label: 'Q1 FY26 Exit Survey',
-      shortLabel: 'Q1 Exit',
-      path: '/dashboards/exit-survey-q1',
-      icon: FileText,
-      isActive: isActive('/dashboards/exit-survey-q1')
-    },
-    {
-      id: 'turnover-q1-fy26',
-      label: 'Q1 FY26 Turnover',
-      shortLabel: 'Q1 Turn',
-      path: '/dashboards/turnover-q1',
-      icon: TrendingDown,
-      isActive: isActive('/dashboards/turnover-q1')
-    },
-    {
-      id: 'recruiting-q1-fy26',
-      label: 'Q1 FY26 Recruiting (BE)',
-      shortLabel: 'Q1 Recruit',
-      path: '/dashboards/recruiting-q1',
-      icon: UserPlus,
-      isActive: isActive('/dashboards/recruiting-q1')
-    },
-    {
-      id: 'recruiting-temp-q1-fy26',
-      label: 'Q1 FY26 Recruiting (Temp)',
-      shortLabel: 'Q1 Temp',
-      path: '/dashboards/recruiting-nbe-q1',
-      icon: UserPlus,
-      isActive: isActive('/dashboards/recruiting-nbe-q1')
-    },
-    {
-      id: 'turnover-trends',
-      label: 'Turnover Trends (Since Q1 FY23)',
-      shortLabel: 'Trends',
-      path: '/dashboards/turnover-trends',
-      icon: LineChart,
-      isActive: isActive('/dashboards/turnover-trends')
-    },
-    {
-      id: 'quarterly-turnover-rates',
-      label: 'Quarterly Turnover Rates',
-      shortLabel: 'Q Rates',
-      path: '/dashboards/quarterly-turnover-rates',
-      icon: BarChart3,
-      isActive: isActive('/dashboards/quarterly-turnover-rates')
-    },
-    {
-      id: 'workforce-q1-fy26',
-      label: 'Q1 FY26 Workforce',
-      shortLabel: 'Q1 Work',
-      path: '/dashboards/workforce-q1',
-      icon: Users,
-      isActive: isActive('/dashboards/workforce-q1')
-    },
-    {
-      id: 'demographics-q1-fy26',
-      label: 'Q1 FY26 Demographics',
-      shortLabel: 'Q1 Demo',
-      path: '/dashboards/demographics-q1',
-      icon: Users,
-      isActive: isActive('/dashboards/demographics-q1')
-    },
-    {
-      id: 'promotions-q1-fy26',
-      label: 'Q1 FY26 Promotions',
-      shortLabel: 'Q1 Promo',
-      path: '/dashboards/promotions-q1',
-      icon: TrendingUp,
-      isActive: isActive('/dashboards/promotions-q1')
-    },
-    {
-      id: 'promotion-reasons',
-      label: 'Promotion Reasons Guide',
-      shortLabel: 'Guide',
-      path: '/dashboards/promotion-reasons',
-      icon: BookOpen,
-      isActive: isActive('/dashboards/promotion-reasons')
-    },
-    {
-      id: 'job-changes-testing',
-      label: 'Job Changes (All Data)',
-      shortLabel: 'All Jobs',
-      path: '/dashboards/job-changes-testing',
-      icon: TrendingUp,
-      isActive: isActive('/dashboards/job-changes-testing')
-    }
-  ];
-
-  // Admin items
-  const adminNavigationItems = [
-    {
-      id: 'data-validation',
-      label: 'Data Validation',
-      shortLabel: 'Valid',
-      path: '/admin/data-validation',
-      icon: Shield,
-      isActive: isActive('/admin/data-validation')
-    },
-    {
-      id: 'data-sources',
-      label: 'Data Sources',
-      shortLabel: 'Data',
-      path: '/admin/data-sources',
-      icon: Database,
-      isActive: isActive('/admin/data-sources')
-    },
-    {
-      id: 'report-generator',
-      label: 'Report Generator',
-      shortLabel: 'Reports',
-      path: '/admin/report-generator',
-      icon: FileText,
-      isActive: isActive('/admin/report-generator')
-    }
-  ];
-
+  }, [location.pathname]);
 
   const toggleMobileMenu = useCallback(() => {
     const newState = !isMobileMenuOpen;
     setIsMobileMenuOpen(newState);
-    
-    if (newState) {
-      announceToScreenReader('Mobile menu opened');
-    } else {
-      announceToScreenReader('Mobile menu closed');
-    }
+    announceToScreenReader(newState ? 'Mobile menu opened' : 'Mobile menu closed');
   }, [isMobileMenuOpen]);
 
   const closeMobileMenu = useCallback(() => {
@@ -251,109 +93,127 @@ const Navigation = () => {
     announceToScreenReader('Mobile menu closed');
   }, []);
 
-  const toggleAnnualReports = useCallback(() => {
-    const newState = !isAnnualExpanded;
-    setIsAnnualExpanded(newState);
-    announceToScreenReader(newState ? 'Annual Reports expanded' : 'Annual Reports collapsed');
-  }, [isAnnualExpanded]);
+  const toggleSection = useCallback((sectionId) => {
+    setExpandedSections(prev => {
+      const newState = !prev[sectionId];
+      announceToScreenReader(newState ? `${sectionId} section expanded` : `${sectionId} section collapsed`);
+      return { ...prev, [sectionId]: newState };
+    });
+  }, []);
 
-  const toggleQuarterlyReports = useCallback(() => {
-    const newState = !isQuarterlyExpanded;
-    setIsQuarterlyExpanded(newState);
-    announceToScreenReader(newState ? 'Quarterly Reports expanded' : 'Quarterly Reports collapsed');
-  }, [isQuarterlyExpanded]);
-
-
-
-  // Render desktop icon-based navigation items
-  const renderDesktopNavItem = (item) => {
+  // Render a full-text nav link (icon + label)
+  const renderNavItem = (item, { indent = false, onClick } = {}) => {
     const IconComponent = item.icon;
+    const active = isActive(item.path);
     return (
       <Link
         key={item.id}
         to={item.path}
-        onClick={() => announceToScreenReader(`Navigating to ${item.label}`)}
-        aria-label={item.label}
-        className={`flex flex-col items-center gap-1 px-2 py-2 rounded-lg transition-colors focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none ${
-          item.isActive
+        onClick={() => {
+          announceToScreenReader(`Navigating to ${item.label}`);
+          if (onClick) onClick();
+        }}
+        className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none ${
+          indent ? 'ml-6' : ''
+        } ${
+          active
             ? 'bg-blue-50 text-blue-700'
-            : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
+            : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
         }`}
       >
-        <IconComponent size={20} />
-        <span className="text-xs text-center leading-tight break-words max-w-full">
-          {item.shortLabel}
-        </span>
+        <IconComponent size={18} />
+        <span>{item.label}</span>
       </Link>
     );
   };
 
-  // Render mobile full-text navigation items
-  const renderMobileNavItem = (item) => {
+  // Render an expandable nav item with children
+  const renderExpandableNavItem = (item, { onClick } = {}) => {
     const IconComponent = item.icon;
+    const isExpanded = expandedSections[item.sectionKey];
+    const hasActiveChild = item.children?.some(child => isActive(child.path));
+
     return (
-      <Link
-        key={item.id}
-        to={item.path}
-        onClick={closeMobileMenu}
-        className={`flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium transition-colors ${
-          item.isActive
-            ? 'bg-blue-50 text-blue-700'
-            : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
-        }`}
-      >
-        <IconComponent size={20} />
-        {item.label}
-      </Link>
+      <div key={item.id}>
+        <button
+          onClick={() => toggleSection(item.sectionKey)}
+          aria-expanded={isExpanded}
+          className={`w-full flex items-center justify-between gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none ${
+            hasActiveChild
+              ? 'bg-blue-50 text-blue-700'
+              : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+          }`}
+        >
+          <div className="flex items-center gap-3">
+            <IconComponent size={18} />
+            <span>{item.label}</span>
+          </div>
+          {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+        </button>
+
+        {isExpanded && (
+          <div className="mt-1 space-y-1">
+            {item.children.map(child => renderNavItem(child, { indent: true, onClick }))}
+          </div>
+        )}
+      </div>
     );
   };
+
+  // Render the full navigation content (shared between desktop and mobile)
+  const renderNavigationContent = ({ onItemClick } = {}) => (
+    <>
+      {/* Dashboard link */}
+      {renderNavItem(navigationConfig.dashboard, { onClick: onItemClick })}
+
+      {/* Sections */}
+      {navigationConfig.sections.map(section => (
+        <div key={section.id} className="mt-6">
+          {/* Section header */}
+          <div className="px-3 mb-2">
+            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+              {section.label}
+            </span>
+          </div>
+
+          {/* Section items */}
+          <div className="space-y-1">
+            {section.items.map(item =>
+              item.expandable
+                ? renderExpandableNavItem(item, { onClick: onItemClick })
+                : renderNavItem(item, { onClick: onItemClick })
+            )}
+          </div>
+        </div>
+      ))}
+    </>
+  );
 
   return (
     <>
-      {/* Desktop Sidebar - Compact Icon Navigation */}
-      <nav className="hidden md:flex md:flex-col md:w-28 bg-white border-r border-gray-200 h-full no-print navigation sidebar">
+      {/* Desktop Sidebar - Full-Text Navigation */}
+      <nav className="hidden md:flex md:flex-col md:w-64 bg-gray-50 border-r border-gray-200 h-full no-print navigation sidebar">
         <div className="flex flex-col h-full">
-          {/* Logo/Brand - Compact */}
-          <div className="flex items-center justify-center p-4 border-b border-gray-200">
+          {/* Brand */}
+          <div className="flex items-center gap-3 p-4 border-b border-gray-200">
             <Link
               to="/dashboards"
-              className="flex flex-col items-center gap-1 text-blue-700 hover:text-blue-800 transition-colors"
+              className="flex items-center gap-3 text-blue-700 hover:text-blue-800 transition-colors"
               aria-label="HR Reports Home"
             >
               <BarChart3 size={24} />
-              <span className="text-xs font-bold">HR</span>
+              <span className="text-lg font-bold">HR Reports</span>
             </Link>
           </div>
 
-          {/* Navigation Items - Icon with abbreviated labels */}
-          <div className="flex-1 py-4 px-2 space-y-1 overflow-y-auto">
-            {/* Core Navigation */}
-            {coreNavigationItems.map(renderDesktopNavItem)}
-
-            {/* ANNUAL REPORTS Section */}
-            <div className="pt-2 border-t border-gray-200">
-              <div className="text-xs font-bold text-gray-500 uppercase text-center px-2 py-2">
-                Annual
-              </div>
-              {annualReportItems.map(renderDesktopNavItem)}
-            </div>
-
-            {/* QUARTERLY REPORTS Section */}
-            <div className="pt-2 border-t border-gray-200">
-              <div className="text-xs font-bold text-gray-500 uppercase text-center px-2 py-2">
-                Quarterly
-              </div>
-              {quarterlyReportItems.map(renderDesktopNavItem)}
-            </div>
-
-            {/* ADMIN Section */}
-            <div className="pt-2 border-t border-gray-200">
-              {adminNavigationItems.map(renderDesktopNavItem)}
-            </div>
+          {/* Navigation Items */}
+          <div className="flex-1 py-4 px-3 space-y-1 overflow-y-auto">
+            {renderNavigationContent()}
           </div>
 
-          {/* Sync Status Indicator - Bottom of sidebar */}
-          <div className="p-2 border-t border-gray-200">
+          {/* Bottom: Sitemap + Sync Status */}
+          <div className="border-t border-gray-200 px-3 py-3 space-y-2">
+            {renderNavItem(navigationConfig.bottom)}
             <SyncStatusIndicator className="text-xs" />
           </div>
         </div>
@@ -362,19 +222,16 @@ const Navigation = () => {
       {/* Mobile Navigation Header */}
       <div className="md:hidden bg-white border-b border-gray-200 sticky top-0 z-50 no-print navigation">
         <div className="flex items-center justify-between h-16 px-4">
-          {/* Logo/Brand */}
-          <Link 
-            to="/dashboards" 
+          <Link
+            to="/dashboards"
             className="flex items-center gap-2 text-blue-700 hover:text-blue-800 transition-colors"
           >
             <BarChart3 size={24} />
             <span className="text-xl font-bold">HR Reports</span>
           </Link>
-          
-          {/* Sync Status - Mobile */}
+
           <SyncStatusIndicator className="hidden sm:flex text-xs" />
 
-          {/* Mobile menu button */}
           <div>
             <button
               onClick={toggleMobileMenu}
@@ -393,126 +250,23 @@ const Navigation = () => {
       {isMobileMenuOpen && (
         <>
           {/* Overlay */}
-          <div 
+          <div
             className="fixed inset-0 bg-black bg-opacity-25 z-40 md:hidden"
             onClick={closeMobileMenu}
           />
-          
+
           {/* Mobile Sidebar */}
-          <div className="fixed inset-y-0 left-0 w-64 bg-white border-r border-gray-200 z-50 md:hidden no-print navigation sidebar">
+          <div id="mobile-menu" className="fixed inset-y-0 left-0 w-64 bg-gray-50 border-r border-gray-200 z-50 md:hidden no-print navigation sidebar">
             <div className="flex flex-col h-full">
               {/* Mobile Navigation Items */}
-              <div className="flex-1 py-6 px-4 space-y-2 overflow-y-auto">
-                {/* Core Navigation */}
-                {coreNavigationItems.map(renderMobileNavItem)}
+              <div className="flex-1 py-6 px-4 space-y-1 overflow-y-auto">
+                {renderNavigationContent({ onItemClick: closeMobileMenu })}
+              </div>
 
-                {/* ANNUAL REPORTS Section */}
-                <div className="pt-2 border-t border-gray-200">
-                  <button
-                    onClick={toggleAnnualReports}
-                    aria-expanded={isAnnualExpanded}
-                    className="w-full flex items-center justify-between gap-3 px-3 py-3 rounded-lg text-sm font-medium transition-colors text-gray-700 hover:bg-gray-50"
-                  >
-                    <div className="flex items-center gap-3">
-                      <FileText size={20} />
-                      <span>Annual Reports</span>
-                    </div>
-                    {isAnnualExpanded ? (
-                      <ChevronDown size={16} />
-                    ) : (
-                      <ChevronRight size={16} />
-                    )}
-                  </button>
-
-                  {/* Annual Report Subitems */}
-                  {isAnnualExpanded && (
-                    <div className="mt-1 ml-4 space-y-1">
-                      {annualReportItems.map((item) => {
-                        const IconComponent = item.icon;
-                        return (
-                          <Link
-                            key={item.id}
-                            to={item.path}
-                            onClick={closeMobileMenu}
-                            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors ${
-                              item.isActive
-                                ? 'bg-blue-50 text-blue-700 font-medium'
-                                : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                            }`}
-                          >
-                            <IconComponent size={16} />
-                            {item.label}
-                          </Link>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
-
-                {/* QUARTERLY REPORTS Section */}
-                <div className="pt-2 border-t border-gray-200">
-                  <button
-                    onClick={toggleQuarterlyReports}
-                    aria-expanded={isQuarterlyExpanded}
-                    className="w-full flex items-center justify-between gap-3 px-3 py-3 rounded-lg text-sm font-medium transition-colors text-gray-700 hover:bg-gray-50"
-                  >
-                    <div className="flex items-center gap-3">
-                      <FileText size={20} />
-                      <span>Quarterly Reports</span>
-                    </div>
-                    {isQuarterlyExpanded ? (
-                      <ChevronDown size={16} />
-                    ) : (
-                      <ChevronRight size={16} />
-                    )}
-                  </button>
-
-                  {/* Quarterly Report Subitems */}
-                  {isQuarterlyExpanded && (
-                    <div className="mt-1 ml-4 space-y-1">
-                      {quarterlyReportItems.map((item) => {
-                        const IconComponent = item.icon;
-                        return (
-                          <Link
-                            key={item.id}
-                            to={item.path}
-                            onClick={closeMobileMenu}
-                            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors ${
-                              item.isActive
-                                ? 'bg-blue-50 text-blue-700 font-medium'
-                                : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                            }`}
-                          >
-                            <IconComponent size={16} />
-                            {item.label}
-                          </Link>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
-
-                {/* ADMIN Section */}
-                <div className="pt-2 border-t border-gray-200">
-                  {adminNavigationItems.map((item) => {
-                    const IconComponent = item.icon;
-                    return (
-                      <Link
-                        key={item.id}
-                        to={item.path}
-                        onClick={closeMobileMenu}
-                        className={`flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium transition-colors ${
-                          item.isActive
-                            ? 'bg-blue-50 text-blue-700'
-                            : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
-                        }`}
-                      >
-                        <IconComponent size={20} />
-                        {item.label}
-                      </Link>
-                    );
-                  })}
-                </div>
+              {/* Bottom: Sitemap + Sync Status */}
+              <div className="border-t border-gray-200 px-4 py-3 space-y-2">
+                {renderNavItem(navigationConfig.bottom, { onClick: closeMobileMenu })}
+                <SyncStatusIndicator className="text-xs" />
               </div>
             </div>
           </div>
@@ -522,4 +276,4 @@ const Navigation = () => {
   );
 };
 
-export default Navigation; 
+export default Navigation;
