@@ -33,7 +33,7 @@ jest.mock('./services/dataSyncService', () => ({
 
 // Mocking child components that are not relevant to this integration test
 // This speeds up the test and isolates it to the App component's behavior.
-jest.mock('./components/dashboards/DashboardIndex', () => () => <div>Dashboard Index</div>);
+jest.mock('./components/dashboards/MarketingSlides', () => () => <div>Marketing Slides</div>);
 jest.mock('./components/dashboards/TurnoverDashboard', () => () => <div>Turnover Dashboard</div>);
 
 // SIMPLIFIED: Personal PDF export workflow - only need basic smoke test

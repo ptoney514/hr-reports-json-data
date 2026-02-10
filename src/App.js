@@ -8,7 +8,7 @@ import { DashboardProvider } from './contexts/DashboardContext';
 import { setupGlobalErrorHandling } from './utils/errorHandler';
 import { DashboardSkeleton } from './components/ui/LoadingSkeleton';
 // Lazy load dashboard components for better performance
-const DashboardIndex = lazy(() => import('./components/dashboards/DashboardIndex'));
+const MarketingSlides = lazy(() => import('./components/dashboards/MarketingSlides'));
 const TurnoverDashboard = lazy(() => import('./components/dashboards/TurnoverDashboard'));
 // Testing components removed - using static data approach
 const RecruitingDashboard = lazy(() => import('./components/dashboards/RecruitingDashboard'));
@@ -51,6 +51,8 @@ const RecruitingTestDashboard = lazy(() => import('./components/dashboards/Recru
 const ReportGenerator = lazy(() => import('./components/reports/ReportGenerator'));
 // Print Layout (Report Builder)
 const PrintLayout = lazy(() => import('./components/print/PrintLayout'));
+// Executive Dashboard
+const ExecutiveDashboard = lazy(() => import('./components/dashboards/ExecutiveDashboard'));
 // Sitemap
 const SitemapDashboard = lazy(() => import('./components/dashboards/SitemapDashboard'));
 // Archive/Legacy Components
@@ -171,7 +173,7 @@ function App() {
               {/* Print Layout Route - Full page, own navigation */}
               <Route path="/print/*" element={<PrintLayout />} />
               {/* Dashboard Routes */}
-              <Route path="/dashboards" element={<DashboardIndex />} />
+              <Route path="/dashboards/marketing-slides" element={<MarketingSlides />} />
               <Route path="/dashboards/workforce" element={<WorkforceDashboard />} />
               <Route path="/dashboards/turnover" element={<TurnoverDashboard />} />
               <Route path="/dashboards/recruiting" element={<RecruitingDashboard />} />
@@ -225,6 +227,9 @@ function App() {
               <Route path="/admin/report-generator" element={<ReportGenerator />} />
               {/* AdminDashboard route removed - using static data */}
 
+              {/* Executive Dashboard */}
+              <Route path="/dashboards/executive" element={<ExecutiveDashboard />} />
+
               {/* Sitemap Route */}
               <Route path="/sitemap" element={<SitemapDashboard />} />
 
@@ -236,11 +241,12 @@ function App() {
               <Route path="/archive/data-import" element={<DataImportDashboard />} />
               <Route path="/archive/data-health" element={<DataHealthDashboard />} />
               
-              {/* Default route - redirect to dashboards index */}
-              <Route path="/" element={<Navigate to="/dashboards" replace />} />
-              
-              {/* Catch-all route - redirect to dashboards */}
-              <Route path="*" element={<Navigate to="/dashboards" replace />} />
+              {/* Default route - redirect to executive dashboard */}
+              <Route path="/" element={<Navigate to="/dashboards/executive" replace />} />
+              <Route path="/dashboards" element={<Navigate to="/dashboards/executive" replace />} />
+
+              {/* Catch-all route - redirect to sitemap */}
+              <Route path="*" element={<Navigate to="/sitemap" replace />} />
               </Routes>
               </Suspense>
             </AppLayout>

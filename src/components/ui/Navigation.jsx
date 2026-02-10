@@ -27,8 +27,8 @@ const Navigation = () => {
   const navigationConfig = {
     dashboard: {
       id: 'dashboard',
-      label: 'Dashboard',
-      path: '/dashboards',
+      label: 'Executive Dashboard',
+      path: '/dashboards/executive',
       icon: Home
     },
     sections: [
