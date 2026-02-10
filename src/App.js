@@ -54,10 +54,10 @@ const PrintLayout = lazy(() => import('./components/print/PrintLayout'));
 // Sitemap
 const SitemapDashboard = lazy(() => import('./components/dashboards/SitemapDashboard'));
 // Archive/Legacy Components
-const ExitSurveyDashboard_Old = lazy(() => import('./components/dashboards/ExitSurveyDashboard_Old'));
-const ExitSurveyDashboard_Previous = lazy(() => import('./components/dashboards/ExitSurveyDashboard_Previous'));
-const ExitSurveyQ1Dashboard_old = lazy(() => import('./components/dashboards/ExitSurveyQ1Dashboard_old'));
-const ExitSurveyQ4Dashboard_old = lazy(() => import('./components/dashboards/ExitSurveyQ4Dashboard_old'));
+const ExitSurveyDashboardOld = lazy(() => import('./components/dashboards/ExitSurveyDashboard_Old'));
+const ExitSurveyDashboardPrevious = lazy(() => import('./components/dashboards/ExitSurveyDashboard_Previous'));
+const ExitSurveyQ1DashboardOld = lazy(() => import('./components/dashboards/ExitSurveyQ1Dashboard_old'));
+const ExitSurveyQ4DashboardOld = lazy(() => import('./components/dashboards/ExitSurveyQ4Dashboard_old'));
 const DataImportDashboard = lazy(() => import('./components/dashboards/DataImportDashboard'));
 const DataHealthDashboard = lazy(() => import('./components/dashboards/DataHealthDashboard'));
 // WorkforceAudit temporarily disabled - papaparse dependency issue
@@ -229,10 +229,10 @@ function App() {
               <Route path="/sitemap" element={<SitemapDashboard />} />
 
               {/* Archive/Legacy Routes */}
-              <Route path="/archive/exit-survey-old" element={<ExitSurveyDashboard_Old />} />
-              <Route path="/archive/exit-survey-previous" element={<ExitSurveyDashboard_Previous />} />
-              <Route path="/archive/exit-survey-q1-old" element={<ExitSurveyQ1Dashboard_old />} />
-              <Route path="/archive/exit-survey-q4-old" element={<ExitSurveyQ4Dashboard_old />} />
+              <Route path="/archive/exit-survey-old" element={<ExitSurveyDashboardOld />} />
+              <Route path="/archive/exit-survey-previous" element={<ExitSurveyDashboardPrevious />} />
+              <Route path="/archive/exit-survey-q1-old" element={<ExitSurveyQ1DashboardOld />} />
+              <Route path="/archive/exit-survey-q4-old" element={<ExitSurveyQ4DashboardOld />} />
               <Route path="/archive/data-import" element={<DataImportDashboard />} />
               <Route path="/archive/data-health" element={<DataHealthDashboard />} />
               

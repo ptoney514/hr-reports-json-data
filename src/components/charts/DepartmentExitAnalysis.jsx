@@ -1,7 +1,7 @@
 import React, { memo, useMemo } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { AlertTriangle, CheckCircle, Users, TrendingUp } from 'lucide-react';
-import { calculateDepartmentRiskScores, getRiskLevel } from '../../utils/exitSurveyAnalytics';
+import { AlertTriangle, CheckCircle, Users } from 'lucide-react';
+import { calculateDepartmentRiskScores } from '../../utils/exitSurveyAnalytics';
 
 const DepartmentExitAnalysis = memo(({ 
   height = 400,

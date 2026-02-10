@@ -256,7 +256,7 @@ const Navigation = () => {
           />
 
           {/* Mobile Sidebar */}
-          <div className="fixed inset-y-0 left-0 w-64 bg-gray-50 border-r border-gray-200 z-50 md:hidden no-print navigation sidebar">
+          <div id="mobile-menu" className="fixed inset-y-0 left-0 w-64 bg-gray-50 border-r border-gray-200 z-50 md:hidden no-print navigation sidebar">
             <div className="flex flex-col h-full">
               {/* Mobile Navigation Items */}
               <div className="flex-1 py-6 px-4 space-y-1 overflow-y-auto">
