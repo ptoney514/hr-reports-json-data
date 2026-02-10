@@ -34,6 +34,8 @@ const QuarterlyTurnoverRatesDashboard = lazy(() => import('./components/dashboar
 // Quarterly Workforce Reports
 const WorkforceQ1Dashboard = lazy(() => import('./components/dashboards/WorkforceQ1FY26Dashboard'));
 const DemographicsQ1Dashboard = lazy(() => import('./components/dashboards/DemographicsQ1FY26Dashboard'));
+const EthnicityDistributionQ1 = lazy(() => import('./components/dashboards/EthnicityDistributionQ1'));
+const AgeGenderQ1 = lazy(() => import('./components/dashboards/AgeGenderQ1'));
 // Quarterly Recruiting Reports
 const RecruitingQ1Dashboard = lazy(() => import('./components/dashboards/RecruitingQ1FY26Dashboard'));
 const RecruitingNBEQ1Dashboard = lazy(() => import('./components/dashboards/RecruitingNBEQ1FY26Dashboard'));
@@ -49,6 +51,15 @@ const RecruitingTestDashboard = lazy(() => import('./components/dashboards/Recru
 const ReportGenerator = lazy(() => import('./components/reports/ReportGenerator'));
 // Print Layout (Report Builder)
 const PrintLayout = lazy(() => import('./components/print/PrintLayout'));
+// Sitemap
+const SitemapDashboard = lazy(() => import('./components/dashboards/SitemapDashboard'));
+// Archive/Legacy Components
+const ExitSurveyDashboard_Old = lazy(() => import('./components/dashboards/ExitSurveyDashboard_Old'));
+const ExitSurveyDashboard_Previous = lazy(() => import('./components/dashboards/ExitSurveyDashboard_Previous'));
+const ExitSurveyQ1Dashboard_old = lazy(() => import('./components/dashboards/ExitSurveyQ1Dashboard_old'));
+const ExitSurveyQ4Dashboard_old = lazy(() => import('./components/dashboards/ExitSurveyQ4Dashboard_old'));
+const DataImportDashboard = lazy(() => import('./components/dashboards/DataImportDashboard'));
+const DataHealthDashboard = lazy(() => import('./components/dashboards/DataHealthDashboard'));
 // WorkforceAudit temporarily disabled - papaparse dependency issue
 // const WorkforceAudit = lazy(() => import('./components/dashboards/WorkforceAudit'));
 // AdminDashboard removed - using static data now
@@ -188,6 +199,8 @@ function App() {
               {/* Quarterly Workforce Reports */}
               <Route path="/dashboards/workforce-q1" element={<WorkforceQ1Dashboard />} />
               <Route path="/dashboards/demographics-q1" element={<DemographicsQ1Dashboard />} />
+              <Route path="/dashboards/ethnicity-q1" element={<EthnicityDistributionQ1 />} />
+              <Route path="/dashboards/age-gender-q1" element={<AgeGenderQ1 />} />
 
               {/* Quarterly Recruiting Reports */}
               <Route path="/dashboards/recruiting-q1" element={<RecruitingQ1Dashboard />} />
@@ -211,6 +224,17 @@ function App() {
               <Route path="/admin/data-sources" element={<DataSourceAdmin />} />
               <Route path="/admin/report-generator" element={<ReportGenerator />} />
               {/* AdminDashboard route removed - using static data */}
+
+              {/* Sitemap Route */}
+              <Route path="/sitemap" element={<SitemapDashboard />} />
+
+              {/* Archive/Legacy Routes */}
+              <Route path="/archive/exit-survey-old" element={<ExitSurveyDashboard_Old />} />
+              <Route path="/archive/exit-survey-previous" element={<ExitSurveyDashboard_Previous />} />
+              <Route path="/archive/exit-survey-q1-old" element={<ExitSurveyQ1Dashboard_old />} />
+              <Route path="/archive/exit-survey-q4-old" element={<ExitSurveyQ4Dashboard_old />} />
+              <Route path="/archive/data-import" element={<DataImportDashboard />} />
+              <Route path="/archive/data-health" element={<DataHealthDashboard />} />
               
               {/* Default route - redirect to dashboards index */}
               <Route path="/" element={<Navigate to="/dashboards" replace />} />
