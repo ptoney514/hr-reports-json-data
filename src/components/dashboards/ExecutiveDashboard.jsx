@@ -1,11 +1,10 @@
 import React, { useState, useMemo } from 'react';
 import { ComposableMap, Geographies, Geography } from 'react-simple-maps';
-import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, LabelList } from 'recharts';
+import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, LabelList } from 'recharts';
 import {
   getQuarterlyWorkforceData,
   getQuarterlyTurnoverData,
   getExitSurveyData,
-  QUARTERLY_HEADCOUNT_TRENDS
 } from '../../data/staticData';
 
 // Quarter configuration
@@ -28,22 +27,67 @@ const OPEN_REQUISITIONS = {
   "2025-09-30": { count: 143, source: "Staff (myJobs)" }
 };
 
-// Employee distribution by state per quarter
+// Benefit-eligible employee residence counts by state per quarter
 const EMPLOYEES_BY_STATE = {
   "2025-09-30": {
-    NE: { count: 4834, label: "Omaha Campus" },
-    AZ: { count: 694, label: "Phoenix Campus" },
+    NE: 2218, AZ: 487, IA: 9, MN: 5,
+    CO: 4, FL: 4, OH: 4, IL: 3,
+    CA: 2, KS: 2, OR: 2,
+    CT: 1, GA: 1, MD: 1, MO: 1, NJ: 1, NV: 1, PA: 1, UT: 1, VA: 1,
   }
 };
 
 const GEO_URL = "https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json";
 
+// All 50 states + DC FIPS codes (used by us-atlas TopoJSON)
 const STATE_FIPS = {
-  NE: "31",
-  AZ: "04",
+  AL: "01", AK: "02", AZ: "04", AR: "05", CA: "06", CO: "08", CT: "09",
+  DE: "10", DC: "11", FL: "12", GA: "13", HI: "15", ID: "16", IL: "17",
+  IN: "18", IA: "19", KS: "20", KY: "21", LA: "22", ME: "23", MD: "24",
+  MA: "25", MI: "26", MN: "27", MS: "28", MO: "29", MT: "30", NE: "31",
+  NV: "32", NH: "33", NJ: "34", NM: "35", NY: "36", NC: "37", ND: "38",
+  OH: "39", OK: "40", OR: "41", PA: "42", RI: "44", SC: "45", SD: "46",
+  TN: "47", TX: "48", UT: "49", VT: "50", VA: "51", WA: "53", WV: "54",
+  WI: "55", WY: "56",
 };
 
-const DONUT_COLORS = ['#10B981', '#3B82F6', '#F59E0B', '#6B7280', '#8B5CF6'];
+// Reverse lookup: FIPS code -> state abbreviation
+const FIPS_TO_STATE = Object.fromEntries(
+  Object.entries(STATE_FIPS).map(([state, fips]) => [fips, state])
+);
+
+// State names for accessible data table
+const STATE_NAMES = {
+  AL: "Alabama", AK: "Alaska", AZ: "Arizona", AR: "Arkansas", CA: "California",
+  CO: "Colorado", CT: "Connecticut", DE: "Delaware", DC: "District of Columbia",
+  FL: "Florida", GA: "Georgia", HI: "Hawaii", ID: "Idaho", IL: "Illinois",
+  IN: "Indiana", IA: "Iowa", KS: "Kansas", KY: "Kentucky", LA: "Louisiana",
+  ME: "Maine", MD: "Maryland", MA: "Massachusetts", MI: "Michigan", MN: "Minnesota",
+  MS: "Mississippi", MO: "Missouri", MT: "Montana", NE: "Nebraska", NV: "Nevada",
+  NH: "New Hampshire", NJ: "New Jersey", NM: "New Mexico", NY: "New York",
+  NC: "North Carolina", ND: "North Dakota", OH: "Ohio", OK: "Oklahoma",
+  OR: "Oregon", PA: "Pennsylvania", RI: "Rhode Island", SC: "South Carolina",
+  SD: "South Dakota", TN: "Tennessee", TX: "Texas", UT: "Utah", VT: "Vermont",
+  VA: "Virginia", WA: "Washington", WV: "West Virginia", WI: "Wisconsin", WY: "Wyoming",
+};
+
+// Choropleth color ranges (7 tiers)
+const COLOR_RANGES = [
+  { min: 500, max: Infinity, color: '#00245D', label: '500+' },
+  { min: 50,  max: 499,     color: '#1D4ED8', label: '50-499' },
+  { min: 10,  max: 49,      color: '#3B82F6', label: '10-49' },
+  { min: 5,   max: 9,       color: '#60A5FA', label: '5-9' },
+  { min: 2,   max: 4,       color: '#93C5FD', label: '2-4' },
+  { min: 1,   max: 1,       color: '#DBEAFE', label: '1' },
+  { min: 0,   max: 0,       color: '#E5E7EB', label: '0' },
+];
+
+function getColorForCount(count) {
+  for (const range of COLOR_RANGES) {
+    if (count >= range.min && count <= range.max) return range.color;
+  }
+  return '#E5E7EB';
+}
 
 const ExecutiveDashboard = () => {
   const [selectedQuarter, setSelectedQuarter] = useState("2025-09-30");
@@ -98,21 +142,6 @@ const ExecutiveDashboard = () => {
       total: band.faculty + band.staff,
     }));
   }, [turnoverData]);
-
-  // QoQ benefit-eligible headcount changes from QUARTERLY_HEADCOUNT_TRENDS
-  const qoqData = useMemo(() => {
-    const qLabel = EXECUTIVE_QUARTERS.find(q => q.value === selectedQuarter)?.label;
-    const trends = QUARTERLY_HEADCOUNT_TRENDS;
-    const currentIdx = trends.findIndex(t => t.quarter === qLabel);
-    if (currentIdx <= 0) return { facultyQoQ: 0, staffQoQ: 0 };
-    const current = trends[currentIdx];
-    const previous = trends[currentIdx - 1];
-    return {
-      facultyQoQ: ((current.faculty - previous.faculty) / previous.faculty) * 100,
-      staffQoQ: ((current.staff - previous.staff) / previous.staff) * 100,
-    };
-  }, [selectedQuarter]);
-
 
   // Demographics references
   const demographics = workforceData?.demographics;
@@ -303,54 +332,43 @@ const ExecutiveDashboard = () => {
 
         {/* ── MIDDLE ROW ── */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
-          {/* Workforce by Type (Donut) */}
-          <div className="bg-white rounded-lg shadow-sm border p-3">
-            <h2 className="text-sm font-semibold text-gray-700 mb-2">Workforce by Type</h2>
-            {/* Centered donut chart */}
-            <div className="flex justify-center">
-              <div className="relative w-48 h-48">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={donutData}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={55}
-                      outerRadius={85}
-                      dataKey="value"
-                      stroke="none"
-                    >
-                      {donutData.map((_, i) => (
-                        <Cell key={`cell-${i}`} fill={DONUT_COLORS[i]} />
-                      ))}
-                    </Pie>
-                  </PieChart>
-                </ResponsiveContainer>
-                <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                  <span className="text-2xl font-bold text-gray-900">
-                    {totalHeadcount.toLocaleString()}
-                  </span>
-                  <span className="text-[10px] text-gray-500 uppercase">Total</span>
-                </div>
-              </div>
+          {/* Employees by Type */}
+          <div className="bg-white rounded-lg shadow-sm border p-4">
+            <h2 className="text-base font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <svg className="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
+              </svg>
+              Employees by Type
+            </h2>
+
+            <div className="space-y-2.5">
+              {donutData.map((d) => {
+                const maxValue = Math.max(...donutData.map(item => item.value));
+                return (
+                  <div key={d.name} className="flex items-center gap-3">
+                    <div className="w-20 text-sm text-gray-700 font-medium truncate" title={d.fullName || d.name}>{d.name}</div>
+                    <div className="flex-1">
+                      <div className="h-6 bg-gray-100 rounded overflow-hidden">
+                        <div
+                          className="h-full bg-blue-500 rounded"
+                          style={{ width: `${(d.value / maxValue) * 100}%` }}
+                          role="meter"
+                          aria-valuenow={d.value}
+                          aria-valuemin={0}
+                          aria-valuemax={maxValue}
+                          aria-label={`${d.fullName || d.name}: ${d.value.toLocaleString()}`}
+                        />
+                      </div>
+                    </div>
+                    <div className="w-14 text-right text-sm font-semibold text-gray-700">{d.value.toLocaleString()}</div>
+                  </div>
+                );
+              })}
             </div>
-            {/* Legend below chart */}
-            <div className="grid grid-cols-3 gap-x-3 gap-y-1 mt-2">
-              {donutData.map((d, i) => (
-                <div key={d.name} className="flex items-center gap-1.5 text-xs">
-                  <span
-                    className="w-2.5 h-2.5 rounded-full flex-shrink-0"
-                    style={{ backgroundColor: DONUT_COLORS[i] }}
-                    aria-hidden="true"
-                  />
-                  <span className="text-gray-600">{d.name}:</span>
-                  <span className="font-semibold text-gray-900">{d.value.toLocaleString()}</span>
-                </div>
-              ))}
-            </div>
+
             {/* Screen-reader accessible data table */}
             <table className="sr-only">
-              <caption>Workforce breakdown by employee type</caption>
+              <caption>Benefit eligible workforce by employee type</caption>
               <thead>
                 <tr><th>Type</th><th>Count</th></tr>
               </thead>
@@ -362,238 +380,179 @@ const ExecutiveDashboard = () => {
             </table>
           </div>
 
-          {/* Q1 Talent Movement */}
-          <div className="bg-white rounded-lg shadow-sm border p-3">
-            <h2 className="text-sm font-semibold text-gray-700 mb-2">Q1 Talent Movement</h2>
-            <div className="grid grid-cols-2 gap-3 mb-3">
-              <div className="text-center p-2 bg-green-50 rounded">
-                <div className="text-lg font-bold text-green-700">+{newHires}</div>
-                <div className="text-xs text-green-600">Hires</div>
-              </div>
-              <div className="text-center p-2 bg-red-50 rounded">
-                <div className="text-lg font-bold text-red-700">-{separations}</div>
-                <div className="text-xs text-red-600">Separations</div>
-              </div>
-            </div>
-            <div
-              className={`text-center p-2 rounded mb-3 ${
-                netChange < 0 ? 'bg-red-50' : netChange > 0 ? 'bg-green-50' : 'bg-gray-50'
-              }`}
-            >
-              <div className="text-xs text-gray-500 uppercase font-semibold">Net Change</div>
-              <div
-                className={`text-xl font-bold ${
-                  netChange < 0
-                    ? 'text-red-700'
-                    : netChange > 0
-                    ? 'text-green-700'
-                    : 'text-gray-700'
-                }`}
-              >
-                {netChange > 0 ? '+' : ''}{netChange}
-              </div>
-            </div>
-            <div className="bg-gray-50 rounded p-2">
-              <div className="text-xs text-gray-500 uppercase font-semibold mb-1">
-                Open Requisitions
-              </div>
-              <div className="text-sm font-medium text-gray-900">{requisitions} Staff Reqs</div>
-            </div>
-          </div>
-
-          {/* Exit Survey Insights */}
-          <div className="bg-white rounded-lg shadow-sm border p-3">
-            <h2 className="text-sm font-semibold text-gray-700 mb-2">Exit Survey Insights</h2>
-            <div className="grid grid-cols-3 gap-2 mb-3">
-              <div className="text-center">
-                <div className="text-lg font-bold text-gray-900">
-                  {exitSurveyData.totalResponses}
-                </div>
-                <div className="text-[10px] text-gray-500">Responses</div>
-              </div>
-              <div className="text-center">
-                <div className="text-lg font-bold text-gray-900">
-                  {exitSurveyData.responseRate}%
-                </div>
-                <div className="text-[10px] text-gray-500">Rate</div>
-              </div>
-              <div className="text-center">
-                <div className="text-lg font-bold text-gray-900">
-                  {exitSurveyData.wouldRecommend}%
-                </div>
-                <div className="text-[10px] text-gray-500">Recommend</div>
-              </div>
-            </div>
-
-            {/* Top Exit Factors */}
-            <div className="mb-2">
-              <h3 className="text-xs font-semibold text-gray-500 uppercase mb-1">
-                Top Exit Factors
-              </h3>
-              {topFactors.map((f, i) => (
-                <div key={i} className="flex items-center gap-2 mb-1">
-                  <div className="flex-1 min-w-0">
-                    <div className="text-[11px] text-gray-600 truncate" title={f.reason}>
-                      {f.reason}
-                    </div>
-                    <div className="w-full bg-gray-100 rounded-full h-1.5">
-                      <div
-                        className="bg-red-400 h-1.5 rounded-full"
-                        style={{ width: `${Math.min(f.percentage, 100)}%` }}
-                        role="meter"
-                        aria-valuenow={f.percentage}
-                        aria-valuemin={0}
-                        aria-valuemax={100}
-                        aria-label={`${f.reason}: ${f.percentage}%`}
-                      />
-                    </div>
-                  </div>
-                  <span className="text-xs font-medium text-gray-700 w-10 text-right flex-shrink-0">
-                    {f.percentage}%
-                  </span>
-                </div>
-              ))}
-            </div>
-
-            {/* Satisfaction Ratings */}
-            {satisfactionRatings && (
-              <div>
-                <h3 className="text-xs font-semibold text-gray-500 uppercase mb-1">
-                  Satisfaction (1-5)
-                </h3>
-                {satisfactionRows.map(item => (
-                  <div key={item.key} className="flex items-center gap-1 mb-0.5">
-                    <span className="text-[10px] text-gray-600 w-20 truncate">{item.label}</span>
-                    <div className="flex-1 bg-gray-100 rounded-full h-1.5">
-                      <div
-                        className="bg-blue-400 h-1.5 rounded-full"
-                        style={{ width: `${(satisfactionRatings[item.key] / 5) * 100}%` }}
-                        role="meter"
-                        aria-valuenow={satisfactionRatings[item.key]}
-                        aria-valuemin={0}
-                        aria-valuemax={5}
-                        aria-label={`${item.label}: ${satisfactionRatings[item.key]} out of 5`}
-                      />
-                    </div>
-                    <span className="text-[10px] font-medium text-gray-700 w-6 text-right">
-                      {satisfactionRatings[item.key]}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* ── BOTTOM ROW ── */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
-          {/* Benefit-Eligible Faculty */}
+          {/* Gender Breakdown */}
           <div className="bg-white rounded-lg shadow-sm border p-4">
-            <div className="flex items-start justify-between mb-3">
-              <div className="w-9 h-9 rounded-lg bg-indigo-50 flex items-center justify-center">
-                <svg className="w-5 h-5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                  <path d="M4.26 10.147a60.438 60.438 0 0 0-.491 6.347A48.62 48.62 0 0 1 12 20.904a48.62 48.62 0 0 1 8.232-4.41 60.46 60.46 0 0 0-.491-6.347m-15.482 0a50.636 50.636 0 0 0-2.658-.813A59.906 59.906 0 0 1 12 3.493a59.903 59.903 0 0 1 10.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.717 50.717 0 0 1 12 13.489a50.702 50.702 0 0 1 7.74-3.342M6.75 15a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm0 0v-3.675A55.378 55.378 0 0 1 12 8.443m-7.007 11.55A5.981 5.981 0 0 0 6.75 15.75v-1.5" />
-                </svg>
-              </div>
-              <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-indigo-50 text-indigo-700 uppercase tracking-wide">Faculty</span>
-            </div>
-            <div className="flex items-baseline gap-2 mb-1">
-              <span className="text-3xl font-bold text-gray-900">{summary.faculty.count.toLocaleString()}</span>
-              <span className={`text-sm font-semibold ${qoqData.facultyQoQ >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                {qoqData.facultyQoQ >= 0 ? '+' : ''}{qoqData.facultyQoQ.toFixed(1)}%
-              </span>
-            </div>
-            <div className="text-xs font-medium text-gray-500">Benefit Eligible Faculty</div>
-            <div className="text-xs text-gray-400 mt-1">
-              OMA: {summary.faculty.oma.toLocaleString()} | PHX: {summary.faculty.phx.toLocaleString()}
-            </div>
-          </div>
-
-          {/* Benefit-Eligible Staff */}
-          <div className="bg-white rounded-lg shadow-sm border p-4">
-            <div className="flex items-start justify-between mb-3">
-              <div className="w-9 h-9 rounded-lg bg-emerald-50 flex items-center justify-center">
-                <svg className="w-5 h-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                  <path d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21" />
-                </svg>
-              </div>
-              <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 uppercase tracking-wide">Staff</span>
-            </div>
-            <div className="flex items-baseline gap-2 mb-1">
-              <span className="text-3xl font-bold text-gray-900">{summary.staff.count.toLocaleString()}</span>
-              <span className={`text-sm font-semibold ${qoqData.staffQoQ >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                {qoqData.staffQoQ >= 0 ? '+' : ''}{qoqData.staffQoQ.toFixed(1)}%
-              </span>
-            </div>
-            <div className="text-xs font-medium text-gray-500">Benefit Eligible Staff</div>
-            <div className="text-xs text-gray-400 mt-1">
-              OMA: {summary.staff.oma.toLocaleString()} | PHX: {summary.staff.phx.toLocaleString()}
-            </div>
-          </div>
-
-          {/* Demographics Snapshot */}
-          <div className="bg-white rounded-lg shadow-sm border p-4">
-            <h2 className="text-sm font-semibold text-gray-700 mb-4">Gender Breakdown</h2>
+            <h2 className="text-base font-bold text-gray-900 mb-4">Gender Breakdown</h2>
             {demographics?.gender && (
               <div className="space-y-4">
                 {/* Faculty Gender */}
                 <div>
-                  <div className="flex items-center justify-between mb-1.5">
-                    <span className="text-sm font-medium text-gray-700">Faculty</span>
-                    <div className="flex items-center gap-3 text-xs text-gray-500">
-                      <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-pink-400 inline-block" />Female {demographics.gender.faculty.distribution[0].percentage}%</span>
-                      <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-blue-400 inline-block" />Male {(100 - demographics.gender.faculty.distribution[0].percentage).toFixed(1)}%</span>
-                    </div>
-                  </div>
-                  <div className="flex h-6 rounded-full overflow-hidden bg-gray-100">
+                  <span className="text-sm font-medium text-gray-700">Benefit Eligible Faculty</span>
+                  <div className="flex h-7 rounded-full overflow-hidden bg-gray-100 mt-1.5">
                     <div
-                      className="bg-pink-400 flex items-center justify-center transition-all"
-                      style={{
-                        width: `${demographics.gender.faculty.distribution[0].percentage}%`,
-                      }}
+                      className="bg-emerald-500 flex items-center justify-center transition-all"
+                      style={{ width: `${demographics.gender.faculty.distribution[0].percentage}%` }}
                     >
                       <span className="text-xs font-semibold text-white">
                         {demographics.gender.faculty.distribution[0].percentage}%
                       </span>
                     </div>
-                    <div className="bg-blue-400 flex-1" />
+                    <div className="bg-blue-400 flex-1 flex items-center justify-center">
+                      <span className="text-xs font-semibold text-white">
+                        {(100 - demographics.gender.faculty.distribution[0].percentage).toFixed(1)}%
+                      </span>
+                    </div>
                   </div>
                 </div>
 
                 {/* Staff Gender */}
                 <div>
-                  <div className="flex items-center justify-between mb-1.5">
-                    <span className="text-sm font-medium text-gray-700">Staff</span>
-                    <div className="flex items-center gap-3 text-xs text-gray-500">
-                      <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-pink-400 inline-block" />Female {demographics.gender.staff.distribution[0].percentage}%</span>
-                      <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-blue-400 inline-block" />Male {(100 - demographics.gender.staff.distribution[0].percentage).toFixed(1)}%</span>
-                    </div>
-                  </div>
-                  <div className="flex h-6 rounded-full overflow-hidden bg-gray-100">
+                  <span className="text-sm font-medium text-gray-700">Benefit Eligible Staff</span>
+                  <div className="flex h-7 rounded-full overflow-hidden bg-gray-100 mt-1.5">
                     <div
-                      className="bg-pink-400 flex items-center justify-center transition-all"
-                      style={{
-                        width: `${demographics.gender.staff.distribution[0].percentage}%`,
-                      }}
+                      className="bg-emerald-500 flex items-center justify-center transition-all"
+                      style={{ width: `${demographics.gender.staff.distribution[0].percentage}%` }}
                     >
                       <span className="text-xs font-semibold text-white">
                         {demographics.gender.staff.distribution[0].percentage}%
                       </span>
                     </div>
-                    <div className="bg-blue-400 flex-1" />
+                    <div className="bg-blue-400 flex-1 flex items-center justify-center">
+                      <span className="text-xs font-semibold text-white">
+                        {(100 - demographics.gender.staff.distribution[0].percentage).toFixed(1)}%
+                      </span>
+                    </div>
                   </div>
+                </div>
+
+                {/* Legend */}
+                <div className="flex items-center justify-center gap-4 pt-1">
+                  <span className="flex items-center gap-1.5 text-xs font-semibold text-emerald-500">
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block" />Female
+                  </span>
+                  <span className="flex items-center gap-1.5 text-xs font-semibold text-blue-400">
+                    <span className="w-2.5 h-2.5 rounded-full bg-blue-400 inline-block" />Male
+                  </span>
                 </div>
               </div>
             )}
           </div>
 
+          {/* Exit Surveys */}
+          <div className="bg-white rounded-lg shadow-sm border p-4">
+            <h2 className="text-base font-bold text-gray-900 mb-3">Exit Surveys</h2>
+            <div className="flex items-start justify-between mb-3">
+              <div className="w-9 h-9 rounded-lg bg-green-50 flex items-center justify-center">
+                <svg className="w-5 h-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6.633 10.25c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 0 1 2.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 0 0 .322-1.672V2.75a.75.75 0 0 1 .75-.75 2.25 2.25 0 0 1 2.25 2.25c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 0 1-2.649 7.521c-.388.482-.987.729-1.605.729H14.23c-.483 0-.964-.078-1.423-.23l-3.114-1.04a4.501 4.501 0 0 0-1.423-.23H5.904m.729-6.555a9.01 9.01 0 0 0-.729 6.555M5.904 16.75h-.159a1.5 1.5 0 0 1-1.5-1.5v-6a1.5 1.5 0 0 1 1.5-1.5h.159" />
+                </svg>
+              </div>
+              <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full uppercase tracking-wide ${
+                exitSurveyData.wouldRecommend >= 75
+                  ? 'bg-green-50 text-green-700'
+                  : exitSurveyData.wouldRecommend >= 50
+                  ? 'bg-amber-50 text-amber-700'
+                  : 'bg-red-50 text-red-700'
+              }`}>
+                {exitSurveyData.wouldRecommend >= 75 ? 'High' : exitSurveyData.wouldRecommend >= 50 ? 'Moderate' : 'Low'}
+              </span>
+            </div>
+            <div className="text-3xl font-bold text-gray-900">{exitSurveyData.wouldRecommend}%</div>
+            <div className="text-sm font-medium text-gray-700 mt-0.5">Would Recommend Creighton</div>
+            <div className="text-xs text-gray-400 mt-1">
+              {Math.round(exitSurveyData.wouldRecommend / 100 * exitSurveyData.totalResponses)} of {exitSurveyData.totalResponses} responses
+            </div>
+          </div>
         </div>
 
-        {/* ── CHART ROW ── */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+        {/* ── CHART ROW (60/40 split) ── */}
+        <div className="flex flex-col lg:flex-row gap-3">
+          {/* Benefit Eligible Employee by State — Choropleth Map */}
+          <div className="bg-white rounded-lg shadow-sm border p-4" style={{ flex: 3 }}>
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-base font-bold text-gray-900">Benefit Eligible Employee by State</h2>
+              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 uppercase tracking-wide">
+                {quarterConfig?.label}
+              </span>
+            </div>
+            {employeesByState && (
+              <>
+                <div
+                  role="img"
+                  aria-label={`US choropleth map showing benefit-eligible employee distribution across ${Object.keys(employeesByState).length} states. Total: ${Object.values(employeesByState).reduce((s, c) => s + c, 0).toLocaleString()} employees.`}
+                >
+                  <ComposableMap
+                    projection="geoAlbersUsa"
+                    projectionConfig={{ scale: 800 }}
+                    width={600}
+                    height={400}
+                    style={{ width: '100%', height: 'auto' }}
+                  >
+                    <Geographies geography={GEO_URL}>
+                      {({ geographies }) =>
+                        geographies.map((geo) => {
+                          const fips = geo.id;
+                          const stateCode = FIPS_TO_STATE[fips];
+                          const count = stateCode ? (employeesByState[stateCode] || 0) : 0;
+                          return (
+                            <Geography
+                              key={geo.rsmKey || geo.id}
+                              geography={geo}
+                              fill={getColorForCount(count)}
+                              stroke="#FFFFFF"
+                              strokeWidth={0.5}
+                              style={{
+                                default: { outline: 'none' },
+                                hover: { outline: 'none', opacity: 0.85 },
+                                pressed: { outline: 'none' },
+                              }}
+                            />
+                          );
+                        })
+                      }
+                    </Geographies>
+                  </ComposableMap>
+                </div>
+
+                {/* Color legend */}
+                <div className="mt-3">
+                  <div className="text-xs font-semibold text-gray-600 mb-1.5 text-center">Employees by State</div>
+                  <div className="flex flex-wrap gap-2 justify-center">
+                    {COLOR_RANGES.slice().reverse().map((range) => (
+                      <div key={range.label} className="flex items-center gap-1">
+                        <span
+                          className="w-4 h-3 rounded-sm inline-block border border-gray-300"
+                          style={{ backgroundColor: range.color }}
+                          aria-hidden="true"
+                        />
+                        <span className="text-[10px] text-gray-600">{range.label}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Screen-reader accessible data table */}
+                <table className="sr-only">
+                  <caption>Benefit-eligible employee count by state of residence</caption>
+                  <thead>
+                    <tr><th>State</th><th>Employees</th></tr>
+                  </thead>
+                  <tbody>
+                    {Object.entries(employeesByState)
+                      .sort((a, b) => b[1] - a[1])
+                      .map(([code, count]) => (
+                        <tr key={code}><td>{STATE_NAMES[code] || code}</td><td>{count}</td></tr>
+                      ))
+                    }
+                  </tbody>
+                </table>
+              </>
+            )}
+          </div>
+
           {/* Turnover by Length of Service */}
-          <div className="bg-white rounded-lg shadow-sm border p-4">
-            <h2 className="text-sm font-semibold text-gray-700 mb-3">Turnover by Length of Service</h2>
+          <div className="bg-white rounded-lg shadow-sm border p-4" style={{ flex: 2 }}>
+            <h2 className="text-base font-bold text-gray-900 mb-3">Turnover by Length of Service</h2>
             {losChartData.length > 0 && (
               <ResponsiveContainer width="100%" height={320}>
                 <BarChart data={losChartData} margin={{ top: 25, right: 10, left: -10, bottom: 0 }}>
@@ -619,80 +578,6 @@ const ExecutiveDashboard = () => {
                   </Bar>
                 </BarChart>
               </ResponsiveContainer>
-            )}
-          </div>
-
-          {/* Employee Locations */}
-          <div className="bg-white rounded-lg shadow-sm border p-4">
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="text-sm font-semibold text-gray-700">Employee Locations</h2>
-              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 uppercase tracking-wide">
-                {quarterConfig?.label}
-              </span>
-            </div>
-            {employeesByState && (
-              <>
-                <div role="img" aria-label="US map showing employee distribution: Nebraska 4,834 employees, Arizona 694 employees">
-                  <ComposableMap
-                    projection="geoAlbersUsa"
-                    projectionConfig={{ scale: 800 }}
-                    width={600}
-                    height={400}
-                    style={{ width: '100%', height: 'auto' }}
-                  >
-                    <Geographies geography={GEO_URL}>
-                      {({ geographies }) =>
-                        geographies.map((geo) => {
-                          const fips = geo.id;
-                          let fill = '#E5E7EB';
-                          if (fips === STATE_FIPS.NE) fill = '#00245D';
-                          if (fips === STATE_FIPS.AZ) fill = '#0054A6';
-                          return (
-                            <Geography
-                              key={geo.rsmKey || geo.id}
-                              geography={geo}
-                              fill={fill}
-                              stroke="#FFFFFF"
-                              strokeWidth={0.5}
-                              style={{
-                                default: { outline: 'none' },
-                                hover: { outline: 'none' },
-                                pressed: { outline: 'none' },
-                              }}
-                            />
-                          );
-                        })
-                      }
-                    </Geographies>
-                  </ComposableMap>
-                </div>
-                <div className="flex gap-3 mt-3 justify-center">
-                  <div className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 rounded-full">
-                    <span className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: '#00245D' }} aria-hidden="true" />
-                    <span className="text-xs font-semibold text-gray-700">
-                      NE: {employeesByState.NE.count.toLocaleString()}
-                    </span>
-                    <span className="text-xs text-gray-500">({employeesByState.NE.label})</span>
-                  </div>
-                  <div className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 rounded-full">
-                    <span className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: '#0054A6' }} aria-hidden="true" />
-                    <span className="text-xs font-semibold text-gray-700">
-                      AZ: {employeesByState.AZ.count.toLocaleString()}
-                    </span>
-                    <span className="text-xs text-gray-500">({employeesByState.AZ.label})</span>
-                  </div>
-                </div>
-                <table className="sr-only">
-                  <caption>Employee distribution by campus location</caption>
-                  <thead>
-                    <tr><th>State</th><th>Campus</th><th>Employees</th></tr>
-                  </thead>
-                  <tbody>
-                    <tr><td>Nebraska</td><td>{employeesByState.NE.label}</td><td>{employeesByState.NE.count}</td></tr>
-                    <tr><td>Arizona</td><td>{employeesByState.AZ.label}</td><td>{employeesByState.AZ.count}</td></tr>
-                  </tbody>
-                </table>
-              </>
             )}
           </div>
         </div>
