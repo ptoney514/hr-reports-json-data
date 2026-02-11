@@ -31,7 +31,8 @@ import {
 const SitemapDashboard = () => {
   // Main Dashboards
   const mainDashboards = [
-    { path: '/dashboards', label: 'Dashboard Home', icon: Home },
+    { path: '/dashboards/executive', label: 'Executive Dashboard', icon: Home },
+    { path: '/dashboards/marketing-slides', label: 'Marketing Slides', icon: FileText },
     { path: '/dashboards/workforce', label: 'Workforce Overview', icon: Users },
     { path: '/dashboards/turnover', label: 'Turnover Overview', icon: TrendingDown },
     { path: '/dashboards/recruiting', label: 'Recruiting Overview', icon: UserPlus }

@@ -157,13 +157,13 @@ describe('Navigation Component', () => {
   });
 
   describe('Active State', () => {
-    test('Dashboard link shows active state on /dashboards', () => {
-      renderWithRoute('/dashboards');
+    test('Dashboard link shows active state on /dashboards/executive', () => {
+      renderWithRoute('/dashboards/executive');
 
-      // Find the Dashboard nav link (not the brand link)
-      const dashboardLinks = screen.getAllByRole('link', { name: /^dashboard$/i });
+      // Find the Executive Dashboard nav link (not the brand link)
+      const dashboardLinks = screen.getAllByRole('link', { name: /executive dashboard/i });
       const activeLink = dashboardLinks.find(link =>
-        link.getAttribute('href') === '/dashboards' &&
+        link.getAttribute('href') === '/dashboards/executive' &&
         link.classList.contains('bg-blue-50')
       );
       expect(activeLink).toBeTruthy();
