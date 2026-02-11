@@ -89,6 +89,7 @@ function getColorForCount(count) {
   return '#E5E7EB';
 }
 
+
 const ExecutiveDashboard = () => {
   const [selectedQuarter, setSelectedQuarter] = useState("2025-09-30");
 
@@ -440,13 +441,8 @@ const ExecutiveDashboard = () => {
 
           {/* Exit Surveys */}
           <div className="bg-white rounded-lg shadow-sm border p-4">
-            <h2 className="text-base font-bold text-gray-900 mb-3">Exit Surveys</h2>
-            <div className="flex items-start justify-between mb-3">
-              <div className="w-9 h-9 rounded-lg bg-green-50 flex items-center justify-center">
-                <svg className="w-5 h-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6.633 10.25c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 0 1 2.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 0 0 .322-1.672V2.75a.75.75 0 0 1 .75-.75 2.25 2.25 0 0 1 2.25 2.25c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 0 1-2.649 7.521c-.388.482-.987.729-1.605.729H14.23c-.483 0-.964-.078-1.423-.23l-3.114-1.04a4.501 4.501 0 0 0-1.423-.23H5.904m.729-6.555a9.01 9.01 0 0 0-.729 6.555M5.904 16.75h-.159a1.5 1.5 0 0 1-1.5-1.5v-6a1.5 1.5 0 0 1 1.5-1.5h.159" />
-                </svg>
-              </div>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Exit Surveys</h2>
               <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full uppercase tracking-wide ${
                 exitSurveyData.wouldRecommend >= 75
                   ? 'bg-green-50 text-green-700'
@@ -457,10 +453,25 @@ const ExecutiveDashboard = () => {
                 {exitSurveyData.wouldRecommend >= 75 ? 'High' : exitSurveyData.wouldRecommend >= 50 ? 'Moderate' : 'Low'}
               </span>
             </div>
-            <div className="text-3xl font-bold text-gray-900">{exitSurveyData.wouldRecommend}%</div>
-            <div className="text-sm font-medium text-gray-700 mt-0.5">Would Recommend Creighton</div>
-            <div className="text-xs text-gray-400 mt-1">
-              {Math.round(exitSurveyData.wouldRecommend / 100 * exitSurveyData.totalResponses)} of {exitSurveyData.totalResponses} responses
+            <div className="flex items-baseline gap-2 mb-3">
+              <span className="text-4xl font-bold text-[#00695C]">{exitSurveyData.wouldRecommend}%</span>
+              <span className="text-base font-medium text-gray-700">Would Recommend</span>
+            </div>
+            <div className="h-2.5 bg-green-100 rounded-full overflow-hidden mb-3" role="meter" aria-valuenow={exitSurveyData.wouldRecommend} aria-valuemin={0} aria-valuemax={100} aria-label={`${exitSurveyData.wouldRecommend}% would recommend`}>
+              <div className="h-full bg-[#10B981] rounded-full" style={{ width: `${exitSurveyData.wouldRecommend}%` }} />
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-gray-400">
+                {Math.round(exitSurveyData.wouldRecommend / 100 * exitSurveyData.totalResponses)} of {exitSurveyData.totalResponses} responses
+              </span>
+              <div className="flex gap-0.5" aria-hidden="true">
+                {Array.from({ length: exitSurveyData.totalResponses }, (_, i) => (
+                  <span
+                    key={i}
+                    className={`w-2 h-2 rounded-full ${i < Math.round(exitSurveyData.wouldRecommend / 100 * exitSurveyData.totalResponses) ? 'bg-[#10B981]' : 'bg-gray-300'}`}
+                  />
+                ))}
+              </div>
             </div>
           </div>
         </div>
