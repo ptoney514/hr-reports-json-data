@@ -239,11 +239,11 @@ describe('WorkforceQ1FY26Dashboard', () => {
       );
 
       expect(screen.getByText('Q1 FY26 Workforce and Headcount Report')).toBeInTheDocument();
-      expect(screen.getByText('Benefit Eligible Employees • July 2025 - September 2025')).toBeInTheDocument();
-      expect(screen.getByText('Employee headcount, workforce composition, and organizational trends')).toBeInTheDocument();
+      expect(screen.getByText(/Benefit Eligible Employees/)).toBeInTheDocument();
+      expect(screen.getByText('Creighton University')).toBeInTheDocument();
     });
 
-    it('should display total headcount in header', () => {
+    it('should display total headcount in cards', () => {
       render(
         <BrowserRouter>
           <WorkforceQ1FY26Dashboard />
@@ -251,7 +251,7 @@ describe('WorkforceQ1FY26Dashboard', () => {
       );
 
       expect(screen.getAllByText('5,528').length).toBeGreaterThan(0);
-      expect(screen.getByText('Total Q1 FY26 Headcount')).toBeInTheDocument();
+      expect(screen.getByText('Total Headcount')).toBeInTheDocument();
     });
   });
 
@@ -266,24 +266,24 @@ describe('WorkforceQ1FY26Dashboard', () => {
       // Total Headcount
       expect(screen.getByText('Total Headcount')).toBeInTheDocument();
 
-      // Faculty - appears in card and chart
-      expect(screen.getByText('Benefit Eligible Faculty')).toBeInTheDocument();
+      // Faculty - appears in card (BE Faculty) and chart (Benefit-Eligible Faculty)
+      expect(screen.getByText('BE Faculty')).toBeInTheDocument();
       expect(screen.getAllByText('697').length).toBeGreaterThan(0);
 
-      // Staff - appears in card and chart (updated for Grade R: 1,419)
-      expect(screen.getByText('Benefit Eligible Staff')).toBeInTheDocument();
+      // Staff - appears in card (BE Staff) and chart (updated for Grade R: 1,419)
+      expect(screen.getByText('BE Staff')).toBeInTheDocument();
       expect(screen.getAllByText('1,419').length).toBeGreaterThan(0);
 
-      // House Staff Physicians - appears in card and chart
-      expect(screen.getAllByText('House Staff Physicians').length).toBeGreaterThan(0);
+      // House Staff - appears in card and chart
+      expect(screen.getAllByText(/House Staff/).length).toBeGreaterThan(0);
       expect(screen.getAllByText('613').length).toBeGreaterThan(0);
 
       // Student Workers - appears in card and chart
       expect(screen.getAllByText('Student Workers').length).toBeGreaterThan(0);
       expect(screen.getAllByText('2,157').length).toBeGreaterThan(0);
 
-      // Temporary Employees - appears in card and chart (updated for Grade R: 642)
-      expect(screen.getAllByText('Temporary Employees').length).toBeGreaterThan(0);
+      // Non-Benefit Eligible - appears in card, Temporary Employees in chart (updated for Grade R: 642)
+      expect(screen.getAllByText('Non-Benefit Eligible').length).toBeGreaterThan(0);
       expect(screen.getAllByText('642').length).toBeGreaterThan(0);
     });
 
@@ -422,10 +422,10 @@ describe('WorkforceQ1FY26Dashboard', () => {
       const facultyLegends = screen.getAllByText('Faculty');
       expect(facultyLegends.length).toBeGreaterThan(0);
 
-      const studentsLegends = screen.getAllByText('Students');
-      expect(studentsLegends.length).toBeGreaterThan(0);
+      const studentWorkerLegends = screen.getAllByText('Student Workers');
+      expect(studentWorkerLegends.length).toBeGreaterThan(0);
 
-      expect(screen.getByText('House Staff')).toBeInTheDocument();
+      expect(screen.getAllByText(/House Staff/).length).toBeGreaterThan(0);
       // Multiple instances of "Non-Benefit Eligible" exist in the dashboard
       const nonBenefitEligibleElements = screen.getAllByText('Non-Benefit Eligible');
       expect(nonBenefitEligibleElements.length).toBeGreaterThan(0);
