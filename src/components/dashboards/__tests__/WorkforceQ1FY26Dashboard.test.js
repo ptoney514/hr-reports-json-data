@@ -231,16 +231,15 @@ describe('WorkforceQ1FY26Dashboard', () => {
       expect(getQuarterlyWorkforceData).toHaveBeenCalledWith("2025-09-30");
     });
 
-    it('should display page title and header information', () => {
+    it('should display subtitle and quarter selector', () => {
       render(
         <BrowserRouter>
           <WorkforceQ1FY26Dashboard />
         </BrowserRouter>
       );
 
-      expect(screen.getByText('Q1 FY26 Workforce and Headcount Report')).toBeInTheDocument();
       expect(screen.getByText(/Benefit Eligible Employees/)).toBeInTheDocument();
-      expect(screen.getByText('Creighton University')).toBeInTheDocument();
+      expect(screen.getByLabelText('Select quarter')).toBeInTheDocument();
     });
 
     it('should display total headcount in cards', () => {

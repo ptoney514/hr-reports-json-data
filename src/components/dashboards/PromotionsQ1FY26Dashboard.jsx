@@ -342,8 +342,8 @@ const PromotionsQ1FY26Dashboard = () => {
   ];
 
   return (
-    <div id="promotions-q1-fy26-dashboard" className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-6">
+    <div id="promotions-q1-fy26-dashboard" className="min-h-screen">
+      <div className="w-[85%] max-w-[1280px] mx-auto pt-5 pb-8">
 
         {/* Page Header */}
         <div className="mb-8">

@@ -1,7 +1,7 @@
 import React, { useEffect, Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import Navigation from './components/ui/Navigation';
+import SlideHeader from './components/ui/SlideHeader';
 import ErrorBoundary from './components/ui/ErrorBoundary';
 // Removed DataSourceProvider - using static data now
 import { DashboardProvider } from './contexts/DashboardContext';
@@ -80,11 +80,11 @@ const AppLayout = ({ children }) => {
     );
   }
 
-  // Standard layout with sidebar navigation
+  // Standard layout with top-bar slide navigation
   return (
-    <div className="App flex h-screen bg-gray-50">
-      <Navigation />
-      <main className="flex-1 overflow-y-auto">
+    <div className="App min-h-screen bg-gray-100">
+      <SlideHeader />
+      <main className="overflow-y-auto">
         {children}
       </main>
     </div>

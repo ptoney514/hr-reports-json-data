@@ -59,18 +59,16 @@ const TotalRewardsDashboard = () => {
 
   return (
     <ErrorBoundary>
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen">
         {/* Header Section */}
         <div className="bg-white border-b-2" style={{ borderBottomColor: '#4366D0' }}>
-          <div className="p-8">
-            <div className="max-w-7xl mx-auto">
-              <h1 className="text-4xl font-bold text-center mb-2" style={{ color: '#00245D' }}>Total Rewards FY2025 Excellence</h1>
-              <p className="text-center text-lg" style={{ color: '#4366D0' }}>Transforming Compensation & Benefits Strategy</p>
-            </div>
+          <div className="w-[85%] max-w-[1280px] mx-auto py-8">
+            <h1 className="text-4xl font-bold text-center mb-2" style={{ color: '#00245D' }}>Total Rewards FY2025 Excellence</h1>
+            <p className="text-center text-lg" style={{ color: '#4366D0' }}>Transforming Compensation & Benefits Strategy</p>
           </div>
         </div>
 
-        <div className="p-8 max-w-7xl mx-auto">
+        <div className="w-[85%] max-w-[1280px] mx-auto pt-5 pb-8">
           {/* Strategic Focus Card - Similar to Benefits & Wellbeing */}
           <div className="mb-12">
             <div className="rounded-3xl p-10 relative overflow-hidden"

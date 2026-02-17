@@ -24,7 +24,7 @@ const DashboardLayoutInner = ({
   onExport,
   className = "",
   gridCols = "grid-cols-1 lg:grid-cols-2",
-  maxWidth = "max-w-7xl"
+  maxWidth = "w-[85%] max-w-[1280px]"
 }) => {
   const mainContentRef = useRef(null);
   const skipLinksRef = useRef(null);
@@ -216,7 +216,7 @@ const DashboardLayoutInner = ({
   };
 
   return (
-    <div className={`bg-gray-50 min-h-screen print:bg-white print:p-2 ${className}`}>
+    <div className={`min-h-screen print:bg-white print:p-2 ${className}`}>
       {/* Skip link for accessibility */}
       <a href="#main-content" className="skip-link">
         Skip to main content
@@ -262,7 +262,7 @@ const DashboardLayoutInner = ({
       <main 
         id="main-content" 
         ref={mainContentRef}
-        className={`mx-auto px-4 py-4 print:p-0 ${maxWidth}`} 
+        className={`mx-auto pt-5 pb-8 print:p-0 ${maxWidth}`}
         role="main"
         tabIndex="-1"
         aria-labelledby="dashboard-title"
