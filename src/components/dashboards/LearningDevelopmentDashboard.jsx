@@ -71,18 +71,16 @@ const LearningDevelopmentDashboard = () => {
 
   return (
     <ErrorBoundary>
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen">
         {/* Header Section */}
         <div className="bg-white border-b-2" style={{ borderBottomColor: '#4366D0' }}>
-          <div className="p-8">
-            <div className="max-w-7xl mx-auto">
-              <h1 className="text-4xl font-bold text-center mb-2" style={{ color: '#00245D' }}>FY2025 Achievements Unlocked</h1>
-              <p className="text-center text-lg" style={{ color: '#4366D0' }}>Celebrating milestones that advance our mission</p>
-            </div>
+          <div className="w-[85%] max-w-[1280px] mx-auto py-8">
+            <h1 className="text-4xl font-bold text-center mb-2" style={{ color: '#00245D' }}>FY2025 Achievements Unlocked</h1>
+            <p className="text-center text-lg" style={{ color: '#4366D0' }}>Celebrating milestones that advance our mission</p>
           </div>
         </div>
 
-        <div className="p-8 max-w-7xl mx-auto">
+        <div className="w-[85%] max-w-[1280px] mx-auto pt-5 pb-8">
           {/* Transforming How We Learn Section - New Design */}
           <div className="bg-white rounded-2xl border p-8 mb-12" style={{ borderColor: '#D7D2CB' }}>
             <h2 className="text-3xl font-bold text-center mb-8" style={{ color: '#00245D' }}>Transforming How We Learn, Grow, and Succeed</h2>

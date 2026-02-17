@@ -50,8 +50,8 @@ const ExitSurveyOverview = () => {
   ];
 
   return (
-    <div id="exit-survey-overview" className="min-h-screen bg-gray-50 py-8 dashboard-container print:bg-white print:py-0">
-      <div className="max-w-7xl mx-auto px-6 print:max-w-none print:px-0 print:mx-0">
+    <div id="exit-survey-overview" className="min-h-screen dashboard-container print:bg-white print:py-0">
+      <div className="w-[85%] max-w-[1280px] mx-auto pt-5 pb-8 print:w-full print:max-w-none print:px-0 print:mx-0">
         
         {/* Header */}
         <div className="mb-8">

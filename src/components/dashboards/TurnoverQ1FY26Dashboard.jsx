@@ -2,6 +2,8 @@ import React from 'react';
 import { TrendingDown, Users, UserCheck, Briefcase, BarChart3, Clock, Calendar, PieChart } from 'lucide-react';
 import { PieChart as RechartsPie, Pie, Cell, ResponsiveContainer } from 'recharts';
 import { getQuarterlyTurnoverData } from '../../services/dataService';
+import { useQuarter } from '../../contexts/QuarterContext';
+import NoDataForQuarter from '../ui/NoDataForQuarter';
 
 /**
  * Q1 FY26 Terminations & Turnover Dashboard
@@ -11,8 +13,14 @@ import { getQuarterlyTurnoverData } from '../../services/dataService';
  * Follows universal quarterly report patterns for consistency
  */
 const TurnoverQ1FY26Dashboard = () => {
-  // Load Q1 FY26 data dynamically from staticData.js
-  const data = getQuarterlyTurnoverData("2025-09-30");
+  const { selectedQuarter } = useQuarter();
+
+  // Load data dynamically from staticData.js based on global quarter
+  const data = getQuarterlyTurnoverData(selectedQuarter);
+
+  if (!data) {
+    return <NoDataForQuarter dataLabel="Turnover data" />;
+  }
 
   // Extract data for easier access
   const terminationData = data.summary;
@@ -56,8 +64,8 @@ const TurnoverQ1FY26Dashboard = () => {
   const earlyTenureCategoryData = data.earlyTurnover.byEmployeeCategory;
 
   return (
-    <div id="turnover-q1-fy26-dashboard" className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-6">
+    <div id="turnover-q1-fy26-dashboard" className="min-h-screen">
+      <div className="w-[85%] max-w-[1280px] mx-auto pt-5 pb-8">
 
         {/* Page Header */}
         <div className="mb-8">

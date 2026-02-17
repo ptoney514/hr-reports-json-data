@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { ComposableMap, Geographies, Geography } from 'react-simple-maps';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, LabelList } from 'recharts';
 import {
@@ -6,11 +6,8 @@ import {
   getQuarterlyTurnoverData,
   getExitSurveyData,
 } from '../../data/staticData';
-
-// Quarter configuration
-const EXECUTIVE_QUARTERS = [
-  { value: "2025-09-30", label: "Q1 FY26", period: "July - September 2025" },
-];
+import { useQuarter } from '../../contexts/QuarterContext';
+import NoDataForQuarter from '../ui/NoDataForQuarter';
 
 // New hire data per quarter (sourced from RecruitingQ1FY26Dashboard)
 const NEWHIRE_DATA = {
@@ -91,9 +88,7 @@ function getColorForCount(count) {
 
 
 const ExecutiveDashboard = () => {
-  const [selectedQuarter, setSelectedQuarter] = useState("2025-09-30");
-
-  const quarterConfig = EXECUTIVE_QUARTERS.find(q => q.value === selectedQuarter);
+  const { selectedQuarter, quarterConfig } = useQuarter();
 
   // Load data from staticData.js
   const workforceData = useMemo(
@@ -241,53 +236,16 @@ const ExecutiveDashboard = () => {
 
   // Check if data exists for selected quarter (after all hooks)
   if (!workforceData || !turnoverData || !exitSurveyData) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center p-8 bg-white rounded-lg shadow-sm border">
-          <h1 className="text-xl font-semibold text-gray-700 mb-2">Data Not Yet Available</h1>
-          <p className="text-gray-500">
-            Data for {quarterConfig?.label || selectedQuarter} has not been loaded yet.
-          </p>
-        </div>
-      </div>
-    );
+    return <NoDataForQuarter dataLabel="Executive dashboard data" />;
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 print:bg-white print:min-h-0">
-      {/* ── HEADER ── */}
-      <header className="bg-gradient-to-r from-[#00245D] to-[#0054A6] text-white px-6 py-4 print:py-3">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-bold">HR Executive Dashboard</h1>
-            <p className="text-blue-200 text-sm">
-              {quarterConfig?.label} &mdash; {quarterConfig?.period}
-            </p>
-          </div>
-          <div className="flex items-center gap-4">
-            <div className="text-right hidden sm:block">
-              <div className="text-xs text-blue-200 uppercase tracking-wider">
-                Creighton University
-              </div>
-              <div className="text-xs text-blue-300">Omaha &amp; Phoenix</div>
-            </div>
-            <select
-              value={selectedQuarter}
-              onChange={(e) => setSelectedQuarter(e.target.value)}
-              className="bg-white/10 border border-white/20 rounded px-3 py-1.5 text-sm text-white print:hidden focus:ring-2 focus:ring-white/40 focus:outline-none"
-              aria-label="Select quarter"
-            >
-              {EXECUTIVE_QUARTERS.map(q => (
-                <option key={q.value} value={q.value} className="text-gray-900">
-                  {q.label}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-      </header>
-
-      <div className="px-4 py-3 space-y-3 print:px-2 print:py-1 print:space-y-2">
+    <div className="min-h-screen print:bg-white print:min-h-0">
+      <div className="w-[85%] max-w-[1280px] mx-auto pt-5 pb-8 space-y-3 print:w-full print:max-w-none print:px-2 print:py-1 print:space-y-2">
+        {/* Period context (quarter now controlled globally via header) */}
+        <p className="text-sm text-gray-500 print:hidden">
+          {quarterConfig?.label} &mdash; {quarterConfig?.period}
+        </p>
         {/* ── KPI ROW ── */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3" role="region" aria-label="Key performance indicators">
           {/* Total Headcount */}

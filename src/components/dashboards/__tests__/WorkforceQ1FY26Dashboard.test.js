@@ -2,11 +2,16 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import WorkforceQ1FY26Dashboard from '../WorkforceQ1FY26Dashboard';
-import { getQuarterlyWorkforceData } from '../../../data/staticData';
 
-// Mock staticData
-jest.mock('../../../data/staticData', () => ({
-  getQuarterlyWorkforceData: jest.fn(),
+// The component imports from services/dataService which proxies to data/staticData.
+// Mock the dataService module directly since that's what the component imports.
+// NOTE: jest.mock() factory is hoisted above all variable declarations, so data
+// referenced directly inside the factory must be inlined. Only jest.fn() variables
+// prefixed with "mock" bypass hoisting restrictions.
+const mockGetQuarterlyWorkforceData = jest.fn();
+
+jest.mock('../../../services/dataService', () => ({
+  getQuarterlyWorkforceData: (...args) => mockGetQuarterlyWorkforceData(...args),
   QUARTERLY_HEADCOUNT_TRENDS: [
     { quarter: "Q1 FY24", faculty: 700, staff: 1410, hsp: 580, students: 1700, temp: 610, total: 5000 },
     { quarter: "Q2 FY24", faculty: 705, staff: 1420, hsp: 585, students: 1780, temp: 610, total: 5100 },
@@ -17,7 +22,17 @@ jest.mock('../../../data/staticData', () => ({
     { quarter: "Q3 FY25", faculty: 700, staff: 1455, hsp: 605, students: 2010, temp: 630, total: 5400 },
     { quarter: "Q4 FY25", faculty: 689, staff: 1448, hsp: 610, students: 1650, temp: 640, total: 5037 },
     { quarter: "Q1 FY26", faculty: 697, staff: 1419, hsp: 613, students: 2157, temp: 642, total: 5528 }
-  ]
+  ],
+}));
+
+// Mock QuarterContext
+jest.mock('../../../contexts/QuarterContext', () => ({
+  useQuarter: () => ({
+    selectedQuarter: '2025-09-30',
+    quarterConfig: { value: '2025-09-30', label: 'Q1 FY26', period: 'July - September 2025', fiscalYear: 'FY26' },
+    setQuarter: jest.fn(),
+    availableQuarters: [{ value: '2025-09-30', label: 'Q1 FY26', period: 'July - September 2025', fiscalYear: 'FY26' }],
+  }),
 }));
 
 describe('WorkforceQ1FY26Dashboard', () => {
@@ -37,8 +52,8 @@ describe('WorkforceQ1FY26Dashboard', () => {
         phx: 40
       },
       staff: {
-        count: 1419,  // Updated for Grade R exclusion (was 1431)
-        oma: 1318,    // Updated for Grade R exclusion (was 1330)
+        count: 1419,
+        oma: 1318,
         phx: 101
       },
       houseStaffPhysicians: {
@@ -52,8 +67,8 @@ describe('WorkforceQ1FY26Dashboard', () => {
         phx: 69
       },
       temporary: {
-        count: 642,  // Updated: includes Grade R (was 630)
-        oma: 501,    // Updated (was 489)
+        count: 642,
+        oma: 501,
         phx: 141
       }
     },
@@ -69,10 +84,10 @@ describe('WorkforceQ1FY26Dashboard', () => {
       {
         group: "Benefit-Eligible Staff",
         faculty: 0,
-        staff: 1419,  // Updated for Grade R exclusion (was 1431)
+        staff: 1419,
         hsp: 0,
         students: 0,
-        total: 1419   // Updated (was 1431)
+        total: 1419
       },
       {
         group: "House Staff Physicians",
@@ -96,16 +111,16 @@ describe('WorkforceQ1FY26Dashboard', () => {
         staff: 0,
         hsp: 0,
         students: 0,
-        total: 642  // Updated: includes Grade R (was 630)
+        total: 642
       }
     ],
     locationDetails: {
       omaha: {
         faculty: 657,
-        staff: 1318,  // Updated for Grade R exclusion (was 1330)
+        staff: 1318,
         hsp: 270,
         students: 2088,
-        temp: 501,    // Updated: includes Grade R (was 489)
+        temp: 501,
         total: 4834
       },
       phoenix: {
@@ -213,7 +228,7 @@ describe('WorkforceQ1FY26Dashboard', () => {
   };
 
   beforeEach(() => {
-    getQuarterlyWorkforceData.mockReturnValue(mockData);
+    mockGetQuarterlyWorkforceData.mockReturnValue(mockData);
   });
 
   afterEach(() => {
@@ -228,19 +243,17 @@ describe('WorkforceQ1FY26Dashboard', () => {
         </BrowserRouter>
       );
 
-      expect(getQuarterlyWorkforceData).toHaveBeenCalledWith("2025-09-30");
+      expect(mockGetQuarterlyWorkforceData).toHaveBeenCalledWith("2025-09-30");
     });
 
-    it('should display page title and header information', () => {
+    it('should display subtitle and period context', () => {
       render(
         <BrowserRouter>
           <WorkforceQ1FY26Dashboard />
         </BrowserRouter>
       );
 
-      expect(screen.getByText('Q1 FY26 Workforce and Headcount Report')).toBeInTheDocument();
       expect(screen.getByText(/Benefit Eligible Employees/)).toBeInTheDocument();
-      expect(screen.getByText('Creighton University')).toBeInTheDocument();
     });
 
     it('should display total headcount in cards', () => {
@@ -310,7 +323,7 @@ describe('WorkforceQ1FY26Dashboard', () => {
         </BrowserRouter>
       );
 
-      const data = getQuarterlyWorkforceData("2025-09-30");
+      const data = mockGetQuarterlyWorkforceData("2025-09-30");
       const sumOfCategories =
         data.summary.faculty.count +
         data.summary.staff.count +
@@ -319,11 +332,11 @@ describe('WorkforceQ1FY26Dashboard', () => {
         data.summary.temporary.count;
 
       expect(sumOfCategories).toBe(data.summary.total.count);
-      expect(sumOfCategories).toBe(5528); // 697 + 1431 + 613 + 2157 + 630
+      expect(sumOfCategories).toBe(5528);
     });
 
     it('should validate OMA + PHX = Total for each category', () => {
-      const data = getQuarterlyWorkforceData("2025-09-30");
+      const data = mockGetQuarterlyWorkforceData("2025-09-30");
 
       // Total
       expect(data.summary.total.oma + data.summary.total.phx).toBe(data.summary.total.count);
@@ -345,7 +358,7 @@ describe('WorkforceQ1FY26Dashboard', () => {
     });
 
     it('should validate location totals match summary totals', () => {
-      const data = getQuarterlyWorkforceData("2025-09-30");
+      const data = mockGetQuarterlyWorkforceData("2025-09-30");
 
       // Omaha total
       const omahaSum =
@@ -371,7 +384,7 @@ describe('WorkforceQ1FY26Dashboard', () => {
     });
 
     it('should validate employee group totals match summary', () => {
-      const data = getQuarterlyWorkforceData("2025-09-30");
+      const data = mockGetQuarterlyWorkforceData("2025-09-30");
 
       expect(data.employeeGroups[0].total).toBe(data.summary.faculty.count);
       expect(data.employeeGroups[1].total).toBe(data.summary.staff.count);
@@ -426,7 +439,6 @@ describe('WorkforceQ1FY26Dashboard', () => {
       expect(studentWorkerLegends.length).toBeGreaterThan(0);
 
       expect(screen.getAllByText(/House Staff/).length).toBeGreaterThan(0);
-      // Multiple instances of "Non-Benefit Eligible" exist in the dashboard
       const nonBenefitEligibleElements = screen.getAllByText('Non-Benefit Eligible');
       expect(nonBenefitEligibleElements.length).toBeGreaterThan(0);
     });
@@ -434,7 +446,7 @@ describe('WorkforceQ1FY26Dashboard', () => {
 
   describe('Business Rules Validation', () => {
     it('should follow WORKFORCE_METHODOLOGY.md v2.0 categorization', () => {
-      const data = getQuarterlyWorkforceData("2025-09-30");
+      const data = mockGetQuarterlyWorkforceData("2025-09-30");
 
       // Verify data structure matches methodology
       expect(data.summary).toHaveProperty('faculty');
@@ -445,7 +457,7 @@ describe('WorkforceQ1FY26Dashboard', () => {
     });
 
     it('should validate assignment category counts sum to total', () => {
-      const data = getQuarterlyWorkforceData("2025-09-30");
+      const data = mockGetQuarterlyWorkforceData("2025-09-30");
 
       const assignmentCategorySum = Object.values(data.assignmentCategories).reduce((sum, count) => sum + count, 0);
 
@@ -453,7 +465,7 @@ describe('WorkforceQ1FY26Dashboard', () => {
     });
 
     it('should validate benefit-eligible categories match methodology (with Grade R exclusion)', () => {
-      const data = getQuarterlyWorkforceData("2025-09-30");
+      const data = mockGetQuarterlyWorkforceData("2025-09-30");
 
       // Benefit-eligible assignment codes from WORKFORCE_METHODOLOGY.md
       const benefitEligibleCodes = ['F12', 'F11', 'F10', 'F09', 'PT12', 'PT11', 'PT10', 'PT9'];
@@ -470,7 +482,7 @@ describe('WorkforceQ1FY26Dashboard', () => {
     });
 
     it('should validate student worker categories', () => {
-      const data = getQuarterlyWorkforceData("2025-09-30");
+      const data = mockGetQuarterlyWorkforceData("2025-09-30");
 
       const studentSum = (data.assignmentCategories['SUE'] || 0) + (data.assignmentCategories['CWS'] || 0);
 
@@ -479,7 +491,7 @@ describe('WorkforceQ1FY26Dashboard', () => {
     });
 
     it('should validate temporary/non-benefit categories (with Grade R)', () => {
-      const data = getQuarterlyWorkforceData("2025-09-30");
+      const data = mockGetQuarterlyWorkforceData("2025-09-30");
 
       const tempSum =
         (data.assignmentCategories['TEMP'] || 0) +
@@ -494,7 +506,7 @@ describe('WorkforceQ1FY26Dashboard', () => {
     });
 
     it('should validate HSR category equals house staff count', () => {
-      const data = getQuarterlyWorkforceData("2025-09-30");
+      const data = mockGetQuarterlyWorkforceData("2025-09-30");
 
       expect(data.assignmentCategories['HSR']).toBe(data.summary.houseStaffPhysicians.count);
       expect(data.assignmentCategories['HSR']).toBe(613);
@@ -503,13 +515,13 @@ describe('WorkforceQ1FY26Dashboard', () => {
 
   describe('Q1 FY26 Specific Data Validation', () => {
     it('should have correct Q1 FY26 total headcount', () => {
-      const data = getQuarterlyWorkforceData("2025-09-30");
+      const data = mockGetQuarterlyWorkforceData("2025-09-30");
 
       expect(data.summary.total.count).toBe(5528);
     });
 
     it('should have correct campus distribution', () => {
-      const data = getQuarterlyWorkforceData("2025-09-30");
+      const data = mockGetQuarterlyWorkforceData("2025-09-30");
 
       expect(data.summary.total.oma).toBe(4834);
       expect(data.summary.total.phx).toBe(694);
@@ -517,7 +529,7 @@ describe('WorkforceQ1FY26Dashboard', () => {
     });
 
     it('should have correct faculty count', () => {
-      const data = getQuarterlyWorkforceData("2025-09-30");
+      const data = mockGetQuarterlyWorkforceData("2025-09-30");
 
       expect(data.summary.faculty.count).toBe(697);
       expect(data.summary.faculty.oma).toBe(657);
@@ -525,7 +537,7 @@ describe('WorkforceQ1FY26Dashboard', () => {
     });
 
     it('should have correct staff count', () => {
-      const data = getQuarterlyWorkforceData("2025-09-30");
+      const data = mockGetQuarterlyWorkforceData("2025-09-30");
 
       // Updated for Grade R exclusion methodology (was 1431/1330)
       expect(data.summary.staff.count).toBe(1419);
@@ -534,7 +546,7 @@ describe('WorkforceQ1FY26Dashboard', () => {
     });
 
     it('should have correct house staff physicians count', () => {
-      const data = getQuarterlyWorkforceData("2025-09-30");
+      const data = mockGetQuarterlyWorkforceData("2025-09-30");
 
       expect(data.summary.houseStaffPhysicians.count).toBe(613);
       expect(data.summary.houseStaffPhysicians.oma).toBe(270);
@@ -542,7 +554,7 @@ describe('WorkforceQ1FY26Dashboard', () => {
     });
 
     it('should have correct student workers count', () => {
-      const data = getQuarterlyWorkforceData("2025-09-30");
+      const data = mockGetQuarterlyWorkforceData("2025-09-30");
 
       expect(data.summary.studentWorkers.count).toBe(2157);
       expect(data.summary.studentWorkers.oma).toBe(2088);
@@ -550,7 +562,7 @@ describe('WorkforceQ1FY26Dashboard', () => {
     });
 
     it('should have correct temporary employees count', () => {
-      const data = getQuarterlyWorkforceData("2025-09-30");
+      const data = mockGetQuarterlyWorkforceData("2025-09-30");
 
       // Updated: includes Grade R employees (was 630/489)
       expect(data.summary.temporary.count).toBe(642);
@@ -561,7 +573,7 @@ describe('WorkforceQ1FY26Dashboard', () => {
 
   describe('Data Consistency Cross-Checks', () => {
     it('should validate Omaha campus totals match across different data structures', () => {
-      const data = getQuarterlyWorkforceData("2025-09-30");
+      const data = mockGetQuarterlyWorkforceData("2025-09-30");
 
       // From summary
       const omahaFromSummary =
@@ -579,7 +591,7 @@ describe('WorkforceQ1FY26Dashboard', () => {
     });
 
     it('should validate Phoenix campus totals match across different data structures', () => {
-      const data = getQuarterlyWorkforceData("2025-09-30");
+      const data = mockGetQuarterlyWorkforceData("2025-09-30");
 
       // From summary
       const phoenixFromSummary =
@@ -597,12 +609,27 @@ describe('WorkforceQ1FY26Dashboard', () => {
     });
 
     it('should validate employee groups sum matches total', () => {
-      const data = getQuarterlyWorkforceData("2025-09-30");
+      const data = mockGetQuarterlyWorkforceData("2025-09-30");
 
       const employeeGroupSum = data.employeeGroups.reduce((sum, group) => sum + group.total, 0);
 
       expect(employeeGroupSum).toBe(data.summary.total.count);
       expect(employeeGroupSum).toBe(5528);
+    });
+  });
+
+  describe('Null-Data Scenario', () => {
+    it('should display NoDataForQuarter when data is null', () => {
+      mockGetQuarterlyWorkforceData.mockReturnValue(null);
+
+      render(
+        <BrowserRouter>
+          <WorkforceQ1FY26Dashboard />
+        </BrowserRouter>
+      );
+
+      expect(screen.getByText('Data Not Yet Available')).toBeInTheDocument();
+      expect(screen.getByText(/Workforce data/)).toBeInTheDocument();
     });
   });
 
@@ -625,19 +652,17 @@ describe('WorkforceQ1FY26Dashboard', () => {
 
   describe('Data Source Traceability', () => {
     it('should document data source in component comments', () => {
-      // This test validates that the component has proper documentation
-      // Check that getQuarterlyWorkforceData is called with correct date
       render(
         <BrowserRouter>
           <WorkforceQ1FY26Dashboard />
         </BrowserRouter>
       );
 
-      expect(getQuarterlyWorkforceData).toHaveBeenCalledWith("2025-09-30");
+      expect(mockGetQuarterlyWorkforceData).toHaveBeenCalledWith("2025-09-30");
     });
 
     it('should use data from scripts/extract_q1_fy26_workforce.js processing', () => {
-      const data = getQuarterlyWorkforceData("2025-09-30");
+      const data = mockGetQuarterlyWorkforceData("2025-09-30");
 
       // Validate data structure matches expected output from extraction script
       expect(data).toHaveProperty('reportingDate');
@@ -652,7 +677,7 @@ describe('WorkforceQ1FY26Dashboard', () => {
 
   describe('Edge Cases', () => {
     it('should handle missing data gracefully', () => {
-      getQuarterlyWorkforceData.mockReturnValue({
+      mockGetQuarterlyWorkforceData.mockReturnValue({
         reportingDate: "9/30/25",
         quarter: "Q1 FY26",
         fiscalPeriod: "July 2025 - September 2025",

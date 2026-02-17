@@ -35,11 +35,10 @@ const BenefitsWellbeingDashboard = () => {
 
   return (
     <ErrorBoundary>
-      <div className="min-h-screen" style={{ backgroundColor: '#FAFBFC' }}>
+      <div className="min-h-screen">
         {/* Modern Minimal Header */}
         <div className="bg-white">
-          <div className="px-8 py-12">
-            <div className="max-w-7xl mx-auto">
+          <div className="w-[85%] max-w-[1280px] mx-auto py-12">
               <div className="flex items-center gap-3 mb-4">
                 <div className="p-2 rounded-xl" style={{ backgroundColor: `${colors.green}20` }}>
                   <Heart className="w-6 h-6" style={{ color: colors.green }} />
@@ -54,11 +53,10 @@ const BenefitsWellbeingDashboard = () => {
               <p className="text-lg font-light" style={{ color: '#6B7280' }}>
                 Transforming employee health, security, and quality of life
               </p>
-            </div>
           </div>
         </div>
 
-        <div className="px-8 py-12 max-w-7xl mx-auto">
+        <div className="w-[85%] max-w-[1280px] mx-auto pt-5 pb-8">
           {/* Strategic Cost Reduction Initiative - Hero Section */}
           <div className="mb-16">
             <div className="bg-gradient-to-r from-white to-blue-50 rounded-3xl p-12 relative overflow-hidden shadow-lg border border-blue-100">

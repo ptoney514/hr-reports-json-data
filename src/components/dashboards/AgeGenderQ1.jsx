@@ -1,6 +1,8 @@
 import React from 'react';
 import { Users, FileText } from 'lucide-react';
 import { getQuarterlyWorkforceData } from '../../services/dataService';
+import { useQuarter } from '../../contexts/QuarterContext';
+import NoDataForQuarter from '../ui/NoDataForQuarter';
 
 /**
  * Q1 FY26 Age/Gender Distribution Report
@@ -11,11 +13,16 @@ import { getQuarterlyWorkforceData } from '../../services/dataService';
  * No Recharts needed - pure CSS/Tailwind bars
  */
 const AgeGenderQ1 = () => {
-  const data = getQuarterlyWorkforceData("2025-09-30");
+  const { selectedQuarter } = useQuarter();
+  const data = getQuarterlyWorkforceData(selectedQuarter);
+
+  if (!data) {
+    return <NoDataForQuarter dataLabel="Age/gender distribution data" />;
+  }
 
   return (
-    <div id="age-gender-q1-dashboard" className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-6">
+    <div id="age-gender-q1-dashboard" className="min-h-screen">
+      <div className="w-[85%] max-w-[1280px] mx-auto pt-5 pb-8">
 
         {/* Page Header */}
         <div className="mb-8">

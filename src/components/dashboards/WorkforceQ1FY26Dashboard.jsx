@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { FileText, TrendingDown, CheckCircle, AlertCircle, Info, BarChart3, MapPin } from 'lucide-react';
 import { ResponsiveContainer, Tooltip, LineChart, Line, XAxis, YAxis, CartesianGrid, Legend } from 'recharts';
 import { getQuarterlyWorkforceData, QUARTERLY_HEADCOUNT_TRENDS } from '../../services/dataService';
+import { useQuarter } from '../../contexts/QuarterContext';
+import NoDataForQuarter from '../ui/NoDataForQuarter';
 
 /**
  * Q1 FY26 Workforce and Headcount Dashboard
@@ -14,16 +16,15 @@ import { getQuarterlyWorkforceData, QUARTERLY_HEADCOUNT_TRENDS } from '../../ser
 
 // Helper to generate common Line chart props for secondary trend lines (dashed style)
 
-const WORKFORCE_QUARTERS = [
-  { value: "2025-09-30", label: "Q1 FY26", period: "July 2025 - September 2025" },
-];
-
 const WorkforceQ1FY26Dashboard = () => {
-  const [selectedQuarter, setSelectedQuarter] = useState("2025-09-30");
-  const quarterConfig = WORKFORCE_QUARTERS.find(q => q.value === selectedQuarter);
+  const { selectedQuarter, quarterConfig } = useQuarter();
 
   // Load workforce data based on selected quarter
   const data = getQuarterlyWorkforceData(selectedQuarter);
+
+  if (!data) {
+    return <NoDataForQuarter dataLabel="Workforce data" />;
+  }
 
   const headcountData = data.summary;
 
@@ -31,42 +32,12 @@ const WorkforceQ1FY26Dashboard = () => {
   const employeeGroupData = data.employeeGroups;
 
   return (
-    <div id="workforce-q1-fy26-dashboard" className="min-h-screen bg-gray-100 print:bg-white print:min-h-0">
-
-      {/* Page Header */}
-      <header className="bg-gradient-to-r from-[#00245D] to-[#0054A6] text-white px-6 py-4 print:py-3">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-bold">
-              {quarterConfig?.label} Workforce and Headcount Report
-            </h1>
-            <p className="text-blue-200 text-sm">
-              Benefit Eligible Employees &mdash; {quarterConfig?.period}
-            </p>
-          </div>
-          <div className="flex items-center gap-4">
-            <div className="text-right hidden sm:block">
-              <div className="text-xs text-blue-200 uppercase tracking-wider">
-                Creighton University
-              </div>
-            </div>
-            <select
-              value={selectedQuarter}
-              onChange={(e) => setSelectedQuarter(e.target.value)}
-              className="bg-white/10 border border-white/20 rounded px-3 py-1.5 text-sm text-white print:hidden focus:ring-2 focus:ring-white/40 focus:outline-none"
-              aria-label="Select quarter"
-            >
-              {WORKFORCE_QUARTERS.map(q => (
-                <option key={q.value} value={q.value} className="text-gray-900">
-                  {q.label}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-      </header>
-
-      <div className="px-4 py-3 space-y-3 print:px-2 print:py-1 print:space-y-2">
+    <div id="workforce-q1-fy26-dashboard" className="min-h-screen print:bg-white print:min-h-0">
+      <div className="w-[85%] max-w-[1280px] mx-auto pt-5 pb-8 space-y-3 print:w-full print:max-w-none print:px-2 print:py-1 print:space-y-2">
+        {/* Period context (quarter now controlled globally via header) */}
+        <p className="text-sm text-gray-500 print:hidden">
+          Benefit Eligible Employees &mdash; {quarterConfig?.period}
+        </p>
 
         {/* Headcount Metric Cards - 6 Cards */}
         <div className="grid grid-cols-3 lg:grid-cols-6 gap-3" role="region" aria-label="Key performance indicators">

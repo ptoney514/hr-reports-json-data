@@ -2437,15 +2437,15 @@ export const getRecruitingData = (date = "2025-06-30") => {
 };
 
 export const getExitSurveyData = (date = "2025-06-30") => {
-  return EXIT_SURVEY_DATA[date] || EXIT_SURVEY_DATA["2025-06-30"];
+  return EXIT_SURVEY_DATA[date] || null;
 };
 
 export const getQuarterlyTurnoverData = (date = "2025-09-30") => {
-  return QUARTERLY_TURNOVER_DATA[date] || QUARTERLY_TURNOVER_DATA["2025-09-30"];
+  return QUARTERLY_TURNOVER_DATA[date] || null;
 };
 
 export const getQuarterlyWorkforceData = (date = "2025-09-30") => {
-  return QUARTERLY_WORKFORCE_DATA[date] || QUARTERLY_WORKFORCE_DATA["2025-09-30"];
+  return QUARTERLY_WORKFORCE_DATA[date] || null;
 };
 
 export const getQuarterlyTurnoverRatesByCategory = () => {

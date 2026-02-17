@@ -1,6 +1,8 @@
 import React from 'react';
 import { FileText, Users, BarChart3, ThumbsUp, Star, AlertTriangle, Activity, TrendingDown } from 'lucide-react';
 import { getExitSurveyData } from '../../services/dataService';
+import { useQuarter } from '../../contexts/QuarterContext';
+import NoDataForQuarter from '../ui/NoDataForQuarter';
 
 /**
  * Q1 FY26 Exit Survey Dashboard
@@ -28,8 +30,14 @@ const DEPARTURE_REASON_COLORS = [
 ];
 
 const ExitSurveyQ1FY26Dashboard = () => {
-  // Get Q1 FY26 data
-  const surveyData = getExitSurveyData("2025-09-30");
+  const { selectedQuarter } = useQuarter();
+
+  // Get data based on global quarter
+  const surveyData = getExitSurveyData(selectedQuarter);
+
+  if (!surveyData) {
+    return <NoDataForQuarter dataLabel="Exit survey data" />;
+  }
 
   // Quarterly trend data (Q1 FY26 → Q1 FY25, descending)
   // UPDATED 2025-12-04: Grade R now included as HSP (benefit-eligible)
@@ -95,8 +103,8 @@ const ExitSurveyQ1FY26Dashboard = () => {
   };
 
   return (
-    <div id="exit-survey-q1-fy26-dashboard" className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-6">
+    <div id="exit-survey-q1-fy26-dashboard" className="min-h-screen">
+      <div className="w-[85%] max-w-[1280px] mx-auto pt-5 pb-8">
 
         {/* Page Header */}
         <div className="mb-8">

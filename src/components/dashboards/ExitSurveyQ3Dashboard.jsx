@@ -32,7 +32,8 @@ const ExitSurveyQ3Dashboard = () => {
   ];
 
   return (
-    <div className="p-6 space-y-6 bg-gray-50 min-h-screen">
+    <div className="min-h-screen">
+      <div className="w-[85%] max-w-[1280px] mx-auto pt-5 pb-8 space-y-6">
       {/* Header with Alert */}
       <div className="bg-red-50 border-l-4 border-red-400 p-4">
         <div className="flex items-center">
@@ -253,6 +254,7 @@ const ExitSurveyQ3Dashboard = () => {
             ))}
           </ul>
         </div>
+      </div>
       </div>
     </div>
   );
