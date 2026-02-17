@@ -2,6 +2,8 @@ import React from 'react';
 import { Users, FileText } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { getQuarterlyWorkforceData } from '../../services/dataService';
+import { useQuarter } from '../../contexts/QuarterContext';
+import NoDataForQuarter from '../ui/NoDataForQuarter';
 
 /**
  * Q1 FY26 Ethnicity Distribution Report
@@ -11,7 +13,12 @@ import { getQuarterlyWorkforceData } from '../../services/dataService';
  * Methodology: WORKFORCE_METHODOLOGY.md v2.0
  */
 const EthnicityDistributionQ1 = () => {
-  const data = getQuarterlyWorkforceData("2025-09-30");
+  const { selectedQuarter } = useQuarter();
+  const data = getQuarterlyWorkforceData(selectedQuarter);
+
+  if (!data) {
+    return <NoDataForQuarter dataLabel="Ethnicity distribution data" />;
+  }
 
   return (
     <div id="ethnicity-q1-dashboard" className="min-h-screen">

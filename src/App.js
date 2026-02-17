@@ -5,6 +5,7 @@ import SlideHeader from './components/ui/SlideHeader';
 import ErrorBoundary from './components/ui/ErrorBoundary';
 // Removed DataSourceProvider - using static data now
 import { DashboardProvider } from './contexts/DashboardContext';
+import { QuarterProvider } from './contexts/QuarterContext';
 import { setupGlobalErrorHandling } from './utils/errorHandler';
 import { DashboardSkeleton } from './components/ui/LoadingSkeleton';
 // Lazy load dashboard components for better performance
@@ -156,6 +157,7 @@ function App() {
             showHomeButton={false}
           >
           <Router>
+            <QuarterProvider>
             <AppLayout>
               {/* Main Content with Suspense for lazy loading */}
               <Suspense fallback={
@@ -250,6 +252,7 @@ function App() {
               </Routes>
               </Suspense>
             </AppLayout>
+            </QuarterProvider>
           </Router>
           
           {/* React Query DevTools - Disabled to remove TanStack logo */}
