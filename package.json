@@ -79,6 +79,7 @@
     "etl:recruiting": "node scripts/etl/recruiting-metrics-to-postgres.js",
     "etl:recruiting:generate": "node scripts/generate-recruiting-excel-template.js",
     "etl:sample-data": "node scripts/etl/load-sample-data.js",
+    "etl:load-all": "bash scripts/etl/load-all-quarters.sh",
     "ci:local": "npm ci && npm run build && npm test -- --coverage --watchAll=false",
     "ci:quick": "npm run build && npm test -- --watchAll=false",
     "ci:audit": "npm audit --audit-level=high || true",

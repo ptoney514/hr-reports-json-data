@@ -286,6 +286,15 @@ export async function getRecruitingMetrics(fiscalYear, quarter) {
 }
 
 /**
+ * Get available quarters with data status
+ *
+ * @returns {Promise<Array>} Available quarters sorted newest-first
+ */
+export async function getAvailableQuarters() {
+  return fetchFromAPI('/available-quarters');
+}
+
+/**
  * Health check endpoint
  *
  * @returns {Promise<Object>} API health status
@@ -372,6 +381,7 @@ const apiService = {
   getNewHireDemographics,
   getHiringTrends,
   getRecruitingMetrics,
+  getAvailableQuarters,
   // Utility functions
   checkAPIHealth,
   getAvailablePeriods,

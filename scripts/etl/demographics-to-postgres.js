@@ -45,6 +45,7 @@ const BENEFIT_ELIGIBLE_CATEGORIES = ['F12', 'F11', 'F09', 'F10', 'PT12', 'PT10',
 
 // Date constants for filtering
 const EXCEL_DATE_MAP = {
+  '2025-09-30': 45930,  // FY26 Q1
   '2025-06-30': 45838,  // FY25 Q4
   '2025-03-31': 45747,  // FY25 Q3
   '2024-12-31': 45657,  // FY25 Q2
@@ -466,7 +467,18 @@ async function main() {
   // Load Excel data
   const workbook = loadExcelFile(sourceFile);
   const sheetNames = getSheetNames(workbook);
-  const sheetName = sheetNames[0];
+
+  // Auto-detect sheet with most rows (main data sheet)
+  let sheetName = sheetNames[0];
+  let maxRows = 0;
+  sheetNames.forEach(name => {
+    const testRows = sheetToJSON(workbook, name);
+    if (testRows.length > maxRows) {
+      maxRows = testRows.length;
+      sheetName = name;
+    }
+  });
+
   let rows = sheetToJSON(workbook, sheetName);
 
   console.log(`${colors.green}✓${colors.reset} Loaded ${rows.length.toLocaleString()} rows from sheet "${sheetName}"\n`);
