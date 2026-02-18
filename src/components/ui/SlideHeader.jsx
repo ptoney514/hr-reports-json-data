@@ -178,7 +178,7 @@ const SlideHeader = ({ sticky = true }) => {
           >
             {availableQuarters.map(q => (
               <option key={q.value} value={q.value} className="text-gray-900">
-                {q.label}
+                {q.label} ({q.period})
               </option>
             ))}
           </select>
