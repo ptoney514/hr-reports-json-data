@@ -55,6 +55,8 @@ const PrintLayout = lazy(() => import('./components/print/PrintLayout'));
 // Executive Dashboard
 const ExecutiveDashboard = lazy(() => import('./components/dashboards/ExecutiveDashboard'));
 const ExecutiveDashboardNew = lazy(() => import('./components/dashboards/ExecutiveDashboardNew'));
+// Section Dividers
+const SectionDivider = lazy(() => import('./components/ui/SectionDivider'));
 // Sitemap
 const SitemapDashboard = lazy(() => import('./components/dashboards/SitemapDashboard'));
 // Archive/Legacy Components
@@ -229,6 +231,9 @@ function App() {
               <Route path="/admin/data-sources" element={<DataSourceAdmin />} />
               <Route path="/admin/report-generator" element={<ReportGenerator />} />
               {/* AdminDashboard route removed - using static data */}
+
+              {/* Section Divider Pages */}
+              <Route path="/dashboards/section/:section" element={<SectionDivider />} />
 
               {/* Executive Dashboard */}
               <Route path="/dashboards/executive-new" element={<ExecutiveDashboardNew />} />
