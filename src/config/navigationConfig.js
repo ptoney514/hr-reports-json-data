@@ -3,7 +3,7 @@
  * Order defines the prev/next slide navigation sequence.
  */
 export const navigationRoutes = [
-  { path: '/dashboards/executive', label: 'Executive Dashboard', group: null },
+  { path: '/dashboards/executive-new', label: 'Executive Dashboard', group: null },
   // Workforce
   { path: '/dashboards/workforce-q1', label: 'Workforce Q1', group: 'Workforce' },
   { path: '/dashboards/ethnicity-q1', label: 'Ethnicity Distribution', group: 'Workforce' },
@@ -24,6 +24,7 @@ export const navigationRoutes = [
   { path: '/dashboards/learning-development', label: 'Learning & Development', group: 'Other' },
   { path: '/dashboards/total-rewards', label: 'Total Rewards', group: 'Other' },
   { path: '/dashboards/benefits-wellbeing', label: 'Benefits & Wellbeing', group: 'Other' },
+  { path: '/sitemap', label: 'Sitemap', group: null },
 ];
 
 /**
