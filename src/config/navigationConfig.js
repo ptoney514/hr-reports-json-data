@@ -7,6 +7,7 @@ export const navigationRoutes = [
   // Workforce
   { path: '/dashboards/section/headcount', label: 'Title - Headcount', group: 'Workforce', isDivider: true },
   { path: '/dashboards/workforce-q1', label: 'Workforce', group: 'Workforce' },
+  { path: '/dashboards/temp-workers-q1', label: 'Temp Workers', group: 'Workforce' },
   { path: '/dashboards/ethnicity-q1', label: 'Ethnicity Distribution', group: 'Workforce' },
   { path: '/dashboards/age-gender-q1', label: 'Age/Gender', group: 'Workforce' },
   // Turnover

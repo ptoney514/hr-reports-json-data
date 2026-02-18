@@ -34,6 +34,7 @@ const TurnoverTrendsDashboard = lazy(() => import('./components/dashboards/Turno
 const QuarterlyTurnoverRatesDashboard = lazy(() => import('./components/dashboards/QuarterlyTurnoverRatesDashboard'));
 // Quarterly Workforce Reports
 const WorkforceQ1Dashboard = lazy(() => import('./components/dashboards/WorkforceQ1FY26Dashboard'));
+const TempWorkersQ1Dashboard = lazy(() => import('./components/dashboards/TempWorkersQ1FY26Dashboard'));
 const DemographicsQ1Dashboard = lazy(() => import('./components/dashboards/DemographicsQ1FY26Dashboard'));
 const EthnicityDistributionQ1 = lazy(() => import('./components/dashboards/EthnicityDistributionQ1'));
 const AgeGenderQ1 = lazy(() => import('./components/dashboards/AgeGenderQ1'));
@@ -205,6 +206,7 @@ function App() {
 
               {/* Quarterly Workforce Reports */}
               <Route path="/dashboards/workforce-q1" element={<WorkforceQ1Dashboard />} />
+              <Route path="/dashboards/temp-workers-q1" element={<TempWorkersQ1Dashboard />} />
               <Route path="/dashboards/demographics-q1" element={<DemographicsQ1Dashboard />} />
               <Route path="/dashboards/ethnicity-q1" element={<EthnicityDistributionQ1 />} />
               <Route path="/dashboards/age-gender-q1" element={<AgeGenderQ1 />} />
