@@ -34,6 +34,7 @@ const TurnoverTrendsDashboard = lazy(() => import('./components/dashboards/Turno
 const QuarterlyTurnoverRatesDashboard = lazy(() => import('./components/dashboards/QuarterlyTurnoverRatesDashboard'));
 // Quarterly Workforce Reports
 const WorkforceQ1Dashboard = lazy(() => import('./components/dashboards/WorkforceQ1FY26Dashboard'));
+const TempWorkersQ1Dashboard = lazy(() => import('./components/dashboards/TempWorkersQ1FY26Dashboard'));
 const DemographicsQ1Dashboard = lazy(() => import('./components/dashboards/DemographicsQ1FY26Dashboard'));
 const EthnicityDistributionQ1 = lazy(() => import('./components/dashboards/EthnicityDistributionQ1'));
 const AgeGenderQ1 = lazy(() => import('./components/dashboards/AgeGenderQ1'));
@@ -54,6 +55,9 @@ const ReportGenerator = lazy(() => import('./components/reports/ReportGenerator'
 const PrintLayout = lazy(() => import('./components/print/PrintLayout'));
 // Executive Dashboard
 const ExecutiveDashboard = lazy(() => import('./components/dashboards/ExecutiveDashboard'));
+const ExecutiveDashboardNew = lazy(() => import('./components/dashboards/ExecutiveDashboardNew'));
+// Section Dividers
+const SectionDivider = lazy(() => import('./components/ui/SectionDivider'));
 // Sitemap
 const SitemapDashboard = lazy(() => import('./components/dashboards/SitemapDashboard'));
 // Archive/Legacy Components
@@ -202,6 +206,7 @@ function App() {
 
               {/* Quarterly Workforce Reports */}
               <Route path="/dashboards/workforce-q1" element={<WorkforceQ1Dashboard />} />
+              <Route path="/dashboards/temp-workers-q1" element={<TempWorkersQ1Dashboard />} />
               <Route path="/dashboards/demographics-q1" element={<DemographicsQ1Dashboard />} />
               <Route path="/dashboards/ethnicity-q1" element={<EthnicityDistributionQ1 />} />
               <Route path="/dashboards/age-gender-q1" element={<AgeGenderQ1 />} />
@@ -229,8 +234,11 @@ function App() {
               <Route path="/admin/report-generator" element={<ReportGenerator />} />
               {/* AdminDashboard route removed - using static data */}
 
+              {/* Section Divider Pages */}
+              <Route path="/dashboards/section/:section" element={<SectionDivider />} />
+
               {/* Executive Dashboard */}
-              <Route path="/dashboards/executive" element={<ExecutiveDashboard />} />
+              <Route path="/dashboards/executive-new" element={<ExecutiveDashboardNew />} />
 
               {/* Sitemap Route */}
               <Route path="/sitemap" element={<SitemapDashboard />} />
@@ -242,10 +250,11 @@ function App() {
               <Route path="/archive/exit-survey-q4-old" element={<ExitSurveyQ4DashboardOld />} />
               <Route path="/archive/data-import" element={<DataImportDashboard />} />
               <Route path="/archive/data-health" element={<DataHealthDashboard />} />
+              <Route path="/archive/executive-old" element={<ExecutiveDashboard />} />
               
               {/* Default route - redirect to executive dashboard */}
-              <Route path="/" element={<Navigate to="/dashboards/executive" replace />} />
-              <Route path="/dashboards" element={<Navigate to="/dashboards/executive" replace />} />
+              <Route path="/" element={<Navigate to="/dashboards/executive-new" replace />} />
+              <Route path="/dashboards" element={<Navigate to="/dashboards/executive-new" replace />} />
 
               {/* Catch-all route - redirect to sitemap */}
               <Route path="*" element={<Navigate to="/sitemap" replace />} />

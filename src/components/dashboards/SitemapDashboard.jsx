@@ -31,7 +31,7 @@ import {
 const SitemapDashboard = () => {
   // Main Dashboards
   const mainDashboards = [
-    { path: '/dashboards/executive', label: 'Executive Dashboard', icon: Home },
+    { path: '/dashboards/executive-new', label: 'Executive Dashboard', icon: Home },
     { path: '/dashboards/marketing-slides', label: 'Marketing Slides', icon: FileText },
     { path: '/dashboards/workforce', label: 'Workforce Overview', icon: Users },
     { path: '/dashboards/turnover', label: 'Turnover Overview', icon: TrendingDown },
@@ -107,7 +107,8 @@ const SitemapDashboard = () => {
     { path: '/archive/exit-survey-q1-old', label: 'Exit Survey Q1 (Old Version)', icon: Archive },
     { path: '/archive/exit-survey-q4-old', label: 'Exit Survey Q4 (Old Version)', icon: Archive },
     { path: '/archive/data-import', label: 'Data Import Dashboard', icon: Archive },
-    { path: '/archive/data-health', label: 'Data Health Dashboard', icon: Archive }
+    { path: '/archive/data-health', label: 'Data Health Dashboard', icon: Archive },
+    { path: '/archive/executive-old', label: 'Executive Dashboard (Old)', icon: Archive }
   ];
 
   // Render a single link item

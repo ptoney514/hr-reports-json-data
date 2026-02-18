@@ -253,7 +253,7 @@ describe('WorkforceQ1FY26Dashboard', () => {
         </BrowserRouter>
       );
 
-      expect(screen.getByText(/Benefit Eligible Employees/)).toBeInTheDocument();
+      expect(screen.getByText(/Non-Benefit Eligible \(NBE\) includes TEMP, PRN workers/)).toBeInTheDocument();
     });
 
     it('should display total headcount in cards', () => {
@@ -395,19 +395,14 @@ describe('WorkforceQ1FY26Dashboard', () => {
   });
 
   describe('Chart Rendering', () => {
-    it('should render Workforce by Employee Type chart', () => {
+    it('should render headcount trend chart', () => {
       render(
         <BrowserRouter>
           <WorkforceQ1FY26Dashboard />
         </BrowserRouter>
       );
 
-      expect(screen.getByText('Workforce by Employee Type')).toBeInTheDocument();
-      expect(screen.getByText('Benefit-Eligible Faculty')).toBeInTheDocument();
-      expect(screen.getByText('Benefit-Eligible Staff')).toBeInTheDocument();
-      expect(screen.getAllByText('House Staff Physicians').length).toBeGreaterThan(0);
-      expect(screen.getAllByText('Student Workers').length).toBeGreaterThan(0);
-      expect(screen.getAllByText('Temporary Employees').length).toBeGreaterThan(0);
+      expect(screen.getByText('Quarterly Benefit Eligible Faculty & Staff Headcount Trend')).toBeInTheDocument();
     });
 
     it('should render Campus Comparison by Employee Type chart', () => {
