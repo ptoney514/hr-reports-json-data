@@ -10,18 +10,19 @@ import { useAvailableQuarters, FALLBACK_QUARTERS } from '../useAvailableQuarters
 
 describe('useAvailableQuarters', () => {
   describe('JSON mode (default)', () => {
-    it('returns FALLBACK_QUARTERS immediately without loading', () => {
+    it('returns filtered quarters immediately without loading', () => {
       const { result } = renderHook(() => useAvailableQuarters());
 
-      expect(result.current.quarters).toEqual(FALLBACK_QUARTERS);
+      const expected = FALLBACK_QUARTERS.filter(q => q.hasData);
+      expect(result.current.quarters).toEqual(expected);
       expect(result.current.loading).toBe(false);
       expect(result.current.error).toBeNull();
     });
 
-    it('returns all 6 quarters', () => {
+    it('returns only 2 quarters with data (Q1 FY26 + Q4 FY25)', () => {
       const { result } = renderHook(() => useAvailableQuarters());
 
-      expect(result.current.quarters).toHaveLength(6);
+      expect(result.current.quarters).toHaveLength(2);
     });
 
     it('quarters are sorted newest-first', () => {
@@ -32,18 +33,29 @@ describe('useAvailableQuarters', () => {
       expect(values).toEqual(sorted);
     });
 
-    it('all quarters have hasData: true', () => {
+    it('all returned quarters have hasData: true', () => {
       const { result } = renderHook(() => useAvailableQuarters());
 
       expect(result.current.quarters.every(q => q.hasData)).toBe(true);
     });
+
+    it('hook filters to only quarters with data', () => {
+      const { result } = renderHook(() => useAvailableQuarters());
+
+      const quartersWithData = FALLBACK_QUARTERS.filter(q => q.hasData);
+      expect(result.current.quarters).toEqual(quartersWithData);
+      expect(result.current.quarters.length).toBeLessThan(FALLBACK_QUARTERS.length);
+    });
   });
 
   describe('FALLBACK_QUARTERS export', () => {
-    it('contains Q1 FY26', () => {
+    it('contains all 6 quarters', () => {
       expect(FALLBACK_QUARTERS).toBeDefined();
       expect(Array.isArray(FALLBACK_QUARTERS)).toBe(true);
+      expect(FALLBACK_QUARTERS).toHaveLength(6);
+    });
 
+    it('contains Q1 FY26', () => {
       const q1fy26 = FALLBACK_QUARTERS.find(q => q.value === '2025-09-30');
       expect(q1fy26).toBeDefined();
       expect(q1fy26.label).toBe('Q1 FY26');

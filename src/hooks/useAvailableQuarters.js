@@ -25,28 +25,28 @@ export const FALLBACK_QUARTERS = [
     label: 'Q3 FY25',
     period: 'January - March 2025',
     fiscalYear: 'FY25',
-    hasData: true,
+    hasData: false,
   },
   {
     value: '2024-12-31',
     label: 'Q2 FY25',
     period: 'October - December 2024',
     fiscalYear: 'FY25',
-    hasData: true,
+    hasData: false,
   },
   {
     value: '2024-09-30',
     label: 'Q1 FY25',
     period: 'July - September 2024',
     fiscalYear: 'FY25',
-    hasData: true,
+    hasData: false,
   },
   {
     value: '2024-06-30',
     label: 'Q4 FY24',
     period: 'April - June 2024',
     fiscalYear: 'FY24',
-    hasData: true,
+    hasData: false,
   },
 ];
 
@@ -61,7 +61,7 @@ const USE_API = DATA_SOURCE === 'api';
  * Filters to only quarters with data.
  */
 export function useAvailableQuarters() {
-  const [quarters, setQuarters] = useState(FALLBACK_QUARTERS);
+  const [quarters, setQuarters] = useState(FALLBACK_QUARTERS.filter(q => q.hasData));
   const [loading, setLoading] = useState(USE_API);
   const [error, setError] = useState(null);
 

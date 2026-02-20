@@ -83,6 +83,8 @@
     "ci:local": "npm ci && npm run build && npm test -- --coverage --watchAll=false",
     "ci:quick": "npm run build && npm test -- --watchAll=false",
     "ci:audit": "npm audit --audit-level=high || true",
+    "test:e2e": "npx playwright test",
+    "test:e2e:headed": "npx playwright test --headed",
     "prepare": "husky"
   },
   "eslintConfig": {
@@ -105,6 +107,7 @@
   },
   "devDependencies": {
     "@axe-core/react": "^4.10.2",
+    "@playwright/test": "^1.58.2",
     "@tanstack/react-query-devtools": "^5.84.2",
     "@types/file-saver": "^2.0.7",
     "@types/jest": "^30.0.0",
