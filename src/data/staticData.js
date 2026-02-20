@@ -2497,6 +2497,87 @@ export const QUARTERLY_WORKFORCE_DATA = {
         temp: 178,
         total: 733
       }
+    },
+    // Ethnicity and Gender Demographics (Benefit-Eligible only)
+    // Source: scripts/extract_q2_fy26_demographics.js
+    // Classification: Person Type = FACULTY → faculty, else → staff
+    demographics: {
+      ethnicity: {
+        faculty: {
+          total: 708,
+          distribution: [
+            { ethnicity: "White", count: 551, percentage: 77.8, color: "#93C5FD" },
+            { ethnicity: "Not Disclosed", count: 53, percentage: 7.5, color: "#D1D5DB" },
+            { ethnicity: "Asian", count: 53, percentage: 7.5, color: "#60A5FA" },
+            { ethnicity: "Two or More Races", count: 19, percentage: 2.7, color: "#FBBF24" },
+            { ethnicity: "Black or African American", count: 17, percentage: 2.4, color: "#34D399" },
+            { ethnicity: "Hispanic or Latino", count: 12, percentage: 1.7, color: "#F87171" },
+            { ethnicity: "American Indian or Alaska Native", count: 3, percentage: 0.4, color: "#A78BFA" }
+          ]
+        },
+        staff: {
+          total: 1471,
+          distribution: [
+            { ethnicity: "White", count: 1003, percentage: 68.2, color: "#93C5FD" },
+            { ethnicity: "Not Disclosed", count: 127, percentage: 8.6, color: "#D1D5DB" },
+            { ethnicity: "Asian", count: 120, percentage: 8.2, color: "#60A5FA" },
+            { ethnicity: "Black or African American", count: 83, percentage: 5.6, color: "#34D399" },
+            { ethnicity: "Hispanic or Latino", count: 66, percentage: 4.5, color: "#FBBF24" },
+            { ethnicity: "Two or More Races", count: 64, percentage: 4.4, color: "#F87171" },
+            { ethnicity: "American Indian or Alaska Native", count: 6, percentage: 0.4, color: "#A78BFA" },
+            { ethnicity: "Native Hawaiian or other Pacific Islander", count: 2, percentage: 0.1, color: "#FB923C" }
+          ]
+        }
+      },
+      gender: {
+        faculty: {
+          total: 708,
+          distribution: [
+            { gender: "Female", count: 376, percentage: 53.1, color: "#EC4899" },
+            { gender: "Male", count: 332, percentage: 46.9, color: "#3B82F6" }
+          ]
+        },
+        staff: {
+          total: 1471,
+          distribution: [
+            { gender: "Female", count: 922, percentage: 62.7, color: "#EC4899" },
+            { gender: "Male", count: 549, percentage: 37.3, color: "#3B82F6" }
+          ]
+        }
+      },
+      ageGender: {
+        faculty: {
+          category: "Benefit-Eligible Faculty",
+          total: 708,
+          femaleTotal: 376,
+          maleTotal: 332,
+          femalePercentage: 53.1,
+          malePercentage: 46.9,
+          ageGenderBreakdown: [
+            { ageBand: "20-30", female: 3, male: 9, total: 12 },
+            { ageBand: "31-40", female: 90, male: 51, total: 141 },
+            { ageBand: "41-50", female: 132, male: 78, total: 210 },
+            { ageBand: "51-60", female: 81, male: 80, total: 161 },
+            { ageBand: "61 Plus", female: 70, male: 114, total: 184 }
+          ]
+        },
+        staff: {
+          category: "Benefit-Eligible Staff",
+          total: 1471,
+          femaleTotal: 922,
+          maleTotal: 549,
+          femalePercentage: 62.7,
+          malePercentage: 37.3,
+          ageGenderBreakdown: [
+            { ageBand: "Under 20", female: 0, male: 1, total: 1 },
+            { ageBand: "20-30", female: 148, male: 79, total: 227 },
+            { ageBand: "31-40", female: 170, male: 137, total: 307 },
+            { ageBand: "41-50", female: 229, male: 120, total: 349 },
+            { ageBand: "51-60", female: 233, male: 117, total: 350 },
+            { ageBand: "61 Plus", female: 142, male: 95, total: 237 }
+          ]
+        }
+      }
     }
   },
   // Q1 FY26 - July-September 2025
