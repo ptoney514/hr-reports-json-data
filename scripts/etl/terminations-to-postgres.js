@@ -310,7 +310,7 @@ async function processTerminations(rows, options, sourceFile) {
     }
 
     // Get employee hash
-    const employeeId = row['Employee ID'] || row['Empl ID'] || row.employee_id || row.employeeId;
+    const employeeId = row['Employee ID'] || row['Empl ID'] || row['Empl Num'] || row.employee_id || row.employeeId;
     const employeeHash = employeeId ? hashValue(employeeId.toString()) : `anon_${Date.now()}_${Math.random()}`;
 
     // Get termination reason

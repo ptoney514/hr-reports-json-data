@@ -1923,7 +1923,7 @@ export const QUARTERLY_TURNOVER_TRENDS = {
 // when quarterly snapshots become available. Currently only end-of-year (Q4) data is validated.
 
 export const QUARTERLY_HEADCOUNT_TRENDS = [
-  // COMPREHENSIVE QUARTERLY WORKFORCE TRENDS (Q1 FY24 - Q1 FY26)
+  // COMPREHENSIVE QUARTERLY WORKFORCE TRENDS (Q1 FY24 - Q2 FY26)
   // Source: source-metrics/workforce-headcount/New Emp List since FY20 to Q1FY25 1031 PT.xlsx
   // ✅ ALL DATA EXTRACTED FROM ORACLE HCM - Actual headcount from assignment categories
   //
@@ -1945,7 +1945,8 @@ export const QUARTERLY_HEADCOUNT_TRENDS = [
   { quarter: "Q2 FY25", faculty: 689, staff: 1441, total: 2130, students: 1714, hsp: 612, temp: 574 },  // ✅ ACTUAL
   { quarter: "Q3 FY25", faculty: 684, staff: 1439, total: 2123, students: 2129, hsp: 601, temp: 670 },  // ✅ ACTUAL
   { quarter: "Q4 FY25", faculty: 689, staff: 1448, total: 2137, students: 1916, hsp: 600, temp: 660 },  // ✅ ACTUAL
-  { quarter: "Q1 FY26", faculty: 698, staff: 1451, total: 2149, students: 1860, hsp: 616, temp: 608 }   // ✅ ACTUAL
+  { quarter: "Q1 FY26", faculty: 698, staff: 1451, total: 2149, students: 1860, hsp: 616, temp: 608 },  // ✅ ACTUAL
+  { quarter: "Q2 FY26", faculty: 708, staff: 1459, total: 2167, students: 2032, hsp: 622, temp: 709 }   // ✅ ACTUAL
 ];
 
 // ============================================================================
@@ -2043,6 +2044,138 @@ export const QUARTERLY_TURNOVER_BENCHMARKS = {
 // Pattern: Follows same structure as EXIT_SURVEY_DATA with date-based keys
 
 export const QUARTERLY_TURNOVER_DATA = {
+  // Q2 FY26 - October-December 2025
+  // Data Source: source-metrics/terms/Terms Since 2017 Detail PT-2-20-2026.xlsx
+  // Processed: 2026-02-20 via ETL terminations-to-postgres.js
+  // Total benefit-eligible: 39 (Faculty: 5, Staff: 29, HSP: 5)
+  "2025-12-31": {
+    reportingDate: "12/31/25",
+    quarter: "Q2 FY26",
+    fiscalPeriod: "October 2025 - December 2025",
+    summary: {
+      total: {
+        count: 39,
+        oma: 33,
+        phx: 6
+      },
+      faculty: {
+        count: 5,
+        oma: 2,
+        phx: 3
+      },
+      staffExempt: {
+        count: 11,
+        oma: 10,
+        phx: 1
+      },
+      staffNonExempt: {
+        count: 18,
+        oma: 18,
+        phx: 0
+      },
+      staff: {
+        count: 29,
+        oma: 28,
+        phx: 1
+      },
+      houseStaffPhysicians: {
+        count: 5,
+        oma: 3,
+        phx: 2
+      }
+    },
+    terminationTypesByGroup: [
+      {
+        group: "Benefit Eligible Faculty",
+        total: 5,
+        voluntary: 4,
+        involuntary: 0,
+        retirement: 1,
+        endOfAssignment: 0
+      },
+      {
+        group: "Benefit Eligible Staff",
+        total: 29,
+        voluntary: 27,
+        involuntary: 0,
+        retirement: 2,
+        endOfAssignment: 0
+      },
+      {
+        group: "House Staff Physicians",
+        total: 5,
+        voluntary: 5,
+        involuntary: 0,
+        retirement: 0,
+        endOfAssignment: 0
+      }
+    ],
+    yearsOfService: [
+      { range: "<1 Year", faculty: 0, staff: 6, hsp: 2 },
+      { range: "1-3 Years", faculty: 2, staff: 17, hsp: 3 },
+      { range: "3-5 Years", faculty: 1, staff: 1, hsp: 0 },
+      { range: "5-10 Years", faculty: 0, staff: 1, hsp: 0 },
+      { range: "10-15 Years", faculty: 1, staff: 1, hsp: 0 },
+      { range: "15-20 Years", faculty: 0, staff: 1, hsp: 0 },
+      { range: "20+ Years", faculty: 1, staff: 2, hsp: 0 }
+    ],
+    ageGroups: [
+      { range: "<25", faculty: 0, staff: 3, hsp: 0 },
+      { range: "25-34", faculty: 0, staff: 11, hsp: 4 },
+      { range: "35-44", faculty: 1, staff: 5, hsp: 1 },
+      { range: "45-54", faculty: 0, staff: 6, hsp: 0 },
+      { range: "55-64", faculty: 3, staff: 2, hsp: 0 },
+      { range: "65+", faculty: 1, staff: 2, hsp: 0 }
+    ],
+    earlyTurnover: {
+      total: 8,
+      byTerminationType: [
+        { name: "Voluntary", value: 8, percentage: 100.0, color: "#3B82F6" }
+      ],
+      byEmployeeCategory: [
+        { name: "Benefit Eligible Staff", value: 6, percentage: 75.0, color: "#3B82F6" },
+        { name: "House Staff Physicians", value: 2, percentage: 25.0, color: "#10B981" }
+      ],
+      bySchool: [
+        { school: "Facilities", count: 3, percentage: 50.0, color: "#EF4444" },
+        { school: "Other", count: 3, percentage: 50.0, color: "#6B7280" }
+      ],
+      bySchoolDetailed: [
+        { school: "Facilities", count: 3, percentage: 50.0 },
+        { school: "MarCom", count: 1, percentage: 16.7 },
+        { school: "VPIT", count: 1, percentage: 16.7 },
+        { school: "Other", count: 1, percentage: 16.7 }
+      ]
+    },
+    staffTurnoverBySchool: [
+      { school: "Facilities", count: 6, percentage: 20.7, color: "#EF4444" },
+      { school: "Medicine", count: 3, percentage: 10.3, color: "#3B82F6" },
+      { school: "Dentistry", count: 2, percentage: 6.9, color: "#F59E0B" },
+      { school: "VPEM", count: 2, percentage: 6.9, color: "#10B981" },
+      { school: "HR", count: 2, percentage: 6.9, color: "#8B5CF6" },
+      { school: "VPSL", count: 2, percentage: 6.9, color: "#06B6D4" },
+      { school: "SueSucs", count: 2, percentage: 6.9, color: "#EC4899" },
+      { school: "Other", count: 10, percentage: 34.5, color: "#6B7280" }
+    ],
+    facultyTurnoverBySchool: [
+      { school: "Nursing", count: 2, percentage: 40.0, color: "#3B82F6" },
+      { school: "Dentistry", count: 1, percentage: 20.0, color: "#F59E0B" },
+      { school: "Pharmacy & Health Professions", count: 1, percentage: 20.0, color: "#10B981" },
+      { school: "Heider College of Business", count: 1, percentage: 20.0, color: "#8B5CF6" }
+    ],
+    turnoverBySchool: [
+      { school: "Facilities", faculty: 0, staff: 6, total: 6 },
+      { school: "Medicine", faculty: 0, staff: 3, total: 3 },
+      { school: "Dentistry", faculty: 1, staff: 2, total: 3 },
+      { school: "Nursing", faculty: 2, staff: 0, total: 2 },
+      { school: "VPEM", faculty: 0, staff: 2, total: 2 },
+      { school: "HR", faculty: 0, staff: 2, total: 2 },
+      { school: "Pharmacy & Health Professions", faculty: 1, staff: 1, total: 2 },
+      { school: "VPSL", faculty: 0, staff: 2, total: 2 },
+      { school: "SueSucs", faculty: 0, staff: 2, total: 2 },
+      { school: "Other", faculty: 1, staff: 9, total: 10, note: "VPMM, MarCom, CollProCE, Athletics, VPFN, Unknown, Arts & Sciences, Research, VPIT, Heider College of Business" }
+    ]
+  },
   // Q1 FY26 - July-September 2025
   // UPDATED 2025-12-04: Grade R now included as benefit-eligible under House Staff Physicians
   // Total: 73 (includes 15 Grade R as HSP terminations)
@@ -2266,6 +2399,188 @@ export const QUARTERLY_TURNOVER_DATA = {
 // Pattern: Follows same structure as QUARTERLY_TURNOVER_DATA with date-based keys
 
 export const QUARTERLY_WORKFORCE_DATA = {
+  // Q2 FY26 - October-December 2025
+  // Data Source: source-metrics/workforce-headcount/New Emp List since FY20 to Q1FY25 1031 PT 12-9-2025.xlsx
+  // Processed: 2026-02-20 via ETL workforce-to-postgres.js
+  // Methodology: WORKFORCE_METHODOLOGY.md v2.1 (Person Type + Assignment Category)
+  "2025-12-31": {
+    reportingDate: "12/31/25",
+    quarter: "Q2 FY26",
+    fiscalPeriod: "October 2025 - December 2025",
+    summary: {
+      total: {
+        count: 5530,
+        oma: 4797,
+        phx: 733
+      },
+      faculty: {
+        count: 708,
+        oma: 668,
+        phx: 40
+      },
+      staff: {
+        count: 1459,
+        oma: 1355,
+        phx: 104
+      },
+      houseStaffPhysicians: {
+        count: 622,
+        oma: 279,
+        phx: 343
+      },
+      studentWorkers: {
+        count: 2032,
+        oma: 1964,
+        phx: 68
+      },
+      temporary: {
+        count: 709,
+        oma: 531,
+        phx: 178
+      }
+    },
+    employeeGroups: [
+      {
+        group: "Benefit-Eligible Faculty",
+        faculty: 708,
+        staff: 0,
+        hsp: 0,
+        students: 0,
+        total: 708
+      },
+      {
+        group: "Benefit-Eligible Staff",
+        faculty: 0,
+        staff: 1459,
+        hsp: 0,
+        students: 0,
+        total: 1459
+      },
+      {
+        group: "House Staff Physicians",
+        faculty: 0,
+        staff: 0,
+        hsp: 622,
+        students: 0,
+        total: 622
+      },
+      {
+        group: "Non-Benefit Eligible",
+        faculty: 0,
+        staff: 0,
+        hsp: 0,
+        students: 0,
+        total: 709
+      },
+      {
+        group: "Student Workers",
+        faculty: 0,
+        staff: 0,
+        hsp: 0,
+        students: 2032,
+        total: 2032
+      }
+    ],
+    locationDetails: {
+      omaha: {
+        faculty: 668,
+        staff: 1355,
+        hsp: 279,
+        students: 1964,
+        temp: 531,
+        total: 4797
+      },
+      phoenix: {
+        faculty: 40,
+        staff: 104,
+        hsp: 343,
+        students: 68,
+        temp: 178,
+        total: 733
+      }
+    },
+    // Ethnicity and Gender Demographics (Benefit-Eligible only)
+    // Source: scripts/extract_q2_fy26_demographics.js
+    // Classification: Person Type = FACULTY → faculty, else → staff
+    demographics: {
+      ethnicity: {
+        faculty: {
+          total: 708,
+          distribution: [
+            { ethnicity: "White", count: 551, percentage: 77.8, color: "#93C5FD" },
+            { ethnicity: "Not Disclosed", count: 53, percentage: 7.5, color: "#D1D5DB" },
+            { ethnicity: "Asian", count: 53, percentage: 7.5, color: "#60A5FA" },
+            { ethnicity: "Two or More Races", count: 19, percentage: 2.7, color: "#FBBF24" },
+            { ethnicity: "Black or African American", count: 17, percentage: 2.4, color: "#34D399" },
+            { ethnicity: "Hispanic or Latino", count: 12, percentage: 1.7, color: "#F87171" },
+            { ethnicity: "American Indian or Alaska Native", count: 3, percentage: 0.4, color: "#A78BFA" }
+          ]
+        },
+        staff: {
+          total: 1471,
+          distribution: [
+            { ethnicity: "White", count: 1003, percentage: 68.2, color: "#93C5FD" },
+            { ethnicity: "Not Disclosed", count: 127, percentage: 8.6, color: "#D1D5DB" },
+            { ethnicity: "Asian", count: 120, percentage: 8.2, color: "#60A5FA" },
+            { ethnicity: "Black or African American", count: 83, percentage: 5.6, color: "#34D399" },
+            { ethnicity: "Hispanic or Latino", count: 66, percentage: 4.5, color: "#FBBF24" },
+            { ethnicity: "Two or More Races", count: 64, percentage: 4.4, color: "#F87171" },
+            { ethnicity: "American Indian or Alaska Native", count: 6, percentage: 0.4, color: "#A78BFA" },
+            { ethnicity: "Native Hawaiian or other Pacific Islander", count: 2, percentage: 0.1, color: "#FB923C" }
+          ]
+        }
+      },
+      gender: {
+        faculty: {
+          total: 708,
+          distribution: [
+            { gender: "Female", count: 376, percentage: 53.1, color: "#EC4899" },
+            { gender: "Male", count: 332, percentage: 46.9, color: "#3B82F6" }
+          ]
+        },
+        staff: {
+          total: 1471,
+          distribution: [
+            { gender: "Female", count: 922, percentage: 62.7, color: "#EC4899" },
+            { gender: "Male", count: 549, percentage: 37.3, color: "#3B82F6" }
+          ]
+        }
+      },
+      ageGender: {
+        faculty: {
+          category: "Benefit-Eligible Faculty",
+          total: 708,
+          femaleTotal: 376,
+          maleTotal: 332,
+          femalePercentage: 53.1,
+          malePercentage: 46.9,
+          ageGenderBreakdown: [
+            { ageBand: "20-30", female: 3, male: 9, total: 12 },
+            { ageBand: "31-40", female: 90, male: 51, total: 141 },
+            { ageBand: "41-50", female: 132, male: 78, total: 210 },
+            { ageBand: "51-60", female: 81, male: 80, total: 161 },
+            { ageBand: "61 Plus", female: 70, male: 114, total: 184 }
+          ]
+        },
+        staff: {
+          category: "Benefit-Eligible Staff",
+          total: 1471,
+          femaleTotal: 922,
+          maleTotal: 549,
+          femalePercentage: 62.7,
+          malePercentage: 37.3,
+          ageGenderBreakdown: [
+            { ageBand: "Under 20", female: 0, male: 1, total: 1 },
+            { ageBand: "20-30", female: 148, male: 79, total: 227 },
+            { ageBand: "31-40", female: 170, male: 137, total: 307 },
+            { ageBand: "41-50", female: 229, male: 120, total: 349 },
+            { ageBand: "51-60", female: 233, male: 117, total: 350 },
+            { ageBand: "61 Plus", female: 142, male: 95, total: 237 }
+          ]
+        }
+      }
+    }
+  },
   // Q1 FY26 - July-September 2025
   // Data Source: source-metrics/workforce/raw/FY26_Q1/New Emp List since FY20 to Q1FY25 1031 PT.xlsx
   // Processed: 2025-11-19 via scripts/extract_q1_fy26_workforce.js
@@ -2495,13 +2810,14 @@ export const QUARTERLY_WORKFORCE_DATA = {
   }
 };
 
-// Available reporting dates - All FY25 quarters + Q1 FY26
+// Available reporting dates - All FY25 quarters + FY26
 export const AVAILABLE_DATES = [
   { value: "2024-09-30", label: "9/30/24 (Q1 FY25)", status: "complete" },
   { value: "2024-12-31", label: "12/31/24 (Q2 FY25)", status: "complete" },
   { value: "2025-03-31", label: "3/31/25 (Q3 FY25)", status: "complete" },
   { value: "2025-06-30", label: "6/30/25 (Q4 FY25)", status: "complete" },
-  { value: "2025-09-30", label: "9/30/25 (Q1 FY26)", status: "complete" }
+  { value: "2025-09-30", label: "9/30/25 (Q1 FY26)", status: "complete" },
+  { value: "2025-12-31", label: "12/31/25 (Q2 FY26)", status: "complete" }
 ];
 
 // Helper functions for accessing data

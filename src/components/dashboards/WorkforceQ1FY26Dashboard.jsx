@@ -104,7 +104,7 @@ const WorkforceQ1FY26Dashboard = () => {
             Quarterly Benefit Eligible Faculty &amp; Staff Headcount Trend
           </h2>
           <ResponsiveContainer width="100%" height={385}>
-            <LineChart data={QUARTERLY_HEADCOUNT_TRENDS} margin={{ top: 40, right: 30, left: 50, bottom: 20 }}>
+            <LineChart data={QUARTERLY_HEADCOUNT_TRENDS.slice(-9)} margin={{ top: 40, right: 30, left: 50, bottom: 20 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#D7D2CB" />
               <XAxis
                 dataKey="quarter"
