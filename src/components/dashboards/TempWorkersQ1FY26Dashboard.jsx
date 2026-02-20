@@ -49,7 +49,7 @@ const TempWorkersQ1FY26Dashboard = () => {
   const totalPhx = houseStaffPhysicians.phx + temporary.phx + studentWorkers.phx;
 
   // Derive trend data from QUARTERLY_HEADCOUNT_TRENDS
-  const tempWorkerTrends = QUARTERLY_HEADCOUNT_TRENDS.map(q => ({
+  const tempWorkerTrends = QUARTERLY_HEADCOUNT_TRENDS.slice(-9).map(q => ({
     quarter: q.quarter,
     hsp: q.hsp,
     tempNBE: q.temp,

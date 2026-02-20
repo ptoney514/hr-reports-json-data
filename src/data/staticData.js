@@ -1923,7 +1923,7 @@ export const QUARTERLY_TURNOVER_TRENDS = {
 // when quarterly snapshots become available. Currently only end-of-year (Q4) data is validated.
 
 export const QUARTERLY_HEADCOUNT_TRENDS = [
-  // COMPREHENSIVE QUARTERLY WORKFORCE TRENDS (Q1 FY24 - Q1 FY26)
+  // COMPREHENSIVE QUARTERLY WORKFORCE TRENDS (Q1 FY24 - Q2 FY26)
   // Source: source-metrics/workforce-headcount/New Emp List since FY20 to Q1FY25 1031 PT.xlsx
   // ✅ ALL DATA EXTRACTED FROM ORACLE HCM - Actual headcount from assignment categories
   //
@@ -1945,7 +1945,8 @@ export const QUARTERLY_HEADCOUNT_TRENDS = [
   { quarter: "Q2 FY25", faculty: 689, staff: 1441, total: 2130, students: 1714, hsp: 612, temp: 574 },  // ✅ ACTUAL
   { quarter: "Q3 FY25", faculty: 684, staff: 1439, total: 2123, students: 2129, hsp: 601, temp: 670 },  // ✅ ACTUAL
   { quarter: "Q4 FY25", faculty: 689, staff: 1448, total: 2137, students: 1916, hsp: 600, temp: 660 },  // ✅ ACTUAL
-  { quarter: "Q1 FY26", faculty: 698, staff: 1451, total: 2149, students: 1860, hsp: 616, temp: 608 }   // ✅ ACTUAL
+  { quarter: "Q1 FY26", faculty: 698, staff: 1451, total: 2149, students: 1860, hsp: 616, temp: 608 },  // ✅ ACTUAL
+  { quarter: "Q2 FY26", faculty: 708, staff: 1459, total: 2167, students: 2032, hsp: 622, temp: 709 }   // ✅ ACTUAL
 ];
 
 // ============================================================================

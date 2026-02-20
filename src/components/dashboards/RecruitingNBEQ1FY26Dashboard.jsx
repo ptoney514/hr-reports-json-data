@@ -68,7 +68,7 @@ const Q1_FY26_TEMP_DATA = {
 // Transform to show only temporary worker categories (students, hsp, temp)
 // Note: All quarterly data is actual headcount from Oracle HCM (since Q1 FY23)
 // Prefixed dataKeys (1_hsp, 2_temp, 3_students, 4_total) to control Recharts legend sort order
-const QUARTERLY_TEMP_HEADCOUNT_TRENDS = QUARTERLY_HEADCOUNT_TRENDS.map(q => ({
+const QUARTERLY_TEMP_HEADCOUNT_TRENDS = QUARTERLY_HEADCOUNT_TRENDS.slice(-9).map(q => ({
   quarter: q.quarter,
   '1_hsp': q.hsp,
   '2_temp': q.temp,
