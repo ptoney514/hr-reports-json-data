@@ -19,10 +19,10 @@ describe('useAvailableQuarters', () => {
       expect(result.current.error).toBeNull();
     });
 
-    it('returns only 2 quarters with data (Q1 FY26 + Q4 FY25)', () => {
+    it('returns only 3 quarters with data (Q2 FY26 + Q1 FY26 + Q4 FY25)', () => {
       const { result } = renderHook(() => useAvailableQuarters());
 
-      expect(result.current.quarters).toHaveLength(2);
+      expect(result.current.quarters).toHaveLength(3);
     });
 
     it('quarters are sorted newest-first', () => {
@@ -49,10 +49,19 @@ describe('useAvailableQuarters', () => {
   });
 
   describe('FALLBACK_QUARTERS export', () => {
-    it('contains all 6 quarters', () => {
+    it('contains all 7 quarters', () => {
       expect(FALLBACK_QUARTERS).toBeDefined();
       expect(Array.isArray(FALLBACK_QUARTERS)).toBe(true);
-      expect(FALLBACK_QUARTERS).toHaveLength(6);
+      expect(FALLBACK_QUARTERS).toHaveLength(7);
+    });
+
+    it('contains Q2 FY26', () => {
+      const q2fy26 = FALLBACK_QUARTERS.find(q => q.value === '2025-12-31');
+      expect(q2fy26).toBeDefined();
+      expect(q2fy26.label).toBe('Q2 FY26');
+      expect(q2fy26.period).toBe('October - December 2025');
+      expect(q2fy26.fiscalYear).toBe('FY26');
+      expect(q2fy26.hasData).toBe(true);
     });
 
     it('contains Q1 FY26', () => {

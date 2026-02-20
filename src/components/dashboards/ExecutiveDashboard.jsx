@@ -9,8 +9,14 @@ import {
 import { useQuarter } from '../../contexts/QuarterContext';
 import NoDataForQuarter from '../ui/NoDataForQuarter';
 
-// New hire data per quarter (sourced from RecruitingQ1FY26Dashboard)
+// New hire data per quarter (benefit-eligible hires with Current Hire Date in quarter range)
 const NEWHIRE_DATA = {
+  "2025-12-31": {
+    total: 58,
+    faculty: 13,
+    staff: 45,
+    note: "Oct-Dec 2025"
+  },
   "2025-09-30": {
     total: 69,
     faculty: 31,

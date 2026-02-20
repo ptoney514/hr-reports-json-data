@@ -7,6 +7,13 @@ import { getAvailableQuarters } from '../services/apiService';
  */
 export const FALLBACK_QUARTERS = [
   {
+    value: '2025-12-31',
+    label: 'Q2 FY26',
+    period: 'October - December 2025',
+    fiscalYear: 'FY26',
+    hasData: true,
+  },
+  {
     value: '2025-09-30',
     label: 'Q1 FY26',
     period: 'July - September 2025',

@@ -45,6 +45,7 @@ const BENEFIT_ELIGIBLE_CATEGORIES = ['F12', 'F11', 'F09', 'F10', 'PT12', 'PT10',
 
 // Date constants for filtering
 const EXCEL_DATE_MAP = {
+  '2025-12-31': 46022,  // FY26 Q2
   '2025-09-30': 45930,  // FY26 Q1
   '2025-06-30': 45838,  // FY25 Q4
   '2025-03-31': 45747,  // FY25 Q3
