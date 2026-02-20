@@ -13,7 +13,7 @@ import { useQuarter } from '../../contexts/QuarterContext';
 const SlideHeader = ({ sticky = true }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { selectedQuarter, quarterConfig, setQuarter, availableQuarters } = useQuarter();
+  const { selectedQuarter, quarterConfig, setQuarter, availableQuarters, quartersLoading } = useQuarter();
 
   // Find current index in the ordered route list
   const currentIndex = navigationRoutes.findIndex(r => r.path === location.pathname);
@@ -173,14 +173,20 @@ const SlideHeader = ({ sticky = true }) => {
           <select
             value={selectedQuarter}
             onChange={handleQuarterChange}
-            className="bg-white/10 border border-white/20 rounded px-2 py-1 text-sm text-white focus:ring-2 focus:ring-white/40 focus:outline-none"
+            disabled={quartersLoading}
+            aria-busy={quartersLoading}
+            className="bg-white/10 border border-white/20 rounded px-2 py-1 text-sm text-white focus:ring-2 focus:ring-white/40 focus:outline-none disabled:opacity-50"
             aria-label="Select reporting quarter"
           >
-            {availableQuarters.map(q => (
-              <option key={q.value} value={q.value} className="text-gray-900">
-                {q.label}
-              </option>
-            ))}
+            {quartersLoading ? (
+              <option value="">Loading quarters…</option>
+            ) : (
+              availableQuarters.map(q => (
+                <option key={q.value} value={q.value} className="text-gray-900">
+                  {q.label} ({q.period})
+                </option>
+              ))
+            )}
           </select>
         </div>
       </div>

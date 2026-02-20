@@ -11,7 +11,8 @@ import {
   mockHealthResponse,
   mockTop15SchoolOrgData,
   mockAnnualTurnoverRates,
-  mockMobilityData
+  mockMobilityData,
+  mockAvailableQuarters
 } from '../../__fixtures__/testData';
 
 // Store original fetch
@@ -284,6 +285,36 @@ describe('apiService', () => {
     });
   });
 
+  describe('getAvailableQuarters', () => {
+    it('calls /available-quarters endpoint', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve(mockAvailableQuarters),
+      });
+
+      await apiService.getAvailableQuarters();
+
+      expect(mockFetch).toHaveBeenCalledWith(
+        '/api/available-quarters',
+        expect.any(Object)
+      );
+    });
+
+    it('returns array of quarter objects', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve(mockAvailableQuarters),
+      });
+
+      const result = await apiService.getAvailableQuarters();
+
+      expect(Array.isArray(result)).toBe(true);
+      expect(result[0]).toHaveProperty('value');
+      expect(result[0]).toHaveProperty('label');
+      expect(result[0]).toHaveProperty('hasData');
+    });
+  });
+
   describe('Health Check Functions', () => {
     describe('checkAPIHealth', () => {
       it('calls /health endpoint', async () => {
@@ -429,6 +460,7 @@ describe('apiService', () => {
       expect(defaultExport.getSchoolOrgData).toBeDefined();
       expect(defaultExport.getTop15SchoolOrgData).toBeDefined();
       expect(defaultExport.getMobilityData).toBeDefined();
+      expect(defaultExport.getAvailableQuarters).toBeDefined();
     });
 
     it('contains health check functions', () => {

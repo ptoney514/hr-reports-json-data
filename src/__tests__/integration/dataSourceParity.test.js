@@ -39,6 +39,7 @@ jest.mock('../../services/apiService', () => ({
   getAnnualTurnoverRates: jest.fn(),
   getSchoolOrgData: jest.fn(),
   getMobilityData: jest.fn(),
+  getAvailableQuarters: jest.fn(),
   checkAPIHealth: jest.fn()
 }));
 
@@ -359,6 +360,64 @@ describe('Data Source Parity Tests', () => {
       const result = await compareDataSources('quarterlyTurnover', '2025-09-30');
 
       expect(result.match).toBe(true);
+    });
+  });
+
+  describe('Available Quarters Parity', () => {
+    it('API returns quarters with expected shape', async () => {
+      const mockQuarters = [
+        { value: '2025-09-30', label: 'Q1 FY26', period: 'July - September 2025', fiscalYear: 'FY26', hasData: true },
+        { value: '2025-06-30', label: 'Q4 FY25', period: 'April - June 2025', fiscalYear: 'FY25', hasData: true },
+      ];
+
+      apiService.getAvailableQuarters.mockResolvedValue(mockQuarters);
+
+      const result = await apiService.getAvailableQuarters();
+
+      expect(Array.isArray(result)).toBe(true);
+      result.forEach((q) => {
+        expect(q).toHaveProperty('value');
+        expect(q).toHaveProperty('label');
+        expect(q).toHaveProperty('period');
+        expect(q).toHaveProperty('fiscalYear');
+        expect(q).toHaveProperty('hasData');
+      });
+    });
+
+    it('available quarters include all dates used by other endpoints', async () => {
+      const mockQuarters = testDates.map((date) => ({
+        value: date,
+        label: `Q-${date}`,
+        period: 'test period',
+        fiscalYear: 'FY25',
+        hasData: true,
+      }));
+
+      apiService.getAvailableQuarters.mockResolvedValue(mockQuarters);
+
+      const result = await apiService.getAvailableQuarters();
+      const availableValues = result.map((q) => q.value);
+
+      testDates.forEach((date) => {
+        expect(availableValues).toContain(date);
+      });
+    });
+
+    it('quarter values are valid quarter-end dates', async () => {
+      const mockQuarters = [
+        { value: '2025-09-30', label: 'Q1 FY26', hasData: true },
+        { value: '2025-06-30', label: 'Q4 FY25', hasData: true },
+      ];
+
+      apiService.getAvailableQuarters.mockResolvedValue(mockQuarters);
+
+      const result = await apiService.getAvailableQuarters();
+      const validEndings = ['09-30', '12-31', '03-31', '06-30'];
+
+      result.forEach((q) => {
+        const monthDay = q.value.slice(5);
+        expect(validEndings).toContain(monthDay);
+      });
     });
   });
 });

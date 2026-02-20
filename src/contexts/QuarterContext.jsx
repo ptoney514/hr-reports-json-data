@@ -1,41 +1,43 @@
-import React, { createContext, useContext, useState, useCallback, useMemo } from 'react';
+import React, { createContext, useContext, useState, useCallback, useMemo, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { useAvailableQuarters, FALLBACK_QUARTERS } from '../hooks/useAvailableQuarters';
 
 /**
- * Available quarters — single source of truth.
- * Add new entries here as data becomes available.
+ * Static fallback — kept for backward compatibility.
+ * Components that import AVAILABLE_QUARTERS directly still get a valid array.
  */
-export const AVAILABLE_QUARTERS = [
-  {
-    value: '2025-09-30',
-    label: 'Q1 FY26',
-    period: 'July - September 2025',
-    fiscalYear: 'FY26',
-  },
-];
-
-const DEFAULT_QUARTER = '2025-09-30';
+export const AVAILABLE_QUARTERS = FALLBACK_QUARTERS;
 
 const QuarterContext = createContext(null);
 
 export const QuarterProvider = ({ children }) => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const { quarters: availableQuarters, loading: quartersLoading } = useAvailableQuarters();
+
+  // Default = first available quarter (newest with data)
+  const defaultQuarter = availableQuarters[0]?.value || '2025-09-30';
 
   // Initialise from URL param or fall back to default
   const paramValue = searchParams.get('quarter');
   const initialQuarter =
-    AVAILABLE_QUARTERS.find((q) => q.value === paramValue)?.value || DEFAULT_QUARTER;
+    availableQuarters.find(q => q.value === paramValue)?.value || defaultQuarter;
 
   const [selectedQuarter, setSelectedQuarterState] = useState(initialQuarter);
+
+  // Re-validate selection when quarters list changes (after API response)
+  useEffect(() => {
+    if (!quartersLoading && !availableQuarters.find(q => q.value === selectedQuarter)) {
+      setSelectedQuarterState(availableQuarters[0]?.value || '2025-09-30');
+    }
+  }, [availableQuarters, quartersLoading, selectedQuarter]);
 
   const setQuarter = useCallback(
     (value) => {
       setSelectedQuarterState(value);
-      // Sync to URL — omit param when it's the default to keep URLs clean
       setSearchParams(
         (prev) => {
           const next = new URLSearchParams(prev);
-          if (value === DEFAULT_QUARTER) {
+          if (value === defaultQuarter) {
             next.delete('quarter');
           } else {
             next.set('quarter', value);
@@ -45,12 +47,12 @@ export const QuarterProvider = ({ children }) => {
         { replace: true },
       );
     },
-    [setSearchParams],
+    [setSearchParams, defaultQuarter],
   );
 
   const quarterConfig = useMemo(
-    () => AVAILABLE_QUARTERS.find((q) => q.value === selectedQuarter),
-    [selectedQuarter],
+    () => availableQuarters.find(q => q.value === selectedQuarter),
+    [selectedQuarter, availableQuarters],
   );
 
   const ctx = useMemo(
@@ -58,18 +60,15 @@ export const QuarterProvider = ({ children }) => {
       selectedQuarter,
       quarterConfig,
       setQuarter,
-      availableQuarters: AVAILABLE_QUARTERS,
+      availableQuarters,
+      quartersLoading,
     }),
-    [selectedQuarter, quarterConfig, setQuarter],
+    [selectedQuarter, quarterConfig, setQuarter, availableQuarters, quartersLoading],
   );
 
   return <QuarterContext.Provider value={ctx}>{children}</QuarterContext.Provider>;
 };
 
-/**
- * Hook to consume the global quarter state.
- * Must be used inside <QuarterProvider>.
- */
 export const useQuarter = () => {
   const ctx = useContext(QuarterContext);
   if (!ctx) {

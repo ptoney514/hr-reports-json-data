@@ -34,34 +34,34 @@ const TurnoverQ1FY26Dashboard = () => {
     involuntary: '#EF4444'       // Red
   };
 
-  // Years of Service at Termination - Load from data
-  const yearsOfServiceData = data.yearsOfService.map(item => ({
+  // Years of Service at Termination - Load from data (may be null for older quarters)
+  const yearsOfServiceData = data.yearsOfService?.map(item => ({
     ...item,
     total: item.faculty + item.staff
-  }));
+  })) || null;
 
   // Find max total for scaling
-  const maxYearsTotal = Math.max(...yearsOfServiceData.map(item => item.total));
+  const maxYearsTotal = yearsOfServiceData ? Math.max(...yearsOfServiceData.map(item => item.total)) : 0;
 
   // Y-axis scale (0 to max, rounded up to nearest 5)
-  const yAxisMax = Math.ceil(maxYearsTotal / 5) * 5;
+  const yAxisMax = Math.ceil(maxYearsTotal / 5) * 5 || 5;
   const yAxisSteps = Array.from({ length: (yAxisMax / 5) + 1 }, (_, i) => i * 5);
 
-  // Turnover by Age - Load from data
-  const ageGroupData = data.ageGroups.map(item => ({
+  // Turnover by Age - Load from data (may be null for older quarters)
+  const ageGroupData = data.ageGroups?.map(item => ({
     ...item,
     total: item.faculty + item.staff
-  }));
+  })) || null;
 
   // Find max for age chart scaling
-  const maxAgeTotal = Math.max(...ageGroupData.map(item => item.total));
-  const ageAxisMax = Math.ceil(maxAgeTotal / 5) * 5;
+  const maxAgeTotal = ageGroupData ? Math.max(...ageGroupData.map(item => item.total)) : 0;
+  const ageAxisMax = Math.ceil(maxAgeTotal / 5) * 5 || 5;
   const ageAxisSteps = Array.from({ length: (ageAxisMax / 5) + 1 }, (_, i) => i * 5);
 
-  // Early Turnover Data - Load from data
-  const earlyTenureData = data.earlyTurnover.byTerminationType;
-  const earlyTenureTotal = data.earlyTurnover.total;
-  const earlyTenureCategoryData = data.earlyTurnover.byEmployeeCategory;
+  // Early Turnover Data - Load from data (may be null for older quarters)
+  const earlyTenureData = data.earlyTurnover?.byTerminationType || null;
+  const earlyTenureTotal = data.earlyTurnover?.total || 0;
+  const earlyTenureCategoryData = data.earlyTurnover?.byEmployeeCategory || null;
 
   return (
     <div id="turnover-q1-fy26-dashboard" className="min-h-screen">
@@ -397,6 +397,7 @@ const TurnoverQ1FY26Dashboard = () => {
         </div>
 
         {/* Turnover by Length of Service */}
+        {yearsOfServiceData && (
         <div className="bg-white rounded-lg shadow-sm border p-6 mb-8">
           <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
             <Clock style={{color: '#0054A6'}} size={20} />
@@ -489,8 +490,10 @@ const TurnoverQ1FY26Dashboard = () => {
             <span className="font-semibold">Note:</span> Displays years of service at termination for {terminationData.faculty.count} benefit-eligible faculty and {terminationData.staff.count} benefit-eligible staff terminations in {data.quarter}.
           </div>
         </div>
+        )}
 
         {/* Turnover by Age */}
+        {ageGroupData && (
         <div className="bg-white rounded-lg shadow-sm border p-6 mb-8">
           <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
             <Calendar style={{color: '#0054A6'}} size={20} />
@@ -579,8 +582,10 @@ const TurnoverQ1FY26Dashboard = () => {
             <span className="font-semibold">Note:</span> Displays age distribution at termination for {terminationData.faculty.count} benefit-eligible faculty and {terminationData.staff.count} benefit-eligible staff terminations in {data.quarter}.
           </div>
         </div>
+        )}
 
         {/* Early Turnover Deep Dive - Two Column Layout */}
+        {data.earlyTurnover && (
         <div className="mb-8">
           <div className="bg-gradient-to-r from-blue-50 to-white rounded-lg shadow-sm border p-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-8 flex items-center gap-2">
@@ -813,6 +818,7 @@ const TurnoverQ1FY26Dashboard = () => {
             </div>
           </div>
         </div>
+        )}
 
         {/* Future: Additional charts and visualizations will go here */}
 

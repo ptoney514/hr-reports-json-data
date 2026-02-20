@@ -225,6 +225,15 @@ export const mockMobilityData = {
   crossDepartmentMoves: 42
 };
 
+// Mock available quarters (for available-quarters API endpoint)
+export const mockAvailableQuarters = [
+  { value: '2025-09-30', label: 'Q1 FY26', period: 'July - September 2025', fiscalYear: 'FY26', hasData: true },
+  { value: '2025-06-30', label: 'Q4 FY25', period: 'April - June 2025', fiscalYear: 'FY25', hasData: true },
+  { value: '2025-03-31', label: 'Q3 FY25', period: 'January - March 2025', fiscalYear: 'FY25', hasData: false },
+  { value: '2024-12-31', label: 'Q2 FY25', period: 'October - December 2024', fiscalYear: 'FY25', hasData: false },
+  { value: '2024-09-30', label: 'Q1 FY25', period: 'July - September 2024', fiscalYear: 'FY25', hasData: false },
+];
+
 // Mock available dates
 export const mockAvailableDates = [
   "2024-06-30",
@@ -354,6 +363,7 @@ export default {
   mockTop15SchoolOrgData,
   mockHealthResponse,
   mockMobilityData,
+  mockAvailableQuarters,
   mockAvailableDates,
   mockFiscalPeriods,
   mockConstants,

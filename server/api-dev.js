@@ -715,6 +715,69 @@ app.get('/api/recruiting/metrics/:fiscalYear/:quarter', async (req, res) => {
   }
 });
 
+// Available quarters endpoint
+app.get('/api/available-quarters', async (req, res) => {
+  try {
+    const result = await sql`
+      SELECT
+        fp.period_date, fp.fiscal_year, fp.fiscal_quarter,
+        fp.quarter_label, fp.quarter_start, fp.quarter_end,
+        CASE WHEN COUNT(ws.snapshot_id) > 0 THEN true ELSE false END AS has_data
+      FROM dim_fiscal_periods fp
+      LEFT JOIN fact_workforce_snapshots ws ON ws.period_date = fp.period_date
+      WHERE fp.is_quarter_end = true
+        AND fp.period_date <= CURRENT_DATE + INTERVAL '6 months'
+      GROUP BY fp.period_date, fp.fiscal_year, fp.fiscal_quarter,
+               fp.quarter_label, fp.quarter_start, fp.quarter_end
+      ORDER BY fp.period_date DESC
+      LIMIT 8
+    `;
+
+    const monthNames = [
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+
+    const quarters = result.map(row => {
+      const startDate = new Date(row.quarter_start);
+      const endDate = new Date(row.quarter_end);
+      const startMonth = monthNames[startDate.getUTCMonth()];
+      const endMonth = monthNames[endDate.getUTCMonth()];
+      const endYear = endDate.getUTCFullYear();
+
+      const periodDate = new Date(row.period_date);
+      const value = periodDate.toISOString().split('T')[0];
+
+      // Transform DB format "FY26_Q1" → "Q1 FY26" for display
+      const qLabel = row.quarter_label;
+      const displayLabel = qLabel.includes('_')
+        ? `${qLabel.split('_')[1]} ${qLabel.split('_')[0]}`
+        : qLabel;
+
+      // Transform fiscal_year (number 2026) → "FY26" string
+      const fy = typeof row.fiscal_year === 'number'
+        ? `FY${String(row.fiscal_year).slice(-2)}`
+        : row.fiscal_year;
+
+      return {
+        value,
+        label: displayLabel,
+        period: `${startMonth} - ${endMonth} ${endYear}`,
+        fiscalYear: fy,
+        hasData: row.has_data
+      };
+    });
+
+    res.json(quarters);
+  } catch (error) {
+    console.error('Available Quarters API Error:', error);
+    res.status(500).json({
+      error: 'Internal server error',
+      message: error.message
+    });
+  }
+});
+
 // Start server
 app.listen(PORT, () => {
   console.log(`API server running on http://localhost:${PORT}`);
@@ -723,4 +786,5 @@ app.listen(PORT, () => {
   console.log(`Turnover Metrics:   http://localhost:${PORT}/api/turnover-metrics/FY2025`);
   console.log(`Recruiting Summary: http://localhost:${PORT}/api/recruiting/summary/FY2026/1`);
   console.log(`Recruiting Metrics: http://localhost:${PORT}/api/recruiting/metrics/FY2026/1`);
+  console.log(`Available Quarters: http://localhost:${PORT}/api/available-quarters`);
 });

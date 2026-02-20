@@ -2193,6 +2193,68 @@ export const QUARTERLY_TURNOVER_DATA = {
       { school: "Arts & Sciences", faculty: 1, staff: 0, total: 1 },
       { school: "Other", faculty: 0, staff: 16, total: 16, note: "Enrollment Management, UCOM, University Relations, Phoenix, Provost, VPMM, VPFN, CollProCE, Student Success, Information Technology, (blank)" }
     ]
+  },
+  // Q4 FY25 - April-June 2025
+  // Derived from legacy TURNOVER_DATA["2025-06-30"]
+  "2025-06-30": {
+    reportingDate: "6/30/25",
+    quarter: "Q4 FY25",
+    fiscalPeriod: "April 2025 - June 2025",
+    summary: {
+      total: { count: 62, oma: 57, phx: 5 },
+      faculty: { count: 21, oma: 20, phx: 1 },
+      staff: { count: 41, oma: 37, phx: 4 }
+    },
+    terminationTypesByGroup: [
+      {
+        group: "Benefit Eligible Faculty",
+        total: 21,
+        voluntary: 3,
+        involuntary: 1,
+        retirement: 9,
+        endOfAssignment: 8
+      },
+      {
+        group: "Benefit Eligible Staff",
+        total: 41,
+        voluntary: 27,
+        involuntary: 3,
+        retirement: 5,
+        endOfAssignment: 6
+      }
+    ],
+    yearsOfService: [
+      { range: "<1 Year", faculty: 9, staff: 18 },
+      { range: "1-5 Years", faculty: 5, staff: 9 },
+      { range: "5-10 Years", faculty: 4, staff: 7 },
+      { range: "10-20 Years", faculty: 3, staff: 6 },
+      { range: "20+ Years", faculty: 0, staff: 1 }
+    ],
+    exitReasons: [
+      { reason: "Resigned", total: 25, percentage: 40.3, faculty: 3, staff: 22 },
+      { reason: "Retirement", total: 14, percentage: 22.6, faculty: 9, staff: 5 },
+      { reason: "End Assignment", total: 9, percentage: 14.5, faculty: 7, staff: 2 },
+      { reason: "Better Opportunity", total: 5, percentage: 8.1, faculty: 0, staff: 5 },
+      { reason: "Invol Performance", total: 3, percentage: 4.8, faculty: 1, staff: 2 },
+      { reason: "Personal Reasons", total: 2, percentage: 3.2, faculty: 0, staff: 2 },
+      { reason: "Relocation", total: 2, percentage: 3.2, faculty: 0, staff: 2 },
+      { reason: "Death", total: 1, percentage: 1.6, faculty: 1, staff: 0 },
+      { reason: "Reduction In Force", total: 1, percentage: 1.6, faculty: 0, staff: 1 }
+    ],
+    schoolTurnover: [
+      { school: "College of Medicine", rate: 7.1, departures: 35 },
+      { school: "Academic Affairs", rate: 7.6, departures: 23 },
+      { school: "Student Affairs", rate: 9.2, departures: 23 },
+      { school: "Information Technology", rate: 5.6, departures: 11 },
+      { school: "Finance & Administration", rate: 9.9, departures: 17 }
+    ],
+    turnoverBySchool: [
+      { school: "College of Medicine", faculty: 5, staff: 30, total: 35 },
+      { school: "Academic Affairs", faculty: 8, staff: 15, total: 23 },
+      { school: "Student Affairs", faculty: 3, staff: 20, total: 23 },
+      { school: "Finance & Administration", faculty: 0, staff: 17, total: 17 },
+      { school: "Information Technology", faculty: 0, staff: 11, total: 11 }
+    ]
   }
 };
 
@@ -2410,6 +2472,25 @@ export const QUARTERLY_WORKFORCE_DATA = {
           ]
         }
       }
+    }
+  },
+  // Q4 FY25 - April-June 2025
+  // Derived from legacy WORKFORCE_DATA["2025-06-30"]
+  "2025-06-30": {
+    reportingDate: "6/30/25",
+    quarter: "Q4 FY25",
+    fiscalPeriod: "April 2025 - June 2025",
+    summary: {
+      total: { count: 5037, oma: 4287, phx: 750 },
+      faculty: { count: 689, oma: 649, phx: 40 },
+      staff: { count: 1448, oma: 1344, phx: 104 },
+      houseStaffPhysicians: { count: 612, oma: 268, phx: 344 },
+      studentWorkers: { count: 1714, oma: 1604, phx: 110 },
+      temporary: { count: 574, oma: 422, phx: 152 }
+    },
+    locationDetails: {
+      omaha: { faculty: 649, staff: 1344, hsp: 268, students: 1604, temp: 422, total: 4287 },
+      phoenix: { faculty: 40, staff: 104, hsp: 344, students: 110, temp: 152, total: 750 }
     }
   }
 };

@@ -325,6 +325,20 @@ export const getAvailableQuarters = () => {
 };
 
 /**
+ * Async version of getAvailableQuarters - fetches from API with JSON fallback
+ */
+export const getAvailableQuartersAsync = async () => {
+  return withFallback(
+    () => apiService.getAvailableQuarters(),
+    () => {
+      // Fallback: return static AVAILABLE_QUARTERS with hasData flag
+      const { AVAILABLE_QUARTERS } = require('../contexts/QuarterContext');
+      return AVAILABLE_QUARTERS.map(q => ({ ...q, hasData: true }));
+    }
+  );
+};
+
+/**
  * Get most recent quarter
  */
 export const getMostRecentQuarter = () => {
@@ -438,6 +452,7 @@ const dataService = {
   getHeadcountTrendsDataAsync,
   getPhoenixHeadcountDataAsync,
   getOmahaHeadcountDataAsync,
+  getAvailableQuartersAsync,
 
   // Utilities
   getDataSourceInfo,
