@@ -138,7 +138,7 @@ const TempWorkersQ1FY26Dashboard = () => {
 
         {/* Quarterly Trend Chart */}
         <div className="bg-white rounded-lg shadow-sm border p-4">
-          <h2 className="text-base font-bold text-gray-900 mb-3">
+          <h2 className="text-xl font-bold text-gray-900 mb-3">
             Quarterly Temporary Workers Headcount Trend
           </h2>
           <ResponsiveContainer width="100%" height={385}>
@@ -222,7 +222,7 @@ const TempWorkersQ1FY26Dashboard = () => {
 
         {/* Campus Comparison - Temporary Workers by Type */}
         <div className="bg-white rounded-lg shadow-sm border p-4">
-          <h2 className="text-base font-bold text-gray-900 mb-3 flex items-center gap-2">
+          <h2 className="text-xl font-bold text-gray-900 mb-3 flex items-center gap-2">
             <MapPin style={{ color: COLORS.total }} size={18} />
             Campus Comparison - Temporary Workers by Type
           </h2>
