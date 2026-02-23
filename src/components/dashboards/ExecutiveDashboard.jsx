@@ -150,15 +150,16 @@ const ExecutiveDashboard = () => {
 
 
   // Exit survey data points
-  const topFactors = exitSurveyData?.contributingReasons?.slice(0, 3)
-    || exitSurveyData?.departureReasons?.slice(0, 3)
-    || [];
   const satisfactionRatings = exitSurveyData?.satisfactionRatings;
 
   // Key insights — dynamically computed, never hardcoded
   const insights = useMemo(() => {
     if (!exitSurveyData) return [];
     const items = [];
+
+    const topFactors = exitSurveyData?.contributingReasons?.slice(0, 3)
+      || exitSurveyData?.departureReasons?.slice(0, 3)
+      || [];
 
     // 1) Net headcount direction
     if (netChange < 0) {
@@ -227,18 +228,7 @@ const ExecutiveDashboard = () => {
     }
 
     return items;
-  }, [netChange, topFactors, exitSurveyData, satisfactionRatings]);
-
-  // Satisfaction rating rows (ordered by value descending)
-  const satisfactionRows = satisfactionRatings
-    ? [
-        { label: 'Benefits', key: 'benefits' },
-        { label: 'Management', key: 'managementSupport' },
-        { label: 'Job Satisfaction', key: 'jobSatisfaction' },
-        { label: 'Compensation', key: 'compensation' },
-        { label: 'Career Dev', key: 'careerDevelopment' },
-      ]
-    : [];
+  }, [netChange, exitSurveyData, satisfactionRatings]);
 
   // Check if data exists for selected quarter (after all hooks)
   if (!workforceData || !turnoverData || !exitSurveyData) {
