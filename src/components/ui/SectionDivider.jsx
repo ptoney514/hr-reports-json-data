@@ -9,8 +9,10 @@ import { useParams } from 'react-router-dom';
 
 const sectionTitles = {
   headcount: 'Headcount',
-  turnover: 'Turnover',
+  demographics: 'Demographics',
   recruiting: 'Recruiting',
+  turnover: 'Turnover',
+  promotions: 'Promotions',
   'exit-survey': 'Exit Survey',
   other: 'Other',
 };

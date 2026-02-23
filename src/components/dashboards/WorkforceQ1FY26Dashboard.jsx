@@ -17,7 +17,7 @@ import NoDataForQuarter from '../ui/NoDataForQuarter';
 // Helper to generate common Line chart props for secondary trend lines (dashed style)
 
 const WorkforceQ1FY26Dashboard = () => {
-  const { selectedQuarter, quarterConfig } = useQuarter();
+  const { selectedQuarter } = useQuarter();
 
   // Load workforce data based on selected quarter
   const data = getQuarterlyWorkforceData(selectedQuarter);
@@ -39,8 +39,8 @@ const WorkforceQ1FY26Dashboard = () => {
 
           {/* Total Headcount Card */}
           <div className="bg-white rounded-lg shadow-sm border p-3 border-t-4 border-t-blue-500">
-            <h2 className="text-xs font-semibold text-gray-500 uppercase">Total Headcount</h2>
-            <div className="text-2xl font-bold text-gray-900">{headcountData.total.count.toLocaleString()}</div>
+            <h2 className="text-sm font-semibold text-gray-500 uppercase">Total Headcount</h2>
+            <div className="text-3xl font-bold text-gray-900">{headcountData.total.count.toLocaleString()}</div>
             <div className="text-xs text-gray-500 mt-1">
               OMA: {headcountData.total.oma.toLocaleString()} | PHX: {headcountData.total.phx}
             </div>
@@ -48,8 +48,8 @@ const WorkforceQ1FY26Dashboard = () => {
 
           {/* Benefit Eligible Faculty Card */}
           <div className="bg-white rounded-lg shadow-sm border p-3 border-t-4 border-t-purple-500">
-            <h2 className="text-xs font-semibold text-gray-500 uppercase">BE Faculty</h2>
-            <div className="text-2xl font-bold text-gray-900">{headcountData.faculty.count}</div>
+            <h2 className="text-sm font-semibold text-gray-500 uppercase">BE Faculty</h2>
+            <div className="text-3xl font-bold text-gray-900">{headcountData.faculty.count}</div>
             <div className="text-xs text-gray-500 mt-1">
               OMA: {headcountData.faculty.oma} | PHX: {headcountData.faculty.phx}
             </div>
@@ -57,8 +57,8 @@ const WorkforceQ1FY26Dashboard = () => {
 
           {/* Benefit Eligible Staff Card */}
           <div className="bg-white rounded-lg shadow-sm border p-3 border-t-4 border-t-green-500">
-            <h2 className="text-xs font-semibold text-gray-500 uppercase">BE Staff</h2>
-            <div className="text-2xl font-bold text-gray-900">{headcountData.staff.count.toLocaleString()}</div>
+            <h2 className="text-sm font-semibold text-gray-500 uppercase">BE Staff</h2>
+            <div className="text-3xl font-bold text-gray-900">{headcountData.staff.count.toLocaleString()}</div>
             <div className="text-xs text-gray-500 mt-1">
               OMA: {headcountData.staff.oma.toLocaleString()} | PHX: {headcountData.staff.phx}
             </div>
@@ -66,8 +66,8 @@ const WorkforceQ1FY26Dashboard = () => {
 
           {/* House Staff Physicians Card */}
           <div className="bg-white rounded-lg shadow-sm border p-3 border-t-4 border-t-cyan-500">
-            <h2 className="text-xs font-semibold text-gray-500 uppercase">House Staff</h2>
-            <div className="text-2xl font-bold text-gray-900">{headcountData.houseStaffPhysicians.count}</div>
+            <h2 className="text-sm font-semibold text-gray-500 uppercase">House Staff</h2>
+            <div className="text-3xl font-bold text-gray-900">{headcountData.houseStaffPhysicians.count}</div>
             <div className="text-xs text-gray-500 mt-1">
               OMA: {headcountData.houseStaffPhysicians.oma} | PHX: {headcountData.houseStaffPhysicians.phx}
             </div>
@@ -75,8 +75,8 @@ const WorkforceQ1FY26Dashboard = () => {
 
           {/* Non-Benefit Eligible Card */}
           <div className="bg-white rounded-lg shadow-sm border p-3 border-t-4 border-t-orange-500">
-            <h2 className="text-xs font-semibold text-gray-500 uppercase">Non-Benefit Eligible</h2>
-            <div className="text-2xl font-bold text-gray-900">{headcountData.temporary.count}</div>
+            <h2 className="text-sm font-semibold text-gray-500 uppercase">Non-Benefit Eligible</h2>
+            <div className="text-3xl font-bold text-gray-900">{headcountData.temporary.count}</div>
             <div className="text-xs text-gray-500 mt-1">
               OMA: {headcountData.temporary.oma} | PHX: {headcountData.temporary.phx}
             </div>
@@ -84,8 +84,8 @@ const WorkforceQ1FY26Dashboard = () => {
 
           {/* Student Workers Card */}
           <div className="bg-white rounded-lg shadow-sm border p-3 border-t-4 border-t-yellow-500">
-            <h2 className="text-xs font-semibold text-gray-500 uppercase">Student Workers</h2>
-            <div className="text-2xl font-bold text-gray-900">{headcountData.studentWorkers.count.toLocaleString()}</div>
+            <h2 className="text-sm font-semibold text-gray-500 uppercase">Student Workers</h2>
+            <div className="text-3xl font-bold text-gray-900">{headcountData.studentWorkers.count.toLocaleString()}</div>
             <div className="text-xs text-gray-500 mt-1">
               OMA: {headcountData.studentWorkers.oma.toLocaleString()} | PHX: {headcountData.studentWorkers.phx}
             </div>
@@ -100,7 +100,7 @@ const WorkforceQ1FY26Dashboard = () => {
 
         {/* Headcount Trends Chart */}
         <div className="bg-white rounded-lg shadow-sm border p-4">
-          <h2 className="text-base font-bold text-gray-900 mb-3">
+          <h2 className="text-xl font-bold text-gray-900 mb-3">
             Quarterly Benefit Eligible Faculty &amp; Staff Headcount Trend
           </h2>
           <ResponsiveContainer width="100%" height={385}>
@@ -185,7 +185,7 @@ const WorkforceQ1FY26Dashboard = () => {
 
         {/* Campus Comparison by Employee Type */}
         <div className="bg-white rounded-lg shadow-sm border p-4">
-          <h2 className="text-base font-bold text-gray-900 mb-3 flex items-center gap-2">
+          <h2 className="text-xl font-bold text-gray-900 mb-3 flex items-center gap-2">
             <MapPin style={{color: '#0054A6'}} size={18} />
             Campus Comparison by Employee Type
           </h2>

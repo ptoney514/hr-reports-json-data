@@ -32,17 +32,24 @@ const ExitSurveyOverview = lazy(() => import('./components/dashboards/ExitSurvey
 const TurnoverQ1Dashboard = lazy(() => import('./components/dashboards/TurnoverQ1FY26Dashboard'));
 const TurnoverTrendsDashboard = lazy(() => import('./components/dashboards/TurnoverTrendsDashboard'));
 const QuarterlyTurnoverRatesDashboard = lazy(() => import('./components/dashboards/QuarterlyTurnoverRatesDashboard'));
+const TurnoverBySchoolSlide = lazy(() => import('./components/dashboards/TurnoverBySchoolSlide'));
+const TurnoverByServiceSlide = lazy(() => import('./components/dashboards/TurnoverByServiceSlide'));
+const TurnoverByAgeSlide = lazy(() => import('./components/dashboards/TurnoverByAgeSlide'));
+const EarlyTurnoverSlide = lazy(() => import('./components/dashboards/EarlyTurnoverSlide'));
 // Quarterly Workforce Reports
 const WorkforceQ1Dashboard = lazy(() => import('./components/dashboards/WorkforceQ1FY26Dashboard'));
 const TempWorkersQ1Dashboard = lazy(() => import('./components/dashboards/TempWorkersQ1FY26Dashboard'));
+const HeadcountTrendsSlide = lazy(() => import('./components/dashboards/HeadcountTrendsSlide'));
 const DemographicsQ1Dashboard = lazy(() => import('./components/dashboards/DemographicsQ1FY26Dashboard'));
 const EthnicityDistributionQ1 = lazy(() => import('./components/dashboards/EthnicityDistributionQ1'));
 const AgeGenderQ1 = lazy(() => import('./components/dashboards/AgeGenderQ1'));
 // Quarterly Recruiting Reports
 const RecruitingQ1Dashboard = lazy(() => import('./components/dashboards/RecruitingQ1FY26Dashboard'));
 const RecruitingNBEQ1Dashboard = lazy(() => import('./components/dashboards/RecruitingNBEQ1FY26Dashboard'));
+const RecruitingDetailsSlide = lazy(() => import('./components/dashboards/RecruitingDetailsSlide'));
 // Quarterly Promotions Reports
 const PromotionsQ1Dashboard = lazy(() => import('./components/dashboards/PromotionsQ1FY26Dashboard'));
+const PromotionsBySchoolSlide = lazy(() => import('./components/dashboards/PromotionsBySchoolSlide'));
 const PromotionReasonsReference = lazy(() => import('./components/dashboards/PromotionReasonsReference'));
 const JobChangesTestingDashboard = lazy(() => import('./components/dashboards/JobChangesTestingDashboard'));
 // Validation Test Pages
@@ -203,10 +210,15 @@ function App() {
               <Route path="/dashboards/turnover-q1" element={<TurnoverQ1Dashboard />} />
               <Route path="/dashboards/turnover-trends" element={<TurnoverTrendsDashboard />} />
               <Route path="/dashboards/quarterly-turnover-rates" element={<QuarterlyTurnoverRatesDashboard />} />
+              <Route path="/dashboards/turnover-by-school" element={<TurnoverBySchoolSlide />} />
+              <Route path="/dashboards/turnover-by-service" element={<TurnoverByServiceSlide />} />
+              <Route path="/dashboards/turnover-by-age" element={<TurnoverByAgeSlide />} />
+              <Route path="/dashboards/early-turnover" element={<EarlyTurnoverSlide />} />
 
               {/* Quarterly Workforce Reports */}
               <Route path="/dashboards/workforce-q1" element={<WorkforceQ1Dashboard />} />
               <Route path="/dashboards/temp-workers-q1" element={<TempWorkersQ1Dashboard />} />
+              <Route path="/dashboards/headcount-trends" element={<HeadcountTrendsSlide />} />
               <Route path="/dashboards/demographics-q1" element={<DemographicsQ1Dashboard />} />
               <Route path="/dashboards/ethnicity-q1" element={<EthnicityDistributionQ1 />} />
               <Route path="/dashboards/age-gender-q1" element={<AgeGenderQ1 />} />
@@ -214,9 +226,11 @@ function App() {
               {/* Quarterly Recruiting Reports */}
               <Route path="/dashboards/recruiting-q1" element={<RecruitingQ1Dashboard />} />
               <Route path="/dashboards/recruiting-nbe-q1" element={<RecruitingNBEQ1Dashboard />} />
+              <Route path="/dashboards/recruiting-details" element={<RecruitingDetailsSlide />} />
 
               {/* Quarterly Promotions Reports */}
               <Route path="/dashboards/promotions-q1" element={<PromotionsQ1Dashboard />} />
+              <Route path="/dashboards/promotions-by-school" element={<PromotionsBySchoolSlide />} />
               <Route path="/dashboards/promotion-reasons" element={<PromotionReasonsReference />} />
               <Route path="/dashboards/job-changes-testing" element={<JobChangesTestingDashboard />} />
 
