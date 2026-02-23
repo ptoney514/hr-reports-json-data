@@ -1,5 +1,5 @@
 import React from 'react';
-import { Globe, Target, Users } from 'lucide-react';
+import { Globe, Target } from 'lucide-react';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
 import { useQuarter } from '../../contexts/QuarterContext';
 import NoDataForQuarter from '../ui/NoDataForQuarter';

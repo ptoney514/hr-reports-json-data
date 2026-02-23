@@ -17,7 +17,7 @@ import NoDataForQuarter from '../ui/NoDataForQuarter';
 // Helper to generate common Line chart props for secondary trend lines (dashed style)
 
 const WorkforceQ1FY26Dashboard = () => {
-  const { selectedQuarter, quarterConfig } = useQuarter();
+  const { selectedQuarter } = useQuarter();
 
   // Load workforce data based on selected quarter
   const data = getQuarterlyWorkforceData(selectedQuarter);

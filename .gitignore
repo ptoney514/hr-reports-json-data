@@ -96,4 +96,6 @@ backup/
 *.png
 *.jpg
 playwright-screenshot.js
+playwright-report/
+test-results/
 .vercel
