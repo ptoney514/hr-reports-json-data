@@ -1858,11 +1858,11 @@ export const EXIT_SURVEY_DATA = {
 // Source: source-metrics/terminations/cleaned/FY25_Q4/terminations_cleaned.csv
 // Generated: 2025-11-17 via scripts/aggregate_quarterly_turnover.py
 // Categories: Faculty, Staff Exempt, Staff Non-Exempt
-// Time Period: Q2 FY22 → Q1 FY26 (16 quarters)
+// Time Period: Q2 FY22 → Q2 FY26 (17 quarters)
 
 export const QUARTERLY_TURNOVER_TRENDS = {
   // Overall turnover counts by quarter (all terminations)
-  // Time Range: Q1 FY23 → Q1 FY26 (13 quarters - complete FY23, FY24, FY25, start of FY26)
+  // Time Range: Q1 FY23 → Q2 FY26 (14 quarters - complete FY23, FY24, FY25, start of FY26)
   // IMPORTANT: Only includes BENEFIT-ELIGIBLE employees (Assignment Category F/PT regular)
   // NOTE: Jesuits with F/PT assignments ARE INCLUDED per data owner guidance
   overallTurnover: [
@@ -1878,11 +1878,12 @@ export const QUARTERLY_TURNOVER_TRENDS = {
     { quarter: "Q2 FY25", faculty: 4, staff: 34 },
     { quarter: "Q3 FY25", faculty: 8, staff: 43 },
     { quarter: "Q4 FY25", faculty: 10, staff: 41 },
-    { quarter: "Q1 FY26", faculty: 4, staff: 54, hsp: 15 }  // Includes Grade R as HSP
+    { quarter: "Q1 FY26", faculty: 4, staff: 54, hsp: 15 },  // Includes Grade R as HSP
+    { quarter: "Q2 FY26", faculty: 5, staff: 29, hsp: 5 }
   ],
 
   // Early turnover counts by quarter (<1 year tenure only)
-  // Time Range: Q1 FY23 → Q1 FY26 (13 quarters)
+  // Time Range: Q1 FY23 → Q2 FY26 (14 quarters)
   // IMPORTANT: Only includes BENEFIT-ELIGIBLE employees (now includes HSP/Grade R)
   earlyTurnover: [
     { quarter: "Q1 FY23", faculty: 0, staff: 19 },
@@ -1897,7 +1898,8 @@ export const QUARTERLY_TURNOVER_TRENDS = {
     { quarter: "Q2 FY25", faculty: 1, staff: 13 },
     { quarter: "Q3 FY25", faculty: 1, staff: 9 },
     { quarter: "Q4 FY25", faculty: 0, staff: 5 },
-    { quarter: "Q1 FY26", faculty: 0, staff: 13, hsp: 4 }  // Includes Grade R as HSP
+    { quarter: "Q1 FY26", faculty: 0, staff: 13, hsp: 4 },  // Includes Grade R as HSP
+    { quarter: "Q2 FY26", faculty: 0, staff: 6, hsp: 2 }
   ]
 };
 

@@ -7,8 +7,8 @@ import { useQuarter } from '../../contexts/QuarterContext';
 /**
  * Two-row slide-style top navigation header.
  *
- * Row 1 (primary bar): identity + period context + branding — stays visible in print.
- * Row 2 (secondary bar): slide nav + quarter dropdown — hidden in print.
+ * Row 1 (top bar): slide nav + quarter dropdown — hidden in print.
+ * Row 2 (bottom bar): identity + period context + branding — stays visible in print.
  */
 const SlideHeader = ({ sticky = true }) => {
   const location = useLocation();
@@ -57,42 +57,7 @@ const SlideHeader = ({ sticky = true }) => {
     <header
       className={`${sticky ? 'sticky top-0' : ''} z-40`}
     >
-      {/* ── ROW 1 — Primary bar (identity + period context + branding) ── */}
-      <div className="bg-gradient-to-r from-[#00245D] to-[#0054A6] text-white print:static">
-        <div className="w-[85%] max-w-[1280px] mx-auto py-2.5 flex items-center justify-between gap-4">
-          {/* LEFT: App title */}
-          <Link
-            to="/dashboards/executive"
-            className="flex items-center gap-2 text-white hover:text-blue-200 transition-colors shrink-0"
-            aria-label="HR Reports Home"
-          >
-            <BarChart3 size={22} />
-            <span className="text-base font-bold hidden sm:inline">HR Executive Dashboard</span>
-          </Link>
-
-          {/* CENTER: Period context (static text, prints cleanly) */}
-          {quarterConfig && (
-            <div className="text-center flex-1 min-w-0">
-              <span className="text-sm font-semibold">
-                {quarterConfig.label}
-              </span>
-              <span className="text-xs text-blue-200 ml-2 hidden sm:inline">
-                {quarterConfig.period}
-              </span>
-            </div>
-          )}
-
-          {/* RIGHT: Branding */}
-          <div className="text-right shrink-0 hidden sm:block">
-            <div className="text-xs text-blue-200 uppercase tracking-wider">
-              Creighton University
-            </div>
-            <div className="text-xs text-blue-300">Omaha &amp; Phoenix</div>
-          </div>
-        </div>
-      </div>
-
-      {/* ── ROW 2 — Secondary bar (navigation controls + quarter selector) ── */}
+      {/* ── ROW 1 — Navigation bar (controls + quarter selector) ── */}
       <div className="bg-[#003580] text-white print:hidden">
         <div className="w-[85%] max-w-[1280px] mx-auto py-1.5 flex items-center justify-between gap-4">
           {/* LEFT: Prev/Next + Dropdown + Slide counter */}
@@ -188,6 +153,41 @@ const SlideHeader = ({ sticky = true }) => {
               ))
             )}
           </select>
+        </div>
+      </div>
+
+      {/* ── ROW 2 — Title bar (identity + period context + branding) ── */}
+      <div className="bg-gradient-to-r from-[#00245D] to-[#0054A6] text-white print:static">
+        <div className="w-[85%] max-w-[1280px] mx-auto py-2.5 flex items-center justify-between gap-4">
+          {/* LEFT: App title */}
+          <Link
+            to="/dashboards/executive"
+            className="flex items-center gap-2 text-white hover:text-blue-200 transition-colors shrink-0"
+            aria-label="HR Reports Home"
+          >
+            <BarChart3 size={22} />
+            <span className="text-base font-bold hidden sm:inline">{currentRoute?.label || 'HR Executive Dashboard'}</span>
+          </Link>
+
+          {/* CENTER: Period context (static text, prints cleanly) */}
+          {quarterConfig && (
+            <div className="text-center flex-1 min-w-0">
+              <span className="text-sm font-semibold">
+                {quarterConfig.label}
+              </span>
+              <span className="text-xs text-blue-200 ml-2 hidden sm:inline">
+                {quarterConfig.period}
+              </span>
+            </div>
+          )}
+
+          {/* RIGHT: Branding */}
+          <div className="text-right shrink-0 hidden sm:block">
+            <div className="text-xs text-blue-200 uppercase tracking-wider">
+              Creighton University
+            </div>
+            <div className="text-xs text-blue-300">Omaha &amp; Phoenix</div>
+          </div>
         </div>
       </div>
     </header>
