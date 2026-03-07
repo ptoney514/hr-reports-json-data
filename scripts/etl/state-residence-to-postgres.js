@@ -16,90 +16,29 @@
 
 const fs = require('fs');
 const path = require('path');
-const { sql, endPool, startAuditLog, completeAuditLog, checkConnection } = require('./neon-client');
-
-const {
-  getQuarterDatesFromKey,
-  getFiscalPeriodKey
-} = require('../utils/fiscal-calendar');
-
+const { sql } = require('./neon-client');
+const { getQuarterDatesFromKey, getFiscalPeriodKey } = require('../utils/fiscal-calendar');
 const { formatDate } = require('../utils/excel-helpers');
+const { colors, info, success, warning, error: logError, dryRunPrefix } = require('../utils/formatting');
+const { parseArgs } = require('../utils/cli-parser');
+const { runETL, startAudit, completeAudit } = require('../utils/etl-runner');
 
-const colors = {
-  reset: '\x1b[0m',
-  red: '\x1b[31m',
-  green: '\x1b[32m',
-  yellow: '\x1b[33m',
-  blue: '\x1b[34m',
-  cyan: '\x1b[36m'
+const SCRIPT_OPTIONS = [
+  { flags: '--file,-f', key: 'file', type: 'string', description: 'Input JSON file (e.g., { "NE": 2218, "AZ": 487 })' },
+  { flags: '--quarter,-q', key: 'quarter', type: 'string', description: 'Fiscal period (e.g., FY26_Q3)' },
+  { flags: '--date,-d', key: 'date', type: 'string', description: 'Period date (YYYY-MM-DD format)' }
+];
+
+const HELP_CONFIG = {
+  title: 'State Residence ETL to Postgres',
+  usage: [
+    'node scripts/etl/state-residence-to-postgres.js --file data.json --quarter FY26_Q3',
+    'node scripts/etl/state-residence-to-postgres.js --file data.json --date 2026-03-31'
+  ],
+  notes: [
+    'Input JSON Format: { "NE": 2218, "AZ": 487, "IA": 9, "MN": 5 }'
+  ]
 };
-
-/**
- * Parse command line arguments
- */
-function parseArgs() {
-  const args = process.argv.slice(2);
-  const options = {
-    file: null,
-    quarter: null,
-    date: null,
-    dryRun: false
-  };
-
-  for (let i = 0; i < args.length; i++) {
-    switch (args[i]) {
-      case '--file':
-      case '-f':
-        options.file = args[++i];
-        break;
-      case '--quarter':
-      case '-q':
-        options.quarter = args[++i];
-        break;
-      case '--date':
-      case '-d':
-        options.date = args[++i];
-        break;
-      case '--dry-run':
-        options.dryRun = true;
-        break;
-      case '--help':
-      case '-h':
-        printHelp();
-        process.exit(0);
-    }
-  }
-
-  return options;
-}
-
-/**
- * Print help message
- */
-function printHelp() {
-  console.log(`
-${colors.cyan}State Residence ETL to Postgres${colors.reset}
-
-${colors.yellow}Usage:${colors.reset}
-  node scripts/etl/state-residence-to-postgres.js --file data.json --quarter FY26_Q3
-  node scripts/etl/state-residence-to-postgres.js --file data.json --date 2026-03-31
-
-${colors.yellow}Options:${colors.reset}
-  -f, --file FILE       Input JSON file (e.g., { "NE": 2218, "AZ": 487 })
-  -q, --quarter PERIOD  Fiscal period (e.g., FY26_Q3)
-  -d, --date DATE       Period date (YYYY-MM-DD format)
-  --dry-run             Preview without database writes
-  -h, --help            Show this help
-
-${colors.yellow}Input JSON Format:${colors.reset}
-  {
-    "NE": 2218,
-    "AZ": 487,
-    "IA": 9,
-    "MN": 5
-  }
-`);
-}
 
 /**
  * Validate state codes against dim_us_states
@@ -146,8 +85,8 @@ async function upsertResidenceData(data, periodDate, sourceFile, dryRun = false)
       } else {
         updated++;
       }
-    } catch (error) {
-      console.error(`  Error upserting ${stateCode}: ${error.message}`);
+    } catch (err) {
+      console.error(`  Error upserting ${stateCode}: ${err.message}`);
       errored++;
     }
   }
@@ -155,136 +94,97 @@ async function upsertResidenceData(data, periodDate, sourceFile, dryRun = false)
   return { inserted, updated, errored };
 }
 
-/**
- * Main function
- */
-async function main() {
-  const options = parseArgs();
+const options = parseArgs('state-residence-to-postgres', SCRIPT_OPTIONS, HELP_CONFIG);
 
-  console.log(`\n${colors.cyan}========================================${colors.reset}`);
-  console.log(`${colors.cyan}   State Residence ETL to Postgres${colors.reset}`);
-  console.log(`${colors.cyan}========================================${colors.reset}\n`);
+runETL({
+  title: 'State Residence ETL to Postgres',
+  loadType: 'state_residence',
+  dryRun: options.dryRun,
+  run: async () => {
+    // Validate input
+    if (!options.file) {
+      logError('Error: --file is required');
+      process.exit(1);
+    }
 
-  // Check connection
-  console.log(`${colors.blue}Checking database connection...${colors.reset}`);
-  const connected = await checkConnection();
+    if (!options.quarter && !options.date) {
+      logError('Error: Either --quarter or --date is required');
+      process.exit(1);
+    }
 
-  if (!connected) {
-    console.error(`${colors.red}Failed to connect to database.${colors.reset}`);
-    process.exit(1);
-  }
-  console.log(`${colors.green}✓${colors.reset} Connected\n`);
+    // Determine period date
+    let periodDate, fiscalPeriod;
 
-  // Validate input
-  if (!options.file) {
-    console.error(`${colors.red}Error: --file is required${colors.reset}`);
-    printHelp();
-    process.exit(1);
-  }
+    if (options.quarter) {
+      const dates = getQuarterDatesFromKey(options.quarter);
+      periodDate = formatDate(dates.end);
+      fiscalPeriod = options.quarter;
+    } else {
+      periodDate = options.date;
+      fiscalPeriod = getFiscalPeriodKey(new Date(periodDate));
+    }
 
-  if (!options.quarter && !options.date) {
-    console.error(`${colors.red}Error: Either --quarter or --date is required${colors.reset}`);
-    printHelp();
-    process.exit(1);
-  }
+    console.log(`${colors.cyan}Period Date: ${periodDate}${colors.reset}`);
+    console.log(`${colors.cyan}Fiscal Period: ${fiscalPeriod}${colors.reset}\n`);
 
-  // Determine period date
-  let periodDate, fiscalPeriod;
+    // Load JSON data
+    const filePath = path.resolve(options.file);
+    info(`Loading JSON: ${filePath}`);
 
-  if (options.quarter) {
-    const dates = getQuarterDatesFromKey(options.quarter);
-    periodDate = formatDate(dates.end);
-    fiscalPeriod = options.quarter;
-  } else {
-    periodDate = options.date;
-    fiscalPeriod = getFiscalPeriodKey(new Date(periodDate));
-  }
+    if (!fs.existsSync(filePath)) {
+      logError(`Error: File not found: ${filePath}`);
+      process.exit(1);
+    }
 
-  console.log(`${colors.cyan}Period Date: ${periodDate}${colors.reset}`);
-  console.log(`${colors.cyan}Fiscal Period: ${fiscalPeriod}${colors.reset}\n`);
+    const data = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+    const stateEntries = Object.entries(data);
+    const totalEmployees = stateEntries.reduce((sum, [, count]) => sum + count, 0);
 
-  // Load JSON data
-  const filePath = path.resolve(options.file);
-  console.log(`${colors.blue}Loading JSON: ${filePath}${colors.reset}`);
+    success(`Loaded ${stateEntries.length} states, ${totalEmployees.toLocaleString()} total employees\n`);
 
-  if (!fs.existsSync(filePath)) {
-    console.error(`${colors.red}Error: File not found: ${filePath}${colors.reset}`);
-    process.exit(1);
-  }
+    // Validate state codes
+    info('Validating state codes...');
+    const { invalid } = await validateStateCodes(Object.keys(data));
 
-  const data = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
-  const stateEntries = Object.entries(data);
-  const totalEmployees = stateEntries.reduce((sum, [, count]) => sum + count, 0);
+    if (invalid.length > 0) {
+      logError(`Error: Invalid state codes: ${invalid.join(', ')}`);
+      warning('Run the dim_us_states seed first.');
+      process.exit(1);
+    }
+    success('All state codes valid\n');
 
-  console.log(`${colors.green}✓${colors.reset} Loaded ${stateEntries.length} states, ${totalEmployees.toLocaleString()} total employees\n`);
+    // Print summary
+    console.log(`${colors.cyan}Data Summary:${colors.reset}`);
+    stateEntries
+      .sort((a, b) => b[1] - a[1])
+      .forEach(([state, count]) => {
+        console.log(`  ${state}: ${count.toLocaleString()}`);
+      });
+    console.log(`  ${'─'.repeat(20)}`);
+    console.log(`  Total: ${totalEmployees.toLocaleString()}\n`);
 
-  // Validate state codes
-  console.log(`${colors.blue}Validating state codes...${colors.reset}`);
-  const { invalid } = await validateStateCodes(Object.keys(data));
-
-  if (invalid.length > 0) {
-    console.error(`${colors.red}Error: Invalid state codes: ${invalid.join(', ')}${colors.reset}`);
-    console.error(`${colors.yellow}Run the dim_us_states seed first.${colors.reset}`);
-    await endPool();
-    process.exit(1);
-  }
-  console.log(`${colors.green}✓${colors.reset} All state codes valid\n`);
-
-  // Print summary
-  console.log(`${colors.cyan}Data Summary:${colors.reset}`);
-  stateEntries
-    .sort((a, b) => b[1] - a[1])
-    .forEach(([state, count]) => {
-      console.log(`  ${state}: ${count.toLocaleString()}`);
-    });
-  console.log(`  ${'─'.repeat(20)}`);
-  console.log(`  Total: ${totalEmployees.toLocaleString()}\n`);
-
-  // Start audit log
-  let loadId = null;
-  if (!options.dryRun) {
-    loadId = await startAuditLog({
+    // Start audit log
+    const loadId = await startAudit({
       loadType: 'state_residence',
-      sourceFile: path.basename(filePath),
+      sourceFile: filePath,
       periodDate,
-      fiscalPeriod
+      fiscalPeriod,
+      dryRun: options.dryRun
     });
-    console.log(`${colors.blue}Audit log started (ID: ${loadId})${colors.reset}\n`);
+
+    // Upsert data
+    info(`${dryRunPrefix(options.dryRun)}Upserting to database...`);
+    const { inserted, updated, errored } = await upsertResidenceData(
+      data,
+      periodDate,
+      path.basename(filePath),
+      options.dryRun
+    );
+
+    success(`Inserted: ${inserted}, Updated: ${updated}, Errors: ${errored}\n`);
+
+    await completeAudit(loadId, { recordsRead: stateEntries.length, inserted, updated, errored });
+
+    return { inserted, updated, errored, sourceFile: filePath, periodDate, fiscalPeriod };
   }
-
-  // Upsert data
-  console.log(`${colors.blue}${options.dryRun ? '[DRY RUN] ' : ''}Upserting to database...${colors.reset}`);
-  const { inserted, updated, errored } = await upsertResidenceData(
-    data,
-    periodDate,
-    path.basename(filePath),
-    options.dryRun
-  );
-
-  console.log(`${colors.green}✓${colors.reset} Inserted: ${inserted}, Updated: ${updated}, Errors: ${errored}\n`);
-
-  // Complete audit log
-  if (loadId) {
-    await completeAuditLog(loadId, {
-      recordsRead: stateEntries.length,
-      recordsInserted: inserted,
-      recordsUpdated: updated,
-      recordsErrored: errored,
-      status: 'completed',
-      errorMessage: errored > 0 ? `${errored} records failed` : null
-    });
-  }
-
-  console.log(`${colors.cyan}========================================${colors.reset}`);
-  console.log(`${colors.green}✓ State Residence ETL Complete${colors.reset}`);
-  console.log(`${colors.cyan}========================================${colors.reset}\n`);
-
-  await endPool();
-}
-
-main().catch(async error => {
-  console.error(`\n${colors.red}Fatal error: ${error.message}${colors.reset}`);
-  console.error(error.stack);
-  await endPool();
-  process.exit(1);
 });

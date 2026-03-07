@@ -18,155 +18,18 @@ const fs = require('fs');
 const path = require('path');
 const { sql, endPool, startAuditLog, completeAuditLog, checkConnection } = require('./neon-client');
 
-// Import existing utilities
-const {
-  loadExcelFile,
-  sheetToJSON,
-  getSheetNames
-} = require('../utils/excel-helpers');
+const { sheetToJSON } = require('../utils/excel-helpers');
+const { colors, printBanner, printComplete } = require('../utils/formatting');
+const { parseArgs } = require('../utils/cli-parser');
+const { loadWorkbook, findDefaultInputFile, validateRequiredSheets } = require('../utils/workbook-loader');
+const { loadConfig } = require('../utils/config-loader');
 
-const colors = {
-  reset: '\x1b[0m',
-  red: '\x1b[31m',
-  green: '\x1b[32m',
-  yellow: '\x1b[33m',
-  blue: '\x1b[34m',
-  cyan: '\x1b[36m'
-};
-
-// Expected sheet names
-const EXPECTED_SHEETS = [
-  'Summary_Rates',
-  'Turnover_Rates_Table',
-  'Higher_Ed_Averages',
-  'Turnover_Breakdown',
-  'Staff_Deviation',
-  'Faculty_Deviation',
-  'Historical_Rates',
-  'Length_of_Service',
-  'Retirements_by_FY',
-  'Faculty_Retirement_Trends',
-  'Faculty_Age_Distribution',
-  'Faculty_Retirement_School',
-  'Staff_Retirement_Trends',
-  'Staff_Age_Distribution',
-  'Metadata'
-];
-
-/**
- * Parse command line arguments
- */
-function parseArgs() {
-  const args = process.argv.slice(2);
-  const options = {
-    input: null,
-    fiscalYear: null,  // Derived from Metadata sheet if not provided
-    dryRun: false,
-    verbose: false
-  };
-
-  for (let i = 0; i < args.length; i++) {
-    switch (args[i]) {
-      case '--input':
-      case '-i':
-        options.input = args[++i];
-        break;
-      case '--fiscal-year':
-      case '-fy':
-        options.fiscalYear = args[++i];
-        break;
-      case '--dry-run':
-        options.dryRun = true;
-        break;
-      case '--verbose':
-      case '-v':
-        options.verbose = true;
-        break;
-      case '--help':
-      case '-h':
-        printHelp();
-        process.exit(0);
-    }
-  }
-
-  return options;
-}
-
-/**
- * Print help message
- */
-function printHelp() {
-  console.log(`
-${colors.cyan}Turnover Metrics ETL to Postgres${colors.reset}
-
-${colors.yellow}Usage:${colors.reset}
-  node scripts/etl/turnover-metrics-to-postgres.js
-  node scripts/etl/turnover-metrics-to-postgres.js --dry-run
-  node scripts/etl/turnover-metrics-to-postgres.js --input file.xlsx
-
-${colors.yellow}Options:${colors.reset}
-  -i, --input FILE         Input Excel file path (default: auto-detect)
-  -fy, --fiscal-year FY    Fiscal year (e.g., FY2025). Default: read from Metadata sheet
-  --dry-run                Preview without database writes
-  -v, --verbose            Show detailed output
-  -h, --help            Show this help message
-
-${colors.yellow}Examples:${colors.reset}
-  # Load turnover metrics
-  npm run etl:turnover
-
-  # Dry run to preview changes
-  npm run etl:turnover -- --dry-run
-`);
-}
-
-/**
- * Find the default input file
- */
-function findDefaultInputFile() {
-  const turnoverDir = path.join(__dirname, '..', '..', 'source-metrics', 'turnover');
-  const defaultFile = path.join(turnoverDir, 'Turnover_Metrics_Master.xlsx');
-
-  if (fs.existsSync(defaultFile)) {
-    return defaultFile;
-  }
-
-  // Fall back to any xlsx file in the directory
-  if (fs.existsSync(turnoverDir)) {
-    const files = fs.readdirSync(turnoverDir)
-      .filter(f => f.endsWith('.xlsx') && !f.startsWith('~'))
-      .sort();
-
-    if (files.length > 0) {
-      return path.join(turnoverDir, files[0]);
-    }
-  }
-
-  return null;
-}
-
-/**
- * Load and validate Excel workbook
- */
-function loadWorkbook(filePath) {
-  const workbook = loadExcelFile(filePath);
-  const sheetNames = getSheetNames(workbook);
-
-  console.log(`${colors.blue}Validating sheets...${colors.reset}`);
-  console.log(`  Found ${sheetNames.length} sheets`);
-
-  const missingSheets = EXPECTED_SHEETS.filter(s => !sheetNames.includes(s));
-  if (missingSheets.length > 0) {
-    console.warn(`${colors.yellow}Warning: Missing expected sheets:${colors.reset} ${missingSheets.join(', ')}`);
-  }
-
-  return { workbook, sheetNames };
-}
+const config = loadConfig();
+const EXPECTED_SHEETS = config.expected_sheets.turnover_metrics;
+const DEVIATION_DEFAULTS = config.deviation_defaults;
 
 /**
  * Extract fiscal year from Metadata sheet
- * @param {Object} workbook - Excel workbook
- * @returns {string|null} Fiscal year (e.g., 'FY2025') or null if not found
  */
 function extractFiscalYearFromMetadata(workbook) {
   try {
@@ -174,7 +37,6 @@ function extractFiscalYearFromMetadata(workbook) {
     const fyRow = rows.find(r => r.field === 'fiscal_year');
     if (fyRow && fyRow.value) {
       const fy = fyRow.value.toString().trim();
-      // Validate format: FY followed by 4 digits
       if (/^FY\d{4}$/.test(fy)) {
         return fy;
       }
@@ -250,7 +112,6 @@ async function upsertTurnoverRatesTable(workbook, sourceFile, dryRun) {
     }
 
     try {
-      // Upsert to summary rates with benchmark
       const result = await sql`
         INSERT INTO fact_turnover_summary_rates (
           fiscal_year, category, turnover_rate, higher_ed_avg, benchmark_source, source_file
@@ -375,9 +236,8 @@ async function upsertStaffDeviation(workbook, sourceFile, dryRun) {
   const rows = sheetToJSON(workbook, sheetName);
   let inserted = 0, updated = 0, errored = 0;
 
-  // Find average for deviation calculation
   const avgRow = rows.find(r => r.is_average === true);
-  const avgRate = avgRow ? avgRow.turnover_rate : 13.6;
+  const avgRate = avgRow ? avgRow.turnover_rate : DEVIATION_DEFAULTS.staff_avg;
 
   console.log(`  ${sheetName}: ${rows.length} rows (avg: ${avgRate}%)`);
 
@@ -426,9 +286,8 @@ async function upsertFacultyDeviation(workbook, sourceFile, dryRun) {
   const rows = sheetToJSON(workbook, sheetName);
   let inserted = 0, updated = 0, errored = 0;
 
-  // Find average for deviation calculation
   const avgRow = rows.find(r => r.is_average === true);
-  const avgRate = avgRow ? avgRow.turnover_rate : 6.3;
+  const avgRate = avgRow ? avgRow.turnover_rate : DEVIATION_DEFAULTS.faculty_avg;
 
   console.log(`  ${sheetName}: ${rows.length} rows (avg: ${avgRate}%)`);
 
@@ -680,10 +539,6 @@ async function upsertRetirementTrends(workbook, sourceFile, dryRun) {
 
 /**
  * Upsert Age Distribution (Faculty + Staff)
- * @param {Object} workbook - Excel workbook
- * @param {string} sourceFile - Source file name
- * @param {boolean} dryRun - Dry run mode
- * @param {string} fiscalYear - Fiscal year (e.g., 'FY2025')
  */
 async function upsertAgeDistribution(workbook, sourceFile, dryRun, fiscalYear) {
   let inserted = 0, updated = 0, errored = 0;
@@ -766,10 +621,6 @@ async function upsertAgeDistribution(workbook, sourceFile, dryRun, fiscalYear) {
 
 /**
  * Upsert Faculty Retirement by School
- * @param {Object} workbook - Excel workbook
- * @param {string} sourceFile - Source file name
- * @param {boolean} dryRun - Dry run mode
- * @param {string} fiscalYear - Fiscal year (e.g., 'FY2025')
  */
 async function upsertFacultyRetirementBySchool(workbook, sourceFile, dryRun, fiscalYear) {
   const sheetName = 'Faculty_Retirement_School';
@@ -819,11 +670,25 @@ async function upsertFacultyRetirementBySchool(workbook, sourceFile, dryRun, fis
  * Main function
  */
 async function main() {
-  const options = parseArgs();
+  const options = parseArgs('turnover-metrics-to-postgres', [
+    { flags: '--input,-i', key: 'input', type: 'string', description: 'Input Excel file path (default: auto-detect)' },
+    { flags: '--fiscal-year,-fy', key: 'fiscalYear', type: 'string', description: 'Fiscal year (e.g., FY2025). Default: read from Metadata sheet' }
+  ], {
+    title: 'Turnover Metrics ETL to Postgres',
+    usage: [
+      'node scripts/etl/turnover-metrics-to-postgres.js',
+      'node scripts/etl/turnover-metrics-to-postgres.js --dry-run',
+      'node scripts/etl/turnover-metrics-to-postgres.js --input file.xlsx'
+    ],
+    examples: [
+      '# Load turnover metrics',
+      'npm run etl:turnover',
+      '# Dry run to preview changes',
+      'npm run etl:turnover -- --dry-run'
+    ]
+  });
 
-  console.log(`\n${colors.cyan}========================================${colors.reset}`);
-  console.log(`${colors.cyan}   Turnover Metrics ETL to Postgres${colors.reset}`);
-  console.log(`${colors.cyan}========================================${colors.reset}\n`);
+  printBanner('Turnover Metrics ETL to Postgres');
 
   if (options.dryRun) {
     console.log(`${colors.yellow}[DRY RUN MODE] No database writes will be made${colors.reset}\n`);
@@ -840,7 +705,8 @@ async function main() {
   console.log(`${colors.green}✓${colors.reset} Connected\n`);
 
   // Find input file
-  let sourceFile = options.input || findDefaultInputFile();
+  const turnoverDir = path.join(__dirname, '..', '..', 'source-metrics', 'turnover');
+  let sourceFile = options.input || findDefaultInputFile(turnoverDir, 'Turnover_Metrics_Master.xlsx');
 
   if (!sourceFile) {
     console.error(`${colors.red}Error: No input file found. Specify with --input or run generate-turnover-excel-template.js first.${colors.reset}`);
@@ -856,9 +722,10 @@ async function main() {
 
   // Load workbook
   const { workbook, sheetNames } = loadWorkbook(sourceFile);
+  validateRequiredSheets(workbook, EXPECTED_SHEETS);
   console.log(`${colors.green}✓${colors.reset} Loaded ${sheetNames.length} sheets\n`);
 
-  // Determine fiscal year (CLI arg takes precedence, then Metadata sheet)
+  // Determine fiscal year
   let fiscalYear = options.fiscalYear;
   if (!fiscalYear) {
     fiscalYear = extractFiscalYearFromMetadata(workbook);
@@ -887,85 +754,30 @@ async function main() {
 
   // Process each sheet type
   console.log(`${colors.blue}Processing sheets...${colors.reset}`);
-  const results = {
-    totalInserted: 0,
-    totalUpdated: 0,
-    totalErrored: 0
-  };
-
+  const results = { totalInserted: 0, totalUpdated: 0, totalErrored: 0 };
   const sourceFileName = path.basename(sourceFile);
 
-  // Summary Rates
-  let r = await upsertSummaryRates(workbook, sourceFileName, options.dryRun);
-  results.totalInserted += r.inserted;
-  results.totalUpdated += r.updated;
-  results.totalErrored += r.errored;
+  const handlers = [
+    () => upsertSummaryRates(workbook, sourceFileName, options.dryRun),
+    () => upsertTurnoverRatesTable(workbook, sourceFileName, options.dryRun),
+    () => upsertHigherEdBenchmarks(workbook, sourceFileName, options.dryRun),
+    () => upsertTurnoverBreakdown(workbook, sourceFileName, options.dryRun),
+    () => upsertStaffDeviation(workbook, sourceFileName, options.dryRun),
+    () => upsertFacultyDeviation(workbook, sourceFileName, options.dryRun),
+    () => upsertHistoricalRates(workbook, sourceFileName, options.dryRun),
+    () => upsertLengthOfService(workbook, sourceFileName, options.dryRun),
+    () => upsertRetirementsByFY(workbook, sourceFileName, options.dryRun),
+    () => upsertRetirementTrends(workbook, sourceFileName, options.dryRun),
+    () => upsertAgeDistribution(workbook, sourceFileName, options.dryRun, fiscalYear),
+    () => upsertFacultyRetirementBySchool(workbook, sourceFileName, options.dryRun, fiscalYear)
+  ];
 
-  // Turnover Rates Table
-  r = await upsertTurnoverRatesTable(workbook, sourceFileName, options.dryRun);
-  results.totalInserted += r.inserted;
-  results.totalUpdated += r.updated;
-  results.totalErrored += r.errored;
-
-  // Higher Ed Benchmarks
-  r = await upsertHigherEdBenchmarks(workbook, sourceFileName, options.dryRun);
-  results.totalInserted += r.inserted;
-  results.totalUpdated += r.updated;
-  results.totalErrored += r.errored;
-
-  // Turnover Breakdown
-  r = await upsertTurnoverBreakdown(workbook, sourceFileName, options.dryRun);
-  results.totalInserted += r.inserted;
-  results.totalUpdated += r.updated;
-  results.totalErrored += r.errored;
-
-  // Staff Deviation
-  r = await upsertStaffDeviation(workbook, sourceFileName, options.dryRun);
-  results.totalInserted += r.inserted;
-  results.totalUpdated += r.updated;
-  results.totalErrored += r.errored;
-
-  // Faculty Deviation
-  r = await upsertFacultyDeviation(workbook, sourceFileName, options.dryRun);
-  results.totalInserted += r.inserted;
-  results.totalUpdated += r.updated;
-  results.totalErrored += r.errored;
-
-  // Historical Rates
-  r = await upsertHistoricalRates(workbook, sourceFileName, options.dryRun);
-  results.totalInserted += r.inserted;
-  results.totalUpdated += r.updated;
-  results.totalErrored += r.errored;
-
-  // Length of Service
-  r = await upsertLengthOfService(workbook, sourceFileName, options.dryRun);
-  results.totalInserted += r.inserted;
-  results.totalUpdated += r.updated;
-  results.totalErrored += r.errored;
-
-  // Retirements by FY
-  r = await upsertRetirementsByFY(workbook, sourceFileName, options.dryRun);
-  results.totalInserted += r.inserted;
-  results.totalUpdated += r.updated;
-  results.totalErrored += r.errored;
-
-  // Retirement Trends
-  r = await upsertRetirementTrends(workbook, sourceFileName, options.dryRun);
-  results.totalInserted += r.inserted;
-  results.totalUpdated += r.updated;
-  results.totalErrored += r.errored;
-
-  // Age Distribution
-  r = await upsertAgeDistribution(workbook, sourceFileName, options.dryRun, fiscalYear);
-  results.totalInserted += r.inserted;
-  results.totalUpdated += r.updated;
-  results.totalErrored += r.errored;
-
-  // Faculty Retirement by School
-  r = await upsertFacultyRetirementBySchool(workbook, sourceFileName, options.dryRun, fiscalYear);
-  results.totalInserted += r.inserted;
-  results.totalUpdated += r.updated;
-  results.totalErrored += r.errored;
+  for (const handler of handlers) {
+    const r = await handler();
+    results.totalInserted += r.inserted;
+    results.totalUpdated += r.updated;
+    results.totalErrored += r.errored;
+  }
 
   // Summary
   console.log(`\n${colors.cyan}Summary:${colors.reset}`);
@@ -980,15 +792,12 @@ async function main() {
       recordsInserted: results.totalInserted,
       recordsUpdated: results.totalUpdated,
       recordsErrored: results.totalErrored,
-      status: results.totalErrored > 0 ? 'completed' : 'completed',
+      status: results.totalErrored > 0 ? 'completed_with_errors' : 'completed',
       errorMessage: results.totalErrored > 0 ? `${results.totalErrored} records failed` : null
     });
   }
 
-  console.log(`\n${colors.cyan}========================================${colors.reset}`);
-  console.log(`${colors.green}✓ Turnover Metrics ETL Complete${colors.reset}`);
-  console.log(`${colors.cyan}========================================${colors.reset}\n`);
-
+  printComplete('Turnover Metrics ETL Complete');
   await endPool();
 }
 

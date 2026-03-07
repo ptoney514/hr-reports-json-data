@@ -20,150 +20,14 @@ const path = require('path');
 const crypto = require('crypto');
 const { sql, endPool, startAuditLog, completeAuditLog, checkConnection } = require('./neon-client');
 
-// Import existing utilities
-const {
-  loadExcelFile,
-  sheetToJSON,
-  getSheetNames
-} = require('../utils/excel-helpers');
+const { sheetToJSON } = require('../utils/excel-helpers');
+const { colors, printBanner, printComplete } = require('../utils/formatting');
+const { parseArgs } = require('../utils/cli-parser');
+const { loadWorkbook, findDefaultInputFile, validateRequiredSheets } = require('../utils/workbook-loader');
+const { loadConfig } = require('../utils/config-loader');
 
-const colors = {
-  reset: '\x1b[0m',
-  red: '\x1b[31m',
-  green: '\x1b[32m',
-  yellow: '\x1b[33m',
-  blue: '\x1b[34m',
-  cyan: '\x1b[36m'
-};
-
-// Expected sheet names
-const EXPECTED_SHEETS = [
-  'Metadata',
-  'Summary_Metrics',
-  'Hire_Rates',
-  'Pipeline_Staff',
-  'Pipeline_Faculty',
-  'New_Hires_Detail',
-  'Hires_By_School',
-  'Application_Sources',
-  'Top_Jobs',
-  'Requisition_Aging',
-  'New_Hire_Demographics',
-  'Hiring_Trends'
-];
-
-/**
- * Parse command line arguments
- */
-function parseArgs() {
-  const args = process.argv.slice(2);
-  const options = {
-    input: null,
-    quarter: null,  // e.g., 'FY26_Q1'
-    dryRun: false,
-    verbose: false
-  };
-
-  for (let i = 0; i < args.length; i++) {
-    switch (args[i]) {
-      case '--input':
-      case '-i':
-        options.input = args[++i];
-        break;
-      case '--quarter':
-      case '-q':
-        options.quarter = args[++i];
-        break;
-      case '--dry-run':
-        options.dryRun = true;
-        break;
-      case '--verbose':
-      case '-v':
-        options.verbose = true;
-        break;
-      case '--help':
-      case '-h':
-        printHelp();
-        process.exit(0);
-    }
-  }
-
-  return options;
-}
-
-/**
- * Print help message
- */
-function printHelp() {
-  console.log(`
-${colors.cyan}Recruiting Metrics ETL to Postgres${colors.reset}
-
-${colors.yellow}Usage:${colors.reset}
-  node scripts/etl/recruiting-metrics-to-postgres.js
-  node scripts/etl/recruiting-metrics-to-postgres.js --dry-run
-  node scripts/etl/recruiting-metrics-to-postgres.js --input file.xlsx
-
-${colors.yellow}Options:${colors.reset}
-  -i, --input FILE         Input Excel file path (default: auto-detect)
-  -q, --quarter QUARTER    Fiscal quarter (e.g., FY26_Q1). Default: read from Metadata sheet
-  --dry-run                Preview without database writes
-  -v, --verbose            Show detailed output
-  -h, --help               Show this help message
-
-${colors.yellow}Examples:${colors.reset}
-  # Load recruiting metrics
-  npm run etl:recruiting
-
-  # Dry run to preview changes
-  npm run etl:recruiting -- --dry-run
-
-  # Load specific file
-  npm run etl:recruiting -- --input source-metrics/recruiting/Q1_FY26.xlsx
-`);
-}
-
-/**
- * Find the default input file
- */
-function findDefaultInputFile() {
-  const recruitingDir = path.join(__dirname, '..', '..', 'source-metrics', 'recruiting');
-  const defaultFile = path.join(recruitingDir, 'Recruiting_Metrics_Master.xlsx');
-
-  if (fs.existsSync(defaultFile)) {
-    return defaultFile;
-  }
-
-  // Fall back to any xlsx file in the directory
-  if (fs.existsSync(recruitingDir)) {
-    const files = fs.readdirSync(recruitingDir)
-      .filter(f => f.endsWith('.xlsx') && !f.startsWith('~'))
-      .sort();
-
-    if (files.length > 0) {
-      return path.join(recruitingDir, files[0]);
-    }
-  }
-
-  return null;
-}
-
-/**
- * Load and validate Excel workbook
- */
-function loadWorkbook(filePath) {
-  const workbook = loadExcelFile(filePath);
-  const sheetNames = getSheetNames(workbook);
-
-  console.log(`${colors.blue}Validating sheets...${colors.reset}`);
-  console.log(`  Found ${sheetNames.length} sheets`);
-
-  const missingSheets = EXPECTED_SHEETS.filter(s => !sheetNames.includes(s));
-  if (missingSheets.length > 0) {
-    console.warn(`${colors.yellow}Warning: Missing expected sheets:${colors.reset} ${missingSheets.join(', ')}`);
-  }
-
-  return { workbook, sheetNames };
-}
+const config = loadConfig();
+const EXPECTED_SHEETS = config.expected_sheets.recruiting_metrics;
 
 /**
  * Extract fiscal year and quarter from Metadata sheet
@@ -444,10 +308,8 @@ async function upsertNewHires(workbook, sourceFile, dryRun, metadata) {
   console.log(`  ${sheetName}: ${rows.length} rows`);
 
   for (const row of rows) {
-    // Use existing hash or generate one
     const employeeHash = row.employee_hash || hashEmployeeId(row.row_id, row.hire_date);
 
-    // Parse hire date (handle MM/DD/YYYY format)
     let hireDateParsed = row.hire_date;
     if (typeof row.hire_date === 'string' && row.hire_date.includes('/')) {
       const [month, day, year] = row.hire_date.split('/');
@@ -761,7 +623,6 @@ async function upsertHiringTrends(workbook, sourceFile, dryRun) {
   console.log(`  ${sheetName}: ${rows.length} rows`);
 
   for (const row of rows) {
-    // Parse quarter string like "Q1 FY24" to extract fiscal_year and fiscal_quarter
     const quarterMatch = row.quarter.match(/Q(\d)\s*FY(\d{2})/i);
     let fiscalYear = null;
     let fiscalQuarter = null;
@@ -813,11 +674,27 @@ async function upsertHiringTrends(workbook, sourceFile, dryRun) {
  * Main function
  */
 async function main() {
-  const options = parseArgs();
+  const options = parseArgs('recruiting-metrics-to-postgres', [
+    { flags: '--input,-i', key: 'input', type: 'string', description: 'Input Excel file path (default: auto-detect)' },
+    { flags: '--quarter,-q', key: 'quarter', type: 'string', description: 'Fiscal quarter (e.g., FY26_Q1). Default: read from Metadata sheet' }
+  ], {
+    title: 'Recruiting Metrics ETL to Postgres',
+    usage: [
+      'node scripts/etl/recruiting-metrics-to-postgres.js',
+      'node scripts/etl/recruiting-metrics-to-postgres.js --dry-run',
+      'node scripts/etl/recruiting-metrics-to-postgres.js --input file.xlsx'
+    ],
+    examples: [
+      '# Load recruiting metrics',
+      'npm run etl:recruiting',
+      '# Dry run to preview changes',
+      'npm run etl:recruiting -- --dry-run',
+      '# Load specific file',
+      'npm run etl:recruiting -- --input source-metrics/recruiting/Q1_FY26.xlsx'
+    ]
+  });
 
-  console.log(`\n${colors.cyan}========================================${colors.reset}`);
-  console.log(`${colors.cyan}   Recruiting Metrics ETL to Postgres${colors.reset}`);
-  console.log(`${colors.cyan}========================================${colors.reset}\n`);
+  printBanner('Recruiting Metrics ETL to Postgres');
 
   if (options.dryRun) {
     console.log(`${colors.yellow}[DRY RUN MODE] No database writes will be made${colors.reset}\n`);
@@ -834,7 +711,8 @@ async function main() {
   console.log(`${colors.green}✓${colors.reset} Connected\n`);
 
   // Find input file
-  let sourceFile = options.input || findDefaultInputFile();
+  const recruitingDir = path.join(__dirname, '..', '..', 'source-metrics', 'recruiting');
+  let sourceFile = options.input || findDefaultInputFile(recruitingDir, 'Recruiting_Metrics_Master.xlsx');
 
   if (!sourceFile) {
     console.error(`${colors.red}Error: No input file found. Specify with --input or run generate-recruiting-excel-template.js first.${colors.reset}`);
@@ -850,6 +728,7 @@ async function main() {
 
   // Load workbook
   const { workbook, sheetNames } = loadWorkbook(sourceFile);
+  validateRequiredSheets(workbook, EXPECTED_SHEETS);
   console.log(`${colors.green}✓${colors.reset} Loaded ${sheetNames.length} sheets\n`);
 
   // Extract metadata
@@ -871,79 +750,29 @@ async function main() {
 
   // Process each sheet type
   console.log(`${colors.blue}Processing sheets...${colors.reset}`);
-  const results = {
-    totalInserted: 0,
-    totalUpdated: 0,
-    totalErrored: 0
-  };
-
+  const results = { totalInserted: 0, totalUpdated: 0, totalErrored: 0 };
   const sourceFileName = path.basename(sourceFile);
 
-  // Summary Metrics
-  let r = await upsertSummaryMetrics(workbook, sourceFileName, options.dryRun, metadata);
-  results.totalInserted += r.inserted;
-  results.totalUpdated += r.updated;
-  results.totalErrored += r.errored;
+  const handlers = [
+    () => upsertSummaryMetrics(workbook, sourceFileName, options.dryRun, metadata),
+    () => upsertHireRates(workbook, sourceFileName, options.dryRun, metadata),
+    () => upsertPipelineStaff(workbook, sourceFileName, options.dryRun, metadata),
+    () => upsertPipelineFaculty(workbook, sourceFileName, options.dryRun, metadata),
+    () => upsertNewHires(workbook, sourceFileName, options.dryRun, metadata),
+    () => upsertHiresBySchool(workbook, sourceFileName, options.dryRun, metadata),
+    () => upsertApplicationSources(workbook, sourceFileName, options.dryRun, metadata),
+    () => upsertTopJobs(workbook, sourceFileName, options.dryRun, metadata),
+    () => upsertRequisitionAging(workbook, sourceFileName, options.dryRun, metadata),
+    () => upsertNewHireDemographics(workbook, sourceFileName, options.dryRun, metadata),
+    () => upsertHiringTrends(workbook, sourceFileName, options.dryRun)
+  ];
 
-  // Hire Rates
-  r = await upsertHireRates(workbook, sourceFileName, options.dryRun, metadata);
-  results.totalInserted += r.inserted;
-  results.totalUpdated += r.updated;
-  results.totalErrored += r.errored;
-
-  // Pipeline Staff
-  r = await upsertPipelineStaff(workbook, sourceFileName, options.dryRun, metadata);
-  results.totalInserted += r.inserted;
-  results.totalUpdated += r.updated;
-  results.totalErrored += r.errored;
-
-  // Pipeline Faculty
-  r = await upsertPipelineFaculty(workbook, sourceFileName, options.dryRun, metadata);
-  results.totalInserted += r.inserted;
-  results.totalUpdated += r.updated;
-  results.totalErrored += r.errored;
-
-  // New Hires Detail
-  r = await upsertNewHires(workbook, sourceFileName, options.dryRun, metadata);
-  results.totalInserted += r.inserted;
-  results.totalUpdated += r.updated;
-  results.totalErrored += r.errored;
-
-  // Hires by School
-  r = await upsertHiresBySchool(workbook, sourceFileName, options.dryRun, metadata);
-  results.totalInserted += r.inserted;
-  results.totalUpdated += r.updated;
-  results.totalErrored += r.errored;
-
-  // Application Sources
-  r = await upsertApplicationSources(workbook, sourceFileName, options.dryRun, metadata);
-  results.totalInserted += r.inserted;
-  results.totalUpdated += r.updated;
-  results.totalErrored += r.errored;
-
-  // Top Jobs
-  r = await upsertTopJobs(workbook, sourceFileName, options.dryRun, metadata);
-  results.totalInserted += r.inserted;
-  results.totalUpdated += r.updated;
-  results.totalErrored += r.errored;
-
-  // Requisition Aging
-  r = await upsertRequisitionAging(workbook, sourceFileName, options.dryRun, metadata);
-  results.totalInserted += r.inserted;
-  results.totalUpdated += r.updated;
-  results.totalErrored += r.errored;
-
-  // New Hire Demographics
-  r = await upsertNewHireDemographics(workbook, sourceFileName, options.dryRun, metadata);
-  results.totalInserted += r.inserted;
-  results.totalUpdated += r.updated;
-  results.totalErrored += r.errored;
-
-  // Hiring Trends
-  r = await upsertHiringTrends(workbook, sourceFileName, options.dryRun);
-  results.totalInserted += r.inserted;
-  results.totalUpdated += r.updated;
-  results.totalErrored += r.errored;
+  for (const handler of handlers) {
+    const r = await handler();
+    results.totalInserted += r.inserted;
+    results.totalUpdated += r.updated;
+    results.totalErrored += r.errored;
+  }
 
   // Summary
   console.log(`\n${colors.cyan}Summary:${colors.reset}`);
@@ -963,10 +792,7 @@ async function main() {
     });
   }
 
-  console.log(`\n${colors.cyan}========================================${colors.reset}`);
-  console.log(`${colors.green}✓ Recruiting Metrics ETL Complete${colors.reset}`);
-  console.log(`${colors.cyan}========================================${colors.reset}\n`);
-
+  printComplete('Recruiting Metrics ETL Complete');
   await endPool();
 }
 

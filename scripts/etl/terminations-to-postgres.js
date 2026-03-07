@@ -17,184 +17,61 @@
 
 const fs = require('fs');
 const path = require('path');
-const { sql, endPool, startAuditLog, completeAuditLog, checkConnection } = require('./neon-client');
+const { sql, endPool, checkConnection } = require('./neon-client');
 
-// Import existing utilities
-const {
-  loadExcelFile,
-  sheetToJSON,
-  getSheetNames,
-  excelDateToJSDate,
-  formatDate,
-  isExcelDate
-} = require('../utils/excel-helpers');
+const { excelDateToJSDate, formatDate, isExcelDate, sheetToJSON, loadExcelFile } = require('../utils/excel-helpers');
+const { getQuarterDatesFromKey } = require('../utils/fiscal-calendar');
+const { hashValue } = require('../utils/pii-removal');
+const { colors, printBanner, printComplete, success, info, error: logError } = require('../utils/formatting');
+const { parseArgs } = require('../utils/cli-parser');
+const { startAudit, completeAudit } = require('../utils/etl-runner');
+const { loadConfig } = require('../utils/config-loader');
+const { createResolver } = require('../utils/column-resolver');
+const { loadSchoolLookup, findSchoolId } = require('../utils/school-lookup');
+const { autoDetectLargestSheet } = require('../utils/workbook-loader');
 
-const {
-  getFiscalPeriodKey,
-  parseFiscalPeriodKey,
-  getQuarterDatesFromKey
-} = require('../utils/fiscal-calendar');
+const config = loadConfig();
+const resolve = createResolver('terminations-to-postgres');
 
-const { removePII, hashValue } = require('../utils/pii-removal');
+const SCRIPT_OPTIONS = [
+  { flags: '--input,-i', key: 'input', type: 'string', description: 'Input Excel file path' },
+  { flags: '--quarter,-q', key: 'quarter', type: 'string', description: 'Fiscal period (e.g., FY25_Q2)' },
+  { flags: '--fiscal-year,--fy', key: 'fiscalYear', type: 'string', description: 'Fiscal year to filter (e.g., 2025)' },
+  { flags: '--from-json', key: 'fromJson', type: 'boolean', description: 'Load from JSON instead of Excel' },
+  { flags: '--file', key: 'file', type: 'string', description: 'JSON file path (with --from-json)' }
+];
 
-const colors = {
-  reset: '\x1b[0m',
-  red: '\x1b[31m',
-  green: '\x1b[32m',
-  yellow: '\x1b[33m',
-  blue: '\x1b[34m',
-  cyan: '\x1b[36m'
+const HELP_CONFIG = {
+  title: 'Terminations Data ETL to Postgres',
+  usage: [
+    'node scripts/etl/terminations-to-postgres.js --input file.xlsx --fiscal-year 2025',
+    'node scripts/etl/terminations-to-postgres.js --from-json --file cleaned.json --quarter FY25_Q2'
+  ]
 };
 
 /**
- * Parse command line arguments
- */
-function parseArgs() {
-  const args = process.argv.slice(2);
-  const options = {
-    input: null,
-    quarter: null,
-    fiscalYear: null,
-    fromJson: false,
-    file: null,
-    dryRun: false
-  };
-
-  for (let i = 0; i < args.length; i++) {
-    switch (args[i]) {
-      case '--input':
-      case '-i':
-        options.input = args[++i];
-        break;
-      case '--quarter':
-      case '-q':
-        options.quarter = args[++i];
-        break;
-      case '--fiscal-year':
-      case '--fy':
-        options.fiscalYear = args[++i];
-        break;
-      case '--from-json':
-        options.fromJson = true;
-        break;
-      case '--file':
-        options.file = args[++i];
-        break;
-      case '--dry-run':
-        options.dryRun = true;
-        break;
-      case '--help':
-      case '-h':
-        printHelp();
-        process.exit(0);
-    }
-  }
-
-  return options;
-}
-
-/**
- * Print help message
- */
-function printHelp() {
-  console.log(`
-${colors.cyan}Terminations Data ETL to Postgres${colors.reset}
-
-${colors.yellow}Usage:${colors.reset}
-  node scripts/etl/terminations-to-postgres.js --input file.xlsx --fiscal-year 2025
-  node scripts/etl/terminations-to-postgres.js --from-json --file cleaned.json --quarter FY25_Q2
-
-${colors.yellow}Options:${colors.reset}
-  -i, --input FILE      Input Excel file path
-  -q, --quarter PERIOD  Fiscal period (e.g., FY25_Q2)
-  --fy, --fiscal-year   Fiscal year to filter (e.g., 2025)
-  --from-json           Load from JSON instead of Excel
-  --file FILE           JSON file path (with --from-json)
-  --dry-run             Preview without database writes
-`);
-}
-
-/**
  * Categorize termination type from reason text
+ * (Too complex for config - kept in code)
  */
 function categorizeTerminationType(reason1, reason2) {
   const reason = (reason1 || reason2 || '').toString().toLowerCase();
 
-  // Retirement
-  if (reason.includes('retire')) {
-    return { type: 'retirement', isVoluntary: true };
+  for (const [catName, catDef] of Object.entries(config.termination_reasons.category_keywords)) {
+    for (const keyword of catDef.keywords) {
+      if (reason.includes(keyword)) {
+        return { type: catName, isVoluntary: catDef.is_voluntary };
+      }
+    }
   }
 
-  // Voluntary
-  if (
-    reason.includes('resignation') ||
-    reason.includes('resign') ||
-    reason.includes('voluntary') ||
-    reason.includes('better opportunity') ||
-    reason.includes('personal') ||
-    reason.includes('career change') ||
-    reason.includes('end assignment') ||
-    reason.includes('relocation')
-  ) {
-    return { type: 'voluntary', isVoluntary: true };
-  }
-
-  // Involuntary
-  if (
-    reason.includes('termination') ||
-    reason.includes('involuntary') ||
-    reason.includes('performance') ||
-    reason.includes('policy') ||
-    reason.includes('layoff') ||
-    reason.includes('reduction') ||
-    reason.includes('conduct') ||
-    reason.includes('probation')
-  ) {
-    return { type: 'involuntary', isVoluntary: false };
-  }
-
-  // Default to voluntary if unclear
   return { type: 'voluntary', isVoluntary: true };
 }
 
 /**
- * Calculate tenure and bucket
- */
-function calculateTenure(hireDate, termDate) {
-  if (!hireDate || !termDate) return { years: null, bucket: null };
-
-  const hire = new Date(hireDate);
-  const term = new Date(termDate);
-
-  if (isNaN(hire) || isNaN(term)) return { years: null, bucket: null };
-
-  const diffMs = term - hire;
-  const years = diffMs / (1000 * 60 * 60 * 24 * 365.25);
-
-  let bucket;
-  if (years < 1) bucket = '<1yr';
-  else if (years < 3) bucket = '1-3yr';
-  else if (years < 5) bucket = '3-5yr';
-  else if (years < 10) bucket = '5-10yr';
-  else bucket = '10+yr';
-
-  return { years: Math.round(years * 100) / 100, bucket };
-}
-
-/**
- * Map raw reason to reason_id from dim_term_reasons
- */
-async function loadReasonLookup() {
-  const reasons = await sql`SELECT reason_id, reason_code, reason_label FROM dim_term_reasons`;
-  return reasons;
-}
-
-/**
- * Find best matching reason ID
+ * Match raw reason to reason_id using keyword-to-code config
  */
 function matchReasonId(reasonText, reasonLookup) {
   if (!reasonText) return null;
-
   const reasonLower = reasonText.toLowerCase();
 
   // Try exact match on label
@@ -204,54 +81,46 @@ function matchReasonId(reasonText, reasonLookup) {
     }
   }
 
-  // Try keyword matching
-  const keywords = {
-    'RESIGN': ['resign', 'resignation'],
-    'RESIGN_CAREER': ['career change', 'career'],
-    'RESIGN_RELOCATION': ['relocation', 'relocate', 'moving'],
-    'RESIGN_PERSONAL': ['personal'],
-    'RESIGN_OPPORTUNITY': ['better opportunity', 'opportunity', 'new position'],
-    'RESIGN_COMPENSATION': ['compensation', 'salary', 'pay'],
-    'RESIGN_HEALTH': ['health', 'medical'],
-    'END_ASSIGNMENT': ['end assignment', 'assignment end', 'contract end'],
-    'END_TEMP': ['temporary', 'temp'],
-    'RETIRE': ['retire', 'retirement'],
-    'RETIRE_EARLY': ['early retire'],
-    'TERM_PERFORMANCE': ['performance'],
-    'TERM_POLICY': ['policy'],
-    'TERM_CONDUCT': ['conduct'],
-    'LAYOFF': ['layoff', 'reduction in force', 'rif'],
-    'POSITION_ELIM': ['position elimination', 'eliminated'],
-    'DEATH': ['death', 'deceased']
-  };
-
-  for (const [code, terms] of Object.entries(keywords)) {
-    for (const term of terms) {
-      if (reasonLower.includes(term)) {
+  // Try keyword matching from config
+  for (const [code, keywords] of Object.entries(config.termination_reasons.keyword_to_code)) {
+    for (const kw of keywords) {
+      if (reasonLower.includes(kw)) {
         const match = reasonLookup.find(r => r.reason_code === code);
         if (match) return match.reason_id;
       }
     }
   }
 
-  // Default to OTHER
-  const other = reasonLookup.find(r => r.reason_code === 'OTHER');
+  const other = reasonLookup.find(r => r.reason_code === config.termination_reasons.default_code);
   return other?.reason_id || null;
 }
 
 /**
- * Load school ID lookup from database
+ * Calculate tenure and bucket using config-driven buckets
  */
-async function loadSchoolLookup() {
-  const schools = await sql`SELECT school_id, code, name FROM dim_schools`;
-  const lookup = {};
+function calculateTenure(hireDate, termDate) {
+  if (!hireDate || !termDate) return { years: null, bucket: null };
 
-  schools.forEach(s => {
-    lookup[s.code.toLowerCase()] = s.school_id;
-    lookup[s.name.toLowerCase()] = s.school_id;
-  });
+  const hire = new Date(hireDate);
+  const term = new Date(termDate);
+  if (isNaN(hire) || isNaN(term)) return { years: null, bucket: null };
 
-  return lookup;
+  const diffMs = term - hire;
+  // Fix: negative tenure = invalid data
+  if (diffMs < 0) return { years: null, bucket: null };
+
+  const years = diffMs / (1000 * 60 * 60 * 24 * 365.25);
+
+  let bucket = null;
+  for (const b of config.tenure_buckets) {
+    const maxOk = b.max_years === null || years < b.max_years;
+    if (years >= b.min_years && maxOk) {
+      bucket = b.label;
+      break;
+    }
+  }
+
+  return { years: Math.round(years * 100) / 100, bucket };
 }
 
 /**
@@ -259,7 +128,7 @@ async function loadSchoolLookup() {
  */
 async function processTerminations(rows, options, sourceFile) {
   const schoolLookup = await loadSchoolLookup();
-  const reasonLookup = await loadReasonLookup();
+  const reasonLookup = await sql`SELECT reason_id, reason_code, reason_label FROM dim_term_reasons`;
 
   let inserted = 0;
   let updated = 0;
@@ -270,8 +139,8 @@ async function processTerminations(rows, options, sourceFile) {
   let filterStart, filterEnd;
   if (options.fiscalYear) {
     const fy = parseInt(options.fiscalYear);
-    filterStart = new Date(fy - 1, 6, 1); // July 1
-    filterEnd = new Date(fy, 5, 30); // June 30
+    filterStart = new Date(fy - 1, 6, 1);
+    filterEnd = new Date(fy, 5, 30);
   } else if (options.quarter) {
     const dates = getQuarterDatesFromKey(options.quarter);
     filterStart = dates.start;
@@ -280,42 +149,34 @@ async function processTerminations(rows, options, sourceFile) {
 
   for (const row of rows) {
     // Get termination date
-    let termDateRaw = row['Term Date'] || row['Termination Date'] || row.term_date || row.termination_date;
+    let termDateRaw = resolve(row, 'term_date');
     let termDate = termDateRaw;
-
     if (isExcelDate(termDateRaw)) {
       termDate = formatDate(excelDateToJSDate(termDateRaw));
     }
-
-    if (!termDate) {
-      skipped++;
-      continue;
-    }
+    if (!termDate) { skipped++; continue; }
 
     // Filter by date range
     if (filterStart && filterEnd) {
       const termDateObj = new Date(termDate);
-      if (termDateObj < filterStart || termDateObj > filterEnd) {
-        skipped++;
-        continue;
-      }
+      if (termDateObj < filterStart || termDateObj > filterEnd) { skipped++; continue; }
     }
 
     // Get hire date
-    let hireDateRaw = row['Hire Date'] || row.hire_date || row.hireDate;
+    let hireDateRaw = resolve(row, 'hire_date');
     let hireDate = hireDateRaw;
-
     if (isExcelDate(hireDateRaw)) {
       hireDate = formatDate(excelDateToJSDate(hireDateRaw));
     }
 
-    // Get employee hash
-    const employeeId = row['Employee ID'] || row['Empl ID'] || row['Empl Num'] || row.employee_id || row.employeeId;
-    const employeeHash = employeeId ? hashValue(employeeId.toString()) : `anon_${Date.now()}_${Math.random()}`;
+    // Get employee hash - skip rows without employee ID to avoid anonymous hash duplication
+    const employeeId = resolve(row, 'employee_id');
+    if (!employeeId) { skipped++; continue; }
+    const employeeHash = hashValue(employeeId.toString());
 
     // Get termination reason
-    const reason1 = row['Term Reason 1'] || row.term_reason_1 || row.termination_reason;
-    const reason2 = row['Term Reason 2'] || row.term_reason_2;
+    const reason1 = resolve(row, 'term_reason_1');
+    const reason2 = resolve(row, 'term_reason_2');
     const { type: termType, isVoluntary } = categorizeTerminationType(reason1, reason2);
     const reasonId = matchReasonId(reason1 || reason2, reasonLookup);
 
@@ -323,38 +184,20 @@ async function processTerminations(rows, options, sourceFile) {
     const { years: tenureYears, bucket: tenureBucket } = calculateTenure(hireDate, termDate);
 
     // Get location
-    const locationRaw = row.Location || row.location || row.State || '';
-    const location = locationRaw.toString().toLowerCase().includes('phoenix') ? 'phoenix' : 'omaha';
+    const locationRaw = resolve(row, 'location') || '';
+    const location = locationRaw.toString().toLowerCase().includes(config.locations.detection_keyword) ? 'phoenix' : 'omaha';
 
     // Get school
-    const schoolRaw = row.School || row.school || row['VP Area'] || '';
-    let schoolId = null;
-    if (schoolRaw) {
-      const schoolLower = schoolRaw.toLowerCase();
-      schoolId = schoolLookup[schoolLower];
-      if (!schoolId) {
-        for (const [key, id] of Object.entries(schoolLookup)) {
-          if (key.includes(schoolLower) || schoolLower.includes(key)) {
-            schoolId = id;
-            break;
-          }
-        }
-      }
-    }
+    const schoolRaw = resolve(row, 'school_terminations') || resolve(row, 'school') || '';
+    const schoolId = findSchoolId(schoolRaw, schoolLookup);
 
     // Get category code
-    const categoryCode = (
-      row['Assignment Category Code'] ||
-      row['Assignment Category'] ||
-      row.assignment_category ||
-      ''
-    ).toString().toUpperCase() || null;
+    const categoryCode = (resolve(row, 'assignment_category') || '').toString().toUpperCase() || null;
 
     // Determine period date
     let periodDate;
     if (options.quarter) {
-      const dates = getQuarterDatesFromKey(options.quarter);
-      periodDate = formatDate(dates.end);
+      periodDate = formatDate(getQuarterDatesFromKey(options.quarter).end);
     } else if (options.fiscalYear) {
       periodDate = `${options.fiscalYear}-06-30`;
     } else {
@@ -401,13 +244,9 @@ async function processTerminations(rows, options, sourceFile) {
         RETURNING (xmax = 0) AS inserted
       `;
 
-      if (result[0]?.inserted) {
-        inserted++;
-      } else {
-        updated++;
-      }
-    } catch (error) {
-      console.error(`  Error upserting termination: ${error.message}`);
+      if (result[0]?.inserted) { inserted++; } else { updated++; }
+    } catch (err) {
+      console.error(`  Error upserting termination: ${err.message}`);
       errored++;
     }
   }
@@ -419,32 +258,26 @@ async function processTerminations(rows, options, sourceFile) {
  * Main function
  */
 async function main() {
-  const options = parseArgs();
+  const options = parseArgs('terminations-to-postgres', SCRIPT_OPTIONS, HELP_CONFIG);
 
-  console.log(`\n${colors.cyan}========================================${colors.reset}`);
-  console.log(`${colors.cyan}   Terminations ETL to Postgres${colors.reset}`);
-  console.log(`${colors.cyan}========================================${colors.reset}\n`);
+  printBanner('Terminations ETL to Postgres');
 
   // Check connection
-  console.log(`${colors.blue}Checking database connection...${colors.reset}`);
+  info('Checking database connection...');
   const connected = await checkConnection();
-
   if (!connected) {
-    console.error(`${colors.red}Failed to connect to database.${colors.reset}`);
+    logError('Failed to connect to database.');
     process.exit(1);
   }
-  console.log(`${colors.green}✓${colors.reset} Connected\n`);
+  success('Connected\n');
 
   // Validate input
   if (!options.input && !options.fromJson) {
-    console.error(`${colors.red}Error: Either --input or --from-json is required${colors.reset}`);
-    printHelp();
+    logError('Error: Either --input or --from-json is required');
     process.exit(1);
   }
-
   if (!options.quarter && !options.fiscalYear) {
-    console.error(`${colors.red}Error: Either --quarter or --fiscal-year is required${colors.reset}`);
-    printHelp();
+    logError('Error: Either --quarter or --fiscal-year is required');
     process.exit(1);
   }
 
@@ -454,28 +287,16 @@ async function main() {
 
   if (options.fromJson) {
     sourceFile = options.file || options.input;
-    console.log(`${colors.blue}Loading JSON: ${sourceFile}${colors.reset}`);
+    info(`Loading JSON: ${sourceFile}`);
     rows = JSON.parse(fs.readFileSync(sourceFile, 'utf-8'));
-    console.log(`${colors.green}✓${colors.reset} Loaded ${rows.length} rows\n`);
+    success(`Loaded ${rows.length} rows\n`);
   } else {
     sourceFile = options.input;
-    console.log(`${colors.blue}Loading Excel: ${sourceFile}${colors.reset}`);
+    info(`Loading Excel: ${sourceFile}`);
     const workbook = loadExcelFile(sourceFile);
-    const sheetNames = getSheetNames(workbook);
-
-    // Auto-detect sheet with most rows
-    let targetSheet = sheetNames[0];
-    let maxRows = 0;
-    for (const name of sheetNames) {
-      const data = sheetToJSON(workbook, name);
-      if (data.length > maxRows) {
-        maxRows = data.length;
-        targetSheet = name;
-      }
-    }
-
-    rows = sheetToJSON(workbook, targetSheet);
-    console.log(`${colors.green}✓${colors.reset} Loaded ${rows.length} rows from sheet "${targetSheet}"\n`);
+    const { sheetName } = autoDetectLargestSheet(workbook);
+    rows = sheetToJSON(workbook, sheetName);
+    success(`Loaded ${rows.length} rows from sheet "${sheetName}"\n`);
   }
 
   // Start audit log
@@ -484,26 +305,23 @@ async function main() {
     ? formatDate(getQuarterDatesFromKey(options.quarter).end)
     : `${options.fiscalYear}-06-30`;
 
-  let loadId = null;
-  if (!options.dryRun) {
-    loadId = await startAuditLog({
-      loadType: 'terminations',
-      sourceFile: path.basename(sourceFile),
-      periodDate,
-      fiscalPeriod
-    });
-    console.log(`${colors.blue}Audit log started (ID: ${loadId})${colors.reset}\n`);
-  }
+  const loadId = await startAudit({
+    loadType: 'terminations',
+    sourceFile,
+    periodDate,
+    fiscalPeriod,
+    dryRun: options.dryRun
+  });
 
   // Process terminations
-  console.log(`${colors.blue}${options.dryRun ? '[DRY RUN] ' : ''}Processing terminations...${colors.reset}`);
+  info(`${options.dryRun ? '[DRY RUN] ' : ''}Processing terminations...`);
   const { inserted, updated, errored, skipped } = await processTerminations(rows, options, sourceFile);
 
-  console.log(`\n${colors.green}✓${colors.reset} Results:`);
+  success('Results:');
   console.log(`  Inserted: ${inserted}`);
   console.log(`  Updated: ${updated}`);
   console.log(`  Errors: ${errored}`);
-  console.log(`  Skipped (filtered/no date): ${skipped}\n`);
+  console.log(`  Skipped (filtered/no date/no ID): ${skipped}\n`);
 
   // Verify count matches expected (FY25 = 222)
   if (options.fiscalYear === '2025' || options.fiscalYear === 2025) {
@@ -518,27 +336,18 @@ async function main() {
   }
 
   // Complete audit log
-  if (loadId) {
-    await completeAuditLog(loadId, {
-      recordsRead: rows.length,
-      recordsInserted: inserted,
-      recordsUpdated: updated,
-      recordsErrored: errored,
-      status: errored > 0 ? 'completed' : 'completed',
-      errorMessage: errored > 0 ? `${errored} records failed` : null
-    });
-  }
+  await completeAudit(loadId, {
+    recordsRead: rows.length,
+    inserted, updated, errored
+  });
 
-  console.log(`\n${colors.cyan}========================================${colors.reset}`);
-  console.log(`${colors.green}✓ Terminations ETL Complete${colors.reset}`);
-  console.log(`${colors.cyan}========================================${colors.reset}\n`);
-
+  printComplete('Terminations ETL Complete');
   await endPool();
 }
 
-main().catch(async error => {
-  console.error(`\n${colors.red}Fatal error: ${error.message}${colors.reset}`);
-  console.error(error.stack);
+main().catch(async err => {
+  console.error(`\n${colors.red}Fatal error: ${err.message}${colors.reset}`);
+  console.error(err.stack);
   await endPool();
   process.exit(1);
 });
