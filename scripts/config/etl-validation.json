@@ -1,0 +1,60 @@
+{
+  "version": "1.0.0",
+  "description": "Hardcoded validation values extracted from ETL scripts. Used to verify data integrity after loads.",
+
+  "fiscal_periods": {
+    "FY25": {
+      "period_date": "2025-06-30",
+      "terminations": {
+        "expected_count": 222,
+        "source_script": "terminations-to-postgres.js",
+        "source_line": "lines 509-518",
+        "validation_query": "SELECT COUNT(*) FROM fact_terminations WHERE period_date = '2025-06-30'"
+      }
+    },
+    "FY26_Q1": {
+      "period_date": "2025-09-30",
+      "workforce": {
+        "faculty": { "total": 697, "omaha": 657, "phoenix": 40 },
+        "staff": { "total": 1419, "omaha": 1318, "phoenix": 101 },
+        "hsp": { "total": 625, "omaha": 282, "phoenix": 343 },
+        "students": { "total": 2157, "omaha": 2088, "phoenix": 69 },
+        "temp": { "total": 630, "omaha": 489, "phoenix": 141 },
+        "grand_total": 5528,
+        "source_script": "workforce-to-postgres.js",
+        "source_line": "lines 557-565"
+      }
+    }
+  },
+
+  "demographics_gender_expected": {
+    "period": "FY25_Q4",
+    "period_date": "2025-06-30",
+    "faculty_male": 321,
+    "faculty_female": 368,
+    "staff_male": 534,
+    "staff_female": 914,
+    "source_script": "demographics-to-postgres.js",
+    "source_line": "lines 553-556"
+  },
+
+  "excel_date_map": {
+    "2025-12-31": 46022,
+    "2025-09-30": 45930,
+    "2025-06-30": 45838,
+    "2025-03-31": 45747,
+    "2024-12-31": 45657,
+    "2024-09-30": 45565,
+    "2024-06-30": 45473,
+    "source_script": "demographics-to-postgres.js",
+    "source_line": "lines 47-55",
+    "_note": "Maps ISO dates to Excel serial date numbers for END DATE filtering. Task #8 aims to eliminate this."
+  },
+
+  "turnover_rate_validation": {
+    "rate_range": { "min": 0, "max": 100 },
+    "benchmark_range": { "min": 0, "max": 100 },
+    "period_format_regex": "^(FY\\d{2}|Q[1-4]_FY\\d{2})$",
+    "source_script": "turnover-rates-to-postgres.js"
+  }
+}

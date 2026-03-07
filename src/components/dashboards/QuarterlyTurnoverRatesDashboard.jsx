@@ -3,7 +3,9 @@ import SummaryCard from '../ui/SummaryCard';
 import QuarterlyTurnoverRatesTable from '../charts/QuarterlyTurnoverRatesTable';
 import ErrorBoundary from '../ui/ErrorBoundary';
 import PDFExportButton from '../ui/PDFExportButton';
+import NoDataForQuarter from '../ui/NoDataForQuarter';
 import { getAnnualTurnoverRatesByCategory } from '../../services/dataService';
+import { useQuarter } from '../../contexts/QuarterContext';
 import {
   TrendingDown,
   BookOpen,
@@ -11,7 +13,21 @@ import {
   Info
 } from 'lucide-react';
 
+// Quarters that have turnover rate analysis data
+const SUPPORTED_QUARTERS = ['2025-09-30', '2025-06-30', '2025-03-31', '2024-12-31', '2024-09-30', '2024-06-30'];
+
 const QuarterlyTurnoverRatesDashboard = () => {
+  const { selectedQuarter } = useQuarter();
+
+  // Show no-data message for quarters without turnover rate data
+  if (!SUPPORTED_QUARTERS.includes(selectedQuarter)) {
+    return (
+      <ErrorBoundary>
+        <NoDataForQuarter dataLabel="Turnover rate analysis" />
+      </ErrorBoundary>
+    );
+  }
+
   // Get data for summary cards (compare FY 2025 vs FY 2024)
   const { annualRates, benchmarks } = getAnnualTurnoverRatesByCategory();
   const currentYear = annualRates.fy2025;

@@ -15,127 +15,46 @@
 
 const fs = require('fs');
 const path = require('path');
-const { sql, endPool, startAuditLog, completeAuditLog, checkConnection } = require('./neon-client');
+const { getPool, upsert } = require('./neon-client');
 const { hashValue } = require('../utils/pii-removal');
 const { getQuarterDatesFromKey, formatDate } = require('../utils/fiscal-calendar');
+const { colors, info, success, warning, error: logError, dryRunPrefix } = require('../utils/formatting');
+const { parseArgs } = require('../utils/cli-parser');
+const { runETL, startAudit, completeAudit } = require('../utils/etl-runner');
+const { loadSchoolLookup, findSchoolId } = require('../utils/school-lookup');
+const { loadConfig } = require('../utils/config-loader');
+const { resolveColumn } = require('../utils/column-resolver');
 
-const colors = {
-  reset: '\x1b[0m',
-  red: '\x1b[31m',
-  green: '\x1b[32m',
-  yellow: '\x1b[33m',
-  blue: '\x1b[34m',
-  cyan: '\x1b[36m'
+const SCRIPT_OPTIONS = [
+  { flags: '--from-json', key: 'fromJson', type: 'boolean', description: 'Load from JSON file' },
+  { flags: '--from-static', key: 'fromStatic', type: 'boolean', description: 'Load from existing staticData.js' },
+  { flags: '--file', key: 'file', type: 'string', description: 'JSON file path' },
+  { flags: '--quarter,-q', key: 'quarter', type: 'string', description: 'Fiscal period (e.g., FY25_Q2)' }
+];
+
+const HELP_CONFIG = {
+  title: 'Internal Mobility ETL to Postgres',
+  usage: [
+    'node scripts/etl/mobility-to-postgres.js --from-json --file mobility.json --quarter FY25_Q2',
+    'node scripts/etl/mobility-to-postgres.js --from-static --quarter FY25_Q2'
+  ]
 };
 
 /**
- * Parse command line arguments
- */
-function parseArgs() {
-  const args = process.argv.slice(2);
-  const options = {
-    fromJson: false,
-    fromStatic: false,
-    file: null,
-    quarter: null,
-    dryRun: false
-  };
-
-  for (let i = 0; i < args.length; i++) {
-    switch (args[i]) {
-      case '--from-json':
-        options.fromJson = true;
-        break;
-      case '--from-static':
-        options.fromStatic = true;
-        break;
-      case '--file':
-        options.file = args[++i];
-        break;
-      case '--quarter':
-      case '-q':
-        options.quarter = args[++i];
-        break;
-      case '--dry-run':
-        options.dryRun = true;
-        break;
-      case '--help':
-      case '-h':
-        printHelp();
-        process.exit(0);
-    }
-  }
-
-  return options;
-}
-
-function printHelp() {
-  console.log(`
-${colors.cyan}Internal Mobility ETL to Postgres${colors.reset}
-
-${colors.yellow}Usage:${colors.reset}
-  node scripts/etl/mobility-to-postgres.js --from-json --file mobility.json --quarter FY25_Q2
-  node scripts/etl/mobility-to-postgres.js --from-static --quarter FY25_Q2
-
-${colors.yellow}Options:${colors.reset}
-  --from-json           Load from JSON file
-  --from-static         Load from existing staticData.js
-  --file FILE           JSON file path
-  -q, --quarter PERIOD  Fiscal period (e.g., FY25_Q2)
-  --dry-run             Preview without database writes
-`);
-}
-
-/**
- * Categorize action type from reason/action text
+ * Categorize action type from reason/action text using config keywords
  */
 function categorizeActionType(action, reason) {
   const combined = ((action || '') + ' ' + (reason || '')).toLowerCase();
+  const config = loadConfig();
+  const actionKeywords = config.mobility_actions.keyword_to_type;
 
-  if (combined.includes('promot')) return 'promotion';
-  if (combined.includes('demot')) return 'demotion';
-  if (combined.includes('transfer')) return 'transfer';
-  if (combined.includes('reclass')) return 'reclassification';
-  if (combined.includes('lateral')) return 'lateral';
-
-  // Default based on grade change
-  return 'transfer';
-}
-
-/**
- * Load school lookup
- */
-async function loadSchoolLookup() {
-  const schools = await sql`SELECT school_id, code, name FROM dim_schools`;
-  const lookup = {};
-
-  schools.forEach(s => {
-    lookup[s.code.toLowerCase()] = s.school_id;
-    lookup[s.name.toLowerCase()] = s.school_id;
-  });
-
-  return lookup;
-}
-
-/**
- * Match school name to ID
- */
-function findSchoolId(schoolName, lookup) {
-  if (!schoolName) return null;
-
-  const schoolLower = schoolName.toLowerCase();
-  let schoolId = lookup[schoolLower];
-
-  if (!schoolId) {
-    for (const [key, id] of Object.entries(lookup)) {
-      if (key.includes(schoolLower) || schoolLower.includes(key)) {
-        schoolId = id;
-        break;
-      }
+  for (const [actionType, keywords] of Object.entries(actionKeywords)) {
+    for (const keyword of keywords) {
+      if (combined.includes(keyword)) return actionType;
     }
   }
 
-  return schoolId || null;
+  return config.mobility_actions.default_type;
 }
 
 /**
@@ -147,39 +66,47 @@ async function processMobilityEvents(rows, options, sourceFile) {
   let inserted = 0;
   let updated = 0;
   let errored = 0;
+  let skipped = 0;
 
   const periodDate = options.quarter
     ? formatDate(getQuarterDatesFromKey(options.quarter).end)
     : null;
 
   for (const row of rows) {
-    // Get employee hash
-    const employeeId = row.employee_id || row.employeeId || row['Employee ID'];
-    const employeeHash = employeeId ? hashValue(employeeId.toString()) : `anon_${Date.now()}_${Math.random()}`;
+    // Get employee ID - skip rows without one to avoid anonymous hash duplication
+    const employeeId = resolveColumn(row, 'employee_id_mobility');
+    if (!employeeId) {
+      skipped++;
+      continue;
+    }
+    const employeeHash = hashValue(employeeId.toString());
 
     // Get effective date
-    const effectiveDate = row.effective_date || row.effectiveDate || row.date;
-    if (!effectiveDate) continue;
+    const effectiveDate = resolveColumn(row, 'effective_date');
+    if (!effectiveDate) {
+      skipped++;
+      continue;
+    }
 
     // Categorize action
     const actionType = categorizeActionType(row.action, row.reason);
-    const reasonCode = row.reason_code || row.reasonCode || row.reason || null;
+    const reasonCode = resolveColumn(row, 'reason_code');
 
     // Before state
-    const beforeSchool = row.before_school || row.beforeSchool || row.from_school || row.fromSchool;
+    const beforeSchool = resolveColumn(row, 'before_school');
     const beforeSchoolId = findSchoolId(beforeSchool, schoolLookup);
-    const beforeGrade = row.before_grade || row.beforeGrade || row.from_grade || null;
-    const beforeJobFamily = row.before_job_family || row.beforeJobFamily || null;
+    const beforeGrade = resolveColumn(row, 'before_grade');
+    const beforeJobFamily = resolveColumn(row, 'before_job_family');
 
     // After state
-    const afterSchool = row.after_school || row.afterSchool || row.to_school || row.toSchool;
+    const afterSchool = resolveColumn(row, 'after_school');
     const afterSchoolId = findSchoolId(afterSchool, schoolLookup);
-    const afterGrade = row.after_grade || row.afterGrade || row.to_grade || null;
-    const afterJobFamily = row.after_job_family || row.afterJobFamily || null;
+    const afterGrade = resolveColumn(row, 'after_grade');
+    const afterJobFamily = resolveColumn(row, 'after_job_family');
 
     // Flags
     const isCrossSchool = beforeSchoolId !== afterSchoolId && beforeSchoolId !== null && afterSchoolId !== null;
-    const isCrossDepartment = row.is_cross_department || row.isCrossDepartment || false;
+    const isCrossDepartment = resolveColumn(row, 'is_cross_department') || false;
 
     // Grade change calculation
     let gradeChange = null;
@@ -198,166 +125,103 @@ async function processMobilityEvents(rows, options, sourceFile) {
     }
 
     try {
-      const result = await sql`
-        INSERT INTO fact_mobility_events (
-          employee_hash, period_date, effective_date,
-          action_type, reason_code,
-          before_school_id, before_grade_code, before_job_family,
-          after_school_id, after_grade_code, after_job_family,
-          is_cross_school, is_cross_department, grade_change,
-          source_file
-        )
-        VALUES (
-          ${employeeHash}, ${periodDate}, ${effectiveDate},
-          ${actionType}, ${reasonCode},
-          ${beforeSchoolId}, ${beforeGrade}, ${beforeJobFamily},
-          ${afterSchoolId}, ${afterGrade}, ${afterJobFamily},
-          ${isCrossSchool}, ${isCrossDepartment}, ${gradeChange},
-          ${path.basename(sourceFile)}
-        )
-        ON CONFLICT (employee_hash, effective_date, action_type)
-        DO UPDATE SET
-          period_date = EXCLUDED.period_date,
-          reason_code = EXCLUDED.reason_code,
-          before_school_id = EXCLUDED.before_school_id,
-          before_grade_code = EXCLUDED.before_grade_code,
-          before_job_family = EXCLUDED.before_job_family,
-          after_school_id = EXCLUDED.after_school_id,
-          after_grade_code = EXCLUDED.after_grade_code,
-          after_job_family = EXCLUDED.after_job_family,
-          is_cross_school = EXCLUDED.is_cross_school,
-          is_cross_department = EXCLUDED.is_cross_department,
-          grade_change = EXCLUDED.grade_change,
-          source_file = EXCLUDED.source_file,
-          loaded_at = NOW()
-        RETURNING (xmax = 0) AS inserted
-      `;
+      const result = await upsert(getPool(), 'fact_mobility_events', {
+        employee_hash: employeeHash,
+        period_date: periodDate,
+        effective_date: effectiveDate,
+        action_type: actionType,
+        reason_code: reasonCode,
+        before_school_id: beforeSchoolId,
+        before_grade_code: beforeGrade,
+        before_job_family: beforeJobFamily,
+        after_school_id: afterSchoolId,
+        after_grade_code: afterGrade,
+        after_job_family: afterJobFamily,
+        is_cross_school: isCrossSchool,
+        is_cross_department: isCrossDepartment,
+        grade_change: gradeChange,
+        source_file: path.basename(sourceFile)
+      }, ['employee_hash', 'effective_date', 'action_type']);
 
-      if (result[0]?.inserted) {
-        inserted++;
-      } else {
-        updated++;
-      }
-    } catch (error) {
-      console.error(`  Error upserting mobility event: ${error.message}`);
+      if (result.inserted) { inserted++; } else { updated++; }
+    } catch (err) {
+      console.error(`  Error upserting mobility event: ${err.message}`);
       errored++;
     }
   }
 
-  return { inserted, updated, errored };
+  return { inserted, updated, errored, skipped };
 }
 
-/**
- * Main function
- */
-async function main() {
-  const options = parseArgs();
+const options = parseArgs('mobility-to-postgres', SCRIPT_OPTIONS, HELP_CONFIG);
 
-  console.log(`\n${colors.cyan}========================================${colors.reset}`);
-  console.log(`${colors.cyan}   Internal Mobility ETL to Postgres${colors.reset}`);
-  console.log(`${colors.cyan}========================================${colors.reset}\n`);
-
-  // Check connection
-  console.log(`${colors.blue}Checking database connection...${colors.reset}`);
-  const connected = await checkConnection();
-
-  if (!connected) {
-    console.error(`${colors.red}Failed to connect to database.${colors.reset}`);
-    process.exit(1);
-  }
-  console.log(`${colors.green}✓${colors.reset} Connected\n`);
-
-  // Validate input
-  if (!options.fromJson && !options.fromStatic) {
-    console.error(`${colors.red}Error: Either --from-json or --from-static is required${colors.reset}`);
-    printHelp();
-    process.exit(1);
-  }
-
-  if (!options.quarter) {
-    console.error(`${colors.red}Error: --quarter is required${colors.reset}`);
-    printHelp();
-    process.exit(1);
-  }
-
-  // Load data
-  let rows;
-  let sourceFile;
-
-  if (options.fromStatic) {
-    // Load from existing internalMobilityData.js
-    const dataPath = path.join(__dirname, '..', '..', 'src', 'data', 'internalMobilityData.js');
-    console.log(`${colors.blue}Loading from staticData: ${dataPath}${colors.reset}`);
-
-    // Read and parse the module
-    const content = fs.readFileSync(dataPath, 'utf-8');
-    // Extract data using regex (simple approach)
-    const match = content.match(/export\s+const\s+\w+\s*=\s*(\[[\s\S]*?\]);/);
-    if (match) {
-      // This is a simplified approach - in production you might use require() or import()
-      console.log(`${colors.yellow}Note: Loading from static data requires manual data extraction${colors.reset}`);
-      rows = [];
-    } else {
-      rows = [];
+runETL({
+  title: 'Internal Mobility ETL to Postgres',
+  loadType: 'mobility',
+  dryRun: options.dryRun,
+  run: async () => {
+    // Validate input
+    if (!options.fromJson && !options.fromStatic) {
+      logError('Error: Either --from-json or --from-static is required');
+      process.exit(1);
     }
-    sourceFile = dataPath;
-    console.log(`${colors.green}✓${colors.reset} Would load from static (${rows.length} records)\n`);
-  } else {
-    sourceFile = options.file;
-    console.log(`${colors.blue}Loading JSON: ${sourceFile}${colors.reset}`);
-    rows = JSON.parse(fs.readFileSync(sourceFile, 'utf-8'));
-    console.log(`${colors.green}✓${colors.reset} Loaded ${rows.length} mobility events\n`);
-  }
 
-  if (rows.length === 0) {
-    console.log(`${colors.yellow}No mobility events to process.${colors.reset}`);
-    await endPool();
-    return;
-  }
+    if (!options.quarter) {
+      logError('Error: --quarter is required');
+      process.exit(1);
+    }
 
-  // Start audit log
-  const periodDate = formatDate(getQuarterDatesFromKey(options.quarter).end);
-  let loadId = null;
+    // Load data
+    let rows;
+    let sourceFile;
 
-  if (!options.dryRun) {
-    loadId = await startAuditLog({
+    if (options.fromStatic) {
+      const dataPath = path.join(__dirname, '..', '..', 'src', 'data', 'internalMobilityData.js');
+      info(`Loading from staticData: ${dataPath}`);
+
+      const content = fs.readFileSync(dataPath, 'utf-8');
+      const match = content.match(/export\s+const\s+\w+\s*=\s*(\[[\s\S]*?\]);/);
+      if (match) {
+        warning('Note: Loading from static data requires manual data extraction');
+        rows = [];
+      } else {
+        rows = [];
+      }
+      sourceFile = dataPath;
+      success(`Would load from static (${rows.length} records)\n`);
+    } else {
+      sourceFile = options.file;
+      info(`Loading JSON: ${sourceFile}`);
+      rows = JSON.parse(fs.readFileSync(sourceFile, 'utf-8'));
+      success(`Loaded ${rows.length} mobility events\n`);
+    }
+
+    if (rows.length === 0) {
+      warning('No mobility events to process.');
+      return { inserted: 0, updated: 0, errored: 0, sourceFile, periodDate: null, fiscalPeriod: options.quarter };
+    }
+
+    const periodDate = formatDate(getQuarterDatesFromKey(options.quarter).end);
+    const loadId = await startAudit({
       loadType: 'mobility',
-      sourceFile: path.basename(sourceFile),
+      sourceFile,
       periodDate,
-      fiscalPeriod: options.quarter
+      fiscalPeriod: options.quarter,
+      dryRun: options.dryRun
     });
-    console.log(`${colors.blue}Audit log started (ID: ${loadId})${colors.reset}\n`);
+
+    info(`${dryRunPrefix(options.dryRun)}Processing mobility events...`);
+    const { inserted, updated, errored, skipped } = await processMobilityEvents(rows, options, sourceFile);
+
+    console.log(`\n${colors.green}✓${colors.reset} Results:`);
+    console.log(`  Inserted: ${inserted}`);
+    console.log(`  Updated: ${updated}`);
+    console.log(`  Errors: ${errored}`);
+    if (skipped > 0) console.log(`  Skipped (no ID/date): ${skipped}`);
+    console.log('');
+
+    await completeAudit(loadId, { recordsRead: rows.length, inserted, updated, errored });
+
+    return { inserted, updated, errored, sourceFile, periodDate, fiscalPeriod: options.quarter };
   }
-
-  // Process events
-  console.log(`${colors.blue}${options.dryRun ? '[DRY RUN] ' : ''}Processing mobility events...${colors.reset}`);
-  const { inserted, updated, errored } = await processMobilityEvents(rows, options, sourceFile);
-
-  console.log(`\n${colors.green}✓${colors.reset} Results:`);
-  console.log(`  Inserted: ${inserted}`);
-  console.log(`  Updated: ${updated}`);
-  console.log(`  Errors: ${errored}\n`);
-
-  // Complete audit log
-  if (loadId) {
-    await completeAuditLog(loadId, {
-      recordsRead: rows.length,
-      recordsInserted: inserted,
-      recordsUpdated: updated,
-      recordsErrored: errored,
-      status: 'completed'
-    });
-  }
-
-  console.log(`${colors.cyan}========================================${colors.reset}`);
-  console.log(`${colors.green}✓ Mobility ETL Complete${colors.reset}`);
-  console.log(`${colors.cyan}========================================${colors.reset}\n`);
-
-  await endPool();
-}
-
-main().catch(async error => {
-  console.error(`\n${colors.red}Fatal error: ${error.message}${colors.reset}`);
-  await endPool();
-  process.exit(1);
 });

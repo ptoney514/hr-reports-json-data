@@ -16,70 +16,60 @@
 
 const fs = require('fs');
 const path = require('path');
-const { sql, endPool, startAuditLog, completeAuditLog, checkConnection } = require('./neon-client');
+const { sql, endPool, checkConnection, getPool, upsert } = require('./neon-client');
 
-// Import existing utilities
-const {
-  loadExcelFile,
-  sheetToJSON,
-  getSheetNames,
-  excelDateToJSDate,
-  formatDate,
-  isExcelDate
-} = require('../utils/excel-helpers');
-
-const {
-  getFiscalPeriodKey,
-  parseFiscalPeriodKey,
-  getQuarterDatesFromKey
-} = require('../utils/fiscal-calendar');
-
+const { excelDateToJSDate, formatDate, loadExcelFile, sheetToJSON, getSheetNames } = require('../utils/excel-helpers');
+const { getFiscalPeriodKey, getQuarterDatesFromKey } = require('../utils/fiscal-calendar');
 const { removePII } = require('../utils/pii-removal');
+const { colors, printBanner, printComplete, success, info, error: logError } = require('../utils/formatting');
+const { parseArgs } = require('../utils/cli-parser');
+const { startAudit, completeAudit } = require('../utils/etl-runner');
+const { loadConfig } = require('../utils/config-loader');
+const { createResolver, validateHeaders } = require('../utils/column-resolver');
+const { loadSchoolLookup, findSchoolId } = require('../utils/school-lookup');
+const { autoDetectLargestSheet } = require('../utils/workbook-loader');
+const { createErrorHandler, retryWithBackoff, ErrorType } = require('../utils/error-handler');
 
-const colors = {
-  reset: '\x1b[0m',
-  red: '\x1b[31m',
-  green: '\x1b[32m',
-  yellow: '\x1b[33m',
-  blue: '\x1b[34m',
-  cyan: '\x1b[36m'
+const config = loadConfig();
+const resolve = createResolver('workforce-to-postgres');
+
+const SCRIPT_OPTIONS = [
+  { flags: '--input,-i', key: 'input', type: 'string', description: 'Input Excel file path' },
+  { flags: '--quarter,-q', key: 'quarter', type: 'string', description: 'Fiscal period (e.g., FY25_Q2)' },
+  { flags: '--date,-d', key: 'date', type: 'string', description: 'Report date (YYYY-MM-DD format)' },
+  { flags: '--sheet,-s', key: 'sheet', type: 'string', description: 'Excel sheet name (auto-detects largest if not specified)' },
+  { flags: '--from-json', key: 'fromJson', type: 'boolean', description: 'Load from JSON instead of Excel' },
+  { flags: '--file', key: 'file', type: 'string', description: 'JSON file path (with --from-json)' }
+];
+
+const HELP_CONFIG = {
+  title: 'Workforce Data ETL to Postgres',
+  usage: [
+    'node scripts/etl/workforce-to-postgres.js --input file.xlsx --quarter FY25_Q2',
+    'node scripts/etl/workforce-to-postgres.js --from-json --file cleaned.json --quarter FY25_Q2'
+  ]
 };
-
-// Assignment category classifications
-const BENEFIT_ELIGIBLE_CATEGORIES = ['F12', 'F09', 'F10', 'F11', 'PT12', 'PT10', 'PT9', 'PT11'];
-const STUDENT_CATEGORIES = ['SUE', 'CWS'];
-const SPECIAL_CATEGORIES = ['HSP', 'HSR', 'TEMP', 'NBE', 'PRN'];
 
 /**
  * Filter rows by End Date matching the target quarter end date
- * The Excel file contains historical data across multiple quarters
- *
- * @param {Array} rows - All rows from Excel
- * @param {string} targetDate - Target date in YYYY-MM-DD format (e.g., '2025-09-30')
- * @returns {Array} Filtered rows matching the target end date
  */
 function filterByEndDate(rows, targetDate) {
   return rows.filter(row => {
-    const endDate = row['END DATE'] || row['End Date'] || row['endDate'] || row['end_date'];
-
+    const endDate = resolve(row, 'end_date');
     if (!endDate) return false;
 
     let dateStr;
-
     if (typeof endDate === 'string') {
       if (endDate.includes('/')) {
-        // Format: M/D/YYYY or MM/DD/YYYY
         const parts = endDate.split('/');
         if (parts.length === 3) {
           const [month, day, year] = parts;
           dateStr = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
         }
       } else if (endDate.includes('-')) {
-        // ISO format YYYY-MM-DD
         dateStr = endDate.substring(0, 10);
       }
     } else if (typeof endDate === 'number') {
-      // Excel serial date number - convert using helper
       try {
         const jsDate = excelDateToJSDate(endDate);
         dateStr = formatDate(jsDate);
@@ -95,145 +85,43 @@ function filterByEndDate(rows, targetDate) {
 }
 
 /**
- * Parse command line arguments
- */
-function parseArgs() {
-  const args = process.argv.slice(2);
-  const options = {
-    input: null,
-    quarter: null,
-    date: null,
-    fromJson: false,
-    file: null,
-    dryRun: false,
-    sheet: null
-  };
-
-  for (let i = 0; i < args.length; i++) {
-    switch (args[i]) {
-      case '--input':
-      case '-i':
-        options.input = args[++i];
-        break;
-      case '--quarter':
-      case '-q':
-        options.quarter = args[++i];
-        break;
-      case '--date':
-      case '-d':
-        options.date = args[++i];
-        break;
-      case '--from-json':
-        options.fromJson = true;
-        break;
-      case '--file':
-        options.file = args[++i];
-        break;
-      case '--dry-run':
-        options.dryRun = true;
-        break;
-      case '--sheet':
-      case '-s':
-        options.sheet = args[++i];
-        break;
-      case '--help':
-      case '-h':
-        printHelp();
-        process.exit(0);
-    }
-  }
-
-  return options;
-}
-
-/**
- * Print help message
- */
-function printHelp() {
-  console.log(`
-${colors.cyan}Workforce Data ETL to Postgres${colors.reset}
-
-${colors.yellow}Usage:${colors.reset}
-  node scripts/etl/workforce-to-postgres.js --input file.xlsx --quarter FY25_Q2
-  node scripts/etl/workforce-to-postgres.js --from-json --file cleaned.json --quarter FY25_Q2
-
-${colors.yellow}Options:${colors.reset}
-  -i, --input FILE      Input Excel file path
-  -q, --quarter PERIOD  Fiscal period (e.g., FY25_Q2)
-  -d, --date DATE       Report date (YYYY-MM-DD format)
-  -s, --sheet NAME      Excel sheet name (auto-detects largest sheet if not specified)
-  --from-json           Load from JSON instead of Excel
-  --file FILE           JSON file path (with --from-json)
-  --dry-run             Preview without database writes
-`);
-}
-
-/**
  * Categorize employee based on assignment category, person type, and grade code
- * Uses WORKFORCE_METHODOLOGY.md v2.1 rules:
- * - HSR code OR Grade R = House Staff Physicians
- * - SUE, CWS = Student Workers
- * - TEMP, NBE, PRN = Non-Benefit Eligible (Temp)
- * - Benefit-eligible (F/PT codes): Use Person Type to determine Faculty vs Staff
- *
- * @param {Object} row - Full employee row with all fields
- * @returns {Object} { type, isBenefitEligible, code }
+ * (5-level cascading priority - kept in code, must NOT be config-driven)
  */
 function categorizeEmployee(row) {
   if (!row) return { type: 'other', isBenefitEligible: false, code: 'UNKNOWN' };
 
-  const assignmentCategory = (
-    row['Assignment Category Code'] ||
-    row['Assignment Category'] ||
-    row.assignment_category ||
-    row.assignment_category_code ||
-    row.assignmentCategoryCode ||
-    ''
-  ).toString().trim().toUpperCase();
+  const assignmentCategory = (resolve(row, 'assignment_category') || '').toString().trim().toUpperCase();
+  const personType = (resolve(row, 'person_type') || '').toString().trim().toUpperCase();
+  const gradeCode = (resolve(row, 'grade_code') || '').toString().trim().toUpperCase();
 
-  const personType = (
-    row['Person Type'] ||
-    row['personType'] ||
-    row.person_type ||
-    ''
-  ).toString().trim().toUpperCase();
-
-  const gradeCode = (
-    row['Grade Code'] ||
-    row['Grade'] ||
-    row.grade ||
-    row.gradeCode ||
-    ''
-  ).toString().trim().toUpperCase();
-
-  // 1. House Staff Physicians (HSR code OR Grade R)
-  if (assignmentCategory === 'HSR' || assignmentCategory === 'HSP') {
+  // 1. House Staff Physicians (HSR/HSP codes)
+  if (config.categories.house_staff.includes(assignmentCategory)) {
     return { type: 'hsp', isBenefitEligible: true, code: assignmentCategory };
   }
 
   // 2. Grade R employees go to HSP (Residents/Fellows)
-  if (gradeCode && gradeCode.startsWith('R')) {
+  if (gradeCode && gradeCode.startsWith(config.grade_codes.house_staff_prefix)) {
     return { type: 'hsp', isBenefitEligible: true, code: assignmentCategory || 'GRADE_R' };
   }
 
-  // 3. Student Workers (SUE, CWS)
-  if (STUDENT_CATEGORIES.includes(assignmentCategory)) {
+  // 3. Student Workers
+  if (config.categories.student.includes(assignmentCategory)) {
     return { type: 'student', isBenefitEligible: false, code: assignmentCategory };
   }
 
   // 4. Non-Benefit Eligible (TEMP, NBE, PRN)
-  if (assignmentCategory === 'TEMP' || assignmentCategory === 'NBE' || assignmentCategory === 'PRN') {
+  if (config.categories.temp.includes(assignmentCategory)) {
     return { type: 'temp', isBenefitEligible: false, code: assignmentCategory };
   }
 
   // 5. Benefit-Eligible - Use Person Type to determine Faculty vs Staff
-  if (BENEFIT_ELIGIBLE_CATEGORIES.includes(assignmentCategory)) {
-    if (personType === 'FACULTY') {
+  if (config.categories.benefit_eligible.includes(assignmentCategory)) {
+    if (config.person_types.faculty.includes(personType)) {
       return { type: 'faculty', isBenefitEligible: true, code: assignmentCategory };
-    } else if (personType === 'STAFF' || personType === 'EMPLOYEE') {
+    } else if (config.person_types.staff.includes(personType)) {
       return { type: 'staff', isBenefitEligible: true, code: assignmentCategory };
     } else {
-      // Unknown person type with benefit-eligible code - default to staff
       return { type: 'staff', isBenefitEligible: true, code: assignmentCategory };
     }
   }
@@ -248,56 +136,33 @@ function aggregateWorkforceData(rows, periodDate) {
   const aggregations = {};
 
   rows.forEach(row => {
-    // Get location
-    const locationRaw = row.Location || row.location || row.LOCATION || row.State || '';
-    const location = locationRaw.toString().toLowerCase().includes('phoenix') ? 'phoenix' : 'omaha';
+    const locationRaw = resolve(row, 'location') || '';
+    const location = locationRaw.toString().toLowerCase().includes(config.locations.detection_keyword) ? 'phoenix' : 'omaha';
 
-    // Categorize employee using full row (for Person Type, Grade Code access)
     const { type, code } = categorizeEmployee(row);
-
-    // Use the code from categorization (may be assignment category or GRADE_R)
     const categoryCode = code || 'UNKNOWN';
 
-    // Get school/org
-    const schoolRaw = row.School || row.school || row['VP Area'] || row.Department || '';
+    const schoolRaw = resolve(row, 'school') || '';
     const school = schoolRaw.toString().trim();
 
-    // Create aggregation key
     const key = `${location}|${categoryCode}|${school}`;
 
     if (!aggregations[key]) {
       aggregations[key] = {
-        periodDate,
-        location,
-        categoryCode: categoryCode.toUpperCase(),
-        school,
-        headcount: 0,
-        facultyCount: 0,
-        staffCount: 0,
-        hspCount: 0,
-        studentCount: 0,
-        tempCount: 0
+        periodDate, location, categoryCode: categoryCode.toUpperCase(), school,
+        headcount: 0, facultyCount: 0, staffCount: 0,
+        hspCount: 0, studentCount: 0, tempCount: 0
       };
     }
 
     aggregations[key].headcount++;
 
     switch (type) {
-      case 'faculty':
-        aggregations[key].facultyCount++;
-        break;
-      case 'staff':
-        aggregations[key].staffCount++;
-        break;
-      case 'hsp':
-        aggregations[key].hspCount++;
-        break;
-      case 'student':
-        aggregations[key].studentCount++;
-        break;
-      case 'temp':
-        aggregations[key].tempCount++;
-        break;
+      case 'faculty': aggregations[key].facultyCount++; break;
+      case 'staff': aggregations[key].staffCount++; break;
+      case 'hsp': aggregations[key].hspCount++; break;
+      case 'student': aggregations[key].studentCount++; break;
+      case 'temp': aggregations[key].tempCount++; break;
     }
   });
 
@@ -305,47 +170,19 @@ function aggregateWorkforceData(rows, periodDate) {
 }
 
 /**
- * Load school ID lookup from database
- */
-async function loadSchoolLookup() {
-  const schools = await sql`SELECT school_id, code, name FROM dim_schools`;
-  const lookup = {};
-
-  schools.forEach(s => {
-    lookup[s.code.toLowerCase()] = s.school_id;
-    lookup[s.name.toLowerCase()] = s.school_id;
-  });
-
-  return lookup;
-}
-
-/**
  * Upsert workforce data to Postgres
  */
 async function upsertWorkforceData(aggregations, sourceFile, dryRun = false) {
   const schoolLookup = await loadSchoolLookup();
+  const errorHandler = createErrorHandler('workforce-to-postgres');
 
   let inserted = 0;
   let updated = 0;
   let errored = 0;
 
-  for (const agg of aggregations) {
-    // Try to match school
-    let schoolId = null;
-    if (agg.school) {
-      const schoolLower = agg.school.toLowerCase();
-      schoolId = schoolLookup[schoolLower] || null;
-
-      // Try partial match
-      if (!schoolId) {
-        for (const [key, id] of Object.entries(schoolLookup)) {
-          if (key.includes(schoolLower) || schoolLower.includes(key)) {
-            schoolId = id;
-            break;
-          }
-        }
-      }
-    }
+  for (let i = 0; i < aggregations.length; i++) {
+    const agg = aggregations[i];
+    const schoolId = agg.school ? findSchoolId(agg.school, schoolLookup) : null;
 
     if (dryRun) {
       console.log(`  [DRY RUN] Would upsert: ${agg.location}/${agg.categoryCode}/${agg.school}: ${agg.headcount}`);
@@ -354,41 +191,32 @@ async function upsertWorkforceData(aggregations, sourceFile, dryRun = false) {
     }
 
     try {
-      const result = await sql`
-        INSERT INTO fact_workforce_snapshots (
-          period_date, location, school_id, category_code,
-          headcount, faculty_count, staff_count, hsp_count, student_count, temp_count,
-          source_file
-        )
-        VALUES (
-          ${agg.periodDate}, ${agg.location}, ${schoolId}, ${agg.categoryCode},
-          ${agg.headcount}, ${agg.facultyCount}, ${agg.staffCount}, ${agg.hspCount}, ${agg.studentCount}, ${agg.tempCount},
-          ${sourceFile}
-        )
-        ON CONFLICT (period_date, location, school_id, category_code)
-        DO UPDATE SET
-          headcount = EXCLUDED.headcount,
-          faculty_count = EXCLUDED.faculty_count,
-          staff_count = EXCLUDED.staff_count,
-          hsp_count = EXCLUDED.hsp_count,
-          student_count = EXCLUDED.student_count,
-          temp_count = EXCLUDED.temp_count,
-          source_file = EXCLUDED.source_file,
-          loaded_at = NOW()
-        RETURNING (xmax = 0) AS inserted
-      `;
+      const result = await retryWithBackoff(() => upsert(getPool(), 'fact_workforce_snapshots', {
+        period_date: agg.periodDate,
+        location: agg.location,
+        school_id: schoolId,
+        category_code: agg.categoryCode,
+        headcount: agg.headcount,
+        faculty_count: agg.facultyCount,
+        staff_count: agg.staffCount,
+        hsp_count: agg.hspCount,
+        student_count: agg.studentCount,
+        temp_count: agg.tempCount,
+        source_file: sourceFile
+      }, ['period_date', 'location', 'school_id', 'category_code']));
 
-      if (result[0]?.inserted) {
-        inserted++;
-      } else {
-        updated++;
-      }
-    } catch (error) {
-      console.error(`  Error upserting ${agg.location}/${agg.categoryCode}: ${error.message}`);
+      if (result.inserted) { inserted++; } else { updated++; }
+    } catch (err) {
+      const errorType = errorHandler.handleError(err, agg, i);
       errored++;
+      if (errorType === ErrorType.FATAL) {
+        errorHandler.printErrorReport();
+        throw err;
+      }
     }
   }
 
+  errorHandler.printErrorReport();
   return { inserted, updated, errored };
 }
 
@@ -396,38 +224,31 @@ async function upsertWorkforceData(aggregations, sourceFile, dryRun = false) {
  * Main function
  */
 async function main() {
-  const options = parseArgs();
+  const options = parseArgs('workforce-to-postgres', SCRIPT_OPTIONS, HELP_CONFIG);
 
-  console.log(`\n${colors.cyan}========================================${colors.reset}`);
-  console.log(`${colors.cyan}   Workforce ETL to Postgres${colors.reset}`);
-  console.log(`${colors.cyan}========================================${colors.reset}\n`);
+  printBanner('Workforce ETL to Postgres');
 
   // Check connection
-  console.log(`${colors.blue}Checking database connection...${colors.reset}`);
+  info('Checking database connection...');
   const connected = await checkConnection();
-
   if (!connected) {
-    console.error(`${colors.red}Failed to connect to database.${colors.reset}`);
+    logError('Failed to connect to database.');
     process.exit(1);
   }
-  console.log(`${colors.green}✓${colors.reset} Connected\n`);
+  success('Connected\n');
 
   // Validate input
   if (!options.input && !options.fromJson) {
-    console.error(`${colors.red}Error: Either --input or --from-json is required${colors.reset}`);
-    printHelp();
+    logError('Error: Either --input or --from-json is required');
     process.exit(1);
   }
-
   if (!options.quarter && !options.date) {
-    console.error(`${colors.red}Error: Either --quarter or --date is required${colors.reset}`);
-    printHelp();
+    logError('Error: Either --quarter or --date is required');
     process.exit(1);
   }
 
   // Determine period date
   let periodDate, fiscalPeriod;
-
   if (options.quarter) {
     const dates = getQuarterDatesFromKey(options.quarter);
     periodDate = formatDate(dates.end);
@@ -446,54 +267,65 @@ async function main() {
 
   if (options.fromJson) {
     sourceFile = options.file || options.input;
-    console.log(`${colors.blue}Loading JSON: ${sourceFile}${colors.reset}`);
+    info(`Loading JSON: ${sourceFile}`);
     rows = JSON.parse(fs.readFileSync(sourceFile, 'utf-8'));
-    console.log(`${colors.green}✓${colors.reset} Loaded ${rows.length} rows\n`);
+    success(`Loaded ${rows.length} rows\n`);
   } else {
     sourceFile = options.input;
-    console.log(`${colors.blue}Loading Excel: ${sourceFile}${colors.reset}`);
+    info(`Loading Excel: ${sourceFile}`);
     const workbook = loadExcelFile(sourceFile);
-    const sheetNames = getSheetNames(workbook);
 
     // Determine which sheet to use
     let sheetName;
     if (options.sheet) {
-      // User specified sheet
       sheetName = options.sheet;
+      const sheetNames = getSheetNames(workbook);
       if (!sheetNames.includes(sheetName)) {
-        console.error(`${colors.red}Error: Sheet "${sheetName}" not found. Available: ${sheetNames.join(', ')}${colors.reset}`);
+        logError(`Error: Sheet "${sheetName}" not found. Available: ${sheetNames.join(', ')}`);
         await endPool();
         process.exit(1);
       }
     } else {
-      // Auto-detect: find sheet with most rows (likely the main data sheet)
-      let maxRows = 0;
-      sheetNames.forEach(name => {
-        const testRows = sheetToJSON(workbook, name);
-        if (testRows.length > maxRows) {
-          maxRows = testRows.length;
-          sheetName = name;
-        }
-      });
+      const detected = autoDetectLargestSheet(workbook);
+      sheetName = detected.sheetName;
       console.log(`${colors.cyan}Auto-detected sheet with most data: "${sheetName}"${colors.reset}`);
     }
 
     rows = sheetToJSON(workbook, sheetName);
-    console.log(`${colors.green}✓${colors.reset} Loaded ${rows.length} rows from sheet "${sheetName}"\n`);
+    success(`Loaded ${rows.length} rows from sheet "${sheetName}"\n`);
+
+    // Validate headers
+    const validation = validateHeaders(rows, 'workforce-to-postgres');
+    if (!validation.valid) {
+      const details = validation.missing
+        .map(m => `  ${m.field} (tried: ${m.tried.join(', ')})`)
+        .join('\n');
+      logError(`Missing required columns for workforce:\n${details}`);
+      await endPool();
+      process.exit(1);
+    }
+    if (options.validateOnly) {
+      const resolved = Object.entries(validation.resolved)
+        .map(([field, alias]) => `  ${field} -> "${alias}"`)
+        .join('\n');
+      success(`Header validation passed. Resolved columns:\n${resolved}`);
+      await endPool();
+      process.exit(0);
+    }
 
     // Remove PII
-    console.log(`${colors.blue}Removing PII...${colors.reset}`);
+    info('Removing PII...');
     rows = rows.map(row => removePII(row, { hashIds: true }));
-    console.log(`${colors.green}✓${colors.reset} PII removed\n`);
+    success('PII removed\n');
 
     // Filter by End Date to get snapshot for target quarter
-    console.log(`${colors.blue}Filtering to End Date: ${periodDate}...${colors.reset}`);
+    info(`Filtering to End Date: ${periodDate}...`);
     const originalCount = rows.length;
     rows = filterByEndDate(rows, periodDate);
-    console.log(`${colors.green}✓${colors.reset} Filtered: ${rows.length} of ${originalCount} rows match End Date ${periodDate}\n`);
+    success(`Filtered: ${rows.length} of ${originalCount} rows match End Date ${periodDate}\n`);
 
     if (rows.length === 0) {
-      console.error(`${colors.red}Error: No rows found with End Date = ${periodDate}${colors.reset}`);
+      logError(`Error: No rows found with End Date = ${periodDate}`);
       console.log(`\n${colors.yellow}Tip: Check that the Excel file contains data for this quarter.${colors.reset}`);
       console.log(`${colors.yellow}Expected End Date format: YYYY-MM-DD or M/D/YYYY${colors.reset}\n`);
       await endPool();
@@ -502,21 +334,18 @@ async function main() {
   }
 
   // Start audit log
-  let loadId = null;
-  if (!options.dryRun) {
-    loadId = await startAuditLog({
-      loadType: 'workforce',
-      sourceFile: path.basename(sourceFile),
-      periodDate,
-      fiscalPeriod
-    });
-    console.log(`${colors.blue}Audit log started (ID: ${loadId})${colors.reset}\n`);
-  }
+  const loadId = await startAudit({
+    loadType: 'workforce',
+    sourceFile,
+    periodDate,
+    fiscalPeriod,
+    dryRun: options.dryRun
+  });
 
   // Aggregate data
-  console.log(`${colors.blue}Aggregating workforce data...${colors.reset}`);
+  info('Aggregating workforce data...');
   const aggregations = aggregateWorkforceData(rows, periodDate);
-  console.log(`${colors.green}✓${colors.reset} Created ${aggregations.length} aggregations\n`);
+  success(`Created ${aggregations.length} aggregations\n`);
 
   // Calculate summary with location breakdown
   const summary = {
@@ -528,30 +357,15 @@ async function main() {
     temp: aggregations.reduce((sum, a) => sum + a.tempCount, 0)
   };
 
-  const locationBreakdown = {
-    omaha: {
-      faculty: aggregations.filter(a => a.location === 'omaha').reduce((sum, a) => sum + a.facultyCount, 0),
-      staff: aggregations.filter(a => a.location === 'omaha').reduce((sum, a) => sum + a.staffCount, 0),
-      hsp: aggregations.filter(a => a.location === 'omaha').reduce((sum, a) => sum + a.hspCount, 0),
-      students: aggregations.filter(a => a.location === 'omaha').reduce((sum, a) => sum + a.studentCount, 0),
-      temp: aggregations.filter(a => a.location === 'omaha').reduce((sum, a) => sum + a.tempCount, 0)
-    },
-    phoenix: {
-      faculty: aggregations.filter(a => a.location === 'phoenix').reduce((sum, a) => sum + a.facultyCount, 0),
-      staff: aggregations.filter(a => a.location === 'phoenix').reduce((sum, a) => sum + a.staffCount, 0),
-      hsp: aggregations.filter(a => a.location === 'phoenix').reduce((sum, a) => sum + a.hspCount, 0),
-      students: aggregations.filter(a => a.location === 'phoenix').reduce((sum, a) => sum + a.studentCount, 0),
-      temp: aggregations.filter(a => a.location === 'phoenix').reduce((sum, a) => sum + a.tempCount, 0)
-    }
-  };
+  const byLoc = (loc, field) => aggregations.filter(a => a.location === loc).reduce((sum, a) => sum + a[field], 0);
 
   console.log(`${colors.cyan}Summary:${colors.reset}`);
   console.log(`  Total: ${summary.total}`);
-  console.log(`  Faculty: ${summary.faculty} (OMA: ${locationBreakdown.omaha.faculty}, PHX: ${locationBreakdown.phoenix.faculty})`);
-  console.log(`  Staff: ${summary.staff} (OMA: ${locationBreakdown.omaha.staff}, PHX: ${locationBreakdown.phoenix.staff})`);
-  console.log(`  HSP: ${summary.hsp} (OMA: ${locationBreakdown.omaha.hsp}, PHX: ${locationBreakdown.phoenix.hsp})`);
-  console.log(`  Students: ${summary.students} (OMA: ${locationBreakdown.omaha.students}, PHX: ${locationBreakdown.phoenix.students})`);
-  console.log(`  Temp: ${summary.temp} (OMA: ${locationBreakdown.omaha.temp}, PHX: ${locationBreakdown.phoenix.temp})\n`);
+  console.log(`  Faculty: ${summary.faculty} (OMA: ${byLoc('omaha', 'facultyCount')}, PHX: ${byLoc('phoenix', 'facultyCount')})`);
+  console.log(`  Staff: ${summary.staff} (OMA: ${byLoc('omaha', 'staffCount')}, PHX: ${byLoc('phoenix', 'staffCount')})`);
+  console.log(`  HSP: ${summary.hsp} (OMA: ${byLoc('omaha', 'hspCount')}, PHX: ${byLoc('phoenix', 'hspCount')})`);
+  console.log(`  Students: ${summary.students} (OMA: ${byLoc('omaha', 'studentCount')}, PHX: ${byLoc('phoenix', 'studentCount')})`);
+  console.log(`  Temp: ${summary.temp} (OMA: ${byLoc('omaha', 'tempCount')}, PHX: ${byLoc('phoenix', 'tempCount')})\n`);
 
   // Expected values for Q1 FY26 validation
   if (periodDate === '2025-09-30') {
@@ -565,37 +379,25 @@ async function main() {
   }
 
   // Upsert to database
-  console.log(`${colors.blue}${options.dryRun ? '[DRY RUN] ' : ''}Upserting to database...${colors.reset}`);
+  info(`${options.dryRun ? '[DRY RUN] ' : ''}Upserting to database...`);
   const { inserted, updated, errored } = await upsertWorkforceData(
-    aggregations,
-    path.basename(sourceFile),
-    options.dryRun
+    aggregations, path.basename(sourceFile), options.dryRun
   );
-
-  console.log(`${colors.green}✓${colors.reset} Inserted: ${inserted}, Updated: ${updated}, Errors: ${errored}\n`);
+  success(`Inserted: ${inserted}, Updated: ${updated}, Errors: ${errored}\n`);
 
   // Complete audit log
-  if (loadId) {
-    await completeAuditLog(loadId, {
-      recordsRead: rows.length,
-      recordsInserted: inserted,
-      recordsUpdated: updated,
-      recordsErrored: errored,
-      status: errored > 0 ? 'completed' : 'completed',
-      errorMessage: errored > 0 ? `${errored} records failed` : null
-    });
-  }
+  await completeAudit(loadId, {
+    recordsRead: rows.length,
+    inserted, updated, errored
+  });
 
-  console.log(`${colors.cyan}========================================${colors.reset}`);
-  console.log(`${colors.green}✓ Workforce ETL Complete${colors.reset}`);
-  console.log(`${colors.cyan}========================================${colors.reset}\n`);
-
+  printComplete('Workforce ETL Complete');
   await endPool();
 }
 
-main().catch(async error => {
-  console.error(`\n${colors.red}Fatal error: ${error.message}${colors.reset}`);
-  console.error(error.stack);
+main().catch(async err => {
+  console.error(`\n${colors.red}Fatal error: ${err.message}${colors.reset}`);
+  console.error(err.stack);
   await endPool();
   process.exit(1);
 });

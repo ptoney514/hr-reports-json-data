@@ -19,26 +19,17 @@
 
 const fs = require('fs');
 const path = require('path');
-const { sql, endPool, startAuditLog, completeAuditLog, checkConnection } = require('./neon-client');
+const { sql, endPool, startAuditLog, completeAuditLog, checkConnection, getPool, upsert } = require('./neon-client');
 
-// Import existing utilities
-const {
-  loadExcelFile,
-  sheetToJSON,
-  getSheetNames
-} = require('../utils/excel-helpers');
+const { sheetToJSON } = require('../utils/excel-helpers');
+const { colors, printBanner, printComplete } = require('../utils/formatting');
+const { parseArgs } = require('../utils/cli-parser');
+const { loadWorkbook, findSheet, findDefaultInputFile } = require('../utils/workbook-loader');
+const { resolveColumn } = require('../utils/column-resolver');
+const { loadConfig } = require('../utils/config-loader');
 
-const colors = {
-  reset: '\x1b[0m',
-  red: '\x1b[31m',
-  green: '\x1b[32m',
-  yellow: '\x1b[33m',
-  blue: '\x1b[34m',
-  cyan: '\x1b[36m'
-};
-
-// Valid categories
-const VALID_CATEGORIES = ['Faculty', 'Staff Exempt', 'Staff Non-Exempt', 'Total'];
+const config = loadConfig();
+const VALID_CATEGORIES = config.turnover_rate_categories || ['Faculty', 'Staff Exempt', 'Staff Non-Exempt', 'Total'];
 
 /**
  * Compare fiscal periods chronologically
@@ -51,120 +42,20 @@ function getMostRecentPeriod(periods) {
   if (!periods || periods.length === 0) return null;
 
   return periods.sort((a, b) => {
-    // Extract fiscal year (always 4 digits after FY)
     const fyMatchA = a.match(/FY(\d{4})/);
     const fyMatchB = b.match(/FY(\d{4})/);
     const fyA = fyMatchA ? parseInt(fyMatchA[1], 10) : 0;
     const fyB = fyMatchB ? parseInt(fyMatchB[1], 10) : 0;
 
-    // Compare fiscal years first
     if (fyA !== fyB) return fyA - fyB;
 
-    // Same fiscal year - check for quarters
     const qMatchA = a.match(/^Q(\d)/);
     const qMatchB = b.match(/^Q(\d)/);
-    const qA = qMatchA ? parseInt(qMatchA[1], 10) : 5; // Full FY sorts after Q4
+    const qA = qMatchA ? parseInt(qMatchA[1], 10) : 5;
     const qB = qMatchB ? parseInt(qMatchB[1], 10) : 5;
 
     return qA - qB;
   }).pop();
-}
-
-/**
- * Parse command line arguments
- */
-function parseArgs() {
-  const args = process.argv.slice(2);
-  const options = {
-    input: null,
-    dryRun: false,
-    verbose: false
-  };
-
-  for (let i = 0; i < args.length; i++) {
-    switch (args[i]) {
-      case '--input':
-      case '-i':
-        options.input = args[++i];
-        break;
-      case '--dry-run':
-        options.dryRun = true;
-        break;
-      case '--verbose':
-      case '-v':
-        options.verbose = true;
-        break;
-      case '--help':
-      case '-h':
-        printHelp();
-        process.exit(0);
-    }
-  }
-
-  return options;
-}
-
-/**
- * Print help message
- */
-function printHelp() {
-  console.log(`
-${colors.cyan}Turnover Rates ETL to Postgres${colors.reset}
-
-${colors.yellow}Usage:${colors.reset}
-  node scripts/etl/turnover-rates-to-postgres.js
-  node scripts/etl/turnover-rates-to-postgres.js --input file.xlsx
-  node scripts/etl/turnover-rates-to-postgres.js --dry-run
-
-${colors.yellow}Options:${colors.reset}
-  -i, --input FILE      Input Excel file path (default: source-metrics/turnover/turnover-rates-input.xlsx)
-  --dry-run             Preview without database writes
-  -v, --verbose         Show detailed output
-  -h, --help            Show this help message
-
-${colors.yellow}Excel Format:${colors.reset}
-  Single sheet with columns:
-  - Category: Faculty, Staff Exempt, Staff Non-Exempt, Total
-  - Period: FY24, FY25, Q1_FY26, etc.
-  - Rate: Turnover rate percentage (e.g., 7.7)
-  - Benchmark: Higher Ed benchmark percentage
-  - Benchmark_Year: Academic year (e.g., 2023-24)
-
-${colors.yellow}Examples:${colors.reset}
-  # Load default file
-  npm run etl:turnover-rates
-
-  # Dry run to preview
-  npm run etl:turnover-rates -- --dry-run
-
-  # Specify custom file
-  npm run etl:turnover-rates -- --input custom-rates.xlsx
-`);
-}
-
-/**
- * Find the default input file
- */
-function findDefaultInputFile() {
-  const turnoverDir = path.join(__dirname, '..', '..', 'source-metrics', 'turnover');
-  const defaultFile = path.join(turnoverDir, 'turnover-rates-input.xlsx');
-
-  if (fs.existsSync(defaultFile)) {
-    return defaultFile;
-  }
-
-  // Fall back to any xlsx file in the directory
-  if (fs.existsSync(turnoverDir)) {
-    const files = fs.readdirSync(turnoverDir)
-      .filter(f => f.endsWith('.xlsx') && !f.startsWith('~'))
-      .sort();
-
-    if (files.length > 0) {
-      return path.join(turnoverDir, files[0]);
-    }
-  }
-
-  return null;
 }
 
 /**
@@ -176,47 +67,39 @@ function findDefaultInputFile() {
 function validateRow(row, rowIndex) {
   const errors = [];
 
-  // Required fields - use ?? to preserve 0 values
-  const category = ((row.Category ?? row.category) ?? '').toString().trim();
-  const period = ((row.Period ?? row.period) ?? '').toString().trim();
+  const category = (resolveColumn(row, 'category') || '').toString().trim();
+  const period = (resolveColumn(row, 'period') || '').toString().trim();
   const rateValue = row.Rate ?? row.rate;
   const rate = rateValue !== undefined && rateValue !== '' ? parseFloat(rateValue) : NaN;
 
-  // Optional fields - use ?? to preserve 0 values
   const benchmarkValue = row.Benchmark ?? row.benchmark;
   const benchmark = benchmarkValue !== undefined && benchmarkValue !== ''
     ? parseFloat(benchmarkValue)
     : null;
   const benchmarkYear = (row.Benchmark_Year || row.benchmark_year || '').toString().trim() || null;
 
-  // Validate category
   if (!category) {
     errors.push('Missing Category');
   } else if (!VALID_CATEGORIES.includes(category)) {
     errors.push(`Invalid Category "${category}". Must be one of: ${VALID_CATEGORIES.join(', ')}`);
   }
 
-  // Validate period
   if (!period) {
     errors.push('Missing Period');
   } else if (!/^(FY\d{2}|Q[1-4]_FY\d{2})$/.test(period)) {
     errors.push(`Invalid Period format "${period}". Use FY24, FY25, Q1_FY26, etc.`);
   }
 
-  // Validate rate
   if (isNaN(rate)) {
     errors.push('Invalid or missing Rate');
   } else if (rate < 0 || rate > 100) {
     errors.push(`Rate ${rate} out of range (0-100)`);
   }
 
-  // Validate benchmark if present
   if (benchmark !== null && (isNaN(benchmark) || benchmark < 0 || benchmark > 100)) {
     errors.push(`Benchmark ${benchmark} out of range (0-100)`);
   }
 
-  // Convert period to fiscal_year format for database
-  // FY24 -> FY2024, Q1_FY26 -> Q1_FY2026
   let fiscalYear = period;
   if (/^FY\d{2}$/.test(period)) {
     fiscalYear = `FY20${period.slice(2)}`;
@@ -258,29 +141,16 @@ async function upsertTurnoverRates(rates, sourceFile, dryRun = false) {
     }
 
     try {
-      const result = await sql`
-        INSERT INTO fact_turnover_summary_rates (
-          fiscal_year, category, turnover_rate, higher_ed_avg, benchmark_source, source_file
-        )
-        VALUES (
-          ${rate.fiscalYear}, ${rate.category}, ${rate.turnoverRate},
-          ${rate.higherEdAvg}, ${rate.benchmarkSource}, ${sourceFile}
-        )
-        ON CONFLICT (fiscal_year, category)
-        DO UPDATE SET
-          turnover_rate = EXCLUDED.turnover_rate,
-          higher_ed_avg = EXCLUDED.higher_ed_avg,
-          benchmark_source = EXCLUDED.benchmark_source,
-          source_file = EXCLUDED.source_file,
-          loaded_at = NOW()
-        RETURNING (xmax = 0) AS inserted
-      `;
+      const result = await upsert(getPool(), 'fact_turnover_summary_rates', {
+        fiscal_year: rate.fiscalYear,
+        category: rate.category,
+        turnover_rate: rate.turnoverRate,
+        higher_ed_avg: rate.higherEdAvg,
+        benchmark_source: rate.benchmarkSource,
+        source_file: sourceFile
+      }, ['fiscal_year', 'category']);
 
-      if (result[0]?.inserted) {
-        inserted++;
-      } else {
-        updated++;
-      }
+      if (result.inserted) { inserted++; } else { updated++; }
     } catch (error) {
       console.error(`  ${colors.red}Error upserting ${rate.category}/${rate.fiscalYear}:${colors.reset} ${error.message}`);
       errored++;
@@ -294,11 +164,24 @@ async function upsertTurnoverRates(rates, sourceFile, dryRun = false) {
  * Main function
  */
 async function main() {
-  const options = parseArgs();
+  const options = parseArgs('turnover-rates-to-postgres', [
+    { flags: '--input,-i', key: 'input', type: 'string', description: 'Input Excel file path' }
+  ], {
+    title: 'Turnover Rates ETL to Postgres',
+    usage: [
+      'node scripts/etl/turnover-rates-to-postgres.js',
+      'node scripts/etl/turnover-rates-to-postgres.js --input file.xlsx',
+      'node scripts/etl/turnover-rates-to-postgres.js --dry-run'
+    ],
+    examples: [
+      '# Load default file',
+      'npm run etl:turnover-rates',
+      '# Dry run to preview',
+      'npm run etl:turnover-rates -- --dry-run'
+    ]
+  });
 
-  console.log(`\n${colors.cyan}========================================${colors.reset}`);
-  console.log(`${colors.cyan}   Turnover Rates ETL to Postgres${colors.reset}`);
-  console.log(`${colors.cyan}========================================${colors.reset}\n`);
+  printBanner('Turnover Rates ETL to Postgres');
 
   // Check connection
   console.log(`${colors.blue}Checking database connection...${colors.reset}`);
@@ -311,7 +194,8 @@ async function main() {
   console.log(`${colors.green}✓${colors.reset} Connected\n`);
 
   // Find input file
-  let sourceFile = options.input || findDefaultInputFile();
+  const turnoverDir = path.join(__dirname, '..', '..', 'source-metrics', 'turnover');
+  let sourceFile = options.input || findDefaultInputFile(turnoverDir, 'turnover-rates-input.xlsx');
 
   if (!sourceFile) {
     console.error(`${colors.red}Error: No input file found.${colors.reset}`);
@@ -327,13 +211,13 @@ async function main() {
   console.log(`${colors.blue}Loading Excel: ${path.basename(sourceFile)}${colors.reset}`);
 
   // Load Excel data
-  const workbook = loadExcelFile(sourceFile);
-  const sheetNames = getSheetNames(workbook);
+  const { workbook } = loadWorkbook(sourceFile);
 
   // Find Turnover_Rates sheet or use first sheet
-  let sheetName = sheetNames.find(s => s.toLowerCase().includes('turnover'));
+  let sheetName = findSheet(workbook, ['Turnover_Rates', 'turnover_rates', 'turnover']);
   if (!sheetName) {
-    sheetName = sheetNames[0];
+    const { getSheetNames } = require('../utils/excel-helpers');
+    sheetName = getSheetNames(workbook)[0];
   }
 
   const rows = sheetToJSON(workbook, sheetName);
@@ -345,12 +229,11 @@ async function main() {
   let validationErrors = 0;
 
   rows.forEach((row, index) => {
-    // Skip empty rows
     if (!row.Category && !row.category && !row.Period && !row.period) {
       return;
     }
 
-    const result = validateRow(row, index + 2); // +2 for 1-based + header row
+    const result = validateRow(row, index + 2);
 
     if (result.valid) {
       validatedRows.push(result.data);
@@ -446,10 +329,7 @@ async function main() {
     });
   }
 
-  console.log(`\n${colors.cyan}========================================${colors.reset}`);
-  console.log(`${colors.green}✓ Turnover Rates ETL Complete${colors.reset}`);
-  console.log(`${colors.cyan}========================================${colors.reset}\n`);
-
+  printComplete('Turnover Rates ETL Complete');
   await endPool();
 }
 

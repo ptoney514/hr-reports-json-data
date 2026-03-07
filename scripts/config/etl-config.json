@@ -1,0 +1,174 @@
+{
+  "version": "1.0.0",
+  "description": "Centralized ETL business rules extracted from 9 ETL scripts. Single source of truth for category classifications, keyword mappings, and domain constants.",
+
+  "categories": {
+    "benefit_eligible": ["F12", "F09", "F10", "F11", "PT12", "PT10", "PT9", "PT11"],
+    "_benefit_eligible_note": "Canonical list resolving divergence between workforce (F12,F09,F10,F11,...) and demographics (F12,F11,F09,F10,...) scripts. Same values, alphabetical order within prefix groups.",
+    "student": ["SUE", "CWS"],
+    "house_staff": ["HSP", "HSR"],
+    "_house_staff_note": "HSP/HSR are ALSO benefit-eligible (isBenefitEligible=true). They appear here as a separate category for classification but share benefit eligibility with the benefit_eligible list.",
+    "temp": ["TEMP", "NBE", "PRN"],
+    "special": ["HSP", "HSR", "TEMP", "NBE", "PRN"],
+    "_special_note": "Original SPECIAL_CATEGORIES from workforce script. Union of house_staff + temp."
+  },
+
+  "person_types": {
+    "faculty": ["FACULTY"],
+    "staff": ["STAFF", "EMPLOYEE"],
+    "_note": "When person type is unrecognized but assignment category is benefit-eligible, defaults to 'staff'."
+  },
+
+  "locations": {
+    "detection_keyword": "phoenix",
+    "detection_method": "lowercase_includes",
+    "values": ["omaha", "phoenix"],
+    "default": "omaha",
+    "_source_fields": ["Location", "location", "LOCATION", "State"],
+    "_note": "If location string contains 'phoenix' (case-insensitive), classify as phoenix; otherwise omaha."
+  },
+
+  "grade_codes": {
+    "house_staff_prefix": "R",
+    "_note": "Grade codes starting with 'R' are classified as house_staff (hsp type), benefit-eligible."
+  },
+
+  "termination_reasons": {
+    "keyword_to_code": {
+      "RESIGN": ["resign", "resignation"],
+      "RESIGN_CAREER": ["career change", "career"],
+      "RESIGN_RELOCATION": ["relocation", "relocate", "moving"],
+      "RESIGN_PERSONAL": ["personal"],
+      "RESIGN_OPPORTUNITY": ["better opportunity", "opportunity", "new position"],
+      "RESIGN_COMPENSATION": ["compensation", "salary", "pay"],
+      "RESIGN_HEALTH": ["health", "medical"],
+      "END_ASSIGNMENT": ["end assignment", "assignment end", "contract end"],
+      "END_TEMP": ["temporary", "temp"],
+      "RETIRE": ["retire", "retirement"],
+      "RETIRE_EARLY": ["early retire"],
+      "TERM_PERFORMANCE": ["performance"],
+      "TERM_POLICY": ["policy"],
+      "TERM_CONDUCT": ["conduct"],
+      "LAYOFF": ["layoff", "reduction in force", "rif"],
+      "POSITION_ELIM": ["position elimination", "eliminated"],
+      "DEATH": ["death", "deceased"]
+    },
+    "default_code": "OTHER",
+    "category_keywords": {
+      "retirement": {
+        "keywords": ["retire"],
+        "is_voluntary": true
+      },
+      "voluntary": {
+        "keywords": ["resignation", "resign", "voluntary", "better opportunity", "personal", "career change", "end assignment", "relocation"],
+        "is_voluntary": true
+      },
+      "involuntary": {
+        "keywords": ["termination", "involuntary", "performance", "policy", "layoff", "reduction", "conduct", "probation"],
+        "is_voluntary": false
+      }
+    },
+    "_default_category": "voluntary",
+    "_default_category_note": "If no category keywords match, defaults to voluntary (is_voluntary=true)."
+  },
+
+  "tenure_buckets": [
+    { "label": "<1yr", "min_years": 0, "max_years": 1 },
+    { "label": "1-3yr", "min_years": 1, "max_years": 3 },
+    { "label": "3-5yr", "min_years": 3, "max_years": 5 },
+    { "label": "5-10yr", "min_years": 5, "max_years": 10 },
+    { "label": "10+yr", "min_years": 10, "max_years": null }
+  ],
+
+  "mobility_actions": {
+    "keyword_to_type": {
+      "promotion": ["promot"],
+      "demotion": ["demot"],
+      "transfer": ["transfer"],
+      "reclassification": ["reclass"],
+      "lateral": ["lateral"]
+    },
+    "default_type": "transfer",
+    "_note": "Keywords matched against combined (action + ' ' + reason).toLowerCase(). First match wins."
+  },
+
+  "ethnicity_normalization": {
+    "i am hispanic or latino.": "Hispanic or Latino"
+  },
+
+  "expected_sheets": {
+    "turnover_metrics": [
+      "Summary_Rates",
+      "Turnover_Rates_Table",
+      "Higher_Ed_Averages",
+      "Turnover_Breakdown",
+      "Staff_Deviation",
+      "Faculty_Deviation",
+      "Historical_Rates",
+      "Length_of_Service",
+      "Retirements_by_FY",
+      "Faculty_Retirement_Trends",
+      "Faculty_Age_Distribution",
+      "Faculty_Retirement_School",
+      "Staff_Retirement_Trends",
+      "Staff_Age_Distribution",
+      "Metadata"
+    ],
+    "recruiting_metrics": [
+      "Metadata",
+      "Summary_Metrics",
+      "Hire_Rates",
+      "Pipeline_Staff",
+      "Pipeline_Faculty",
+      "New_Hires_Detail",
+      "Hires_By_School",
+      "Application_Sources",
+      "Top_Jobs",
+      "Requisition_Aging",
+      "New_Hire_Demographics",
+      "Hiring_Trends"
+    ]
+  },
+
+  "deviation_defaults": {
+    "staff_avg": 13.6,
+    "faculty_avg": 6.3,
+    "_note": "Fallback averages used when no is_average=true row is found in Staff_Deviation/Faculty_Deviation sheets."
+  },
+
+  "turnover_rate_categories": ["Faculty", "Staff Exempt", "Staff Non-Exempt", "Total"],
+
+  "score_normalization": {
+    "scale_min": 1,
+    "scale_max": 5,
+    "percentage_range_min": 0,
+    "percentage_range_max": 100,
+    "conversion_divisor": 20,
+    "_note": "Exit survey scores. If value is 1-5 use as-is; if 0-100, divide by 20 to convert to 1-5 scale."
+  },
+
+  "boolean_parsing": {
+    "true_values": ["yes", "true", "1", "y"],
+    "false_values": ["no", "false", "0", "n"],
+    "_note": "Used in exit-surveys for would_recommend, conduct_concerns fields."
+  },
+
+  "fiscal_year": {
+    "start_month": 7,
+    "start_day": 1,
+    "end_month": 6,
+    "end_day": 30,
+    "_note": "Fiscal year runs July 1 to June 30. FY2025 = July 2024 - June 2025."
+  },
+
+  "defaults": {
+    "default_period_date": "2025-06-30",
+    "_default_period_date_note": "Demographics script defaults to this when no date specified.",
+    "employee_type_default": "STAFF",
+    "_employee_type_note": "New hires default to STAFF when employee_type not provided.",
+    "location_default": "OMA",
+    "_location_default_note": "New hires default to OMA when location not provided.",
+    "ethnicity_default": "Not Disclosed",
+    "_ethnicity_note": "Demographics uses 'Not Disclosed' when ethnicity is null/empty."
+  }
+}

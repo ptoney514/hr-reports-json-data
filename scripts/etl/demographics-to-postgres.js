@@ -17,143 +17,59 @@
 
 const fs = require('fs');
 const path = require('path');
-const { sql, endPool, startAuditLog, completeAuditLog, checkConnection } = require('./neon-client');
+const { sql, endPool, checkConnection, getPool, upsert } = require('./neon-client');
 
-// Import existing utilities
-const {
-  loadExcelFile,
-  sheetToJSON,
-  getSheetNames
-} = require('../utils/excel-helpers');
+const { excelDateToJSDate, formatDate, sheetToJSON } = require('../utils/excel-helpers');
+const { getFiscalPeriodKey, getQuarterDatesFromKey } = require('../utils/fiscal-calendar');
+const { colors, printBanner, printComplete, success, info, warning, error: logError } = require('../utils/formatting');
+const { parseArgs } = require('../utils/cli-parser');
+const { startAudit, completeAudit } = require('../utils/etl-runner');
+const { loadConfig } = require('../utils/config-loader');
+const { createResolver } = require('../utils/column-resolver');
+const { autoDetectLargestSheet, findDefaultInputFile } = require('../utils/workbook-loader');
+const { loadExcelFile } = require('../utils/excel-helpers');
 
-const {
-  getFiscalPeriodKey,
-  getQuarterDatesFromKey
-} = require('../utils/fiscal-calendar');
+const config = loadConfig();
+const resolve = createResolver('demographics-to-postgres');
 
-const colors = {
-  reset: '\x1b[0m',
-  red: '\x1b[31m',
-  green: '\x1b[32m',
-  yellow: '\x1b[33m',
-  blue: '\x1b[34m',
-  cyan: '\x1b[36m'
+const SCRIPT_OPTIONS = [
+  { flags: '--input,-i', key: 'input', type: 'string', description: 'Input Excel file path (default: auto-detect)' },
+  { flags: '--date,-d', key: 'date', type: 'string', description: 'Report date (YYYY-MM-DD format)' },
+  { flags: '--quarter,-q', key: 'quarter', type: 'string', description: 'Fiscal period (e.g., FY25_Q4)' }
+];
+
+const HELP_CONFIG = {
+  title: 'Demographics Data ETL to Postgres',
+  usage: [
+    'node scripts/etl/demographics-to-postgres.js --date 2025-06-30',
+    'node scripts/etl/demographics-to-postgres.js --input file.xlsx --date 2025-06-30',
+    'node scripts/etl/demographics-to-postgres.js --quarter FY25_Q4'
+  ],
+  examples: [
+    '# Load FY25 Q4 demographics',
+    'npm run etl:demographics -- --date 2025-06-30',
+    '',
+    '# Dry run to preview changes',
+    'npm run etl:demographics -- --date 2025-06-30 --dry-run'
+  ]
 };
-
-// Assignment category classifications for benefit-eligible
-const BENEFIT_ELIGIBLE_CATEGORIES = ['F12', 'F11', 'F09', 'F10', 'PT12', 'PT10', 'PT9', 'PT11'];
-
-// Date constants for filtering
-const EXCEL_DATE_MAP = {
-  '2025-12-31': 46022,  // FY26 Q2
-  '2025-09-30': 45930,  // FY26 Q1
-  '2025-06-30': 45838,  // FY25 Q4
-  '2025-03-31': 45747,  // FY25 Q3
-  '2024-12-31': 45657,  // FY25 Q2
-  '2024-09-30': 45565,  // FY25 Q1
-  '2024-06-30': 45473   // FY24 Q4
-};
-
-// Ethnicity normalization map - normalizes Excel values to match staticData.js format
-// Keys must be lowercase for the normalizeEthnicity lookup
-const ETHNICITY_NORMALIZATION = {
-  'i am hispanic or latino.': 'Hispanic or Latino'
-};
-
-/**
- * Parse command line arguments
- */
-function parseArgs() {
-  const args = process.argv.slice(2);
-  const options = {
-    input: null,
-    date: null,
-    quarter: null,
-    dryRun: false,
-    verbose: false
-  };
-
-  for (let i = 0; i < args.length; i++) {
-    switch (args[i]) {
-      case '--input':
-      case '-i':
-        options.input = args[++i];
-        break;
-      case '--date':
-      case '-d':
-        options.date = args[++i];
-        break;
-      case '--quarter':
-      case '-q':
-        options.quarter = args[++i];
-        break;
-      case '--dry-run':
-        options.dryRun = true;
-        break;
-      case '--verbose':
-      case '-v':
-        options.verbose = true;
-        break;
-      case '--help':
-      case '-h':
-        printHelp();
-        process.exit(0);
-    }
-  }
-
-  return options;
-}
-
-/**
- * Print help message
- */
-function printHelp() {
-  console.log(`
-${colors.cyan}Demographics Data ETL to Postgres${colors.reset}
-
-${colors.yellow}Usage:${colors.reset}
-  node scripts/etl/demographics-to-postgres.js --date 2025-06-30
-  node scripts/etl/demographics-to-postgres.js --input file.xlsx --date 2025-06-30
-  node scripts/etl/demographics-to-postgres.js --quarter FY25_Q4
-
-${colors.yellow}Options:${colors.reset}
-  -i, --input FILE      Input Excel file path (default: auto-detect)
-  -d, --date DATE       Report date (YYYY-MM-DD format)
-  -q, --quarter PERIOD  Fiscal period (e.g., FY25_Q4)
-  --dry-run             Preview without database writes
-  -v, --verbose         Show detailed output
-  -h, --help            Show this help message
-
-${colors.yellow}Examples:${colors.reset}
-  # Load FY25 Q4 demographics
-  npm run etl:demographics -- --date 2025-06-30
-
-  # Dry run to preview changes
-  npm run etl:demographics -- --date 2025-06-30 --dry-run
-`);
-}
 
 /**
  * Normalize ethnicity values for consistency
  */
 function normalizeEthnicity(ethnicity) {
-  if (!ethnicity) return 'Not Disclosed';
+  if (!ethnicity) return config.defaults.ethnicity_default;
   const trimmed = ethnicity.trim();
-
-  // Check normalization map
-  if (ETHNICITY_NORMALIZATION[trimmed.toLowerCase()]) {
-    return ETHNICITY_NORMALIZATION[trimmed.toLowerCase()];
-  }
-
-  return trimmed;
+  return config.ethnicity_normalization[trimmed.toLowerCase()] || trimmed;
 }
 
 /**
  * Determine location from row data
  */
 function getLocation(row) {
-  const locationRaw = row.Location || row.location || row.LOCATION || row.State || '';
-  return locationRaw.toString().toLowerCase().includes('phoenix') ? 'phoenix' : 'omaha';
+  const locationRaw = resolve(row, 'location') || '';
+  return locationRaw.toString().toLowerCase().includes(config.locations.detection_keyword)
+    ? 'phoenix' : 'omaha';
 }
 
 /**
@@ -162,15 +78,15 @@ function getLocation(row) {
 function isBenefitEligible(assignmentCategory) {
   if (!assignmentCategory) return false;
   const code = assignmentCategory.toString().trim().toUpperCase();
-  return BENEFIT_ELIGIBLE_CATEGORIES.includes(code);
+  return config.categories.benefit_eligible.includes(code);
 }
 
 /**
  * Get person type (faculty/staff)
  */
 function getPersonType(row) {
-  const personType = row['Person Type'] || row.personType || '';
-  return personType.toString().toUpperCase() === 'FACULTY' ? 'faculty' : 'staff';
+  const personType = resolve(row, 'person_type') || '';
+  return config.person_types.faculty.includes(personType.toString().toUpperCase()) ? 'faculty' : 'staff';
 }
 
 /**
@@ -178,10 +94,10 @@ function getPersonType(row) {
  */
 function parseDemographicRow(row) {
   return {
-    gender: row['Gender'] || row.gender || null,
-    ethnicity: row['Employee Ethnicity'] || row['Ethnicity'] || row.ethnicity || null,
-    ageBand: row['Age Band'] || row['AgeBand'] || row.ageBand || null,
-    assignmentCategory: row['Assignment Category Code'] || row.assignmentCategoryCode || null,
+    gender: resolve(row, 'gender'),
+    ethnicity: resolve(row, 'ethnicity'),
+    ageBand: resolve(row, 'age_band'),
+    assignmentCategory: resolve(row, 'assignment_category', { normalize: true }),
     personType: getPersonType(row),
     location: getLocation(row)
   };
@@ -200,7 +116,6 @@ function aggregateDemographics(rows, periodDate) {
   rows.forEach(row => {
     const demo = parseDemographicRow(row);
 
-    // Skip non-benefit-eligible
     if (!isBenefitEligible(demo.assignmentCategory)) return;
 
     const location = demo.location;
@@ -211,57 +126,39 @@ function aggregateDemographics(rows, periodDate) {
       const genderKey = `${location}|${category}|${demo.gender}`;
       if (!aggregations.gender[genderKey]) {
         aggregations.gender[genderKey] = {
-          periodDate,
-          location,
-          categoryType: category,
-          demographicType: 'gender',
-          demographicValue: demo.gender,
-          count: 0
+          periodDate, location, categoryType: category,
+          demographicType: 'gender', demographicValue: demo.gender, count: 0
         };
       }
       aggregations.gender[genderKey].count++;
 
-      // Also aggregate combined location
       const combinedKey = `combined|${category}|${demo.gender}`;
       if (!aggregations.gender[combinedKey]) {
         aggregations.gender[combinedKey] = {
-          periodDate,
-          location: 'combined',
-          categoryType: category,
-          demographicType: 'gender',
-          demographicValue: demo.gender,
-          count: 0
+          periodDate, location: 'combined', categoryType: category,
+          demographicType: 'gender', demographicValue: demo.gender, count: 0
         };
       }
       aggregations.gender[combinedKey].count++;
     }
 
-    // Aggregate ethnicity (normalize blank/null to "Not Disclosed")
+    // Aggregate ethnicity
     {
       const ethnicity = normalizeEthnicity(demo.ethnicity || '');
       const ethnicityKey = `${location}|${category}|${ethnicity}`;
       if (!aggregations.ethnicity[ethnicityKey]) {
         aggregations.ethnicity[ethnicityKey] = {
-          periodDate,
-          location,
-          categoryType: category,
-          demographicType: 'ethnicity',
-          demographicValue: ethnicity,
-          count: 0
+          periodDate, location, categoryType: category,
+          demographicType: 'ethnicity', demographicValue: ethnicity, count: 0
         };
       }
       aggregations.ethnicity[ethnicityKey].count++;
 
-      // Also aggregate combined location
       const combinedKey = `combined|${category}|${ethnicity}`;
       if (!aggregations.ethnicity[combinedKey]) {
         aggregations.ethnicity[combinedKey] = {
-          periodDate,
-          location: 'combined',
-          categoryType: category,
-          demographicType: 'ethnicity',
-          demographicValue: ethnicity,
-          count: 0
+          periodDate, location: 'combined', categoryType: category,
+          demographicType: 'ethnicity', demographicValue: ethnicity, count: 0
         };
       }
       aggregations.ethnicity[combinedKey].count++;
@@ -272,33 +169,23 @@ function aggregateDemographics(rows, periodDate) {
       const ageBandKey = `${location}|${category}|${demo.ageBand}`;
       if (!aggregations.age_band[ageBandKey]) {
         aggregations.age_band[ageBandKey] = {
-          periodDate,
-          location,
-          categoryType: category,
-          demographicType: 'age_band',
-          demographicValue: demo.ageBand,
-          count: 0
+          periodDate, location, categoryType: category,
+          demographicType: 'age_band', demographicValue: demo.ageBand, count: 0
         };
       }
       aggregations.age_band[ageBandKey].count++;
 
-      // Also aggregate combined location
       const combinedKey = `combined|${category}|${demo.ageBand}`;
       if (!aggregations.age_band[combinedKey]) {
         aggregations.age_band[combinedKey] = {
-          periodDate,
-          location: 'combined',
-          categoryType: category,
-          demographicType: 'age_band',
-          demographicValue: demo.ageBand,
-          count: 0
+          periodDate, location: 'combined', categoryType: category,
+          demographicType: 'age_band', demographicValue: demo.ageBand, count: 0
         };
       }
       aggregations.age_band[combinedKey].count++;
     }
   });
 
-  // Flatten all aggregations
   return [
     ...Object.values(aggregations.gender),
     ...Object.values(aggregations.ethnicity),
@@ -310,9 +197,7 @@ function aggregateDemographics(rows, periodDate) {
  * Calculate percentages within each category
  */
 function calculatePercentages(aggregations) {
-  // Group by location, category, and demographic type to get totals
   const totals = {};
-
   aggregations.forEach(agg => {
     const key = `${agg.location}|${agg.categoryType}|${agg.demographicType}`;
     totals[key] = (totals[key] || 0) + agg.count;
@@ -342,31 +227,20 @@ async function upsertDemographicsData(aggregations, sourceFile, dryRun = false) 
     }
 
     try {
-      const result = await sql`
-        INSERT INTO fact_workforce_demographics (
-          period_date, location, category_type, demographic_type, demographic_value,
-          count, percentage, source_file
-        )
-        VALUES (
-          ${agg.periodDate}, ${agg.location}, ${agg.categoryType}, ${agg.demographicType}, ${agg.demographicValue},
-          ${agg.count}, ${agg.percentage}, ${sourceFile}
-        )
-        ON CONFLICT (period_date, location, category_type, demographic_type, demographic_value)
-        DO UPDATE SET
-          count = EXCLUDED.count,
-          percentage = EXCLUDED.percentage,
-          source_file = EXCLUDED.source_file,
-          loaded_at = NOW()
-        RETURNING (xmax = 0) AS inserted
-      `;
+      const result = await upsert(getPool(), 'fact_workforce_demographics', {
+        period_date: agg.periodDate,
+        location: agg.location,
+        category_type: agg.categoryType,
+        demographic_type: agg.demographicType,
+        demographic_value: agg.demographicValue,
+        count: agg.count,
+        percentage: agg.percentage,
+        source_file: sourceFile
+      }, ['period_date', 'location', 'category_type', 'demographic_type', 'demographic_value']);
 
-      if (result[0]?.inserted) {
-        inserted++;
-      } else {
-        updated++;
-      }
-    } catch (error) {
-      console.error(`  ${colors.red}Error upserting ${agg.location}/${agg.categoryType}/${agg.demographicType}:${colors.reset} ${error.message}`);
+      if (result.inserted) { inserted++; } else { updated++; }
+    } catch (err) {
+      console.error(`  ${colors.red}Error upserting ${agg.location}/${agg.categoryType}/${agg.demographicType}:${colors.reset} ${err.message}`);
       errored++;
     }
   }
@@ -375,154 +249,106 @@ async function upsertDemographicsData(aggregations, sourceFile, dryRun = false) 
 }
 
 /**
- * Find the default input file
- */
-function findDefaultInputFile() {
-  const workforceDir = path.join(__dirname, '..', '..', 'source-metrics', 'workforce-headcount');
-
-  // Look for the main workforce file
-  const candidates = [
-    'New Emp List since FY20 to Q1FY25 1031 PT.xlsx',
-    'New Emp List since FY20 to Q1FY25 1031 PT 12-9-2025.xlsx'
-  ];
-
-  for (const candidate of candidates) {
-    const fullPath = path.join(workforceDir, candidate);
-    if (fs.existsSync(fullPath)) {
-      return fullPath;
-    }
-  }
-
-  // Fall back to any xlsx file in the directory
-  const files = fs.readdirSync(workforceDir)
-    .filter(f => f.endsWith('.xlsx') && !f.startsWith('~'))
-    .sort();
-
-  if (files.length > 0) {
-    return path.join(workforceDir, files[0]);
-  }
-
-  return null;
-}
-
-/**
  * Main function
  */
 async function main() {
-  const options = parseArgs();
+  const options = parseArgs('demographics-to-postgres', SCRIPT_OPTIONS, HELP_CONFIG);
 
-  console.log(`\n${colors.cyan}========================================${colors.reset}`);
-  console.log(`${colors.cyan}   Demographics ETL to Postgres${colors.reset}`);
-  console.log(`${colors.cyan}========================================${colors.reset}\n`);
+  printBanner('Demographics ETL to Postgres');
 
   // Check connection
-  console.log(`${colors.blue}Checking database connection...${colors.reset}`);
+  info('Checking database connection...');
   const connected = await checkConnection();
-
   if (!connected) {
-    console.error(`${colors.red}Failed to connect to database.${colors.reset}`);
+    logError('Failed to connect to database.');
     process.exit(1);
   }
-  console.log(`${colors.green}✓${colors.reset} Connected\n`);
+  success('Connected\n');
 
   // Determine period date
   let periodDate;
-
   if (options.date) {
     periodDate = options.date;
   } else if (options.quarter) {
     const dates = getQuarterDatesFromKey(options.quarter);
-    periodDate = dates.end.toISOString().split('T')[0];
+    periodDate = formatDate(dates.end);
   } else {
-    // Default to FY25 Q4
-    periodDate = '2025-06-30';
-    console.log(`${colors.yellow}No date specified, using default: ${periodDate}${colors.reset}`);
+    periodDate = config.defaults.default_period_date;
+    warning(`No date specified, using default: ${periodDate}`);
   }
 
   const fiscalPeriod = getFiscalPeriodKey(new Date(periodDate));
-
   console.log(`${colors.cyan}Period Date: ${periodDate}${colors.reset}`);
   console.log(`${colors.cyan}Fiscal Period: ${fiscalPeriod}${colors.reset}\n`);
 
-  // Get the Excel date filter value
-  const excelEndDate = EXCEL_DATE_MAP[periodDate];
-  if (!excelEndDate) {
-    console.warn(`${colors.yellow}Warning: No Excel date mapping for ${periodDate}, will load all current employees${colors.reset}`);
-  }
-
   // Find input file
-  let sourceFile = options.input || findDefaultInputFile();
+  const workforceDir = path.join(__dirname, '..', '..', 'source-metrics', 'workforce-headcount');
+  let sourceFile = options.input || findDefaultInputFile(workforceDir, [
+    'New Emp List since FY20 to Q1FY25 1031 PT.xlsx',
+    'New Emp List since FY20 to Q1FY25 1031 PT 12-9-2025.xlsx'
+  ]);
 
   if (!sourceFile) {
-    console.error(`${colors.red}Error: No input file found. Specify with --input${colors.reset}`);
+    logError('Error: No input file found. Specify with --input');
     process.exit(1);
   }
-
   if (!fs.existsSync(sourceFile)) {
-    console.error(`${colors.red}Error: File not found: ${sourceFile}${colors.reset}`);
+    logError(`Error: File not found: ${sourceFile}`);
     process.exit(1);
   }
 
-  console.log(`${colors.blue}Loading Excel: ${path.basename(sourceFile)}${colors.reset}`);
+  info(`Loading Excel: ${path.basename(sourceFile)}`);
 
   // Load Excel data
   const workbook = loadExcelFile(sourceFile);
-  const sheetNames = getSheetNames(workbook);
-
-  // Auto-detect sheet with most rows (main data sheet)
-  let sheetName = sheetNames[0];
-  let maxRows = 0;
-  sheetNames.forEach(name => {
-    const testRows = sheetToJSON(workbook, name);
-    if (testRows.length > maxRows) {
-      maxRows = testRows.length;
-      sheetName = name;
-    }
-  });
-
+  const { sheetName } = autoDetectLargestSheet(workbook);
   let rows = sheetToJSON(workbook, sheetName);
-
-  console.log(`${colors.green}✓${colors.reset} Loaded ${rows.length.toLocaleString()} rows from sheet "${sheetName}"\n`);
+  success(`Loaded ${rows.length.toLocaleString()} rows from sheet "${sheetName}"\n`);
 
   // Filter for current employees (END DATE matches period)
-  if (excelEndDate) {
-    console.log(`${colors.blue}Filtering for employees as of ${periodDate} (END DATE = ${excelEndDate})...${colors.reset}`);
-    rows = rows.filter(row => row['END DATE'] === excelEndDate);
-    console.log(`${colors.green}✓${colors.reset} ${rows.length.toLocaleString()} employees as of ${periodDate}\n`);
+  info(`Filtering for employees as of ${periodDate} (converting Excel serial dates)...`);
+  rows = rows.filter(row => {
+    const endDate = row['END DATE'];
+    if (typeof endDate !== 'number') return false;
+    const converted = formatDate(excelDateToJSDate(endDate));
+    return converted === periodDate;
+  });
+
+  if (rows.length === 0) {
+    logError(`FATAL: No rows matched period_date ${periodDate}. Check that the Excel file contains data for this period.`);
+    await endPool();
+    process.exit(1);
   }
+  success(`${rows.length.toLocaleString()} employees as of ${periodDate}\n`);
 
   // Filter for benefit eligible
-  console.log(`${colors.blue}Filtering for benefit-eligible employees...${colors.reset}`);
-  const benefitEligible = rows.filter(row => isBenefitEligible(row['Assignment Category Code']));
-
+  info('Filtering for benefit-eligible employees...');
+  const benefitEligible = rows.filter(row => isBenefitEligible(resolve(row, 'assignment_category')));
   const facultyCount = benefitEligible.filter(r => getPersonType(r) === 'faculty').length;
   const staffCount = benefitEligible.filter(r => getPersonType(r) === 'staff').length;
 
-  console.log(`${colors.green}✓${colors.reset} ${benefitEligible.length.toLocaleString()} benefit-eligible employees`);
+  success(`${benefitEligible.length.toLocaleString()} benefit-eligible employees`);
   console.log(`  Faculty: ${facultyCount.toLocaleString()}`);
   console.log(`  Staff: ${staffCount.toLocaleString()}\n`);
 
   // Start audit log
-  let loadId = null;
-  if (!options.dryRun) {
-    loadId = await startAuditLog({
-      loadType: 'demographics',
-      sourceFile: path.basename(sourceFile),
-      periodDate,
-      fiscalPeriod
-    });
-    console.log(`${colors.blue}Audit log started (ID: ${loadId})${colors.reset}\n`);
-  }
+  const loadId = await startAudit({
+    loadType: 'demographics',
+    sourceFile,
+    periodDate,
+    fiscalPeriod,
+    dryRun: options.dryRun
+  });
 
   // Aggregate demographics
-  console.log(`${colors.blue}Aggregating demographics data...${colors.reset}`);
+  info('Aggregating demographics data...');
   let aggregations = aggregateDemographics(benefitEligible, periodDate);
-  console.log(`${colors.green}✓${colors.reset} Created ${aggregations.length} aggregations\n`);
+  success(`Created ${aggregations.length} aggregations\n`);
 
   // Calculate percentages
-  console.log(`${colors.blue}Calculating percentages...${colors.reset}`);
+  info('Calculating percentages...');
   aggregations = calculatePercentages(aggregations);
-  console.log(`${colors.green}✓${colors.reset} Percentages calculated\n`);
+  success('Percentages calculated\n');
 
   // Display summary
   const genderCount = aggregations.filter(a => a.demographicType === 'gender' && a.location === 'combined').length;
@@ -535,58 +361,26 @@ async function main() {
   console.log(`  Age band values: ${ageBandCount}`);
   console.log(`  Total: ${genderCount + ethnicityCount + ageBandCount}\n`);
 
-  // Validate expected totals
-  const combinedFacultyMale = aggregations.find(a =>
-    a.location === 'combined' && a.categoryType === 'faculty' && a.demographicType === 'gender' && a.demographicValue === 'M'
-  );
-  const combinedFacultyFemale = aggregations.find(a =>
-    a.location === 'combined' && a.categoryType === 'faculty' && a.demographicType === 'gender' && a.demographicValue === 'F'
-  );
-  const combinedStaffMale = aggregations.find(a =>
-    a.location === 'combined' && a.categoryType === 'staff' && a.demographicType === 'gender' && a.demographicValue === 'M'
-  );
-  const combinedStaffFemale = aggregations.find(a =>
-    a.location === 'combined' && a.categoryType === 'staff' && a.demographicType === 'gender' && a.demographicValue === 'F'
-  );
-
-  console.log(`${colors.cyan}Validation (gender totals):${colors.reset}`);
-  console.log(`  Faculty Male: ${combinedFacultyMale?.count || 0} (expected: 321)`);
-  console.log(`  Faculty Female: ${combinedFacultyFemale?.count || 0} (expected: 368)`);
-  console.log(`  Staff Male: ${combinedStaffMale?.count || 0} (expected: 534)`);
-  console.log(`  Staff Female: ${combinedStaffFemale?.count || 0} (expected: 914)\n`);
-
   // Upsert to database
-  console.log(`${colors.blue}${options.dryRun ? '[DRY RUN] ' : ''}Upserting to database...${colors.reset}`);
+  info(`${options.dryRun ? '[DRY RUN] ' : ''}Upserting to database...`);
   const { inserted, updated, errored } = await upsertDemographicsData(
-    aggregations,
-    path.basename(sourceFile),
-    options.dryRun
+    aggregations, path.basename(sourceFile), options.dryRun
   );
-
-  console.log(`${colors.green}✓${colors.reset} Inserted: ${inserted}, Updated: ${updated}, Errors: ${errored}\n`);
+  success(`Inserted: ${inserted}, Updated: ${updated}, Errors: ${errored}\n`);
 
   // Complete audit log
-  if (loadId) {
-    await completeAuditLog(loadId, {
-      recordsRead: benefitEligible.length,
-      recordsInserted: inserted,
-      recordsUpdated: updated,
-      recordsErrored: errored,
-      status: errored > 0 ? 'completed' : 'completed',
-      errorMessage: errored > 0 ? `${errored} records failed` : null
-    });
-  }
+  await completeAudit(loadId, {
+    recordsRead: benefitEligible.length,
+    inserted, updated, errored
+  });
 
-  console.log(`${colors.cyan}========================================${colors.reset}`);
-  console.log(`${colors.green}✓ Demographics ETL Complete${colors.reset}`);
-  console.log(`${colors.cyan}========================================${colors.reset}\n`);
-
+  printComplete('Demographics ETL Complete');
   await endPool();
 }
 
-main().catch(async error => {
-  console.error(`\n${colors.red}Fatal error: ${error.message}${colors.reset}`);
-  console.error(error.stack);
+main().catch(async err => {
+  console.error(`\n${colors.red}Fatal error: ${err.message}${colors.reset}`);
+  console.error(err.stack);
   await endPool();
   process.exit(1);
 });
