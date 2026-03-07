@@ -18,7 +18,7 @@
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
-const { sql, endPool, startAuditLog, completeAuditLog, checkConnection } = require('./neon-client');
+const { sql, endPool, startAuditLog, completeAuditLog, checkConnection, getPool, upsert } = require('./neon-client');
 
 const { sheetToJSON } = require('../utils/excel-helpers');
 const { colors, printBanner, printComplete } = require('../utils/formatting');
@@ -84,33 +84,20 @@ async function upsertSummaryMetrics(workbook, sourceFile, dryRun, metadata) {
     }
 
     try {
-      const result = await sql`
-        INSERT INTO fact_recruiting_summary (
-          fiscal_year, fiscal_quarter, total_hires, faculty_hires, staff_hires,
-          omaha_hires, phoenix_hires, open_requisitions, active_applications,
-          new_applications, source_file
-        )
-        VALUES (
-          ${fiscalYear}, ${fiscalQuarter}, ${row.total_hires || 0}, ${row.faculty_hires || 0},
-          ${row.staff_hires || 0}, ${row.omaha_hires || 0}, ${row.phoenix_hires || 0},
-          ${row.open_requisitions ?? null}, ${row.active_applications ?? null},
-          ${row.new_applications ?? null}, ${sourceFile}
-        )
-        ON CONFLICT (fiscal_year, fiscal_quarter)
-        DO UPDATE SET
-          total_hires = EXCLUDED.total_hires,
-          faculty_hires = EXCLUDED.faculty_hires,
-          staff_hires = EXCLUDED.staff_hires,
-          omaha_hires = EXCLUDED.omaha_hires,
-          phoenix_hires = EXCLUDED.phoenix_hires,
-          open_requisitions = EXCLUDED.open_requisitions,
-          active_applications = EXCLUDED.active_applications,
-          new_applications = EXCLUDED.new_applications,
-          source_file = EXCLUDED.source_file,
-          loaded_at = NOW()
-        RETURNING (xmax = 0) AS inserted
-      `;
-      if (result[0]?.inserted) inserted++; else updated++;
+      const result = await upsert(getPool(), 'fact_recruiting_summary', {
+        fiscal_year: fiscalYear,
+        fiscal_quarter: fiscalQuarter,
+        total_hires: row.total_hires || 0,
+        faculty_hires: row.faculty_hires || 0,
+        staff_hires: row.staff_hires || 0,
+        omaha_hires: row.omaha_hires || 0,
+        phoenix_hires: row.phoenix_hires || 0,
+        open_requisitions: row.open_requisitions ?? null,
+        active_applications: row.active_applications ?? null,
+        new_applications: row.new_applications ?? null,
+        source_file: sourceFile
+      }, ['fiscal_year', 'fiscal_quarter']);
+      if (result.inserted) inserted++; else updated++;
     } catch (error) {
       console.error(`    ${colors.red}Error:${colors.reset} ${error.message}`);
       errored++;
@@ -141,25 +128,17 @@ async function upsertHireRates(workbook, sourceFile, dryRun, metadata) {
     }
 
     try {
-      const result = await sql`
-        INSERT INTO fact_hire_rates (
-          fiscal_year, fiscal_quarter, source_system, channel,
-          applications, hires, hire_rate, source_file
-        )
-        VALUES (
-          ${fiscalYear}, ${fiscalQuarter}, ${row.source_system}, ${row.channel},
-          ${row.applications || 0}, ${row.hires || 0}, ${row.hire_rate ?? null}, ${sourceFile}
-        )
-        ON CONFLICT (fiscal_year, fiscal_quarter, source_system, channel)
-        DO UPDATE SET
-          applications = EXCLUDED.applications,
-          hires = EXCLUDED.hires,
-          hire_rate = EXCLUDED.hire_rate,
-          source_file = EXCLUDED.source_file,
-          loaded_at = NOW()
-        RETURNING (xmax = 0) AS inserted
-      `;
-      if (result[0]?.inserted) inserted++; else updated++;
+      const result = await upsert(getPool(), 'fact_hire_rates', {
+        fiscal_year: fiscalYear,
+        fiscal_quarter: fiscalQuarter,
+        source_system: row.source_system,
+        channel: row.channel,
+        applications: row.applications || 0,
+        hires: row.hires || 0,
+        hire_rate: row.hire_rate ?? null,
+        source_file: sourceFile
+      }, ['fiscal_year', 'fiscal_quarter', 'source_system', 'channel']);
+      if (result.inserted) inserted++; else updated++;
     } catch (error) {
       console.error(`    ${colors.red}Error:${colors.reset} ${error.message}`);
       errored++;
@@ -190,47 +169,29 @@ async function upsertPipelineStaff(workbook, sourceFile, dryRun, metadata) {
     }
 
     try {
-      const result = await sql`
-        INSERT INTO fact_pipeline_metrics_staff (
-          fiscal_year, fiscal_quarter, open_requisitions, reqs_per_recruiter,
-          avg_days_open, avg_time_to_fill, active_applications, new_applications,
-          apps_per_requisition, internal_app_percentage, referrals, total_hires,
-          internal_hires, internal_hire_rate, avg_days_to_hire, hr_processing_time,
-          offer_acceptance_rate, source_file
-        )
-        VALUES (
-          ${fiscalYear}, ${fiscalQuarter}, ${row.open_requisitions ?? null},
-          ${row.reqs_per_recruiter ?? null}, ${row.avg_days_open ?? null},
-          ${row.avg_time_to_fill ?? null}, ${row.active_applications ?? null},
-          ${row.new_applications ?? null}, ${row.apps_per_req ?? null},
-          ${row.internal_app_percentage ?? null}, ${row.referrals ?? null},
-          ${row.total_hires ?? null}, ${row.internal_hires ?? null},
-          ${row.internal_hire_rate ?? null}, ${row.avg_days_to_hire ?? null},
-          ${row.hr_processing_time ?? null}, ${row.offer_acceptance_rate ?? null},
-          ${sourceFile}
-        )
-        ON CONFLICT (fiscal_year, fiscal_quarter)
-        DO UPDATE SET
-          open_requisitions = EXCLUDED.open_requisitions,
-          reqs_per_recruiter = EXCLUDED.reqs_per_recruiter,
-          avg_days_open = EXCLUDED.avg_days_open,
-          avg_time_to_fill = EXCLUDED.avg_time_to_fill,
-          active_applications = EXCLUDED.active_applications,
-          new_applications = EXCLUDED.new_applications,
-          apps_per_requisition = EXCLUDED.apps_per_requisition,
-          internal_app_percentage = EXCLUDED.internal_app_percentage,
-          referrals = EXCLUDED.referrals,
-          total_hires = EXCLUDED.total_hires,
-          internal_hires = EXCLUDED.internal_hires,
-          internal_hire_rate = EXCLUDED.internal_hire_rate,
-          avg_days_to_hire = EXCLUDED.avg_days_to_hire,
-          hr_processing_time = EXCLUDED.hr_processing_time,
-          offer_acceptance_rate = EXCLUDED.offer_acceptance_rate,
-          source_file = EXCLUDED.source_file,
-          loaded_at = NOW()
-        RETURNING (xmax = 0) AS inserted
-      `;
-      if (result[0]?.inserted) inserted++; else updated++;
+      const result = await upsert(getPool(), 'fact_pipeline_metrics_staff', {
+        fiscal_year: fiscalYear,
+        fiscal_quarter: fiscalQuarter,
+        open_requisitions: row.open_requisitions ?? null,
+        reqs_per_recruiter: row.reqs_per_recruiter ?? null,
+        avg_days_open: row.avg_days_open ?? null,
+        avg_time_to_fill: row.avg_time_to_fill ?? null,
+        active_applications: row.active_applications ?? null,
+        new_applications: row.new_applications ?? null,
+        apps_per_req: row.apps_per_req ?? null,
+        internal_app_percentage: row.internal_app_percentage ?? null,
+        referrals: row.referrals ?? null,
+        total_hires: row.total_hires ?? null,
+        internal_hires: row.internal_hires ?? null,
+        internal_hire_rate: row.internal_hire_rate ?? null,
+        avg_days_to_hire: row.avg_days_to_hire ?? null,
+        hr_processing_time: row.hr_processing_time ?? null,
+        offer_acceptance_rate: row.offer_acceptance_rate ?? null,
+        source_file: sourceFile
+      }, ['fiscal_year', 'fiscal_quarter'], {
+        columnMap: { apps_per_req: 'apps_per_requisition' }
+      });
+      if (result.inserted) inserted++; else updated++;
     } catch (error) {
       console.error(`    ${colors.red}Error:${colors.reset} ${error.message}`);
       errored++;
@@ -261,33 +222,19 @@ async function upsertPipelineFaculty(workbook, sourceFile, dryRun, metadata) {
     }
 
     try {
-      const result = await sql`
-        INSERT INTO fact_pipeline_metrics_faculty (
-          fiscal_year, fiscal_quarter, active_searches, completed_searches,
-          total_hires, tenure_track_hires, non_tenure_hires, instructor_hires,
-          special_faculty_hires, source_file
-        )
-        VALUES (
-          ${fiscalYear}, ${fiscalQuarter}, ${row.active_searches ?? null},
-          ${row.completed_searches ?? null}, ${row.total_hires ?? null},
-          ${row.tenure_track_hires ?? null}, ${row.non_tenure_hires ?? null},
-          ${row.instructor_hires ?? null}, ${row.special_faculty_hires ?? null},
-          ${sourceFile}
-        )
-        ON CONFLICT (fiscal_year, fiscal_quarter)
-        DO UPDATE SET
-          active_searches = EXCLUDED.active_searches,
-          completed_searches = EXCLUDED.completed_searches,
-          total_hires = EXCLUDED.total_hires,
-          tenure_track_hires = EXCLUDED.tenure_track_hires,
-          non_tenure_hires = EXCLUDED.non_tenure_hires,
-          instructor_hires = EXCLUDED.instructor_hires,
-          special_faculty_hires = EXCLUDED.special_faculty_hires,
-          source_file = EXCLUDED.source_file,
-          loaded_at = NOW()
-        RETURNING (xmax = 0) AS inserted
-      `;
-      if (result[0]?.inserted) inserted++; else updated++;
+      const result = await upsert(getPool(), 'fact_pipeline_metrics_faculty', {
+        fiscal_year: fiscalYear,
+        fiscal_quarter: fiscalQuarter,
+        active_searches: row.active_searches ?? null,
+        completed_searches: row.completed_searches ?? null,
+        total_hires: row.total_hires ?? null,
+        tenure_track_hires: row.tenure_track_hires ?? null,
+        non_tenure_hires: row.non_tenure_hires ?? null,
+        instructor_hires: row.instructor_hires ?? null,
+        special_faculty_hires: row.special_faculty_hires ?? null,
+        source_file: sourceFile
+      }, ['fiscal_year', 'fiscal_quarter']);
+      if (result.inserted) inserted++; else updated++;
     } catch (error) {
       console.error(`    ${colors.red}Error:${colors.reset} ${error.message}`);
       errored++;
@@ -326,40 +273,25 @@ async function upsertNewHires(workbook, sourceFile, dryRun, metadata) {
     }
 
     try {
-      const result = await sql`
-        INSERT INTO fact_new_hires (
-          fiscal_year, fiscal_quarter, employee_hash, hire_date, position_title,
-          department, school, employee_type, assignment_code, location,
-          gender, ethnicity, age_band, in_interfolio, in_orc_ats, source_file
-        )
-        VALUES (
-          ${fiscalYear}, ${fiscalQuarter}, ${employeeHash}, ${hireDateParsed},
-          ${row.position_title || null}, ${row.department || null}, ${row.school || null},
-          ${row.employee_type || 'STAFF'}, ${row.assignment_code || null},
-          ${row.location || 'OMA'}, ${row.gender || null}, ${row.ethnicity || null},
-          ${row.age_band || null}, ${row.in_interfolio || false},
-          ${row.in_orc_ats || false}, ${sourceFile}
-        )
-        ON CONFLICT (employee_hash, hire_date)
-        DO UPDATE SET
-          fiscal_year = EXCLUDED.fiscal_year,
-          fiscal_quarter = EXCLUDED.fiscal_quarter,
-          position_title = EXCLUDED.position_title,
-          department = EXCLUDED.department,
-          school = EXCLUDED.school,
-          employee_type = EXCLUDED.employee_type,
-          assignment_code = EXCLUDED.assignment_code,
-          location = EXCLUDED.location,
-          gender = EXCLUDED.gender,
-          ethnicity = EXCLUDED.ethnicity,
-          age_band = EXCLUDED.age_band,
-          in_interfolio = EXCLUDED.in_interfolio,
-          in_orc_ats = EXCLUDED.in_orc_ats,
-          source_file = EXCLUDED.source_file,
-          loaded_at = NOW()
-        RETURNING (xmax = 0) AS inserted
-      `;
-      if (result[0]?.inserted) inserted++; else updated++;
+      const result = await upsert(getPool(), 'fact_new_hires', {
+        fiscal_year: fiscalYear,
+        fiscal_quarter: fiscalQuarter,
+        employee_hash: employeeHash,
+        hire_date: hireDateParsed,
+        position_title: row.position_title || null,
+        department: row.department || null,
+        school: row.school || null,
+        employee_type: row.employee_type || 'STAFF',
+        assignment_code: row.assignment_code || null,
+        location: row.location || 'OMA',
+        gender: row.gender || null,
+        ethnicity: row.ethnicity || null,
+        age_band: row.age_band || null,
+        in_interfolio: row.in_interfolio || false,
+        in_orc_ats: row.in_orc_ats || false,
+        source_file: sourceFile
+      }, ['employee_hash', 'hire_date']);
+      if (result.inserted) inserted++; else updated++;
     } catch (error) {
       console.error(`    ${colors.red}Error (${employeeHash}):${colors.reset} ${error.message}`);
       errored++;
@@ -390,26 +322,16 @@ async function upsertHiresBySchool(workbook, sourceFile, dryRun, metadata) {
     }
 
     try {
-      const result = await sql`
-        INSERT INTO fact_hires_by_school (
-          fiscal_year, fiscal_quarter, school_name, faculty_hires,
-          staff_hires, total_hires, source_file
-        )
-        VALUES (
-          ${fiscalYear}, ${fiscalQuarter}, ${row.school_name},
-          ${row.faculty_hires || 0}, ${row.staff_hires || 0},
-          ${row.total_hires || 0}, ${sourceFile}
-        )
-        ON CONFLICT (fiscal_year, fiscal_quarter, school_name)
-        DO UPDATE SET
-          faculty_hires = EXCLUDED.faculty_hires,
-          staff_hires = EXCLUDED.staff_hires,
-          total_hires = EXCLUDED.total_hires,
-          source_file = EXCLUDED.source_file,
-          loaded_at = NOW()
-        RETURNING (xmax = 0) AS inserted
-      `;
-      if (result[0]?.inserted) inserted++; else updated++;
+      const result = await upsert(getPool(), 'fact_hires_by_school', {
+        fiscal_year: fiscalYear,
+        fiscal_quarter: fiscalQuarter,
+        school_name: row.school_name,
+        faculty_hires: row.faculty_hires || 0,
+        staff_hires: row.staff_hires || 0,
+        total_hires: row.total_hires || 0,
+        source_file: sourceFile
+      }, ['fiscal_year', 'fiscal_quarter', 'school_name']);
+      if (result.inserted) inserted++; else updated++;
     } catch (error) {
       console.error(`    ${colors.red}Error:${colors.reset} ${error.message}`);
       errored++;
@@ -440,24 +362,15 @@ async function upsertApplicationSources(workbook, sourceFile, dryRun, metadata) 
     }
 
     try {
-      const result = await sql`
-        INSERT INTO fact_application_sources (
-          fiscal_year, fiscal_quarter, source_name, application_count,
-          percentage, source_file
-        )
-        VALUES (
-          ${fiscalYear}, ${fiscalQuarter}, ${row.source_name},
-          ${row.applications || 0}, ${row.percentage ?? null}, ${sourceFile}
-        )
-        ON CONFLICT (fiscal_year, fiscal_quarter, source_name)
-        DO UPDATE SET
-          application_count = EXCLUDED.application_count,
-          percentage = EXCLUDED.percentage,
-          source_file = EXCLUDED.source_file,
-          loaded_at = NOW()
-        RETURNING (xmax = 0) AS inserted
-      `;
-      if (result[0]?.inserted) inserted++; else updated++;
+      const result = await upsert(getPool(), 'fact_application_sources', {
+        fiscal_year: fiscalYear,
+        fiscal_quarter: fiscalQuarter,
+        source_name: row.source_name,
+        application_count: row.applications || 0,
+        percentage: row.percentage ?? null,
+        source_file: sourceFile
+      }, ['fiscal_year', 'fiscal_quarter', 'source_name']);
+      if (result.inserted) inserted++; else updated++;
     } catch (error) {
       console.error(`    ${colors.red}Error:${colors.reset} ${error.message}`);
       errored++;
@@ -488,24 +401,15 @@ async function upsertTopJobs(workbook, sourceFile, dryRun, metadata) {
     }
 
     try {
-      const result = await sql`
-        INSERT INTO fact_top_jobs (
-          fiscal_year, fiscal_quarter, rank, job_title,
-          application_count, source_file
-        )
-        VALUES (
-          ${fiscalYear}, ${fiscalQuarter}, ${row.rank}, ${row.job_title},
-          ${row.application_count || 0}, ${sourceFile}
-        )
-        ON CONFLICT (fiscal_year, fiscal_quarter, rank)
-        DO UPDATE SET
-          job_title = EXCLUDED.job_title,
-          application_count = EXCLUDED.application_count,
-          source_file = EXCLUDED.source_file,
-          loaded_at = NOW()
-        RETURNING (xmax = 0) AS inserted
-      `;
-      if (result[0]?.inserted) inserted++; else updated++;
+      const result = await upsert(getPool(), 'fact_top_jobs', {
+        fiscal_year: fiscalYear,
+        fiscal_quarter: fiscalQuarter,
+        rank: row.rank,
+        job_title: row.job_title,
+        application_count: row.application_count || 0,
+        source_file: sourceFile
+      }, ['fiscal_year', 'fiscal_quarter', 'rank']);
+      if (result.inserted) inserted++; else updated++;
     } catch (error) {
       console.error(`    ${colors.red}Error:${colors.reset} ${error.message}`);
       errored++;
@@ -536,25 +440,15 @@ async function upsertRequisitionAging(workbook, sourceFile, dryRun, metadata) {
     }
 
     try {
-      const result = await sql`
-        INSERT INTO fact_requisition_aging (
-          fiscal_year, fiscal_quarter, age_range, requisition_count,
-          percentage, source_file
-        )
-        VALUES (
-          ${fiscalYear}, ${fiscalQuarter}, ${row.age_range},
-          ${row.requisition_count || 0}, ${row.percentage ?? null},
-          ${sourceFile}
-        )
-        ON CONFLICT (fiscal_year, fiscal_quarter, age_range)
-        DO UPDATE SET
-          requisition_count = EXCLUDED.requisition_count,
-          percentage = EXCLUDED.percentage,
-          source_file = EXCLUDED.source_file,
-          loaded_at = NOW()
-        RETURNING (xmax = 0) AS inserted
-      `;
-      if (result[0]?.inserted) inserted++; else updated++;
+      const result = await upsert(getPool(), 'fact_requisition_aging', {
+        fiscal_year: fiscalYear,
+        fiscal_quarter: fiscalQuarter,
+        age_range: row.age_range,
+        requisition_count: row.requisition_count || 0,
+        percentage: row.percentage ?? null,
+        source_file: sourceFile
+      }, ['fiscal_year', 'fiscal_quarter', 'age_range']);
+      if (result.inserted) inserted++; else updated++;
     } catch (error) {
       console.error(`    ${colors.red}Error:${colors.reset} ${error.message}`);
       errored++;
@@ -585,24 +479,16 @@ async function upsertNewHireDemographics(workbook, sourceFile, dryRun, metadata)
     }
 
     try {
-      const result = await sql`
-        INSERT INTO fact_new_hire_demographics (
-          fiscal_year, fiscal_quarter, demo_type, demo_value,
-          count, percentage, source_file
-        )
-        VALUES (
-          ${fiscalYear}, ${fiscalQuarter}, ${row.demo_type}, ${row.demo_value},
-          ${row.count || 0}, ${row.percentage ?? null}, ${sourceFile}
-        )
-        ON CONFLICT (fiscal_year, fiscal_quarter, demo_type, demo_value)
-        DO UPDATE SET
-          count = EXCLUDED.count,
-          percentage = EXCLUDED.percentage,
-          source_file = EXCLUDED.source_file,
-          loaded_at = NOW()
-        RETURNING (xmax = 0) AS inserted
-      `;
-      if (result[0]?.inserted) inserted++; else updated++;
+      const result = await upsert(getPool(), 'fact_new_hire_demographics', {
+        fiscal_year: fiscalYear,
+        fiscal_quarter: fiscalQuarter,
+        demo_type: row.demo_type,
+        demo_value: row.demo_value,
+        count: row.count || 0,
+        percentage: row.percentage ?? null,
+        source_file: sourceFile
+      }, ['fiscal_year', 'fiscal_quarter', 'demo_type', 'demo_value']);
+      if (result.inserted) inserted++; else updated++;
     } catch (error) {
       console.error(`    ${colors.red}Error:${colors.reset} ${error.message}`);
       errored++;
@@ -639,28 +525,16 @@ async function upsertHiringTrends(workbook, sourceFile, dryRun) {
     }
 
     try {
-      const result = await sql`
-        INSERT INTO fact_hiring_trends (
-          quarter, fiscal_year, fiscal_quarter, faculty_hires,
-          staff_hires, total_hires, source_file
-        )
-        VALUES (
-          ${row.quarter}, ${fiscalYear}, ${fiscalQuarter},
-          ${row.faculty_hires || 0}, ${row.staff_hires || 0},
-          ${row.total_hires || 0}, ${sourceFile}
-        )
-        ON CONFLICT (quarter)
-        DO UPDATE SET
-          fiscal_year = EXCLUDED.fiscal_year,
-          fiscal_quarter = EXCLUDED.fiscal_quarter,
-          faculty_hires = EXCLUDED.faculty_hires,
-          staff_hires = EXCLUDED.staff_hires,
-          total_hires = EXCLUDED.total_hires,
-          source_file = EXCLUDED.source_file,
-          loaded_at = NOW()
-        RETURNING (xmax = 0) AS inserted
-      `;
-      if (result[0]?.inserted) inserted++; else updated++;
+      const result = await upsert(getPool(), 'fact_hiring_trends', {
+        quarter: row.quarter,
+        fiscal_year: fiscalYear,
+        fiscal_quarter: fiscalQuarter,
+        faculty_hires: row.faculty_hires || 0,
+        staff_hires: row.staff_hires || 0,
+        total_hires: row.total_hires || 0,
+        source_file: sourceFile
+      }, ['quarter']);
+      if (result.inserted) inserted++; else updated++;
     } catch (error) {
       console.error(`    ${colors.red}Error:${colors.reset} ${error.message}`);
       errored++;

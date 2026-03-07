@@ -225,6 +225,68 @@ async function getDatabaseInfo() {
   return result[0];
 }
 
+/**
+ * Generic upsert helper
+ *
+ * Builds INSERT ... ON CONFLICT ... DO UPDATE dynamically with parameterized
+ * queries.  Returns { inserted, updated } based on the Postgres xmax trick.
+ *
+ * @param {import('@neondatabase/serverless').Pool} pool - Connection pool
+ * @param {string} table - Target table name
+ * @param {Object} data - Column-value pairs to upsert
+ * @param {string[]} conflictKeys - Columns for ON CONFLICT clause
+ * @param {Object} [options]
+ * @param {Object} [options.columnMap] - Maps data keys to DB column names
+ *   e.g. { apps_per_req: 'apps_per_requisition' }
+ * @param {boolean} [options.dryRun] - Log SQL without executing
+ * @param {string[]} [options.updateExclusions] - Columns to skip in DO UPDATE
+ * @param {Object} [options.customSetClauses] - Custom SET expressions by column
+ *   e.g. { termination_id: 'COALESCE(EXCLUDED.termination_id, fact_exit_surveys.termination_id)' }
+ * @returns {Promise<{inserted: boolean, updated: boolean}>}
+ */
+async function upsert(pool, table, data, conflictKeys, options = {}) {
+  const { columnMap = {}, dryRun = false, updateExclusions = [], customSetClauses = {} } = options;
+
+  const dataKeys = Object.keys(data);
+
+  // Map data keys to DB column names
+  const dbColumns = dataKeys.map(k => columnMap[k] || k);
+
+  // Build parameterized placeholders ($1, $2, ...)
+  const values = dataKeys.map(k => data[k]);
+  const placeholders = dataKeys.map((_, i) => `$${i + 1}`);
+
+  // Determine which columns to update on conflict (exclude conflict keys and updateExclusions)
+  const excludeSet = new Set([
+    ...conflictKeys,
+    ...updateExclusions
+  ]);
+  const updateCols = dbColumns.filter(col => !excludeSet.has(col));
+
+  // Build SET clause: col = EXCLUDED.col, ..., loaded_at = NOW()
+  const setClauses = updateCols.map(col =>
+    customSetClauses[col] ? `${col} = ${customSetClauses[col]}` : `${col} = EXCLUDED.${col}`
+  );
+  setClauses.push('loaded_at = NOW()');
+
+  const sqlText = [
+    `INSERT INTO ${table} (${dbColumns.join(', ')})`,
+    `VALUES (${placeholders.join(', ')})`,
+    `ON CONFLICT (${conflictKeys.join(', ')})`,
+    `DO UPDATE SET ${setClauses.join(', ')}`,
+    `RETURNING (xmax = 0) AS inserted`
+  ].join('\n');
+
+  if (dryRun) {
+    console.log(`  [DRY RUN] ${table}: ${sqlText.split('\n')[0]} ...`);
+    return { inserted: true, updated: false };
+  }
+
+  const result = await pool.query(sqlText, values);
+  const wasInserted = result.rows[0]?.inserted === true;
+  return { inserted: wasInserted, updated: !wasInserted };
+}
+
 module.exports = {
   sql,
   getPool,
@@ -236,5 +298,6 @@ module.exports = {
   completeAuditLog,
   checkConnection,
   getDatabaseInfo,
-  getDatabaseUrl
+  getDatabaseUrl,
+  upsert
 };

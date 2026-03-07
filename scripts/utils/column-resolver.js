@@ -116,8 +116,64 @@ function resolveColumns(row, fieldNames, options = {}) {
   return result;
 }
 
+/**
+ * Validate that required column headers are present in sheet data.
+ *
+ * Uses the first row of sheetData to determine available headers,
+ * then checks that every field marked required_by this script
+ * has at least one alias present in those headers.
+ *
+ * @param {Object[]} sheetData - Array of row objects (from sheetToJSON)
+ * @param {string} scriptName - The script name (e.g., 'workforce-to-postgres')
+ * @returns {{ valid: boolean, missing: string[], resolved: Object }}
+ */
+function validateHeaders(sheetData, scriptName) {
+  const mappings = getColumnMappings();
+  const headers = new Set();
+
+  // Collect all keys from the first few rows to handle sparse headers
+  const sampleSize = Math.min(sheetData.length, 5);
+  for (let i = 0; i < sampleSize; i++) {
+    if (sheetData[i]) {
+      Object.keys(sheetData[i]).forEach(k => headers.add(k));
+    }
+  }
+
+  const missing = [];
+  const resolved = {};
+
+  for (const [fieldName, fieldDef] of Object.entries(mappings.fields)) {
+    if (!fieldDef.required_by || !fieldDef.required_by.includes(scriptName)) {
+      continue;
+    }
+
+    let found = false;
+    for (const alias of fieldDef.aliases) {
+      if (headers.has(alias)) {
+        resolved[fieldName] = alias;
+        found = true;
+        break;
+      }
+    }
+
+    if (!found) {
+      missing.push({
+        field: fieldName,
+        tried: fieldDef.aliases
+      });
+    }
+  }
+
+  return {
+    valid: missing.length === 0,
+    missing,
+    resolved
+  };
+}
+
 module.exports = {
   resolveColumn,
   createResolver,
-  resolveColumns
+  resolveColumns,
+  validateHeaders
 };

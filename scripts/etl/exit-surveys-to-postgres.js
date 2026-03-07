@@ -15,7 +15,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { sql } = require('./neon-client');
+const { sql, getPool, upsert } = require('./neon-client');
 const { hashValue } = require('../utils/pii-removal');
 const { getQuarterDatesFromKey, formatDate } = require('../utils/fiscal-calendar');
 const { colors, info, success, error: logError, dryRunPrefix } = require('../utils/formatting');
@@ -131,45 +131,29 @@ async function processExitSurveys(rows, options, sourceFile) {
     }
 
     try {
-      const result = await sql`
-        INSERT INTO fact_exit_surveys (
-          employee_hash, period_date, survey_date, termination_id,
-          career_development, management_support, work_life_balance,
-          compensation, benefits, job_satisfaction, overall_satisfaction,
-          would_recommend, conduct_concerns, has_comments,
-          source_file
-        )
-        VALUES (
-          ${employeeHash}, ${periodDate}, ${surveyDate}, ${terminationId},
-          ${careerDevelopment}, ${managementSupport}, ${workLifeBalance},
-          ${compensation}, ${benefits}, ${jobSatisfaction}, ${overallSatisfaction},
-          ${wouldRecommend}, ${conductConcerns}, ${hasComments},
-          ${path.basename(sourceFile)}
-        )
-        ON CONFLICT (employee_hash, period_date)
-        DO UPDATE SET
-          survey_date = EXCLUDED.survey_date,
-          termination_id = COALESCE(EXCLUDED.termination_id, fact_exit_surveys.termination_id),
-          career_development = EXCLUDED.career_development,
-          management_support = EXCLUDED.management_support,
-          work_life_balance = EXCLUDED.work_life_balance,
-          compensation = EXCLUDED.compensation,
-          benefits = EXCLUDED.benefits,
-          job_satisfaction = EXCLUDED.job_satisfaction,
-          overall_satisfaction = EXCLUDED.overall_satisfaction,
-          would_recommend = EXCLUDED.would_recommend,
-          conduct_concerns = EXCLUDED.conduct_concerns,
-          has_comments = EXCLUDED.has_comments,
-          source_file = EXCLUDED.source_file,
-          loaded_at = NOW()
-        RETURNING (xmax = 0) AS inserted
-      `;
+      const result = await upsert(getPool(), 'fact_exit_surveys', {
+        employee_hash: employeeHash,
+        period_date: periodDate,
+        survey_date: surveyDate,
+        termination_id: terminationId,
+        career_development: careerDevelopment,
+        management_support: managementSupport,
+        work_life_balance: workLifeBalance,
+        compensation,
+        benefits,
+        job_satisfaction: jobSatisfaction,
+        overall_satisfaction: overallSatisfaction,
+        would_recommend: wouldRecommend,
+        conduct_concerns: conductConcerns,
+        has_comments: hasComments,
+        source_file: path.basename(sourceFile)
+      }, ['employee_hash', 'period_date'], {
+        customSetClauses: {
+          termination_id: 'COALESCE(EXCLUDED.termination_id, fact_exit_surveys.termination_id)'
+        }
+      });
 
-      if (result[0]?.inserted) {
-        inserted++;
-      } else {
-        updated++;
-      }
+      if (result.inserted) { inserted++; } else { updated++; }
     } catch (err) {
       console.error(`  Error upserting survey: ${err.message}`);
       errored++;

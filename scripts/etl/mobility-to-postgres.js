@@ -15,7 +15,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { sql } = require('./neon-client');
+const { getPool, upsert } = require('./neon-client');
 const { hashValue } = require('../utils/pii-removal');
 const { getQuarterDatesFromKey, formatDate } = require('../utils/fiscal-calendar');
 const { colors, info, success, warning, error: logError, dryRunPrefix } = require('../utils/formatting');
@@ -125,46 +125,25 @@ async function processMobilityEvents(rows, options, sourceFile) {
     }
 
     try {
-      const result = await sql`
-        INSERT INTO fact_mobility_events (
-          employee_hash, period_date, effective_date,
-          action_type, reason_code,
-          before_school_id, before_grade_code, before_job_family,
-          after_school_id, after_grade_code, after_job_family,
-          is_cross_school, is_cross_department, grade_change,
-          source_file
-        )
-        VALUES (
-          ${employeeHash}, ${periodDate}, ${effectiveDate},
-          ${actionType}, ${reasonCode},
-          ${beforeSchoolId}, ${beforeGrade}, ${beforeJobFamily},
-          ${afterSchoolId}, ${afterGrade}, ${afterJobFamily},
-          ${isCrossSchool}, ${isCrossDepartment}, ${gradeChange},
-          ${path.basename(sourceFile)}
-        )
-        ON CONFLICT (employee_hash, effective_date, action_type)
-        DO UPDATE SET
-          period_date = EXCLUDED.period_date,
-          reason_code = EXCLUDED.reason_code,
-          before_school_id = EXCLUDED.before_school_id,
-          before_grade_code = EXCLUDED.before_grade_code,
-          before_job_family = EXCLUDED.before_job_family,
-          after_school_id = EXCLUDED.after_school_id,
-          after_grade_code = EXCLUDED.after_grade_code,
-          after_job_family = EXCLUDED.after_job_family,
-          is_cross_school = EXCLUDED.is_cross_school,
-          is_cross_department = EXCLUDED.is_cross_department,
-          grade_change = EXCLUDED.grade_change,
-          source_file = EXCLUDED.source_file,
-          loaded_at = NOW()
-        RETURNING (xmax = 0) AS inserted
-      `;
+      const result = await upsert(getPool(), 'fact_mobility_events', {
+        employee_hash: employeeHash,
+        period_date: periodDate,
+        effective_date: effectiveDate,
+        action_type: actionType,
+        reason_code: reasonCode,
+        before_school_id: beforeSchoolId,
+        before_grade_code: beforeGrade,
+        before_job_family: beforeJobFamily,
+        after_school_id: afterSchoolId,
+        after_grade_code: afterGrade,
+        after_job_family: afterJobFamily,
+        is_cross_school: isCrossSchool,
+        is_cross_department: isCrossDepartment,
+        grade_change: gradeChange,
+        source_file: path.basename(sourceFile)
+      }, ['employee_hash', 'effective_date', 'action_type']);
 
-      if (result[0]?.inserted) {
-        inserted++;
-      } else {
-        updated++;
-      }
+      if (result.inserted) { inserted++; } else { updated++; }
     } catch (err) {
       console.error(`  Error upserting mobility event: ${err.message}`);
       errored++;

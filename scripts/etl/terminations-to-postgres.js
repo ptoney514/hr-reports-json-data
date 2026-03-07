@@ -17,7 +17,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { sql, endPool, checkConnection } = require('./neon-client');
+const { sql, endPool, checkConnection, getPool, upsert } = require('./neon-client');
 
 const { excelDateToJSDate, formatDate, isExcelDate, sheetToJSON, loadExcelFile } = require('../utils/excel-helpers');
 const { getQuarterDatesFromKey } = require('../utils/fiscal-calendar');
@@ -26,9 +26,10 @@ const { colors, printBanner, printComplete, success, info, error: logError } = r
 const { parseArgs } = require('../utils/cli-parser');
 const { startAudit, completeAudit } = require('../utils/etl-runner');
 const { loadConfig } = require('../utils/config-loader');
-const { createResolver } = require('../utils/column-resolver');
+const { createResolver, validateHeaders } = require('../utils/column-resolver');
 const { loadSchoolLookup, findSchoolId } = require('../utils/school-lookup');
 const { autoDetectLargestSheet } = require('../utils/workbook-loader');
+const { createErrorHandler, retryWithBackoff, ErrorType } = require('../utils/error-handler');
 
 const config = loadConfig();
 const resolve = createResolver('terminations-to-postgres');
@@ -129,6 +130,7 @@ function calculateTenure(hireDate, termDate) {
 async function processTerminations(rows, options, sourceFile) {
   const schoolLookup = await loadSchoolLookup();
   const reasonLookup = await sql`SELECT reason_id, reason_code, reason_label FROM dim_term_reasons`;
+  const errorHandler = createErrorHandler('terminations-to-postgres');
 
   let inserted = 0;
   let updated = 0;
@@ -147,110 +149,100 @@ async function processTerminations(rows, options, sourceFile) {
     filterEnd = dates.end;
   }
 
-  for (const row of rows) {
-    // Get termination date
-    let termDateRaw = resolve(row, 'term_date');
-    let termDate = termDateRaw;
-    if (isExcelDate(termDateRaw)) {
-      termDate = formatDate(excelDateToJSDate(termDateRaw));
-    }
-    if (!termDate) { skipped++; continue; }
-
-    // Filter by date range
-    if (filterStart && filterEnd) {
-      const termDateObj = new Date(termDate);
-      if (termDateObj < filterStart || termDateObj > filterEnd) { skipped++; continue; }
-    }
-
-    // Get hire date
-    let hireDateRaw = resolve(row, 'hire_date');
-    let hireDate = hireDateRaw;
-    if (isExcelDate(hireDateRaw)) {
-      hireDate = formatDate(excelDateToJSDate(hireDateRaw));
-    }
-
-    // Get employee hash - skip rows without employee ID to avoid anonymous hash duplication
-    const employeeId = resolve(row, 'employee_id');
-    if (!employeeId) { skipped++; continue; }
-    const employeeHash = hashValue(employeeId.toString());
-
-    // Get termination reason
-    const reason1 = resolve(row, 'term_reason_1');
-    const reason2 = resolve(row, 'term_reason_2');
-    const { type: termType, isVoluntary } = categorizeTerminationType(reason1, reason2);
-    const reasonId = matchReasonId(reason1 || reason2, reasonLookup);
-
-    // Calculate tenure
-    const { years: tenureYears, bucket: tenureBucket } = calculateTenure(hireDate, termDate);
-
-    // Get location
-    const locationRaw = resolve(row, 'location') || '';
-    const location = locationRaw.toString().toLowerCase().includes(config.locations.detection_keyword) ? 'phoenix' : 'omaha';
-
-    // Get school
-    const schoolRaw = resolve(row, 'school_terminations') || resolve(row, 'school') || '';
-    const schoolId = findSchoolId(schoolRaw, schoolLookup);
-
-    // Get category code
-    const categoryCode = (resolve(row, 'assignment_category') || '').toString().toUpperCase() || null;
-
-    // Determine period date
-    let periodDate;
-    if (options.quarter) {
-      periodDate = formatDate(getQuarterDatesFromKey(options.quarter).end);
-    } else if (options.fiscalYear) {
-      periodDate = `${options.fiscalYear}-06-30`;
-    } else {
-      periodDate = termDate;
-    }
-
-    if (options.dryRun) {
-      console.log(`  [DRY RUN] Would upsert: ${employeeHash.substring(0, 8)}... | ${termDate} | ${termType}`);
-      inserted++;
-      continue;
-    }
-
+  for (let i = 0; i < rows.length; i++) {
+    const row = rows[i];
     try {
-      const result = await sql`
-        INSERT INTO fact_terminations (
-          employee_hash, period_date, termination_date,
-          location, school_id, category_code,
-          reason_id, reason_raw, termination_type, is_voluntary,
-          hire_date, years_of_service, tenure_bucket,
-          source_file
-        )
-        VALUES (
-          ${employeeHash}, ${periodDate}, ${termDate},
-          ${location}, ${schoolId}, ${categoryCode},
-          ${reasonId}, ${reason1 || reason2 || 'Unknown'}, ${termType}, ${isVoluntary},
-          ${hireDate}, ${tenureYears}, ${tenureBucket},
-          ${path.basename(sourceFile)}
-        )
-        ON CONFLICT (employee_hash, termination_date)
-        DO UPDATE SET
-          period_date = EXCLUDED.period_date,
-          location = EXCLUDED.location,
-          school_id = EXCLUDED.school_id,
-          category_code = EXCLUDED.category_code,
-          reason_id = EXCLUDED.reason_id,
-          reason_raw = EXCLUDED.reason_raw,
-          termination_type = EXCLUDED.termination_type,
-          is_voluntary = EXCLUDED.is_voluntary,
-          hire_date = EXCLUDED.hire_date,
-          years_of_service = EXCLUDED.years_of_service,
-          tenure_bucket = EXCLUDED.tenure_bucket,
-          source_file = EXCLUDED.source_file,
-          loaded_at = NOW()
-        RETURNING (xmax = 0) AS inserted
-      `;
+      // Get termination date
+      let termDateRaw = resolve(row, 'term_date');
+      let termDate = termDateRaw;
+      if (isExcelDate(termDateRaw)) {
+        termDate = formatDate(excelDateToJSDate(termDateRaw));
+      }
+      if (!termDate) { skipped++; continue; }
 
-      if (result[0]?.inserted) { inserted++; } else { updated++; }
+      // Filter by date range
+      if (filterStart && filterEnd) {
+        const termDateObj = new Date(termDate);
+        if (termDateObj < filterStart || termDateObj > filterEnd) { skipped++; continue; }
+      }
+
+      // Get hire date
+      let hireDateRaw = resolve(row, 'hire_date');
+      let hireDate = hireDateRaw;
+      if (isExcelDate(hireDateRaw)) {
+        hireDate = formatDate(excelDateToJSDate(hireDateRaw));
+      }
+
+      // Get employee hash - skip rows without employee ID to avoid anonymous hash duplication
+      const employeeId = resolve(row, 'employee_id');
+      if (!employeeId) { skipped++; continue; }
+      const employeeHash = hashValue(employeeId.toString());
+
+      // Get termination reason
+      const reason1 = resolve(row, 'term_reason_1');
+      const reason2 = resolve(row, 'term_reason_2');
+      const { type: termType, isVoluntary } = categorizeTerminationType(reason1, reason2);
+      const reasonId = matchReasonId(reason1 || reason2, reasonLookup);
+
+      // Calculate tenure
+      const { years: tenureYears, bucket: tenureBucket } = calculateTenure(hireDate, termDate);
+
+      // Get location
+      const locationRaw = resolve(row, 'location') || '';
+      const location = locationRaw.toString().toLowerCase().includes(config.locations.detection_keyword) ? 'phoenix' : 'omaha';
+
+      // Get school
+      const schoolRaw = resolve(row, 'school_terminations') || resolve(row, 'school') || '';
+      const schoolId = findSchoolId(schoolRaw, schoolLookup);
+
+      // Get category code
+      const categoryCode = (resolve(row, 'assignment_category') || '').toString().toUpperCase() || null;
+
+      // Determine period date
+      let periodDate;
+      if (options.quarter) {
+        periodDate = formatDate(getQuarterDatesFromKey(options.quarter).end);
+      } else if (options.fiscalYear) {
+        periodDate = `${options.fiscalYear}-06-30`;
+      } else {
+        periodDate = termDate;
+      }
+
+      if (options.dryRun) {
+        console.log(`  [DRY RUN] Would upsert: ${employeeHash.substring(0, 8)}... | ${termDate} | ${termType}`);
+        inserted++;
+        continue;
+      }
+
+      const result = await retryWithBackoff(() => upsert(getPool(), 'fact_terminations', {
+        employee_hash: employeeHash,
+        period_date: periodDate,
+        termination_date: termDate,
+        location,
+        school_id: schoolId,
+        category_code: categoryCode,
+        reason_id: reasonId,
+        reason_raw: reason1 || reason2 || 'Unknown',
+        termination_type: termType,
+        is_voluntary: isVoluntary,
+        hire_date: hireDate,
+        years_of_service: tenureYears,
+        tenure_bucket: tenureBucket,
+        source_file: path.basename(sourceFile)
+      }, ['employee_hash', 'termination_date']));
+
+      if (result.inserted) { inserted++; } else { updated++; }
     } catch (err) {
-      console.error(`  Error upserting termination: ${err.message}`);
+      const errorType = errorHandler.handleError(err, row, i);
       errored++;
+      if (errorType === ErrorType.FATAL) {
+        errorHandler.printErrorReport();
+        throw err;
+      }
     }
   }
 
+  errorHandler.printErrorReport();
   return { inserted, updated, errored, skipped };
 }
 
@@ -297,6 +289,25 @@ async function main() {
     const { sheetName } = autoDetectLargestSheet(workbook);
     rows = sheetToJSON(workbook, sheetName);
     success(`Loaded ${rows.length} rows from sheet "${sheetName}"\n`);
+  }
+
+  // Validate headers
+  const validation = validateHeaders(rows, 'terminations-to-postgres');
+  if (!validation.valid) {
+    const details = validation.missing
+      .map(m => `  ${m.field} (tried: ${m.tried.join(', ')})`)
+      .join('\n');
+    logError(`Missing required columns for terminations:\n${details}`);
+    await endPool();
+    process.exit(1);
+  }
+  if (options.validateOnly) {
+    const resolved = Object.entries(validation.resolved)
+      .map(([field, alias]) => `  ${field} -> "${alias}"`)
+      .join('\n');
+    success(`Header validation passed. Resolved columns:\n${resolved}`);
+    await endPool();
+    process.exit(0);
   }
 
   // Start audit log

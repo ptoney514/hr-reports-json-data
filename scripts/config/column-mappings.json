@@ -6,227 +6,271 @@
     "end_date": {
       "aliases": ["END DATE", "End Date", "endDate", "end_date"],
       "type": "date",
-      "scripts": ["workforce-to-postgres", "demographics-to-postgres"]
+      "scripts": ["workforce-to-postgres", "demographics-to-postgres"],
+      "required_by": ["workforce-to-postgres"]
     },
     "assignment_category": {
       "aliases": ["Assignment Category Code", "Assignment Category", "assignment_category", "assignment_category_code", "assignmentCategoryCode"],
       "type": "string",
-      "scripts": ["workforce-to-postgres", "terminations-to-postgres", "demographics-to-postgres"]
+      "scripts": ["workforce-to-postgres", "terminations-to-postgres", "demographics-to-postgres"],
+      "required_by": ["workforce-to-postgres", "terminations-to-postgres"]
     },
     "person_type": {
       "aliases": ["Person Type", "personType", "person_type"],
       "type": "string",
-      "scripts": ["workforce-to-postgres", "demographics-to-postgres"]
+      "scripts": ["workforce-to-postgres", "demographics-to-postgres"],
+      "required_by": []
     },
     "grade_code": {
       "aliases": ["Grade Code", "Grade", "grade", "gradeCode"],
       "type": "string",
-      "scripts": ["workforce-to-postgres"]
+      "scripts": ["workforce-to-postgres"],
+      "required_by": []
     },
     "location": {
       "aliases": ["Location", "location", "LOCATION", "State"],
       "type": "string",
-      "scripts": ["workforce-to-postgres", "terminations-to-postgres", "demographics-to-postgres"]
+      "scripts": ["workforce-to-postgres", "terminations-to-postgres", "demographics-to-postgres"],
+      "required_by": ["workforce-to-postgres", "terminations-to-postgres"]
     },
     "school": {
       "aliases": ["School", "school", "VP Area", "Department"],
       "type": "string",
-      "scripts": ["workforce-to-postgres", "terminations-to-postgres"]
+      "scripts": ["workforce-to-postgres", "terminations-to-postgres"],
+      "required_by": []
     },
     "school_terminations": {
       "aliases": ["School", "school", "VP Area"],
       "type": "string",
       "scripts": ["terminations-to-postgres"],
-      "_note": "Terminations script does NOT include 'Department' as a school fallback (workforce does)."
+      "_note": "Terminations script does NOT include 'Department' as a school fallback (workforce does).",
+      "required_by": []
     },
     "term_date": {
       "aliases": ["Term Date", "Termination Date", "term_date", "termination_date"],
       "type": "date",
-      "scripts": ["terminations-to-postgres"]
+      "scripts": ["terminations-to-postgres"],
+      "required_by": ["terminations-to-postgres"]
     },
     "hire_date": {
       "aliases": ["Hire Date", "hire_date", "hireDate"],
       "type": "date",
-      "scripts": ["terminations-to-postgres"]
+      "scripts": ["terminations-to-postgres"],
+      "required_by": []
     },
     "employee_id": {
       "aliases": ["Employee ID", "Empl ID", "Empl Num", "employee_id", "employeeId"],
       "type": "string",
-      "scripts": ["terminations-to-postgres", "exit-surveys-to-postgres", "mobility-to-postgres"]
+      "scripts": ["terminations-to-postgres", "exit-surveys-to-postgres", "mobility-to-postgres"],
+      "required_by": ["terminations-to-postgres", "exit-surveys-to-postgres", "mobility-to-postgres"]
     },
     "term_reason_1": {
       "aliases": ["Term Reason 1", "term_reason_1", "termination_reason"],
       "type": "string",
-      "scripts": ["terminations-to-postgres"]
+      "scripts": ["terminations-to-postgres"],
+      "required_by": []
     },
     "term_reason_2": {
       "aliases": ["Term Reason 2", "term_reason_2"],
       "type": "string",
-      "scripts": ["terminations-to-postgres"]
+      "scripts": ["terminations-to-postgres"],
+      "required_by": []
     },
     "gender": {
       "aliases": ["Gender", "gender"],
       "type": "string",
-      "scripts": ["demographics-to-postgres"]
+      "scripts": ["demographics-to-postgres"],
+      "required_by": ["demographics-to-postgres"]
     },
     "ethnicity": {
       "aliases": ["Employee Ethnicity", "Ethnicity", "ethnicity"],
       "type": "string",
-      "scripts": ["demographics-to-postgres"]
+      "scripts": ["demographics-to-postgres"],
+      "required_by": ["demographics-to-postgres"]
     },
     "age_band": {
       "aliases": ["Age Band", "AgeBand", "ageBand"],
       "type": "string",
-      "scripts": ["demographics-to-postgres"]
+      "scripts": ["demographics-to-postgres"],
+      "required_by": []
     },
     "employee_id_mobility": {
       "aliases": ["employee_id", "employeeId", "Employee ID"],
       "type": "string",
       "scripts": ["mobility-to-postgres"],
-      "_note": "Mobility script checks snake_case first, unlike terminations which checks 'Employee ID' first."
+      "_note": "Mobility script checks snake_case first, unlike terminations which checks 'Employee ID' first.",
+      "required_by": ["mobility-to-postgres"]
     },
     "effective_date": {
       "aliases": ["effective_date", "effectiveDate", "date"],
       "type": "date",
       "scripts": ["mobility-to-postgres"],
-      "_note": "The 'date' alias collides with exit-surveys survey_date alias. See _metadata.ambiguous_aliases."
+      "_note": "The 'date' alias collides with exit-surveys survey_date alias. See _metadata.ambiguous_aliases.",
+      "required_by": ["mobility-to-postgres"]
     },
     "action": {
       "aliases": ["action"],
       "type": "string",
-      "scripts": ["mobility-to-postgres"]
+      "scripts": ["mobility-to-postgres"],
+      "required_by": ["mobility-to-postgres"]
     },
     "reason": {
       "aliases": ["reason"],
       "type": "string",
-      "scripts": ["mobility-to-postgres"]
+      "scripts": ["mobility-to-postgres"],
+      "required_by": []
     },
     "reason_code": {
       "aliases": ["reason_code", "reasonCode", "reason"],
       "type": "string",
-      "scripts": ["mobility-to-postgres"]
+      "scripts": ["mobility-to-postgres"],
+      "required_by": []
     },
     "before_school": {
       "aliases": ["before_school", "beforeSchool", "from_school", "fromSchool"],
       "type": "string",
-      "scripts": ["mobility-to-postgres"]
+      "scripts": ["mobility-to-postgres"],
+      "required_by": []
     },
     "after_school": {
       "aliases": ["after_school", "afterSchool", "to_school", "toSchool"],
       "type": "string",
-      "scripts": ["mobility-to-postgres"]
+      "scripts": ["mobility-to-postgres"],
+      "required_by": []
     },
     "before_grade": {
       "aliases": ["before_grade", "beforeGrade", "from_grade"],
       "type": "string",
-      "scripts": ["mobility-to-postgres"]
+      "scripts": ["mobility-to-postgres"],
+      "required_by": []
     },
     "after_grade": {
       "aliases": ["after_grade", "afterGrade", "to_grade"],
       "type": "string",
-      "scripts": ["mobility-to-postgres"]
+      "scripts": ["mobility-to-postgres"],
+      "required_by": []
     },
     "before_job_family": {
       "aliases": ["before_job_family", "beforeJobFamily"],
       "type": "string",
-      "scripts": ["mobility-to-postgres"]
+      "scripts": ["mobility-to-postgres"],
+      "required_by": []
     },
     "after_job_family": {
       "aliases": ["after_job_family", "afterJobFamily"],
       "type": "string",
-      "scripts": ["mobility-to-postgres"]
+      "scripts": ["mobility-to-postgres"],
+      "required_by": []
     },
     "is_cross_department": {
       "aliases": ["is_cross_department", "isCrossDepartment"],
       "type": "boolean",
-      "scripts": ["mobility-to-postgres"]
+      "scripts": ["mobility-to-postgres"],
+      "required_by": []
     },
     "employee_id_exit_survey": {
       "aliases": ["employee_id", "employeeId", "Employee ID", "Empl ID"],
       "type": "string",
-      "scripts": ["exit-surveys-to-postgres"]
+      "scripts": ["exit-surveys-to-postgres"],
+      "required_by": ["exit-surveys-to-postgres"]
     },
     "career_development": {
       "aliases": ["career_development", "careerDevelopment", "Career Development"],
       "type": "number",
-      "scripts": ["exit-surveys-to-postgres"]
+      "scripts": ["exit-surveys-to-postgres"],
+      "required_by": []
     },
     "management_support": {
       "aliases": ["management_support", "managementSupport", "Management Support", "supervisor"],
       "type": "number",
-      "scripts": ["exit-surveys-to-postgres"]
+      "scripts": ["exit-surveys-to-postgres"],
+      "required_by": []
     },
     "work_life_balance": {
       "aliases": ["work_life_balance", "workLifeBalance", "Work Life Balance", "balance"],
       "type": "number",
-      "scripts": ["exit-surveys-to-postgres"]
+      "scripts": ["exit-surveys-to-postgres"],
+      "required_by": []
     },
     "compensation": {
       "aliases": ["compensation", "Compensation", "salary"],
       "type": "number",
-      "scripts": ["exit-surveys-to-postgres"]
+      "scripts": ["exit-surveys-to-postgres"],
+      "required_by": []
     },
     "benefits": {
       "aliases": ["benefits", "Benefits"],
       "type": "number",
-      "scripts": ["exit-surveys-to-postgres"]
+      "scripts": ["exit-surveys-to-postgres"],
+      "required_by": []
     },
     "job_satisfaction": {
       "aliases": ["job_satisfaction", "jobSatisfaction", "Job Satisfaction"],
       "type": "number",
-      "scripts": ["exit-surveys-to-postgres"]
+      "scripts": ["exit-surveys-to-postgres"],
+      "required_by": []
     },
     "overall_satisfaction": {
       "aliases": ["overall", "Overall", "overall_satisfaction", "Overall Satisfaction"],
       "type": "number",
-      "scripts": ["exit-surveys-to-postgres"]
+      "scripts": ["exit-surveys-to-postgres"],
+      "required_by": []
     },
     "would_recommend": {
       "aliases": ["would_recommend", "wouldRecommend", "Would Recommend", "recommend"],
       "type": "boolean",
-      "scripts": ["exit-surveys-to-postgres"]
+      "scripts": ["exit-surveys-to-postgres"],
+      "required_by": []
     },
     "conduct_concerns": {
       "aliases": ["conduct_concerns", "conductConcerns", "Conduct Concerns", "concerns"],
       "type": "boolean",
-      "scripts": ["exit-surveys-to-postgres"]
+      "scripts": ["exit-surveys-to-postgres"],
+      "required_by": []
     },
     "has_comments": {
       "aliases": ["comments", "Comments", "feedback"],
       "type": "boolean",
       "scripts": ["exit-surveys-to-postgres"],
-      "_note": "Coerced to boolean (!!value). Presence check only, text not stored."
+      "_note": "Coerced to boolean (!!value). Presence check only, text not stored.",
+      "required_by": []
     },
     "survey_date": {
       "aliases": ["survey_date", "surveyDate", "date"],
       "type": "date",
       "scripts": ["exit-surveys-to-postgres"],
-      "_note": "The 'date' alias collides with mobility effective_date. See _metadata.ambiguous_aliases."
+      "_note": "The 'date' alias collides with mobility effective_date. See _metadata.ambiguous_aliases.",
+      "required_by": []
     },
     "category_turnover_rates": {
       "aliases": ["Category", "category"],
       "type": "string",
-      "scripts": ["turnover-rates-to-postgres"]
+      "scripts": ["turnover-rates-to-postgres"],
+      "required_by": ["turnover-rates-to-postgres"]
     },
     "period_turnover_rates": {
       "aliases": ["Period", "period"],
       "type": "string",
-      "scripts": ["turnover-rates-to-postgres"]
+      "scripts": ["turnover-rates-to-postgres"],
+      "required_by": ["turnover-rates-to-postgres"]
     },
     "rate_turnover_rates": {
       "aliases": ["Rate", "rate"],
       "type": "number",
-      "scripts": ["turnover-rates-to-postgres"]
+      "scripts": ["turnover-rates-to-postgres"],
+      "required_by": ["turnover-rates-to-postgres"]
     },
     "benchmark_turnover_rates": {
       "aliases": ["Benchmark", "benchmark"],
       "type": "number",
-      "scripts": ["turnover-rates-to-postgres"]
+      "scripts": ["turnover-rates-to-postgres"],
+      "required_by": []
     },
     "benchmark_year": {
       "aliases": ["Benchmark_Year", "benchmark_year"],
       "type": "string",
-      "scripts": ["turnover-rates-to-postgres"]
+      "scripts": ["turnover-rates-to-postgres"],
+      "required_by": []
     }
   },
 

@@ -19,7 +19,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { sql, endPool, startAuditLog, completeAuditLog, checkConnection } = require('./neon-client');
+const { sql, endPool, startAuditLog, completeAuditLog, checkConnection, getPool, upsert } = require('./neon-client');
 
 const { sheetToJSON } = require('../utils/excel-helpers');
 const { colors, printBanner, printComplete } = require('../utils/formatting');
@@ -141,29 +141,16 @@ async function upsertTurnoverRates(rates, sourceFile, dryRun = false) {
     }
 
     try {
-      const result = await sql`
-        INSERT INTO fact_turnover_summary_rates (
-          fiscal_year, category, turnover_rate, higher_ed_avg, benchmark_source, source_file
-        )
-        VALUES (
-          ${rate.fiscalYear}, ${rate.category}, ${rate.turnoverRate},
-          ${rate.higherEdAvg}, ${rate.benchmarkSource}, ${sourceFile}
-        )
-        ON CONFLICT (fiscal_year, category)
-        DO UPDATE SET
-          turnover_rate = EXCLUDED.turnover_rate,
-          higher_ed_avg = EXCLUDED.higher_ed_avg,
-          benchmark_source = EXCLUDED.benchmark_source,
-          source_file = EXCLUDED.source_file,
-          loaded_at = NOW()
-        RETURNING (xmax = 0) AS inserted
-      `;
+      const result = await upsert(getPool(), 'fact_turnover_summary_rates', {
+        fiscal_year: rate.fiscalYear,
+        category: rate.category,
+        turnover_rate: rate.turnoverRate,
+        higher_ed_avg: rate.higherEdAvg,
+        benchmark_source: rate.benchmarkSource,
+        source_file: sourceFile
+      }, ['fiscal_year', 'category']);
 
-      if (result[0]?.inserted) {
-        inserted++;
-      } else {
-        updated++;
-      }
+      if (result.inserted) { inserted++; } else { updated++; }
     } catch (error) {
       console.error(`  ${colors.red}Error upserting ${rate.category}/${rate.fiscalYear}:${colors.reset} ${error.message}`);
       errored++;

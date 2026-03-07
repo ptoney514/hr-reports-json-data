@@ -16,13 +16,14 @@
 
 const fs = require('fs');
 const path = require('path');
-const { sql, endPool, startAuditLog, completeAuditLog, checkConnection } = require('./neon-client');
+const { sql, endPool, startAuditLog, completeAuditLog, checkConnection, getPool, upsert } = require('./neon-client');
 
 const { sheetToJSON } = require('../utils/excel-helpers');
 const { colors, printBanner, printComplete } = require('../utils/formatting');
 const { parseArgs } = require('../utils/cli-parser');
 const { loadWorkbook, findDefaultInputFile, validateRequiredSheets } = require('../utils/workbook-loader');
 const { loadConfig } = require('../utils/config-loader');
+const { createErrorHandler, retryWithBackoff, ErrorType } = require('../utils/error-handler');
 
 const config = loadConfig();
 const EXPECTED_SHEETS = config.expected_sheets.turnover_metrics;
@@ -51,14 +52,15 @@ function extractFiscalYearFromMetadata(workbook) {
 /**
  * Upsert Summary Rates
  */
-async function upsertSummaryRates(workbook, sourceFile, dryRun) {
+async function upsertSummaryRates(workbook, sourceFile, dryRun, errorHandler) {
   const sheetName = 'Summary_Rates';
   const rows = sheetToJSON(workbook, sheetName);
   let inserted = 0, updated = 0, errored = 0;
 
   console.log(`  ${sheetName}: ${rows.length} rows`);
 
-  for (const row of rows) {
+  for (let i = 0; i < rows.length; i++) {
+    const row = rows[i];
     if (dryRun) {
       console.log(`    [DRY RUN] ${row.fiscal_year}/${row.category}: ${row.turnover_rate}%`);
       inserted++;
@@ -66,28 +68,20 @@ async function upsertSummaryRates(workbook, sourceFile, dryRun) {
     }
 
     try {
-      const result = await sql`
-        INSERT INTO fact_turnover_summary_rates (
-          fiscal_year, category, turnover_rate, prior_year_rate, change, trend, source_file
-        )
-        VALUES (
-          ${row.fiscal_year}, ${row.category}, ${row.turnover_rate},
-          ${row.prior_year_rate || null}, ${row.change || null}, ${row.trend || null}, ${sourceFile}
-        )
-        ON CONFLICT (fiscal_year, category)
-        DO UPDATE SET
-          turnover_rate = EXCLUDED.turnover_rate,
-          prior_year_rate = EXCLUDED.prior_year_rate,
-          change = EXCLUDED.change,
-          trend = EXCLUDED.trend,
-          source_file = EXCLUDED.source_file,
-          loaded_at = NOW()
-        RETURNING (xmax = 0) AS inserted
-      `;
-      if (result[0]?.inserted) inserted++; else updated++;
+      const result = await retryWithBackoff(() => upsert(getPool(), 'fact_turnover_summary_rates', {
+        fiscal_year: row.fiscal_year,
+        category: row.category,
+        turnover_rate: row.turnover_rate,
+        prior_year_rate: row.prior_year_rate || null,
+        change: row.change || null,
+        trend: row.trend || null,
+        source_file: sourceFile
+      }, ['fiscal_year', 'category']));
+      if (result.inserted) inserted++; else updated++;
     } catch (error) {
-      console.error(`    ${colors.red}Error:${colors.reset} ${error.message}`);
+      const errorType = errorHandler.handleError(error, row, i);
       errored++;
+      if (errorType === ErrorType.FATAL) throw error;
     }
   }
 
@@ -97,14 +91,15 @@ async function upsertSummaryRates(workbook, sourceFile, dryRun) {
 /**
  * Upsert Turnover Rates Table (includes higher ed avg)
  */
-async function upsertTurnoverRatesTable(workbook, sourceFile, dryRun) {
+async function upsertTurnoverRatesTable(workbook, sourceFile, dryRun, errorHandler) {
   const sheetName = 'Turnover_Rates_Table';
   const rows = sheetToJSON(workbook, sheetName);
   let inserted = 0, updated = 0, errored = 0;
 
   console.log(`  ${sheetName}: ${rows.length} rows`);
 
-  for (const row of rows) {
+  for (let i = 0; i < rows.length; i++) {
+    const row = rows[i];
     if (dryRun) {
       console.log(`    [DRY RUN] ${row.fiscal_year}/${row.category}: ${row.turnover_rate}% (HE Avg: ${row.higher_ed_avg}%)`);
       inserted++;
@@ -112,27 +107,19 @@ async function upsertTurnoverRatesTable(workbook, sourceFile, dryRun) {
     }
 
     try {
-      const result = await sql`
-        INSERT INTO fact_turnover_summary_rates (
-          fiscal_year, category, turnover_rate, higher_ed_avg, benchmark_source, source_file
-        )
-        VALUES (
-          ${row.fiscal_year}, ${row.category}, ${row.turnover_rate},
-          ${row.higher_ed_avg || null}, ${row.source || null}, ${sourceFile}
-        )
-        ON CONFLICT (fiscal_year, category)
-        DO UPDATE SET
-          turnover_rate = EXCLUDED.turnover_rate,
-          higher_ed_avg = EXCLUDED.higher_ed_avg,
-          benchmark_source = EXCLUDED.benchmark_source,
-          source_file = EXCLUDED.source_file,
-          loaded_at = NOW()
-        RETURNING (xmax = 0) AS inserted
-      `;
-      if (result[0]?.inserted) inserted++; else updated++;
+      const result = await retryWithBackoff(() => upsert(getPool(), 'fact_turnover_summary_rates', {
+        fiscal_year: row.fiscal_year,
+        category: row.category,
+        turnover_rate: row.turnover_rate,
+        higher_ed_avg: row.higher_ed_avg || null,
+        benchmark_source: row.source || null,
+        source_file: sourceFile
+      }, ['fiscal_year', 'category']));
+      if (result.inserted) inserted++; else updated++;
     } catch (error) {
-      console.error(`    ${colors.red}Error:${colors.reset} ${error.message}`);
+      const errorType = errorHandler.handleError(error, row, i);
       errored++;
+      if (errorType === ErrorType.FATAL) throw error;
     }
   }
 
@@ -142,14 +129,15 @@ async function upsertTurnoverRatesTable(workbook, sourceFile, dryRun) {
 /**
  * Upsert Higher Ed Benchmarks
  */
-async function upsertHigherEdBenchmarks(workbook, sourceFile, dryRun) {
+async function upsertHigherEdBenchmarks(workbook, sourceFile, dryRun, errorHandler) {
   const sheetName = 'Higher_Ed_Averages';
   const rows = sheetToJSON(workbook, sheetName);
   let inserted = 0, updated = 0, errored = 0;
 
   console.log(`  ${sheetName}: ${rows.length} rows`);
 
-  for (const row of rows) {
+  for (let i = 0; i < rows.length; i++) {
+    const row = rows[i];
     if (dryRun) {
       console.log(`    [DRY RUN] ${row.fiscal_year}/${row.category}: ${row.higher_ed_avg}%`);
       inserted++;
@@ -157,25 +145,18 @@ async function upsertHigherEdBenchmarks(workbook, sourceFile, dryRun) {
     }
 
     try {
-      const result = await sql`
-        INSERT INTO fact_higher_ed_benchmarks (
-          fiscal_year, category, higher_ed_avg, source, source_file
-        )
-        VALUES (
-          ${row.fiscal_year}, ${row.category}, ${row.higher_ed_avg}, ${row.source || null}, ${sourceFile}
-        )
-        ON CONFLICT (fiscal_year, category)
-        DO UPDATE SET
-          higher_ed_avg = EXCLUDED.higher_ed_avg,
-          source = EXCLUDED.source,
-          source_file = EXCLUDED.source_file,
-          loaded_at = NOW()
-        RETURNING (xmax = 0) AS inserted
-      `;
-      if (result[0]?.inserted) inserted++; else updated++;
+      const result = await retryWithBackoff(() => upsert(getPool(), 'fact_higher_ed_benchmarks', {
+        fiscal_year: row.fiscal_year,
+        category: row.category,
+        higher_ed_avg: row.higher_ed_avg,
+        source: row.source || null,
+        source_file: sourceFile
+      }, ['fiscal_year', 'category']));
+      if (result.inserted) inserted++; else updated++;
     } catch (error) {
-      console.error(`    ${colors.red}Error:${colors.reset} ${error.message}`);
+      const errorType = errorHandler.handleError(error, row, i);
       errored++;
+      if (errorType === ErrorType.FATAL) throw error;
     }
   }
 
@@ -185,14 +166,15 @@ async function upsertHigherEdBenchmarks(workbook, sourceFile, dryRun) {
 /**
  * Upsert Turnover Breakdown
  */
-async function upsertTurnoverBreakdown(workbook, sourceFile, dryRun) {
+async function upsertTurnoverBreakdown(workbook, sourceFile, dryRun, errorHandler) {
   const sheetName = 'Turnover_Breakdown';
   const rows = sheetToJSON(workbook, sheetName);
   let inserted = 0, updated = 0, errored = 0;
 
   console.log(`  ${sheetName}: ${rows.length} rows`);
 
-  for (const row of rows) {
+  for (let i = 0; i < rows.length; i++) {
+    const row = rows[i];
     if (dryRun) {
       console.log(`    [DRY RUN] ${row.fiscal_year}/${row.category}: Vol ${row.voluntary}%, Invol ${row.involuntary}%, Retire ${row.retirement}%`);
       inserted++;
@@ -200,28 +182,20 @@ async function upsertTurnoverBreakdown(workbook, sourceFile, dryRun) {
     }
 
     try {
-      const result = await sql`
-        INSERT INTO fact_turnover_breakdown (
-          fiscal_year, category, involuntary, voluntary, retirement, total, source_file
-        )
-        VALUES (
-          ${row.fiscal_year}, ${row.category}, ${row.involuntary || 0},
-          ${row.voluntary || 0}, ${row.retirement || 0}, ${row.total}, ${sourceFile}
-        )
-        ON CONFLICT (fiscal_year, category)
-        DO UPDATE SET
-          involuntary = EXCLUDED.involuntary,
-          voluntary = EXCLUDED.voluntary,
-          retirement = EXCLUDED.retirement,
-          total = EXCLUDED.total,
-          source_file = EXCLUDED.source_file,
-          loaded_at = NOW()
-        RETURNING (xmax = 0) AS inserted
-      `;
-      if (result[0]?.inserted) inserted++; else updated++;
+      const result = await retryWithBackoff(() => upsert(getPool(), 'fact_turnover_breakdown', {
+        fiscal_year: row.fiscal_year,
+        category: row.category,
+        involuntary: row.involuntary || 0,
+        voluntary: row.voluntary || 0,
+        retirement: row.retirement || 0,
+        total: row.total,
+        source_file: sourceFile
+      }, ['fiscal_year', 'category']));
+      if (result.inserted) inserted++; else updated++;
     } catch (error) {
-      console.error(`    ${colors.red}Error:${colors.reset} ${error.message}`);
+      const errorType = errorHandler.handleError(error, row, i);
       errored++;
+      if (errorType === ErrorType.FATAL) throw error;
     }
   }
 
@@ -231,7 +205,7 @@ async function upsertTurnoverBreakdown(workbook, sourceFile, dryRun) {
 /**
  * Upsert Staff Deviation
  */
-async function upsertStaffDeviation(workbook, sourceFile, dryRun) {
+async function upsertStaffDeviation(workbook, sourceFile, dryRun, errorHandler) {
   const sheetName = 'Staff_Deviation';
   const rows = sheetToJSON(workbook, sheetName);
   let inserted = 0, updated = 0, errored = 0;
@@ -241,7 +215,8 @@ async function upsertStaffDeviation(workbook, sourceFile, dryRun) {
 
   console.log(`  ${sheetName}: ${rows.length} rows (avg: ${avgRate}%)`);
 
-  for (const row of rows) {
+  for (let i = 0; i < rows.length; i++) {
+    const row = rows[i];
     const deviation = parseFloat((row.turnover_rate - avgRate).toFixed(1));
 
     if (dryRun) {
@@ -251,27 +226,19 @@ async function upsertStaffDeviation(workbook, sourceFile, dryRun) {
     }
 
     try {
-      const result = await sql`
-        INSERT INTO fact_staff_turnover_deviation (
-          fiscal_year, department, turnover_rate, is_average, deviation_from_avg, source_file
-        )
-        VALUES (
-          ${row.fiscal_year}, ${row.department}, ${row.turnover_rate},
-          ${row.is_average || false}, ${deviation}, ${sourceFile}
-        )
-        ON CONFLICT (fiscal_year, department)
-        DO UPDATE SET
-          turnover_rate = EXCLUDED.turnover_rate,
-          is_average = EXCLUDED.is_average,
-          deviation_from_avg = EXCLUDED.deviation_from_avg,
-          source_file = EXCLUDED.source_file,
-          loaded_at = NOW()
-        RETURNING (xmax = 0) AS inserted
-      `;
-      if (result[0]?.inserted) inserted++; else updated++;
+      const result = await retryWithBackoff(() => upsert(getPool(), 'fact_staff_turnover_deviation', {
+        fiscal_year: row.fiscal_year,
+        department: row.department,
+        turnover_rate: row.turnover_rate,
+        is_average: row.is_average || false,
+        deviation_from_avg: deviation,
+        source_file: sourceFile
+      }, ['fiscal_year', 'department']));
+      if (result.inserted) inserted++; else updated++;
     } catch (error) {
-      console.error(`    ${colors.red}Error:${colors.reset} ${error.message}`);
+      const errorType = errorHandler.handleError(error, row, i);
       errored++;
+      if (errorType === ErrorType.FATAL) throw error;
     }
   }
 
@@ -281,7 +248,7 @@ async function upsertStaffDeviation(workbook, sourceFile, dryRun) {
 /**
  * Upsert Faculty Deviation
  */
-async function upsertFacultyDeviation(workbook, sourceFile, dryRun) {
+async function upsertFacultyDeviation(workbook, sourceFile, dryRun, errorHandler) {
   const sheetName = 'Faculty_Deviation';
   const rows = sheetToJSON(workbook, sheetName);
   let inserted = 0, updated = 0, errored = 0;
@@ -291,7 +258,8 @@ async function upsertFacultyDeviation(workbook, sourceFile, dryRun) {
 
   console.log(`  ${sheetName}: ${rows.length} rows (avg: ${avgRate}%)`);
 
-  for (const row of rows) {
+  for (let i = 0; i < rows.length; i++) {
+    const row = rows[i];
     const deviation = parseFloat((row.turnover_rate - avgRate).toFixed(1));
 
     if (dryRun) {
@@ -301,27 +269,19 @@ async function upsertFacultyDeviation(workbook, sourceFile, dryRun) {
     }
 
     try {
-      const result = await sql`
-        INSERT INTO fact_faculty_turnover_deviation (
-          fiscal_year, school, turnover_rate, is_average, deviation_from_avg, source_file
-        )
-        VALUES (
-          ${row.fiscal_year}, ${row.school}, ${row.turnover_rate},
-          ${row.is_average || false}, ${deviation}, ${sourceFile}
-        )
-        ON CONFLICT (fiscal_year, school)
-        DO UPDATE SET
-          turnover_rate = EXCLUDED.turnover_rate,
-          is_average = EXCLUDED.is_average,
-          deviation_from_avg = EXCLUDED.deviation_from_avg,
-          source_file = EXCLUDED.source_file,
-          loaded_at = NOW()
-        RETURNING (xmax = 0) AS inserted
-      `;
-      if (result[0]?.inserted) inserted++; else updated++;
+      const result = await retryWithBackoff(() => upsert(getPool(), 'fact_faculty_turnover_deviation', {
+        fiscal_year: row.fiscal_year,
+        school: row.school,
+        turnover_rate: row.turnover_rate,
+        is_average: row.is_average || false,
+        deviation_from_avg: deviation,
+        source_file: sourceFile
+      }, ['fiscal_year', 'school']));
+      if (result.inserted) inserted++; else updated++;
     } catch (error) {
-      console.error(`    ${colors.red}Error:${colors.reset} ${error.message}`);
+      const errorType = errorHandler.handleError(error, row, i);
       errored++;
+      if (errorType === ErrorType.FATAL) throw error;
     }
   }
 
@@ -331,14 +291,15 @@ async function upsertFacultyDeviation(workbook, sourceFile, dryRun) {
 /**
  * Upsert Historical Rates
  */
-async function upsertHistoricalRates(workbook, sourceFile, dryRun) {
+async function upsertHistoricalRates(workbook, sourceFile, dryRun, errorHandler) {
   const sheetName = 'Historical_Rates';
   const rows = sheetToJSON(workbook, sheetName);
   let inserted = 0, updated = 0, errored = 0;
 
   console.log(`  ${sheetName}: ${rows.length} rows`);
 
-  for (const row of rows) {
+  for (let i = 0; i < rows.length; i++) {
+    const row = rows[i];
     if (dryRun) {
       console.log(`    [DRY RUN] ${row.fiscal_year}: ${row.total_turnover_rate}%`);
       inserted++;
@@ -346,24 +307,16 @@ async function upsertHistoricalRates(workbook, sourceFile, dryRun) {
     }
 
     try {
-      const result = await sql`
-        INSERT INTO fact_historical_turnover_rates (
-          fiscal_year, total_turnover_rate, source_file
-        )
-        VALUES (
-          ${row.fiscal_year}, ${row.total_turnover_rate}, ${sourceFile}
-        )
-        ON CONFLICT (fiscal_year)
-        DO UPDATE SET
-          total_turnover_rate = EXCLUDED.total_turnover_rate,
-          source_file = EXCLUDED.source_file,
-          loaded_at = NOW()
-        RETURNING (xmax = 0) AS inserted
-      `;
-      if (result[0]?.inserted) inserted++; else updated++;
+      const result = await retryWithBackoff(() => upsert(getPool(), 'fact_historical_turnover_rates', {
+        fiscal_year: row.fiscal_year,
+        total_turnover_rate: row.total_turnover_rate,
+        source_file: sourceFile
+      }, ['fiscal_year']));
+      if (result.inserted) inserted++; else updated++;
     } catch (error) {
-      console.error(`    ${colors.red}Error:${colors.reset} ${error.message}`);
+      const errorType = errorHandler.handleError(error, row, i);
       errored++;
+      if (errorType === ErrorType.FATAL) throw error;
     }
   }
 
@@ -373,14 +326,15 @@ async function upsertHistoricalRates(workbook, sourceFile, dryRun) {
 /**
  * Upsert Length of Service
  */
-async function upsertLengthOfService(workbook, sourceFile, dryRun) {
+async function upsertLengthOfService(workbook, sourceFile, dryRun, errorHandler) {
   const sheetName = 'Length_of_Service';
   const rows = sheetToJSON(workbook, sheetName);
   let inserted = 0, updated = 0, errored = 0;
 
   console.log(`  ${sheetName}: ${rows.length} rows`);
 
-  for (const row of rows) {
+  for (let i = 0; i < rows.length; i++) {
+    const row = rows[i];
     if (dryRun) {
       console.log(`    [DRY RUN] ${row.employee_type}/${row.tenure_band}: ${row.percentage}% (${row.count})`);
       inserted++;
@@ -388,26 +342,19 @@ async function upsertLengthOfService(workbook, sourceFile, dryRun) {
     }
 
     try {
-      const result = await sql`
-        INSERT INTO fact_turnover_length_of_service (
-          fiscal_year, employee_type, tenure_band, percentage, count, source_file
-        )
-        VALUES (
-          ${row.fiscal_year}, ${row.employee_type}, ${row.tenure_band},
-          ${row.percentage}, ${row.count}, ${sourceFile}
-        )
-        ON CONFLICT (fiscal_year, employee_type, tenure_band)
-        DO UPDATE SET
-          percentage = EXCLUDED.percentage,
-          count = EXCLUDED.count,
-          source_file = EXCLUDED.source_file,
-          loaded_at = NOW()
-        RETURNING (xmax = 0) AS inserted
-      `;
-      if (result[0]?.inserted) inserted++; else updated++;
+      const result = await retryWithBackoff(() => upsert(getPool(), 'fact_turnover_length_of_service', {
+        fiscal_year: row.fiscal_year,
+        employee_type: row.employee_type,
+        tenure_band: row.tenure_band,
+        percentage: row.percentage,
+        count: row.count,
+        source_file: sourceFile
+      }, ['fiscal_year', 'employee_type', 'tenure_band']));
+      if (result.inserted) inserted++; else updated++;
     } catch (error) {
-      console.error(`    ${colors.red}Error:${colors.reset} ${error.message}`);
+      const errorType = errorHandler.handleError(error, row, i);
       errored++;
+      if (errorType === ErrorType.FATAL) throw error;
     }
   }
 
@@ -417,14 +364,15 @@ async function upsertLengthOfService(workbook, sourceFile, dryRun) {
 /**
  * Upsert Retirements by FY
  */
-async function upsertRetirementsByFY(workbook, sourceFile, dryRun) {
+async function upsertRetirementsByFY(workbook, sourceFile, dryRun, errorHandler) {
   const sheetName = 'Retirements_by_FY';
   const rows = sheetToJSON(workbook, sheetName);
   let inserted = 0, updated = 0, errored = 0;
 
   console.log(`  ${sheetName}: ${rows.length} rows`);
 
-  for (const row of rows) {
+  for (let i = 0; i < rows.length; i++) {
+    const row = rows[i];
     if (dryRun) {
       console.log(`    [DRY RUN] ${row.fiscal_year}: F=${row.faculty}, SE=${row.staff_exempt}, SNE=${row.staff_non_exempt}, Total=${row.total}`);
       inserted++;
@@ -432,28 +380,19 @@ async function upsertRetirementsByFY(workbook, sourceFile, dryRun) {
     }
 
     try {
-      const result = await sql`
-        INSERT INTO fact_retirements_by_fy (
-          fiscal_year, faculty, staff_exempt, staff_non_exempt, total, source_file
-        )
-        VALUES (
-          ${row.fiscal_year}, ${row.faculty || 0}, ${row.staff_exempt || 0},
-          ${row.staff_non_exempt || 0}, ${row.total || 0}, ${sourceFile}
-        )
-        ON CONFLICT (fiscal_year)
-        DO UPDATE SET
-          faculty = EXCLUDED.faculty,
-          staff_exempt = EXCLUDED.staff_exempt,
-          staff_non_exempt = EXCLUDED.staff_non_exempt,
-          total = EXCLUDED.total,
-          source_file = EXCLUDED.source_file,
-          loaded_at = NOW()
-        RETURNING (xmax = 0) AS inserted
-      `;
-      if (result[0]?.inserted) inserted++; else updated++;
+      const result = await retryWithBackoff(() => upsert(getPool(), 'fact_retirements_by_fy', {
+        fiscal_year: row.fiscal_year,
+        faculty: row.faculty || 0,
+        staff_exempt: row.staff_exempt || 0,
+        staff_non_exempt: row.staff_non_exempt || 0,
+        total: row.total || 0,
+        source_file: sourceFile
+      }, ['fiscal_year']));
+      if (result.inserted) inserted++; else updated++;
     } catch (error) {
-      console.error(`    ${colors.red}Error:${colors.reset} ${error.message}`);
+      const errorType = errorHandler.handleError(error, row, i);
       errored++;
+      if (errorType === ErrorType.FATAL) throw error;
     }
   }
 
@@ -463,14 +402,15 @@ async function upsertRetirementsByFY(workbook, sourceFile, dryRun) {
 /**
  * Upsert Retirement Trends (Faculty + Staff)
  */
-async function upsertRetirementTrends(workbook, sourceFile, dryRun) {
+async function upsertRetirementTrends(workbook, sourceFile, dryRun, errorHandler) {
   let inserted = 0, updated = 0, errored = 0;
 
   // Faculty trends
   const facultyRows = sheetToJSON(workbook, 'Faculty_Retirement_Trends');
   console.log(`  Faculty_Retirement_Trends: ${facultyRows.length} rows`);
 
-  for (const row of facultyRows) {
+  for (let i = 0; i < facultyRows.length; i++) {
+    const row = facultyRows[i];
     if (dryRun) {
       console.log(`    [DRY RUN] Faculty/${row.year}: Age=${row.avg_age}, LOS=${row.avg_los}`);
       inserted++;
@@ -478,25 +418,18 @@ async function upsertRetirementTrends(workbook, sourceFile, dryRun) {
     }
 
     try {
-      const result = await sql`
-        INSERT INTO fact_retirement_trends (
-          year, employee_type, avg_age, avg_los, source_file
-        )
-        VALUES (
-          ${row.year}, 'Faculty', ${row.avg_age}, ${row.avg_los}, ${sourceFile}
-        )
-        ON CONFLICT (year, employee_type)
-        DO UPDATE SET
-          avg_age = EXCLUDED.avg_age,
-          avg_los = EXCLUDED.avg_los,
-          source_file = EXCLUDED.source_file,
-          loaded_at = NOW()
-        RETURNING (xmax = 0) AS inserted
-      `;
-      if (result[0]?.inserted) inserted++; else updated++;
+      const result = await retryWithBackoff(() => upsert(getPool(), 'fact_retirement_trends', {
+        year: row.year,
+        employee_type: 'Faculty',
+        avg_age: row.avg_age,
+        avg_los: row.avg_los,
+        source_file: sourceFile
+      }, ['year', 'employee_type']));
+      if (result.inserted) inserted++; else updated++;
     } catch (error) {
-      console.error(`    ${colors.red}Error:${colors.reset} ${error.message}`);
+      const errorType = errorHandler.handleError(error, row, i);
       errored++;
+      if (errorType === ErrorType.FATAL) throw error;
     }
   }
 
@@ -504,7 +437,8 @@ async function upsertRetirementTrends(workbook, sourceFile, dryRun) {
   const staffRows = sheetToJSON(workbook, 'Staff_Retirement_Trends');
   console.log(`  Staff_Retirement_Trends: ${staffRows.length} rows`);
 
-  for (const row of staffRows) {
+  for (let i = 0; i < staffRows.length; i++) {
+    const row = staffRows[i];
     if (dryRun) {
       console.log(`    [DRY RUN] Staff/${row.year}: Age=${row.avg_age}, LOS=${row.avg_los}`);
       inserted++;
@@ -512,25 +446,18 @@ async function upsertRetirementTrends(workbook, sourceFile, dryRun) {
     }
 
     try {
-      const result = await sql`
-        INSERT INTO fact_retirement_trends (
-          year, employee_type, avg_age, avg_los, source_file
-        )
-        VALUES (
-          ${row.year}, 'Staff', ${row.avg_age}, ${row.avg_los}, ${sourceFile}
-        )
-        ON CONFLICT (year, employee_type)
-        DO UPDATE SET
-          avg_age = EXCLUDED.avg_age,
-          avg_los = EXCLUDED.avg_los,
-          source_file = EXCLUDED.source_file,
-          loaded_at = NOW()
-        RETURNING (xmax = 0) AS inserted
-      `;
-      if (result[0]?.inserted) inserted++; else updated++;
+      const result = await retryWithBackoff(() => upsert(getPool(), 'fact_retirement_trends', {
+        year: row.year,
+        employee_type: 'Staff',
+        avg_age: row.avg_age,
+        avg_los: row.avg_los,
+        source_file: sourceFile
+      }, ['year', 'employee_type']));
+      if (result.inserted) inserted++; else updated++;
     } catch (error) {
-      console.error(`    ${colors.red}Error:${colors.reset} ${error.message}`);
+      const errorType = errorHandler.handleError(error, row, i);
       errored++;
+      if (errorType === ErrorType.FATAL) throw error;
     }
   }
 
@@ -540,7 +467,7 @@ async function upsertRetirementTrends(workbook, sourceFile, dryRun) {
 /**
  * Upsert Age Distribution (Faculty + Staff)
  */
-async function upsertAgeDistribution(workbook, sourceFile, dryRun, fiscalYear) {
+async function upsertAgeDistribution(workbook, sourceFile, dryRun, fiscalYear, errorHandler) {
   let inserted = 0, updated = 0, errored = 0;
 
   if (!fiscalYear) {
@@ -552,7 +479,8 @@ async function upsertAgeDistribution(workbook, sourceFile, dryRun, fiscalYear) {
   const facultyRows = sheetToJSON(workbook, 'Faculty_Age_Distribution');
   console.log(`  Faculty_Age_Distribution: ${facultyRows.length} rows`);
 
-  for (const row of facultyRows) {
+  for (let i = 0; i < facultyRows.length; i++) {
+    const row = facultyRows[i];
     if (dryRun) {
       console.log(`    [DRY RUN] Faculty/${row.category}: ${row.percentage}%`);
       inserted++;
@@ -560,25 +488,19 @@ async function upsertAgeDistribution(workbook, sourceFile, dryRun, fiscalYear) {
     }
 
     try {
-      const result = await sql`
-        INSERT INTO fact_retirement_age_distribution (
-          fiscal_year, employee_type, category, percentage, color, source_file
-        )
-        VALUES (
-          ${fiscalYear}, 'Faculty', ${row.category}, ${row.percentage}, ${row.color || null}, ${sourceFile}
-        )
-        ON CONFLICT (fiscal_year, employee_type, category)
-        DO UPDATE SET
-          percentage = EXCLUDED.percentage,
-          color = EXCLUDED.color,
-          source_file = EXCLUDED.source_file,
-          loaded_at = NOW()
-        RETURNING (xmax = 0) AS inserted
-      `;
-      if (result[0]?.inserted) inserted++; else updated++;
+      const result = await retryWithBackoff(() => upsert(getPool(), 'fact_retirement_age_distribution', {
+        fiscal_year: fiscalYear,
+        employee_type: 'Faculty',
+        category: row.category,
+        percentage: row.percentage,
+        color: row.color || null,
+        source_file: sourceFile
+      }, ['fiscal_year', 'employee_type', 'category']));
+      if (result.inserted) inserted++; else updated++;
     } catch (error) {
-      console.error(`    ${colors.red}Error:${colors.reset} ${error.message}`);
+      const errorType = errorHandler.handleError(error, row, i);
       errored++;
+      if (errorType === ErrorType.FATAL) throw error;
     }
   }
 
@@ -586,7 +508,8 @@ async function upsertAgeDistribution(workbook, sourceFile, dryRun, fiscalYear) {
   const staffRows = sheetToJSON(workbook, 'Staff_Age_Distribution');
   console.log(`  Staff_Age_Distribution: ${staffRows.length} rows`);
 
-  for (const row of staffRows) {
+  for (let i = 0; i < staffRows.length; i++) {
+    const row = staffRows[i];
     if (dryRun) {
       console.log(`    [DRY RUN] Staff/${row.category}: ${row.percentage}%`);
       inserted++;
@@ -594,25 +517,19 @@ async function upsertAgeDistribution(workbook, sourceFile, dryRun, fiscalYear) {
     }
 
     try {
-      const result = await sql`
-        INSERT INTO fact_retirement_age_distribution (
-          fiscal_year, employee_type, category, percentage, color, source_file
-        )
-        VALUES (
-          ${fiscalYear}, 'Staff', ${row.category}, ${row.percentage}, ${row.color || null}, ${sourceFile}
-        )
-        ON CONFLICT (fiscal_year, employee_type, category)
-        DO UPDATE SET
-          percentage = EXCLUDED.percentage,
-          color = EXCLUDED.color,
-          source_file = EXCLUDED.source_file,
-          loaded_at = NOW()
-        RETURNING (xmax = 0) AS inserted
-      `;
-      if (result[0]?.inserted) inserted++; else updated++;
+      const result = await retryWithBackoff(() => upsert(getPool(), 'fact_retirement_age_distribution', {
+        fiscal_year: fiscalYear,
+        employee_type: 'Staff',
+        category: row.category,
+        percentage: row.percentage,
+        color: row.color || null,
+        source_file: sourceFile
+      }, ['fiscal_year', 'employee_type', 'category']));
+      if (result.inserted) inserted++; else updated++;
     } catch (error) {
-      console.error(`    ${colors.red}Error:${colors.reset} ${error.message}`);
+      const errorType = errorHandler.handleError(error, row, i);
       errored++;
+      if (errorType === ErrorType.FATAL) throw error;
     }
   }
 
@@ -622,7 +539,7 @@ async function upsertAgeDistribution(workbook, sourceFile, dryRun, fiscalYear) {
 /**
  * Upsert Faculty Retirement by School
  */
-async function upsertFacultyRetirementBySchool(workbook, sourceFile, dryRun, fiscalYear) {
+async function upsertFacultyRetirementBySchool(workbook, sourceFile, dryRun, fiscalYear, errorHandler) {
   const sheetName = 'Faculty_Retirement_School';
   const rows = sheetToJSON(workbook, sheetName);
   let inserted = 0, updated = 0, errored = 0;
@@ -634,7 +551,8 @@ async function upsertFacultyRetirementBySchool(workbook, sourceFile, dryRun, fis
 
   console.log(`  ${sheetName}: ${rows.length} rows`);
 
-  for (const row of rows) {
+  for (let i = 0; i < rows.length; i++) {
+    const row = rows[i];
     if (dryRun) {
       console.log(`    [DRY RUN] ${row.school}: ${row.count} faculty`);
       inserted++;
@@ -642,24 +560,17 @@ async function upsertFacultyRetirementBySchool(workbook, sourceFile, dryRun, fis
     }
 
     try {
-      const result = await sql`
-        INSERT INTO fact_faculty_retirement_by_school (
-          fiscal_year, school, count, source_file
-        )
-        VALUES (
-          ${fiscalYear}, ${row.school}, ${row.count}, ${sourceFile}
-        )
-        ON CONFLICT (fiscal_year, school)
-        DO UPDATE SET
-          count = EXCLUDED.count,
-          source_file = EXCLUDED.source_file,
-          loaded_at = NOW()
-        RETURNING (xmax = 0) AS inserted
-      `;
-      if (result[0]?.inserted) inserted++; else updated++;
+      const result = await retryWithBackoff(() => upsert(getPool(), 'fact_faculty_retirement_by_school', {
+        fiscal_year: fiscalYear,
+        school: row.school,
+        count: row.count,
+        source_file: sourceFile
+      }, ['fiscal_year', 'school']));
+      if (result.inserted) inserted++; else updated++;
     } catch (error) {
-      console.error(`    ${colors.red}Error:${colors.reset} ${error.message}`);
+      const errorType = errorHandler.handleError(error, row, i);
       errored++;
+      if (errorType === ErrorType.FATAL) throw error;
     }
   }
 
@@ -722,8 +633,22 @@ async function main() {
 
   // Load workbook
   const { workbook, sheetNames } = loadWorkbook(sourceFile);
-  validateRequiredSheets(workbook, EXPECTED_SHEETS);
+  const sheetValidation = validateRequiredSheets(workbook, EXPECTED_SHEETS);
+
+  if (sheetValidation.missing.length > 0) {
+    console.error(`${colors.red}Missing required sheets: ${sheetValidation.missing.join(', ')}${colors.reset}`);
+    await endPool();
+    process.exit(1);
+  }
+
   console.log(`${colors.green}✓${colors.reset} Loaded ${sheetNames.length} sheets\n`);
+
+  if (options.validateOnly) {
+    const resolved = sheetValidation.present.map(s => `  ${s}`).join('\n');
+    console.log(`${colors.green}✓${colors.reset} Sheet validation passed. Found sheets:\n${resolved}`);
+    await endPool();
+    process.exit(0);
+  }
 
   // Determine fiscal year
   let fiscalYear = options.fiscalYear;
@@ -756,20 +681,21 @@ async function main() {
   console.log(`${colors.blue}Processing sheets...${colors.reset}`);
   const results = { totalInserted: 0, totalUpdated: 0, totalErrored: 0 };
   const sourceFileName = path.basename(sourceFile);
+  const errorHandler = createErrorHandler('turnover-metrics-to-postgres');
 
   const handlers = [
-    () => upsertSummaryRates(workbook, sourceFileName, options.dryRun),
-    () => upsertTurnoverRatesTable(workbook, sourceFileName, options.dryRun),
-    () => upsertHigherEdBenchmarks(workbook, sourceFileName, options.dryRun),
-    () => upsertTurnoverBreakdown(workbook, sourceFileName, options.dryRun),
-    () => upsertStaffDeviation(workbook, sourceFileName, options.dryRun),
-    () => upsertFacultyDeviation(workbook, sourceFileName, options.dryRun),
-    () => upsertHistoricalRates(workbook, sourceFileName, options.dryRun),
-    () => upsertLengthOfService(workbook, sourceFileName, options.dryRun),
-    () => upsertRetirementsByFY(workbook, sourceFileName, options.dryRun),
-    () => upsertRetirementTrends(workbook, sourceFileName, options.dryRun),
-    () => upsertAgeDistribution(workbook, sourceFileName, options.dryRun, fiscalYear),
-    () => upsertFacultyRetirementBySchool(workbook, sourceFileName, options.dryRun, fiscalYear)
+    () => upsertSummaryRates(workbook, sourceFileName, options.dryRun, errorHandler),
+    () => upsertTurnoverRatesTable(workbook, sourceFileName, options.dryRun, errorHandler),
+    () => upsertHigherEdBenchmarks(workbook, sourceFileName, options.dryRun, errorHandler),
+    () => upsertTurnoverBreakdown(workbook, sourceFileName, options.dryRun, errorHandler),
+    () => upsertStaffDeviation(workbook, sourceFileName, options.dryRun, errorHandler),
+    () => upsertFacultyDeviation(workbook, sourceFileName, options.dryRun, errorHandler),
+    () => upsertHistoricalRates(workbook, sourceFileName, options.dryRun, errorHandler),
+    () => upsertLengthOfService(workbook, sourceFileName, options.dryRun, errorHandler),
+    () => upsertRetirementsByFY(workbook, sourceFileName, options.dryRun, errorHandler),
+    () => upsertRetirementTrends(workbook, sourceFileName, options.dryRun, errorHandler),
+    () => upsertAgeDistribution(workbook, sourceFileName, options.dryRun, fiscalYear, errorHandler),
+    () => upsertFacultyRetirementBySchool(workbook, sourceFileName, options.dryRun, fiscalYear, errorHandler)
   ];
 
   for (const handler of handlers) {
@@ -778,6 +704,9 @@ async function main() {
     results.totalUpdated += r.updated;
     results.totalErrored += r.errored;
   }
+
+  // Print error report before audit completion
+  errorHandler.printErrorReport();
 
   // Summary
   console.log(`\n${colors.cyan}Summary:${colors.reset}`);

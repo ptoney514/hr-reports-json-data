@@ -17,7 +17,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { sql, endPool, checkConnection } = require('./neon-client');
+const { sql, endPool, checkConnection, getPool, upsert } = require('./neon-client');
 
 const { excelDateToJSDate, formatDate, sheetToJSON } = require('../utils/excel-helpers');
 const { getFiscalPeriodKey, getQuarterDatesFromKey } = require('../utils/fiscal-calendar');
@@ -227,29 +227,18 @@ async function upsertDemographicsData(aggregations, sourceFile, dryRun = false) 
     }
 
     try {
-      const result = await sql`
-        INSERT INTO fact_workforce_demographics (
-          period_date, location, category_type, demographic_type, demographic_value,
-          count, percentage, source_file
-        )
-        VALUES (
-          ${agg.periodDate}, ${agg.location}, ${agg.categoryType}, ${agg.demographicType}, ${agg.demographicValue},
-          ${agg.count}, ${agg.percentage}, ${sourceFile}
-        )
-        ON CONFLICT (period_date, location, category_type, demographic_type, demographic_value)
-        DO UPDATE SET
-          count = EXCLUDED.count,
-          percentage = EXCLUDED.percentage,
-          source_file = EXCLUDED.source_file,
-          loaded_at = NOW()
-        RETURNING (xmax = 0) AS inserted
-      `;
+      const result = await upsert(getPool(), 'fact_workforce_demographics', {
+        period_date: agg.periodDate,
+        location: agg.location,
+        category_type: agg.categoryType,
+        demographic_type: agg.demographicType,
+        demographic_value: agg.demographicValue,
+        count: agg.count,
+        percentage: agg.percentage,
+        source_file: sourceFile
+      }, ['period_date', 'location', 'category_type', 'demographic_type', 'demographic_value']);
 
-      if (result[0]?.inserted) {
-        inserted++;
-      } else {
-        updated++;
-      }
+      if (result.inserted) { inserted++; } else { updated++; }
     } catch (err) {
       console.error(`  ${colors.red}Error upserting ${agg.location}/${agg.categoryType}/${agg.demographicType}:${colors.reset} ${err.message}`);
       errored++;

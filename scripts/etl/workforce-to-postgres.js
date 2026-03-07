@@ -16,7 +16,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { sql, endPool, checkConnection } = require('./neon-client');
+const { sql, endPool, checkConnection, getPool, upsert } = require('./neon-client');
 
 const { excelDateToJSDate, formatDate, loadExcelFile, sheetToJSON, getSheetNames } = require('../utils/excel-helpers');
 const { getFiscalPeriodKey, getQuarterDatesFromKey } = require('../utils/fiscal-calendar');
@@ -25,9 +25,10 @@ const { colors, printBanner, printComplete, success, info, error: logError } = r
 const { parseArgs } = require('../utils/cli-parser');
 const { startAudit, completeAudit } = require('../utils/etl-runner');
 const { loadConfig } = require('../utils/config-loader');
-const { createResolver } = require('../utils/column-resolver');
+const { createResolver, validateHeaders } = require('../utils/column-resolver');
 const { loadSchoolLookup, findSchoolId } = require('../utils/school-lookup');
 const { autoDetectLargestSheet } = require('../utils/workbook-loader');
+const { createErrorHandler, retryWithBackoff, ErrorType } = require('../utils/error-handler');
 
 const config = loadConfig();
 const resolve = createResolver('workforce-to-postgres');
@@ -173,12 +174,14 @@ function aggregateWorkforceData(rows, periodDate) {
  */
 async function upsertWorkforceData(aggregations, sourceFile, dryRun = false) {
   const schoolLookup = await loadSchoolLookup();
+  const errorHandler = createErrorHandler('workforce-to-postgres');
 
   let inserted = 0;
   let updated = 0;
   let errored = 0;
 
-  for (const agg of aggregations) {
+  for (let i = 0; i < aggregations.length; i++) {
+    const agg = aggregations[i];
     const schoolId = agg.school ? findSchoolId(agg.school, schoolLookup) : null;
 
     if (dryRun) {
@@ -188,37 +191,32 @@ async function upsertWorkforceData(aggregations, sourceFile, dryRun = false) {
     }
 
     try {
-      const result = await sql`
-        INSERT INTO fact_workforce_snapshots (
-          period_date, location, school_id, category_code,
-          headcount, faculty_count, staff_count, hsp_count, student_count, temp_count,
-          source_file
-        )
-        VALUES (
-          ${agg.periodDate}, ${agg.location}, ${schoolId}, ${agg.categoryCode},
-          ${agg.headcount}, ${agg.facultyCount}, ${agg.staffCount}, ${agg.hspCount}, ${agg.studentCount}, ${agg.tempCount},
-          ${sourceFile}
-        )
-        ON CONFLICT (period_date, location, school_id, category_code)
-        DO UPDATE SET
-          headcount = EXCLUDED.headcount,
-          faculty_count = EXCLUDED.faculty_count,
-          staff_count = EXCLUDED.staff_count,
-          hsp_count = EXCLUDED.hsp_count,
-          student_count = EXCLUDED.student_count,
-          temp_count = EXCLUDED.temp_count,
-          source_file = EXCLUDED.source_file,
-          loaded_at = NOW()
-        RETURNING (xmax = 0) AS inserted
-      `;
+      const result = await retryWithBackoff(() => upsert(getPool(), 'fact_workforce_snapshots', {
+        period_date: agg.periodDate,
+        location: agg.location,
+        school_id: schoolId,
+        category_code: agg.categoryCode,
+        headcount: agg.headcount,
+        faculty_count: agg.facultyCount,
+        staff_count: agg.staffCount,
+        hsp_count: agg.hspCount,
+        student_count: agg.studentCount,
+        temp_count: agg.tempCount,
+        source_file: sourceFile
+      }, ['period_date', 'location', 'school_id', 'category_code']));
 
-      if (result[0]?.inserted) { inserted++; } else { updated++; }
+      if (result.inserted) { inserted++; } else { updated++; }
     } catch (err) {
-      console.error(`  Error upserting ${agg.location}/${agg.categoryCode}: ${err.message}`);
+      const errorType = errorHandler.handleError(err, agg, i);
       errored++;
+      if (errorType === ErrorType.FATAL) {
+        errorHandler.printErrorReport();
+        throw err;
+      }
     }
   }
 
+  errorHandler.printErrorReport();
   return { inserted, updated, errored };
 }
 
@@ -295,6 +293,25 @@ async function main() {
 
     rows = sheetToJSON(workbook, sheetName);
     success(`Loaded ${rows.length} rows from sheet "${sheetName}"\n`);
+
+    // Validate headers
+    const validation = validateHeaders(rows, 'workforce-to-postgres');
+    if (!validation.valid) {
+      const details = validation.missing
+        .map(m => `  ${m.field} (tried: ${m.tried.join(', ')})`)
+        .join('\n');
+      logError(`Missing required columns for workforce:\n${details}`);
+      await endPool();
+      process.exit(1);
+    }
+    if (options.validateOnly) {
+      const resolved = Object.entries(validation.resolved)
+        .map(([field, alias]) => `  ${field} -> "${alias}"`)
+        .join('\n');
+      success(`Header validation passed. Resolved columns:\n${resolved}`);
+      await endPool();
+      process.exit(0);
+    }
 
     // Remove PII
     info('Removing PII...');

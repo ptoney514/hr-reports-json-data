@@ -16,7 +16,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { sql } = require('./neon-client');
+const { sql, getPool, upsert } = require('./neon-client');
 const { getQuarterDatesFromKey, getFiscalPeriodKey } = require('../utils/fiscal-calendar');
 const { formatDate } = require('../utils/excel-helpers');
 const { colors, info, success, warning, error: logError, dryRunPrefix } = require('../utils/formatting');
@@ -67,24 +67,14 @@ async function upsertResidenceData(data, periodDate, sourceFile, dryRun = false)
     }
 
     try {
-      const result = await sql`
-        INSERT INTO fact_employee_state_residence (
-          period_date, state_code, employee_count, source_file
-        )
-        VALUES (${periodDate}, ${stateCode}, ${count}, ${sourceFile})
-        ON CONFLICT (period_date, state_code)
-        DO UPDATE SET
-          employee_count = EXCLUDED.employee_count,
-          source_file = EXCLUDED.source_file,
-          loaded_at = NOW()
-        RETURNING (xmax = 0) AS inserted
-      `;
+      const result = await upsert(getPool(), 'fact_employee_state_residence', {
+        period_date: periodDate,
+        state_code: stateCode,
+        employee_count: count,
+        source_file: sourceFile
+      }, ['period_date', 'state_code']);
 
-      if (result[0]?.inserted) {
-        inserted++;
-      } else {
-        updated++;
-      }
+      if (result.inserted) { inserted++; } else { updated++; }
     } catch (err) {
       console.error(`  Error upserting ${stateCode}: ${err.message}`);
       errored++;

@@ -325,6 +325,118 @@ describe('Neon Client Patterns', () => {
     });
   });
 
+  describe('Upsert Helper Pattern', () => {
+    const upsert = async (pool, table, data, conflictKeys, options = {}) => {
+      const { columnMap = {}, dryRun = false, updateExclusions = [] } = options;
+      const dataKeys = Object.keys(data);
+      const dbColumns = dataKeys.map(k => columnMap[k] || k);
+      const values = dataKeys.map(k => data[k]);
+      const placeholders = dataKeys.map((_, i) => `$${i + 1}`);
+      const excludeSet = new Set([...conflictKeys, ...updateExclusions]);
+      const updateCols = dbColumns.filter(col => !excludeSet.has(col));
+      const setClauses = updateCols.map(col => `${col} = EXCLUDED.${col}`);
+      setClauses.push('loaded_at = NOW()');
+
+      const sqlText = [
+        `INSERT INTO ${table} (${dbColumns.join(', ')})`,
+        `VALUES (${placeholders.join(', ')})`,
+        `ON CONFLICT (${conflictKeys.join(', ')})`,
+        `DO UPDATE SET ${setClauses.join(', ')}`,
+        `RETURNING (xmax = 0) AS inserted`
+      ].join('\n');
+
+      if (dryRun) {
+        return { inserted: true, updated: false };
+      }
+
+      const result = await pool.query(sqlText, values);
+      const wasInserted = result.rows[0]?.inserted === true;
+      return { inserted: wasInserted, updated: !wasInserted };
+    };
+
+    it('builds correct SQL and returns inserted for new rows', async () => {
+      const pool = {
+        query: jest.fn().mockResolvedValue({ rows: [{ inserted: true }] })
+      };
+
+      const result = await upsert(pool, 'fact_test', {
+        fiscal_year: 'FY25',
+        category: 'staff',
+        rate: 12.5
+      }, ['fiscal_year', 'category']);
+
+      expect(result).toEqual({ inserted: true, updated: false });
+      expect(pool.query).toHaveBeenCalledTimes(1);
+
+      const [sqlText, values] = pool.query.mock.calls[0];
+      expect(sqlText).toContain('INSERT INTO fact_test');
+      expect(sqlText).toContain('ON CONFLICT (fiscal_year, category)');
+      expect(sqlText).toContain('rate = EXCLUDED.rate');
+      expect(sqlText).toContain('loaded_at = NOW()');
+      expect(sqlText).not.toContain('fiscal_year = EXCLUDED.fiscal_year');
+      expect(values).toEqual(['FY25', 'staff', 12.5]);
+    });
+
+    it('returns updated for existing rows', async () => {
+      const pool = {
+        query: jest.fn().mockResolvedValue({ rows: [{ inserted: false }] })
+      };
+
+      const result = await upsert(pool, 'fact_test', {
+        fiscal_year: 'FY25',
+        rate: 15.0
+      }, ['fiscal_year']);
+
+      expect(result).toEqual({ inserted: false, updated: true });
+    });
+
+    it('supports columnMap for asymmetric field names', async () => {
+      const pool = {
+        query: jest.fn().mockResolvedValue({ rows: [{ inserted: true }] })
+      };
+
+      await upsert(pool, 'fact_pipeline_metrics_staff', {
+        fiscal_year: 'FY26',
+        fiscal_quarter: 1,
+        apps_per_req: 25
+      }, ['fiscal_year', 'fiscal_quarter'], {
+        columnMap: { apps_per_req: 'apps_per_requisition' }
+      });
+
+      const [sqlText] = pool.query.mock.calls[0];
+      expect(sqlText).toContain('apps_per_requisition');
+      // The original data key should not appear as a bare column name
+      expect(sqlText).not.toMatch(/\bapps_per_req\b(?!uisition)/);
+    });
+
+    it('respects updateExclusions', async () => {
+      const pool = {
+        query: jest.fn().mockResolvedValue({ rows: [{ inserted: true }] })
+      };
+
+      await upsert(pool, 'fact_test', {
+        id: 1,
+        name: 'test',
+        created_at: '2025-01-01'
+      }, ['id'], { updateExclusions: ['created_at'] });
+
+      const [sqlText] = pool.query.mock.calls[0];
+      expect(sqlText).toContain('name = EXCLUDED.name');
+      expect(sqlText).not.toContain('created_at = EXCLUDED.created_at');
+    });
+
+    it('returns dry-run result without querying', async () => {
+      const pool = { query: jest.fn() };
+
+      const result = await upsert(pool, 'fact_test', {
+        id: 1, name: 'test'
+      }, ['id'], { dryRun: true });
+
+      expect(result).toEqual({ inserted: true, updated: false });
+      expect(pool.query).not.toHaveBeenCalled();
+    });
+  });
+
   describe('Module Exports Pattern', () => {
     it('exports expected functions', () => {
       const expectedExports = [
@@ -338,7 +450,8 @@ describe('Neon Client Patterns', () => {
         'completeAuditLog',
         'checkConnection',
         'getDatabaseInfo',
-        'getDatabaseUrl'
+        'getDatabaseUrl',
+        'upsert'
       ];
 
       // This tests the expected interface - actual implementation is in scripts/etl/neon-client.js

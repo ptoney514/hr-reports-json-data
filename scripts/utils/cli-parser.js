@@ -35,7 +35,8 @@ function parseArgs(scriptName, scriptOptions = [], helpConfig = {}) {
   // Build defaults
   const options = {
     dryRun: false,
-    verbose: false
+    verbose: false,
+    validateOnly: false
   };
 
   for (const opt of scriptOptions) {
@@ -62,6 +63,10 @@ function parseArgs(scriptName, scriptOptions = [], helpConfig = {}) {
     }
     if (arg === '--verbose' || arg === '-v') {
       options.verbose = true;
+      continue;
+    }
+    if (arg === '--validate-only') {
+      options.validateOnly = true;
       continue;
     }
     if (arg === '--help' || arg === '-h') {
@@ -115,6 +120,7 @@ function printHelp(scriptName, scriptOptions, helpConfig) {
 
   // Common options
   output += `  ${'--dry-run'.padEnd(24)} Preview without database writes\n`;
+  output += `  ${'--validate-only'.padEnd(24)} Validate headers and exit without processing\n`;
   output += `  ${'-v, --verbose'.padEnd(24)} Show detailed output\n`;
   output += `  ${'-h, --help'.padEnd(24)} Show this help message\n`;
 
