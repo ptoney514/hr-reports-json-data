@@ -23,7 +23,9 @@ const { sql, endPool, startAuditLog, completeAuditLog, checkConnection } = requi
 const {
   loadExcelFile,
   sheetToJSON,
-  getSheetNames
+  getSheetNames,
+  excelDateToJSDate,
+  formatDate
 } = require('../utils/excel-helpers');
 
 const {
@@ -42,17 +44,6 @@ const colors = {
 
 // Assignment category classifications for benefit-eligible
 const BENEFIT_ELIGIBLE_CATEGORIES = ['F12', 'F11', 'F09', 'F10', 'PT12', 'PT10', 'PT9', 'PT11'];
-
-// Date constants for filtering
-const EXCEL_DATE_MAP = {
-  '2025-12-31': 46022,  // FY26 Q2
-  '2025-09-30': 45930,  // FY26 Q1
-  '2025-06-30': 45838,  // FY25 Q4
-  '2025-03-31': 45747,  // FY25 Q3
-  '2024-12-31': 45657,  // FY25 Q2
-  '2024-09-30': 45565,  // FY25 Q1
-  '2024-06-30': 45473   // FY24 Q4
-};
 
 // Ethnicity normalization map - normalizes Excel values to match staticData.js format
 // Keys must be lowercase for the normalizeEthnicity lookup
@@ -432,7 +423,7 @@ async function main() {
     periodDate = options.date;
   } else if (options.quarter) {
     const dates = getQuarterDatesFromKey(options.quarter);
-    periodDate = dates.end.toISOString().split('T')[0];
+    periodDate = formatDate(dates.end);
   } else {
     // Default to FY25 Q4
     periodDate = '2025-06-30';
@@ -444,11 +435,7 @@ async function main() {
   console.log(`${colors.cyan}Period Date: ${periodDate}${colors.reset}`);
   console.log(`${colors.cyan}Fiscal Period: ${fiscalPeriod}${colors.reset}\n`);
 
-  // Get the Excel date filter value
-  const excelEndDate = EXCEL_DATE_MAP[periodDate];
-  if (!excelEndDate) {
-    console.warn(`${colors.yellow}Warning: No Excel date mapping for ${periodDate}, will load all current employees${colors.reset}`);
-  }
+  // No manual date map needed - we convert Excel serial dates algorithmically
 
   // Find input file
   let sourceFile = options.input || findDefaultInputFile();
@@ -485,11 +472,21 @@ async function main() {
   console.log(`${colors.green}✓${colors.reset} Loaded ${rows.length.toLocaleString()} rows from sheet "${sheetName}"\n`);
 
   // Filter for current employees (END DATE matches period)
-  if (excelEndDate) {
-    console.log(`${colors.blue}Filtering for employees as of ${periodDate} (END DATE = ${excelEndDate})...${colors.reset}`);
-    rows = rows.filter(row => row['END DATE'] === excelEndDate);
-    console.log(`${colors.green}✓${colors.reset} ${rows.length.toLocaleString()} employees as of ${periodDate}\n`);
+  console.log(`${colors.blue}Filtering for employees as of ${periodDate} (converting Excel serial dates)...${colors.reset}`);
+  rows = rows.filter(row => {
+    const endDate = row['END DATE'];
+    if (typeof endDate !== 'number') return false;
+    const converted = formatDate(excelDateToJSDate(endDate));
+    return converted === periodDate;
+  });
+
+  if (rows.length === 0) {
+    console.error(`${colors.red}FATAL: No rows matched period_date ${periodDate}. Check that the Excel file contains data for this period.${colors.reset}`);
+    await endPool();
+    process.exit(1);
   }
+
+  console.log(`${colors.green}✓${colors.reset} ${rows.length.toLocaleString()} employees as of ${periodDate}\n`);
 
   // Filter for benefit eligible
   console.log(`${colors.blue}Filtering for benefit-eligible employees...${colors.reset}`);

@@ -663,19 +663,9 @@ async function upsertRequisitionAging(workbook, sourceFile, dryRun, metadata) {
 
   console.log(`  ${sheetName}: ${rows.length} rows`);
 
-  // Color mapping for aging buckets
-  const ageColors = {
-    '0-30 Days': '#10B981',
-    '31-60 Days': '#3B82F6',
-    '61-90 Days': '#F59E0B',
-    '91-120 Days': '#EF4444',
-    '>120 Days': '#7F1D1D'
-  };
-
   for (const row of rows) {
     const fiscalYear = row.fiscal_year || metadata.fiscalYear;
     const fiscalQuarter = row.fiscal_quarter || metadata.fiscalQuarter;
-    const displayColor = ageColors[row.age_range] || '#9CA3AF';
 
     if (dryRun) {
       console.log(`    [DRY RUN] ${fiscalYear}/Q${fiscalQuarter}/${row.age_range}: ${row.requisition_count} (${row.percentage}%)`);
@@ -687,18 +677,17 @@ async function upsertRequisitionAging(workbook, sourceFile, dryRun, metadata) {
       const result = await sql`
         INSERT INTO fact_requisition_aging (
           fiscal_year, fiscal_quarter, age_range, requisition_count,
-          percentage, display_color, source_file
+          percentage, source_file
         )
         VALUES (
           ${fiscalYear}, ${fiscalQuarter}, ${row.age_range},
           ${row.requisition_count || 0}, ${row.percentage ?? null},
-          ${displayColor}, ${sourceFile}
+          ${sourceFile}
         )
         ON CONFLICT (fiscal_year, fiscal_quarter, age_range)
         DO UPDATE SET
           requisition_count = EXCLUDED.requisition_count,
           percentage = EXCLUDED.percentage,
-          display_color = EXCLUDED.display_color,
           source_file = EXCLUDED.source_file,
           loaded_at = NOW()
         RETURNING (xmax = 0) AS inserted
@@ -723,30 +712,9 @@ async function upsertNewHireDemographics(workbook, sourceFile, dryRun, metadata)
 
   console.log(`  ${sheetName}: ${rows.length} rows`);
 
-  // Color mappings
-  const demoColors = {
-    // Gender
-    'Female': '#EC4899',
-    'Male': '#3B82F6',
-    // Ethnicity
-    'White': '#3B82F6',
-    'Not Disclosed': '#9CA3AF',
-    'Asian': '#10B981',
-    'More than one Ethnicity': '#8B5CF6',
-    'Hispanic or Latino': '#F59E0B',
-    'Black or African American': '#EF4444',
-    // Age bands
-    '21-30': '#3B82F6',
-    '31-40': '#10B981',
-    '41-50': '#F59E0B',
-    '51-60': '#8B5CF6',
-    '61+': '#EF4444'
-  };
-
   for (const row of rows) {
     const fiscalYear = row.fiscal_year || metadata.fiscalYear;
     const fiscalQuarter = row.fiscal_quarter || metadata.fiscalQuarter;
-    const displayColor = demoColors[row.demo_value] || '#9CA3AF';
 
     if (dryRun) {
       console.log(`    [DRY RUN] ${fiscalYear}/Q${fiscalQuarter}/${row.demo_type}/${row.demo_value}: ${row.count} (${row.percentage}%)`);
@@ -758,17 +726,16 @@ async function upsertNewHireDemographics(workbook, sourceFile, dryRun, metadata)
       const result = await sql`
         INSERT INTO fact_new_hire_demographics (
           fiscal_year, fiscal_quarter, demo_type, demo_value,
-          count, percentage, display_color, source_file
+          count, percentage, source_file
         )
         VALUES (
           ${fiscalYear}, ${fiscalQuarter}, ${row.demo_type}, ${row.demo_value},
-          ${row.count || 0}, ${row.percentage ?? null}, ${displayColor}, ${sourceFile}
+          ${row.count || 0}, ${row.percentage ?? null}, ${sourceFile}
         )
         ON CONFLICT (fiscal_year, fiscal_quarter, demo_type, demo_value)
         DO UPDATE SET
           count = EXCLUDED.count,
           percentage = EXCLUDED.percentage,
-          display_color = EXCLUDED.display_color,
           source_file = EXCLUDED.source_file,
           loaded_at = NOW()
         RETURNING (xmax = 0) AS inserted
