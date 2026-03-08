@@ -70,9 +70,6 @@ const WorkforceDashboard = () => {
     }
   };
 
-  // Enhanced subtitle with data source
-  const dataSource = 'Static Data';
-
 
   return (
     <ErrorBoundary>
