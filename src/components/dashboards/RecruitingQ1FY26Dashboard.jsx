@@ -84,6 +84,45 @@ const Q2_FY26_DATA = {
     total: { count: 58, oma: 52, phx: 6 },
     faculty: { count: 9, oma: 7, phx: 2 },
     staff: { count: 49, oma: 45, phx: 4 }
+  },
+  bySchool: [
+    { school: "Facilities", faculty: 0, staff: 11, total: 11 },
+    { school: "Medicine", faculty: 2, staff: 7, total: 9 },
+    { school: "VPSL", faculty: 0, staff: 4, total: 4 },
+    { school: "Dentistry", faculty: 2, staff: 2, total: 4 },
+    { school: "VPEM", faculty: 0, staff: 4, total: 4 },
+    { school: "Provost", faculty: 2, staff: 1, total: 3 },
+    { school: "Public Safety", faculty: 0, staff: 3, total: 3 },
+    { school: "Other", faculty: 3, staff: 17, total: 20 }
+  ],
+  byMonth: [
+    { month: "October 2025", faculty: 2, staff: 19, total: 21 },
+    { month: "November 2025", faculty: 4, staff: 16, total: 20 },
+    { month: "December 2025", faculty: 3, staff: 14, total: 17 }
+  ],
+  demographics: {
+    gender: {
+      female: 32,
+      male: 26,
+      femalePercentage: 55.2,
+      malePercentage: 44.8
+    },
+    ethnicity: [
+      { category: "White", count: 28, percentage: 48.3, color: "#3B82F6" },
+      { category: "Asian", count: 12, percentage: 20.7, color: "#10B981" },
+      { category: "More than one Ethnicity", count: 8, percentage: 13.8, color: "#8B5CF6" },
+      { category: "Not Disclosed", count: 7, percentage: 12.1, color: "#9CA3AF" },
+      { category: "Hispanic or Latino", count: 2, percentage: 3.4, color: "#F59E0B" },
+      { category: "Black or African American", count: 1, percentage: 1.7, color: "#EF4444" }
+    ],
+    ageDistribution: [
+      { band: "Under 20", count: 1, percentage: 1.7, color: "#06B6D4" },
+      { band: "21-30", count: 13, percentage: 22.4, color: "#3B82F6" },
+      { band: "31-40", count: 16, percentage: 27.6, color: "#10B981" },
+      { band: "41-50", count: 19, percentage: 32.8, color: "#F59E0B" },
+      { band: "51-60", count: 7, percentage: 12.1, color: "#8B5CF6" },
+      { band: "61+", count: 2, percentage: 3.4, color: "#EF4444" }
+    ]
   }
 };
 
@@ -715,7 +754,7 @@ const RecruitingQ1FY26Dashboard = () => {
 
           {/* Data Note */}
           <div className="text-xs text-gray-600 mt-4 bg-blue-50 p-3 rounded border border-blue-200 text-center">
-            <span className="font-semibold">Note:</span> Arts & Sciences leads with 17 faculty hires (all academic positions). Facilities and Medicine tied for second with 8 hires each, primarily staff positions.
+            <span className="font-semibold">Note:</span> {schoolChartData[0]?.fullName} leads with {schoolChartData[0]?.total} {schoolChartData[0]?.Faculty > 0 && schoolChartData[0]?.Staff > 0 ? 'hires' : schoolChartData[0]?.Faculty > 0 ? 'faculty hires' : 'staff hires'}{schoolChartData[1] && `. ${schoolChartData[1].fullName} follows with ${schoolChartData[1].total} hires.`}
           </div>
         </div>
 
@@ -867,7 +906,7 @@ const RecruitingQ1FY26Dashboard = () => {
 
           {/* Data Note */}
           <div className="text-xs text-gray-600 mt-6 bg-blue-50 p-3 rounded border border-blue-200 text-center">
-            <span className="font-semibold">Note:</span> Gender distribution shows near-equal representation with 49.3% female and 50.7% male new hires in {data.quarter}.
+            <span className="font-semibold">Note:</span> Gender distribution shows {data.demographics.gender.femalePercentage}% female and {data.demographics.gender.malePercentage}% male new hires in {data.quarter}.
           </div>
         </div>
         </>)}
