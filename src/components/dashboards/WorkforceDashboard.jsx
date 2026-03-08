@@ -4,7 +4,6 @@ import ErrorBoundary from '../ui/ErrorBoundary';
 import GenderDistributionChart from '../charts/GenderDistributionChart';
 import EthnicityBreakdownChart from '../charts/EthnicityBreakdownChart';
 import AgeGenderPyramid from '../charts/AgeGenderPyramid';
-import { DataDebugOverlay } from '../ui/DataDebugOverlay';
 import { getWorkforceData, getTempTotal } from '../../services/dataService';
 import { Users, BookOpen, Building2, Heart, GraduationCap, TrendingUp } from 'lucide-react';
 
@@ -237,13 +236,6 @@ const WorkforceDashboard = () => {
         </div>
       </div>
       
-      {/* Data Debug Overlay - Only in development */}
-      <DataDebugOverlay 
-        data={currentData}
-        rawData={currentData}
-        source={dataSource}
-        dashboardType="workforce"
-      />
     </ErrorBoundary>
   );
 };

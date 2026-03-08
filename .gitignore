@@ -27,6 +27,16 @@ dist/
 
 # Environment variables
 .env
+.env.*
+!.env.example
+
+# Secrets & credentials - never commit these
+**/config/firebase*.js
+**/config/secrets*
+*.pem
+*.key
+*-credentials.json
+service-account*.json
 
 # IDE and editor files
 .vscode/
