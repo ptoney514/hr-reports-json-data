@@ -1,6 +1,8 @@
 import React, { useState, useMemo } from 'react';
 import { UserPlus, Users, UserCheck, Briefcase, Building2, TrendingUp, FileText, CheckCircle, AlertCircle, Info, Clock, Target, Filter, Award, Globe, ChevronUp, ChevronDown } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
+import { useQuarter } from '../../contexts/QuarterContext';
+import NoDataForQuarter from '../ui/NoDataForQuarter';
 
 /**
  * Q1 FY26 Recruiting Dashboard
@@ -66,6 +68,22 @@ const Q1_FY26_DATA = {
       { band: "51-60", count: 6, percentage: 8.7, color: "#8B5CF6" },
       { band: "61+", count: 3, percentage: 4.3, color: "#EF4444" }
     ]
+  }
+};
+
+// Q2 FY26 New Hire Data - extracted from Oracle HCM (Source of Truth)
+// Extracted: 2026-03-07 from New Emp List since FY20 to Q1FY25 1031 PT 12-9-2025.xlsx
+// Methodology: Same as Q1 — benefit-eligible (F12/F11/F10/F09/PT12/PT11/PT10/PT9), exclude Grade R, dedup by Empl num
+const Q2_FY26_DATA = {
+  reportingDate: "12/31/25",
+  quarter: "Q2 FY26",
+  fiscalPeriod: "October 2025 - December 2025",
+  dataAsOf: "2025-12-31",
+  note: "Data extracted from Oracle HCM snapshot as of 12/31/2025.",
+  summary: {
+    total: { count: 58, oma: 52, phx: 6 },
+    faculty: { count: 9, oma: 7, phx: 2 },
+    staff: { count: 49, oma: 45, phx: 4 }
   }
 };
 
@@ -263,40 +281,46 @@ const QUARTERLY_HIRING_TRENDS = [
   { quarter: "Q2 FY25", faculty: 8, staff: 44, total: 52 },
   { quarter: "Q3 FY25", faculty: 3, staff: 44, total: 47 },
   { quarter: "Q4 FY25", faculty: 3, staff: 47, total: 50 },
-  { quarter: "Q1 FY26", faculty: 31, staff: 38, total: 69 }
+  { quarter: "Q1 FY26", faculty: 31, staff: 38, total: 69 },
+  { quarter: "Q2 FY26", faculty: 9, staff: 49, total: 58 }
 ];
 
+// Quarterly data map — keyed by quarter end date
+const QUARTERLY_RECRUITING_PIPELINE = {
+  "2025-09-30": {
+    data: Q1_FY26_DATA,
+    myJobs: MYJOBS_DATA,
+    interfolio: INTERFOLIO_DATA,
+    oracleHires: ORACLE_HIRES_DATA
+  },
+  "2025-12-31": {
+    data: Q2_FY26_DATA
+    // myJobs, interfolio, oracleHires not yet available for Q2
+  }
+};
+
 const RecruitingQ1FY26Dashboard = () => {
-  const data = Q1_FY26_DATA;
-  const summary = data.summary;
-  const myJobs = MYJOBS_DATA;
-  const interfolio = INTERFOLIO_DATA;
-  const oracleHires = ORACLE_HIRES_DATA;
+  const { selectedQuarter } = useQuarter();
+  const quarterData = QUARTERLY_RECRUITING_PIPELINE[selectedQuarter];
 
   // Sorting state for Oracle Hiring Details table
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
 
-  // Sort handler
-  const handleSort = (key) => {
-    setSortConfig(prev => ({
-      key,
-      direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc'
-    }));
-  };
+  const data = quarterData?.data;
+  const oracleHires = quarterData?.oracleHires;
 
-  // Sorted hires data
+  // Sorted hires data (hook must be called before early return)
   const sortedHires = useMemo(() => {
+    if (!oracleHires?.hires) return [];
     if (!sortConfig.key) return oracleHires.hires;
 
     return [...oracleHires.hires].sort((a, b) => {
       let aVal, bVal;
 
       if (sortConfig.key === 'ats') {
-        // Sort by ATS coverage: Interfolio first, then ORC, then neither
         aVal = a.inInterfolio ? 2 : (a.inORC ? 1 : 0);
         bVal = b.inInterfolio ? 2 : (b.inORC ? 1 : 0);
       } else if (sortConfig.key === 'hireDate') {
-        // Parse dates for proper sorting
         aVal = new Date(a.hireDate);
         bVal = new Date(b.hireDate);
       } else {
@@ -308,7 +332,23 @@ const RecruitingQ1FY26Dashboard = () => {
       if (aVal > bVal) return sortConfig.direction === 'asc' ? 1 : -1;
       return 0;
     });
-  }, [oracleHires.hires, sortConfig]);
+  }, [oracleHires?.hires, sortConfig]);
+
+  if (!quarterData) {
+    return <NoDataForQuarter dataLabel="Recruiting & new hires data" />;
+  }
+
+  const summary = data.summary;
+  const myJobs = quarterData.myJobs;
+  const interfolio = quarterData.interfolio;
+
+  // Sort handler
+  const handleSort = (key) => {
+    setSortConfig(prev => ({
+      key,
+      direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc'
+    }));
+  };
 
   // Sortable header component
   const SortableHeader = ({ label, sortKey, className = '' }) => (
@@ -341,7 +381,7 @@ const RecruitingQ1FY26Dashboard = () => {
   };
 
   // Prepare bar chart data for schools
-  const schoolChartData = data.bySchool.slice(0, 8).map(s => ({
+  const schoolChartData = (data.bySchool || []).slice(0, 8).map(s => ({
     name: s.school.length > 15 ? s.school.substring(0, 12) + '...' : s.school,
     fullName: s.school,
     Faculty: s.faculty,
@@ -521,7 +561,7 @@ const RecruitingQ1FY26Dashboard = () => {
         {/* RECRUITMENT PIPELINE SECTION (from myJobs)    */}
         {/* ============================================== */}
 
-        <div className="mb-8">
+        {myJobs && (<div className="mb-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
             <Filter style={{color: '#0054A6'}} size={28} />
             Staff Recruitment Pipeline
@@ -627,12 +667,13 @@ const RecruitingQ1FY26Dashboard = () => {
 
           </div>
 
-        </div>
+        </div>)}
 
         {/* ============================================== */}
         {/* NEW HIRES BREAKDOWN SECTION                   */}
         {/* ============================================== */}
 
+        {data.bySchool && (<>
         {/* New Hires by School/Organization */}
         <div className="bg-white rounded-lg shadow-sm border p-6 mb-8">
           <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
@@ -829,12 +870,13 @@ const RecruitingQ1FY26Dashboard = () => {
             <span className="font-semibold">Note:</span> Gender distribution shows near-equal representation with 49.3% female and 50.7% male new hires in {data.quarter}.
           </div>
         </div>
+        </>)}
 
         {/* ============================================== */}
         {/* ORACLE HIRING DETAILS (All 69 Hires)          */}
         {/* ============================================== */}
 
-        <div className="bg-gradient-to-r from-blue-50 to-white rounded-lg shadow-sm border p-6 mb-8">
+        {oracleHires && (<div className="bg-gradient-to-r from-blue-50 to-white rounded-lg shadow-sm border p-6 mb-8">
           <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-3">
             <Users style={{color: '#0054A6'}} size={24} />
             Oracle Hiring Details
@@ -975,13 +1017,13 @@ const RecruitingQ1FY26Dashboard = () => {
               </div>
             </div>
           </div>
-        </div>
+        </div>)}
 
         {/* ============================================== */}
         {/* FACULTY HIRING SECTION (from Interfolio)      */}
         {/* ============================================== */}
 
-        <div className="bg-gradient-to-r from-green-50 to-white rounded-lg shadow-sm border p-6 mb-8">
+        {interfolio && (<div className="bg-gradient-to-r from-green-50 to-white rounded-lg shadow-sm border p-6 mb-8" aria-label="Faculty hiring section">
           <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-3">
             <Award style={{color: '#10B981'}} size={24} />
             Faculty Hiring Detail
@@ -1052,10 +1094,10 @@ const RecruitingQ1FY26Dashboard = () => {
           <div className="mt-4 text-xs text-gray-500 text-center">
             50% tenure-track positions (3 of 6 faculty hires)
           </div>
-        </div>
+        </div>)}
 
-        {/* Executive Summary */}
-        <div className="bg-white rounded-lg shadow-sm border p-8 mb-8">
+        {/* Executive Summary - only show when full pipeline data is available */}
+        {myJobs && (<div className="bg-white rounded-lg shadow-sm border p-8 mb-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
             <FileText style={{color: '#0054A6'}} size={24} />
             Executive Summary
@@ -1136,7 +1178,7 @@ const RecruitingQ1FY26Dashboard = () => {
             </div>
 
           </div>
-        </div>
+        </div>)}
 
         {/* Methodology Note */}
         <div className="text-xs text-gray-500 text-center">
