@@ -2847,6 +2847,27 @@ export const getQuarterlyWorkforceData = (date = "2025-09-30") => {
   return QUARTERLY_WORKFORCE_DATA[date] || null;
 };
 
+export const QUARTERLY_RECRUITING_DETAILS = {
+  "2025-12-31": {
+    reportingDate: "12/31/25",
+    quarter: "Q2 FY26",
+    fiscalPeriod: "October 2025 - December 2025",
+    staff: { opened: 84, filled: 60, stillOpen: 91, fillRate: 71.4 },
+    faculty: { opened: 21 }
+  },
+  "2025-09-30": {
+    reportingDate: "9/30/25",
+    quarter: "Q1 FY26",
+    fiscalPeriod: "July 2025 - September 2025",
+    staff: { opened: 79, filled: 12, stillOpen: 67, fillRate: 15.2 },
+    faculty: { opened: 23 }
+  }
+};
+
+export const getQuarterlyRecruitingDetails = (date = "2025-12-31") => {
+  return QUARTERLY_RECRUITING_DETAILS[date] || null;
+};
+
 export const getQuarterlyTurnoverRatesByCategory = () => {
   return {
     rates: QUARTERLY_TURNOVER_RATES_BY_CATEGORY,

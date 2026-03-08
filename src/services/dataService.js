@@ -101,6 +101,13 @@ export const getTurnoverMetricsAsync = async (fiscalYear = 'FY2025') => {
 };
 
 /**
+ * Get quarterly recruiting details (position activity metrics)
+ */
+export const getQuarterlyRecruitingDetails = (date = "2025-12-31") => {
+  return staticData.getQuarterlyRecruitingDetails(date);
+};
+
+/**
  * Get recruiting data for a specific date
  */
 export const getRecruitingData = (date = "2025-06-30") => {
@@ -417,6 +424,7 @@ const dataService = {
   getWorkforceData,
   getTurnoverData,
   getTurnoverMetrics,
+  getQuarterlyRecruitingDetails,
   getRecruitingData,
   getExitSurveyData,
   getQuarterlyTurnoverData,
