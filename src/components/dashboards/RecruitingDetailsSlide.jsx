@@ -103,7 +103,7 @@ const RecruitingDetailsSlide = () => {
         </div>
 
         {/* Faculty Section */}
-        <div className="bg-white rounded-lg shadow-sm border p-4">
+        <div className="bg-white rounded-lg shadow-sm border p-4" role="region" aria-label="Faculty position metrics">
           <h2 className="text-xl font-bold text-gray-900 mb-3">Faculty Positions</h2>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
             <div className="bg-white rounded-lg shadow-sm border p-4">
