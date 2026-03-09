@@ -2,13 +2,14 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { TrendingUp, ArrowUp, BarChart3, Calendar, Activity, HelpCircle } from 'lucide-react';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
-import { internalMobilityData } from '../../data/internalMobilityData';
+import { getInternalMobilityData } from '../../services/dataService';
+import { useQuarter } from '../../contexts/QuarterContext';
+import NoDataForQuarter from '../ui/NoDataForQuarter';
 
 /**
- * Q1 FY26 Promotions Dashboard
- * Displays promotions with calculated reason codes
- *
- * Data Source: source-metrics via scripts/processInternalMobility.py
+ * Promotions Dashboard (quarter-aware)
+ * Displays promotions with calculated reason codes.
+ * Data Source: internalMobilityData via dataService (date-keyed).
  */
 
 // Updated color scheme for promotion reasons (WCAG AA compliant)
@@ -21,6 +22,14 @@ const promotionColors = {
 const formatDate = (dateString) => {
   const date = new Date(dateString);
   return `${date.getMonth() + 1}/${date.getDate()}/${String(date.getFullYear()).slice(-2)}`;
+};
+
+// Human-readable period from metadata dateRange
+const getPeriodText = (dateRange) => {
+  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const start = new Date(dateRange.start);
+  const end = new Date(dateRange.end);
+  return `${months[start.getMonth()]} - ${months[end.getMonth()]} ${end.getFullYear()}`;
 };
 
 // Reason Code Badge Component (for detail table)
@@ -243,13 +252,13 @@ const PromotionsDetailTable = ({ data }) => {
 };
 
 // Custom tooltip for charts
-const CustomTooltip = ({ active, payload }) => {
+const CustomTooltip = ({ active, payload, totalPromotions }) => {
   if (active && payload && payload.length) {
     const data = payload[0].payload;
     return (
       <div className="bg-white border border-gray-200 rounded-lg shadow-lg p-3">
         <p className="font-semibold text-gray-900">{data.label}</p>
-        <p className="text-gray-600">{data.count} promotions ({((data.count / 65) * 100).toFixed(0)}%)</p>
+        <p className="text-gray-600">{data.count} promotions ({((data.count / totalPromotions) * 100).toFixed(0)}%)</p>
       </div>
     );
   }
@@ -294,23 +303,38 @@ const OverTimePlaceholder = () => (
     </div>
 
     <div className="mt-4 text-xs text-gray-500">
-      Expected: Q2 FY26 • Historical data: FY25 Q1-Q4 will be available
+      Historical data: FY25 Q1-Q4 will be available
     </div>
   </div>
 );
 
 const PromotionsQ1FY26Dashboard = () => {
-  const { metadata, summary, promotionsByReason, promotionsBySchool, employeeDetails } = internalMobilityData;
+  const { selectedQuarter, quarterConfig } = useQuarter();
+
+  // Get data for the selected quarter
+  const mobilityData = getInternalMobilityData(selectedQuarter);
+
+  if (!mobilityData) {
+    return <NoDataForQuarter dataLabel="Promotions data" />;
+  }
+
+  const { metadata, summary, promotionsByReason, promotionsBySchool, employeeDetails } = mobilityData;
+  const periodText = getPeriodText(metadata.dateRange);
 
   // Calculate derived metrics
   const mostCommonReason = promotionsByReason.reduce((a, b) => a.count > b.count ? a : b);
-  const promotionsPerMonth = (summary.totalPromotions / 3).toFixed(1); // Q1 = 3 months
+  const promotionsPerMonth = (summary.totalPromotions / 3).toFixed(1); // Each quarter = 3 months
 
   // Chart data with color mapping
   const chartData = promotionsByReason.map(item => ({
     ...item,
     color: promotionColors[item.code] || '#9ca3af'
   }));
+
+  // Dynamic axis domain based on data
+  const maxReasonCount = Math.max(...promotionsByReason.map(r => r.count));
+  const xAxisMax = Math.ceil(maxReasonCount / 10) * 10 + 10;
+  const xAxisTicks = Array.from({ length: Math.floor(xAxisMax / 10) + 1 }, (_, i) => i * 10);
 
   // Custom label renderer for external pie labels (print-friendly)
   const renderCustomLabel = ({ cx, cy, midAngle, outerRadius, count, color }) => {
@@ -359,7 +383,7 @@ const PromotionsQ1FY26Dashboard = () => {
                     Employee Promotions & Career Advancement
                   </p>
                   <p className="text-gray-500 text-sm mt-1">
-                    July - September 2025 • Benefit Eligible Employees
+                    {periodText} • Benefit Eligible Employees
                   </p>
                 </div>
               </div>
@@ -391,7 +415,7 @@ const PromotionsQ1FY26Dashboard = () => {
             <div className="text-3xl font-bold text-gray-900 mb-1">{summary.totalPromotions}</div>
             <div className="text-xs text-gray-600 font-medium mb-2">Total Promotions</div>
             <div className="text-xs text-gray-500">
-              100% matched with workforce history
+              {metadata.matchedWithHistory} of {metadata.totalRecordsProcessed} matched with history
             </div>
           </div>
 
@@ -423,7 +447,7 @@ const PromotionsQ1FY26Dashboard = () => {
             <div className="text-3xl font-bold text-gray-900 mb-1">{promotionsPerMonth}</div>
             <div className="text-xs text-gray-600 font-medium mb-2">Promotions/Month</div>
             <div className="text-xs text-gray-500">
-              Average across Q1 period
+              Average across {metadata.quarter} period
             </div>
           </div>
         </div>
@@ -498,8 +522,8 @@ const PromotionsQ1FY26Dashboard = () => {
                   <CartesianGrid strokeDasharray="3 3" horizontal={false} />
                   <XAxis
                     type="number"
-                    domain={[0, 70]}
-                    ticks={[0, 10, 20, 30, 40, 50, 60, 70]}
+                    domain={[0, xAxisMax]}
+                    ticks={xAxisTicks}
                   />
                   <YAxis
                     type="category"
@@ -507,7 +531,7 @@ const PromotionsQ1FY26Dashboard = () => {
                     width={120}
                     tick={{ fontSize: 13 }}
                   />
-                  <Tooltip content={<CustomTooltip />} />
+                  <Tooltip content={<CustomTooltip totalPromotions={summary.totalPromotions} />} />
                   <Bar
                     dataKey="count"
                     radius={[0, 4, 4, 0]}

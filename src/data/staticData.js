@@ -3077,6 +3077,9 @@ export const getExitSurveyData = (date = "2025-06-30") => {
   return EXIT_SURVEY_DATA[date] || null;
 };
 
+// Internal Mobility (date-keyed) — delegated to internalMobilityData.js
+export { getInternalMobilityData } from './internalMobilityData';
+
 export const getQuarterlyTurnoverData = (date = "2025-09-30") => {
   return QUARTERLY_TURNOVER_DATA[date] || null;
 };

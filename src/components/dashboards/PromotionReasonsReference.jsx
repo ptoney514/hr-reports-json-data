@@ -1,10 +1,14 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { BookOpen, ArrowLeft, ArrowRight } from 'lucide-react';
+import { getInternalMobilityData } from '../../services/dataService';
+import { useQuarter } from '../../contexts/QuarterContext';
+import NoDataForQuarter from '../ui/NoDataForQuarter';
 
 /**
- * Promotion Reasons Reference Page
- * Explains the 2 promotion reason codes with definitions and examples
+ * Promotion Reasons Reference Page (quarter-aware)
+ * Explains the 2 promotion reason codes with definitions and examples.
+ * Counts and percentages are derived from current quarter data.
  */
 
 // Color palette matching the Promotions Dashboard
@@ -13,12 +17,10 @@ const promotionColors = {
   APPLIED: '#0054A6',   // Blue (brand)
 };
 
-// Promotion reason data
-const promotionReasons = [
-  {
-    code: 'INCREASE',
+// Static definitions (these don't change per quarter)
+const reasonDefinitions = {
+  INCREASE: {
     label: 'Salary/Grade Increase',
-    color: promotionColors.INCREASE,
     definition: 'Career advancement within your current department through salary/grade increases',
     indicators: [
       'Same department',
@@ -29,13 +31,9 @@ const promotionReasons = [
       after: 'Director (Grade C)',
       note: 'Same department, recognized progression',
     },
-    count: 51,
-    percentage: 78,
   },
-  {
-    code: 'APPLIED',
+  APPLIED: {
     label: 'Applied for Position',
-    color: promotionColors.APPLIED,
     definition: 'Moved to a different department through competitive application',
     indicators: [
       'Different department/cost center',
@@ -47,13 +45,11 @@ const promotionReasons = [
       after: 'Director Alumni Relations',
       note: 'Cross-department career move',
     },
-    count: 14,
-    percentage: 22,
   },
-];
+};
 
 // Reason Card Component
-const ReasonCard = ({ reason }) => (
+const ReasonCard = ({ reason, quarterLabel }) => (
   <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm hover:shadow-md transition-shadow">
     {/* Header with badge and title */}
     <div className="flex items-center gap-3 mb-4">
@@ -101,7 +97,7 @@ const ReasonCard = ({ reason }) => (
     <div
       className="flex items-center justify-between pt-4 border-t border-gray-100"
     >
-      <span className="text-sm text-gray-500">Q1 FY26</span>
+      <span className="text-sm text-gray-500">{quarterLabel}</span>
       <div className="flex items-center gap-2">
         <span className="text-2xl font-bold" style={{ color: reason.color }}>
           {reason.count}
@@ -113,6 +109,34 @@ const ReasonCard = ({ reason }) => (
 );
 
 const PromotionReasonsReference = () => {
+  const { selectedQuarter, quarterConfig } = useQuarter();
+
+  const mobilityData = getInternalMobilityData(selectedQuarter);
+
+  if (!mobilityData) {
+    return <NoDataForQuarter dataLabel="Promotion reasons data" />;
+  }
+
+  const { summary, promotionsByReason } = mobilityData;
+  const quarterLabel = quarterConfig?.label || `${mobilityData.metadata.quarter} ${mobilityData.metadata.fiscalYear}`;
+
+  // Build reason cards with dynamic counts from data
+  const promotionReasons = ['INCREASE', 'APPLIED'].map(code => {
+    const dataEntry = promotionsByReason.find(r => r.code === code);
+    const count = dataEntry?.count || 0;
+    const percentage = summary.totalPromotions > 0
+      ? Math.round((count / summary.totalPromotions) * 100)
+      : 0;
+
+    return {
+      code,
+      color: promotionColors[code],
+      count,
+      percentage,
+      ...reasonDefinitions[code],
+    };
+  });
+
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-6xl mx-auto px-6">
@@ -145,14 +169,14 @@ const PromotionReasonsReference = () => {
             style={{ color: '#0054A6' }}
           >
             <ArrowLeft size={16} />
-            Back to Q1 FY26 Promotions Report
+            Back to {quarterLabel} Promotions Report
           </Link>
         </div>
 
-        {/* 4-Card Grid */}
+        {/* 2-Card Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           {promotionReasons.map((reason) => (
-            <ReasonCard key={reason.code} reason={reason} />
+            <ReasonCard key={reason.code} reason={reason} quarterLabel={quarterLabel} />
           ))}
         </div>
 
@@ -160,16 +184,24 @@ const PromotionReasonsReference = () => {
         <div className="rounded-lg p-4 text-sm bg-gray-100 text-gray-600">
           <strong>Note:</strong> All counts represent benefit-eligible employees only (F12, F09-F11).
           Reason codes are calculated based on title changes, department moves, and grade adjustments.
-          Data source: Q1 FY26 (July - September 2025).
+          Data source: {quarterLabel} ({getPeriodText(mobilityData.metadata.dateRange)}).
         </div>
 
         {/* Data Source Info */}
         <div className="mt-4 text-xs text-gray-400 text-center">
-          Total Q1 FY26 Promotions: 65 employees
+          Total {quarterLabel} Promotions: {summary.totalPromotions} employees
         </div>
       </div>
     </div>
   );
+};
+
+// Human-readable period from metadata dateRange
+const getPeriodText = (dateRange) => {
+  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const start = new Date(dateRange.start);
+  const end = new Date(dateRange.end);
+  return `${months[start.getMonth()]} - ${months[end.getMonth()]} ${end.getFullYear()}`;
 };
 
 export default PromotionReasonsReference;

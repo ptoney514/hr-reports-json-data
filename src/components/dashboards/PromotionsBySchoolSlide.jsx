@@ -1,13 +1,13 @@
 import React from 'react';
 import { BarChart3 } from 'lucide-react';
-import { internalMobilityData } from '../../data/internalMobilityData';
+import { getInternalMobilityData } from '../../services/dataService';
 import { useQuarter } from '../../contexts/QuarterContext';
 import NoDataForQuarter from '../ui/NoDataForQuarter';
 
 /**
- * Promotions by School/Area Slide
+ * Promotions by School/Area Slide (quarter-aware)
  * Standalone table showing promotions by school with applied/increase breakdown.
- * Data: internalMobilityData.promotionsBySchool (Q1 FY26 only)
+ * Data: internalMobilityData via dataService (date-keyed).
  */
 
 const promotionColors = {
@@ -15,19 +15,27 @@ const promotionColors = {
   INCREASE: '#7C3AED',
 };
 
-// Only Q1 FY26 data is available
-const AVAILABLE_QUARTERS = ['2025-09-30'];
+// Human-readable period from metadata dateRange
+const getPeriodText = (dateRange) => {
+  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const start = new Date(dateRange.start);
+  const end = new Date(dateRange.end);
+  return `${months[start.getMonth()]} - ${months[end.getMonth()]} ${end.getFullYear()}`;
+};
 
 const PromotionsBySchoolSlide = () => {
   const { selectedQuarter } = useQuarter();
 
-  if (!AVAILABLE_QUARTERS.includes(selectedQuarter)) {
+  const mobilityData = getInternalMobilityData(selectedQuarter);
+
+  if (!mobilityData) {
     return <NoDataForQuarter dataLabel="Promotions by school data" />;
   }
 
-  const { metadata, summary, promotionsBySchool } = internalMobilityData;
+  const { metadata, summary, promotionsBySchool } = mobilityData;
   const grandTotal = summary.totalPromotions;
   const maxTotal = Math.max(...promotionsBySchool.map(row => row.total));
+  const periodText = getPeriodText(metadata.dateRange);
 
   const columns = [
     { key: 'applied', label: 'Applied', color: promotionColors.APPLIED },
@@ -55,7 +63,7 @@ const PromotionsBySchoolSlide = () => {
                   Employee Promotions & Career Advancement
                 </p>
                 <p className="text-gray-500 text-sm mt-1">
-                  July - September 2025 • Benefit Eligible
+                  {periodText} • Benefit Eligible
                 </p>
               </div>
               <div className="text-right">
