@@ -1,16 +1,15 @@
 import React from 'react';
-import { FileText, Users, BarChart3, ThumbsUp, Star, AlertTriangle, Activity, TrendingDown } from 'lucide-react';
+import { FileText, Users, BarChart3, ThumbsUp, Star, AlertTriangle, TrendingDown, Lightbulb, UserCheck } from 'lucide-react';
 import { getExitSurveyData } from '../../services/dataService';
 import { useQuarter } from '../../contexts/QuarterContext';
 import NoDataForQuarter from '../ui/NoDataForQuarter';
 
 /**
- * Q1 FY26 Exit Survey Dashboard
+ * Exit Survey Dashboard
  * Displays quarterly exit survey analysis following the Quarterly Reports Design System
  *
  * Design System Reference: docs/QUARTERLY_REPORTS_DESIGN_SYSTEM.md
  * Exit Survey Patterns: docs/EXIT_SURVEY_DESIGN_SYSTEM.md
- * Wireframe Reference: docs/wireframes/exit-survey-q1-fy26-wireframe.html
  */
 
 // Color palette for departure reasons chart (12 distinct colors for all reasons)
@@ -29,8 +28,85 @@ const DEPARTURE_REASON_COLORS = [
   '#6366F1'  // Indigo - Remote/Hybrid
 ];
 
+const SATISFACTION_CATEGORIES = [
+  { label: 'Management Support', key: 'managementSupport' },
+  { label: 'Benefits', key: 'benefits' },
+  { label: 'Job Satisfaction', key: 'jobSatisfaction' },
+  { label: 'Career Development', key: 'careerDevelopment' },
+  { label: 'Compensation', key: 'compensation' },
+  { label: 'Work-Life Balance', key: 'workLifeBalance' },
+];
+
+// Quarterly trend data (descending by date)
+const quarterlyData = [
+  {
+    quarter: 'Q2 FY26',
+    terminations: 39,
+    faculty: 5,
+    staff: 29,
+    hsp: 5,
+    responses: 10,
+    responseRate: 25.6,
+    satisfaction: 90
+  },
+  {
+    quarter: 'Q1 FY26',
+    terminations: 73,
+    faculty: 4,
+    staff: 54,
+    hsp: 15,
+    responses: 15,
+    responseRate: 20.5,
+    satisfaction: 80
+  },
+  {
+    quarter: 'Q4 FY25',
+    terminations: 51,
+    faculty: 10,
+    staff: 41,
+    responses: 18,
+    responseRate: 35.3,
+    satisfaction: 83.3
+  },
+  {
+    quarter: 'Q3 FY25',
+    terminations: 51,
+    faculty: 8,
+    staff: 43,
+    responses: 20,
+    responseRate: 39.2,
+    satisfaction: 45
+  },
+  {
+    quarter: 'Q2 FY25',
+    terminations: 38,
+    faculty: 4,
+    staff: 34,
+    responses: 26,
+    responseRate: 68.4,
+    satisfaction: 57.7
+  },
+  {
+    quarter: 'Q1 FY25',
+    terminations: 79,
+    faculty: 5,
+    staff: 74,
+    responses: 25,
+    responseRate: 31.6,
+    satisfaction: 64.0
+  }
+];
+
+const getSatisfactionColor = (score) => {
+  if (score >= 3.5) return '#71CC98'; // Creighton green
+  if (score >= 3.0) return '#FFC72C'; // Creighton yellow
+  return '#EF4444'; // Red for low scores
+};
+
+const getBarWidth = (score) => (score / 5.0) * 100;
+
 const ExitSurveyQ1FY26Dashboard = () => {
-  const { selectedQuarter } = useQuarter();
+  const { selectedQuarter, quarterConfig } = useQuarter();
 
   // Get data based on global quarter
   const surveyData = getExitSurveyData(selectedQuarter);
@@ -39,67 +115,18 @@ const ExitSurveyQ1FY26Dashboard = () => {
     return <NoDataForQuarter dataLabel="Exit survey data" />;
   }
 
-  // Quarterly trend data (Q1 FY26 → Q1 FY25, descending)
-  // UPDATED 2025-12-04: Grade R now included as HSP (benefit-eligible)
-  const quarterlyData = [
-    {
-      quarter: 'Q1 FY26',
-      terminations: 73,  // Includes 15 HSP (Grade R included as benefit-eligible)
-      faculty: 4,
-      staff: 54,         // Staff remains 54
-      hsp: 15,           // House Staff Physicians (Grade R)
-      responses: 15,
-      responseRate: 20.5,  // 15/73 (Grade R included as benefit-eligible)
-      satisfaction: 80 // Would recommend
-    },
-    {
-      quarter: 'Q4 FY25',
-      terminations: 51, // Assignment Category filter
-      faculty: 10,
-      staff: 41, // 51 - 10
-      responses: 18,
-      responseRate: 35.3,
-      satisfaction: 83.3
-    },
-    {
-      quarter: 'Q3 FY25',
-      terminations: 51, // Assignment Category filter
-      faculty: 8,
-      staff: 43,
-      responses: 20,
-      responseRate: 39.2,
-      satisfaction: 45
-    },
-    {
-      quarter: 'Q2 FY25',
-      terminations: 38, // Assignment Category filter
-      faculty: 4,
-      staff: 34, // 38 - 4
-      responses: 26,
-      responseRate: 68.4,
-      satisfaction: 57.7
-    },
-    {
-      quarter: 'Q1 FY25',
-      terminations: 79, // Assignment Category filter (includes Jesuits)
-      faculty: 5,
-      staff: 74,
-      responses: 25,
-      responseRate: 31.6,
-      satisfaction: 64.0
+  const quarterLabel = surveyData.quarter || quarterConfig?.label || 'Quarter';
+  const quarterShort = quarterLabel.split(' ')[0];
+  const periodText = quarterConfig?.period || '';
+
+  // Build employee type subtitle from demographics or default to all-staff
+  const getEmployeeTypeSubtitle = () => {
+    if (surveyData.demographics?.employeeType) {
+      return surveyData.demographics.employeeType
+        .map(t => `${t.type}: ${t.count} (${t.percentage}%)`)
+        .join(', ');
     }
-  ];
-
-  // Helper function to get satisfaction color
-  const getSatisfactionColor = (score) => {
-    if (score >= 3.5) return '#71CC98'; // Creighton green
-    if (score >= 3.0) return '#FFC72C'; // Creighton yellow
-    return '#EF4444'; // Red for low scores
-  };
-
-  // Helper function to calculate bar width percentage
-  const getBarWidth = (score) => {
-    return (score / 5.0) * 100;
+    return `Staff: ${surveyData.totalResponses} (100%)`;
   };
 
   return (
@@ -114,10 +141,10 @@ const ExitSurveyQ1FY26Dashboard = () => {
                 <FileText style={{color: '#0054A6'}} size={32} />
                 <div>
                   <h1 className="text-3xl font-bold text-gray-900">
-                    Q1 FY26 Exit Analysis Report
+                    {quarterLabel} Exit Analysis Report
                   </h1>
                   <p className="text-gray-600 text-lg mt-2">
-                    Quarterly Exit Survey Analysis • July 2025 - September 2025
+                    Quarterly Exit Survey Analysis • {periodText}
                   </p>
                   <p className="text-gray-500 text-sm mt-1">
                     Employee exit survey feedback and departure insights
@@ -128,9 +155,9 @@ const ExitSurveyQ1FY26Dashboard = () => {
                 <div className="text-5xl font-bold" style={{color: '#0054A6'}}>
                   {surveyData.totalResponses}
                 </div>
-                <div className="text-sm text-gray-600 font-medium">Total Q1 FY26 Responses</div>
+                <div className="text-sm text-gray-600 font-medium">Total {quarterLabel} Responses</div>
                 <div className="text-xs text-gray-500 mt-1">
-                  Staff: {surveyData.totalResponses} (100%)
+                  {getEmployeeTypeSubtitle()}
                 </div>
               </div>
             </div>
@@ -145,12 +172,12 @@ const ExitSurveyQ1FY26Dashboard = () => {
             <div className="flex items-center justify-between mb-4">
               <Users style={{color: '#0054A6'}} size={24} />
               <span className="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-800 font-medium">
-                Q1
+                {quarterShort}
               </span>
             </div>
             <div className="text-4xl font-bold text-gray-900 mb-1">{surveyData.totalResponses}</div>
             <div className="text-sm text-gray-600 font-medium">Total Responses</div>
-            <div className="text-xs text-gray-500 mt-2">All staff responses</div>
+            <div className="text-xs text-gray-500 mt-2">{surveyData.totalResponses} of {surveyData.totalExits} terminations</div>
           </div>
 
           {/* Card 2: Survey Response Rate */}
@@ -158,14 +185,14 @@ const ExitSurveyQ1FY26Dashboard = () => {
             <div className="flex items-center justify-between mb-4">
               <BarChart3 style={{color: '#1F74DB'}} size={24} />
               <span className="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-800 font-medium">
-                UPDATED
+                RATE
               </span>
             </div>
             <div className="text-4xl font-bold text-gray-900 mb-1">
               {surveyData.responseRate ? `${surveyData.responseRate}%` : 'TBD'}
             </div>
             <div className="text-sm text-gray-600 font-medium">Survey Response Rate</div>
-            <div className="text-xs text-gray-500 mt-2">15 of 73 terminations</div>
+            <div className="text-xs text-gray-500 mt-2">{surveyData.totalResponses} of {surveyData.totalExits} terminations</div>
           </div>
 
           {/* Card 3: Would Recommend */}
@@ -214,82 +241,19 @@ const ExitSurveyQ1FY26Dashboard = () => {
           </div>
         </div>
 
-        {/* Executive Summary */}
-        <div className="mb-8">
-          <div className="bg-gradient-to-r from-blue-50 to-white rounded-lg shadow-sm border p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-              <Activity style={{color: '#0054A6'}} size={24} />
-              Executive Summary
-            </h2>
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {/* Key Metrics */}
-              <div>
-                <h3 className="text-lg font-semibold mb-4" style={{color: '#0054A6'}}>
-                  Key Metrics
-                </h3>
-                <ul className="space-y-3 text-sm">
-                  <li className="flex items-start gap-2">
-                    <div className="w-2 h-2 rounded-full bg-green-600 mt-2"></div>
-                    <span><strong>{surveyData.totalResponses} total responses</strong> received in Q1 FY26</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <div className="w-2 h-2 rounded-full bg-green-600 mt-2"></div>
-                    <span><strong>{surveyData.wouldRecommend}% would recommend</strong> Creighton as an employer ({surveyData.wouldRecommendCount.positive} of {surveyData.wouldRecommendCount.total})</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <div className="w-2 h-2 rounded-full bg-yellow-600 mt-2"></div>
-                    <span><strong>{surveyData.overallSatisfaction}/5.0 overall satisfaction</strong> rating</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <div className="w-2 h-2 rounded-full bg-orange-600 mt-2"></div>
-                    <span><strong>{surveyData.concernsReported.percentage}% reported concerns</strong> ({surveyData.concernsReported.count} of {surveyData.concernsReported.total} respondents)</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <div className="w-2 h-2 rounded-full bg-blue-600 mt-2"></div>
-                    <span><strong>{surveyData.departmentExits.length} departments</strong> represented in responses</span>
-                  </li>
-                </ul>
-              </div>
-
-              {/* Top Departure Reasons */}
-              <div>
-                <h3 className="text-lg font-semibold mb-4" style={{color: '#0054A6'}}>
-                  Top Departure Reasons
-                </h3>
-                <ul className="space-y-3 text-sm">
-                  {surveyData.departureReasons.slice(0, 4).map((reason, index) => (
-                    <li key={index} className="flex items-start gap-2">
-                      <div className={`w-2 h-2 rounded mt-2 ${
-                        index === 0 ? 'bg-gray-500' :
-                        index === 1 ? 'bg-red-600' :
-                        'bg-blue-600'
-                      }`}></div>
-                      <span>
-                        <strong>"{reason.reason}" ({reason.percentage}%)</strong>
-                        {index === 0 && ' - Top departure reason requiring further analysis'}
-                        {index === 1 && ' - Management relationship issues'}
-                      </span>
-                    </li>
-                  ))}
-                  <li className="flex items-start gap-2">
-                    <div className="w-2 h-2 rounded-full bg-blue-600 mt-2"></div>
-                    <span><strong>Distinct reasons</strong> - {surveyData.departureReasons.length - 2} additional unique departure factors cited</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <div className="w-2 h-2 rounded-full bg-blue-600 mt-2"></div>
-                    <span><strong>Early FY26 baseline</strong> established for future tracking</span>
-                  </li>
-                </ul>
-              </div>
-            </div>
-
-            {/* Data Quality Note */}
-            <div className="mt-6 text-xs text-gray-600 text-center bg-blue-50 p-3 rounded border border-blue-200">
-              <span className="font-semibold">Note:</span> Q1 FY26 includes {surveyData.totalResponses} survey responses from {surveyData.totalExits} benefit-eligible terminations ({surveyData.responseRate}% response rate). Represents initial quarter baseline for FY26 tracking.
+        {/* Key Takeaway Banner (replaces Executive Summary) */}
+        {surveyData.keyInsights && (
+          <div className="mb-8 bg-blue-50 border border-blue-200 rounded-lg p-4 flex items-start gap-3">
+            <Lightbulb style={{color: '#0054A6'}} size={20} className="mt-0.5 flex-shrink-0" />
+            <div className="text-sm text-gray-700">
+              <span className="font-semibold" style={{color: '#0054A6'}}>Key Takeaway:</span>{' '}
+              {surveyData.keyInsights.positiveFeedback?.[0]}
+              {surveyData.keyInsights.areasOfConcern?.[0] && (
+                <> &mdash; however, {surveyData.keyInsights.areasOfConcern[0].toLowerCase()}</>
+              )}
             </div>
           </div>
-        </div>
+        )}
 
         {/* Primary Reasons for Leaving + Contributing Exit Reasons */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
@@ -304,8 +268,6 @@ const ExitSurveyQ1FY26Dashboard = () => {
 
             <div className="space-y-3">
               {surveyData.departureReasons.map((reason, index) => {
-                // Scale bar widths for better visibility: multiply percentage by 3
-                // Count 3 (20%) → 60% width, Count 2 (13.3%) → 40% width, Count 1 (6.7%) → 20% width
                 const visualWidth = Math.min(reason.percentage * 3, 100);
 
                 return (
@@ -323,7 +285,7 @@ const ExitSurveyQ1FY26Dashboard = () => {
                             backgroundColor: DEPARTURE_REASON_COLORS[index % DEPARTURE_REASON_COLORS.length]
                           }}
                         >
-                          {reason.count} ({reason.percentage}%)
+                          {reason.count != null ? `${reason.count} (${reason.percentage}%)` : `${reason.percentage}%`}
                         </div>
                       </div>
                     </div>
@@ -333,7 +295,7 @@ const ExitSurveyQ1FY26Dashboard = () => {
             </div>
 
             <div className="text-xs text-gray-600 mt-6 bg-yellow-50 p-3 rounded border border-yellow-200">
-              <span className="font-semibold">Note:</span> "Other" is top reason requiring further investigation. {surveyData.departureReasons.length} distinct departure reasons cited across {surveyData.totalResponses} responses.
+              <span className="font-semibold">Note:</span> {surveyData.departureReasons.length} distinct departure reasons cited across {surveyData.totalResponses} responses received in {quarterLabel}.
             </div>
           </div>
 
@@ -362,7 +324,7 @@ const ExitSurveyQ1FY26Dashboard = () => {
                             backgroundColor: DEPARTURE_REASON_COLORS[index % DEPARTURE_REASON_COLORS.length]
                           }}
                         >
-                          {reason.count} ({reason.percentage}%)
+                          {reason.count != null ? `${reason.count} (${reason.percentage}%)` : `${reason.percentage}%`}
                         </div>
                       </div>
                     </div>
@@ -372,12 +334,12 @@ const ExitSurveyQ1FY26Dashboard = () => {
             </div>
 
             <div className="text-xs text-gray-600 mt-6 bg-blue-50 p-3 rounded border border-blue-200">
-              <span className="font-semibold">Insight:</span> Respondents could select multiple contributing factors. Pay, workload, and supervisor relationships are key themes. Percentages exceed 100% due to multi-select responses.
+              <span className="font-semibold">Insight:</span> Respondents could select multiple contributing factors. Percentages exceed 100% due to multi-select responses.
             </div>
           </div>
         </div>
 
-        {/* Satisfaction Ratings + Would Recommend */}
+        {/* Satisfaction Ratings + Demographics (or Would Recommend fallback) */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
 
           {/* Satisfaction Ratings by Category */}
@@ -388,119 +350,25 @@ const ExitSurveyQ1FY26Dashboard = () => {
             </h2>
 
             <div className="space-y-4">
-              {/* Management Support */}
-              <div>
-                <div className="flex justify-between text-sm mb-2">
-                  <span className="font-medium text-gray-700">Management Support</span>
-                  <span className="font-bold" style={{color: getSatisfactionColor(surveyData.satisfactionRatings.managementSupport)}}>
-                    {surveyData.satisfactionRatings.managementSupport}
-                  </span>
+              {SATISFACTION_CATEGORIES.map(({ label, key }) => (
+                <div key={key}>
+                  <div className="flex justify-between text-sm mb-2">
+                    <span className="font-medium text-gray-700">{label}</span>
+                    <span className="font-bold" style={{color: getSatisfactionColor(surveyData.satisfactionRatings[key])}}>
+                      {surveyData.satisfactionRatings[key]}
+                    </span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-3">
+                    <div
+                      className="h-3 rounded-full"
+                      style={{
+                        width: `${getBarWidth(surveyData.satisfactionRatings[key])}%`,
+                        backgroundColor: getSatisfactionColor(surveyData.satisfactionRatings[key])
+                      }}
+                    ></div>
+                  </div>
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-3">
-                  <div
-                    className="h-3 rounded-full"
-                    style={{
-                      width: `${getBarWidth(surveyData.satisfactionRatings.managementSupport)}%`,
-                      backgroundColor: getSatisfactionColor(surveyData.satisfactionRatings.managementSupport)
-                    }}
-                  ></div>
-                </div>
-              </div>
-
-              {/* Job Satisfaction */}
-              <div>
-                <div className="flex justify-between text-sm mb-2">
-                  <span className="font-medium text-gray-700">Job Satisfaction</span>
-                  <span className="font-bold" style={{color: getSatisfactionColor(surveyData.satisfactionRatings.jobSatisfaction)}}>
-                    {surveyData.satisfactionRatings.jobSatisfaction}
-                  </span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-3">
-                  <div
-                    className="h-3 rounded-full"
-                    style={{
-                      width: `${getBarWidth(surveyData.satisfactionRatings.jobSatisfaction)}%`,
-                      backgroundColor: getSatisfactionColor(surveyData.satisfactionRatings.jobSatisfaction)
-                    }}
-                  ></div>
-                </div>
-              </div>
-
-              {/* Compensation */}
-              <div>
-                <div className="flex justify-between text-sm mb-2">
-                  <span className="font-medium text-gray-700">Compensation</span>
-                  <span className="font-bold" style={{color: getSatisfactionColor(surveyData.satisfactionRatings.compensation)}}>
-                    {surveyData.satisfactionRatings.compensation}
-                  </span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-3">
-                  <div
-                    className="h-3 rounded-full"
-                    style={{
-                      width: `${getBarWidth(surveyData.satisfactionRatings.compensation)}%`,
-                      backgroundColor: getSatisfactionColor(surveyData.satisfactionRatings.compensation)
-                    }}
-                  ></div>
-                </div>
-              </div>
-
-              {/* Career Development */}
-              <div>
-                <div className="flex justify-between text-sm mb-2">
-                  <span className="font-medium text-gray-700">Career Development</span>
-                  <span className="font-bold" style={{color: getSatisfactionColor(surveyData.satisfactionRatings.careerDevelopment)}}>
-                    {surveyData.satisfactionRatings.careerDevelopment}
-                  </span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-3">
-                  <div
-                    className="h-3 rounded-full"
-                    style={{
-                      width: `${getBarWidth(surveyData.satisfactionRatings.careerDevelopment)}%`,
-                      backgroundColor: getSatisfactionColor(surveyData.satisfactionRatings.careerDevelopment)
-                    }}
-                  ></div>
-                </div>
-              </div>
-
-              {/* Work-Life Balance */}
-              <div>
-                <div className="flex justify-between text-sm mb-2">
-                  <span className="font-medium text-gray-700">Work-Life Balance</span>
-                  <span className="font-bold" style={{color: getSatisfactionColor(surveyData.satisfactionRatings.workLifeBalance)}}>
-                    {surveyData.satisfactionRatings.workLifeBalance}
-                  </span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-3">
-                  <div
-                    className="h-3 rounded-full"
-                    style={{
-                      width: `${getBarWidth(surveyData.satisfactionRatings.workLifeBalance)}%`,
-                      backgroundColor: getSatisfactionColor(surveyData.satisfactionRatings.workLifeBalance)
-                    }}
-                  ></div>
-                </div>
-              </div>
-
-              {/* Benefits */}
-              <div>
-                <div className="flex justify-between text-sm mb-2">
-                  <span className="font-medium text-gray-700">Benefits</span>
-                  <span className="font-bold" style={{color: getSatisfactionColor(surveyData.satisfactionRatings.benefits)}}>
-                    {surveyData.satisfactionRatings.benefits}
-                  </span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-3">
-                  <div
-                    className="h-3 rounded-full"
-                    style={{
-                      width: `${getBarWidth(surveyData.satisfactionRatings.benefits)}%`,
-                      backgroundColor: getSatisfactionColor(surveyData.satisfactionRatings.benefits)
-                    }}
-                  ></div>
-                </div>
-              </div>
+              ))}
             </div>
 
             <div className="text-xs text-gray-500 mt-6 text-center bg-gray-50 p-2 rounded">
@@ -508,54 +376,168 @@ const ExitSurveyQ1FY26Dashboard = () => {
             </div>
           </div>
 
-          {/* Would Recommend Creighton */}
-          <div className="bg-white rounded-lg shadow-sm border p-6">
-            <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-              <ThumbsUp style={{color: '#71CC98'}} size={20} />
-              Would Recommend Creighton
-            </h2>
+          {/* Demographics (Q2+) or Would Recommend (Q1 and earlier) */}
+          {surveyData.demographics ? (
+            <div className="bg-white rounded-lg shadow-sm border p-6">
+              <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                <UserCheck style={{color: '#0054A6'}} size={20} />
+                Respondent Demographics
+              </h2>
 
-            <div className="text-center py-6">
-              <div className="text-6xl font-bold mb-3" style={{color: '#71CC98'}}>
-                {surveyData.wouldRecommend}%
-              </div>
-              <div className="text-lg text-gray-700 mb-6">would recommend Creighton as an employer</div>
-
-              {/* Visual Progress Bar */}
-              <div className="w-full bg-gray-200 rounded-full h-10 mb-6">
-                <div
-                  className="h-10 rounded-full flex items-center justify-center text-white font-semibold text-sm"
-                  style={{
-                    width: `${surveyData.wouldRecommend}%`,
-                    backgroundColor: '#71CC98'
-                  }}
-                >
-                  {surveyData.wouldRecommendCount.positive} of {surveyData.wouldRecommendCount.total} respondents
+              {/* Gender */}
+              <div className="mb-5">
+                <h3 className="text-sm font-semibold text-gray-700 mb-2">Gender</h3>
+                <div className="w-full bg-gray-200 rounded-full h-6 flex overflow-hidden">
+                  {surveyData.demographics.gender.map((g, i) => (
+                    <div
+                      key={i}
+                      className="h-6 flex items-center justify-center text-xs font-semibold text-white"
+                      style={{
+                        width: `${g.percentage}%`,
+                        backgroundColor: i === 0 ? '#3B82F6' : '#EC4899',
+                        minWidth: '50px'
+                      }}
+                      title={`${g.label}: ${g.count} (${g.percentage}%)`}
+                    >
+                      {g.label} {g.percentage}%
+                    </div>
+                  ))}
                 </div>
               </div>
 
-              {/* Breakdown */}
-              <div className="grid grid-cols-2 gap-4 text-center">
-                <div className="bg-green-50 p-4 rounded-lg border border-green-200">
-                  <div className="text-4xl font-bold" style={{color: '#71CC98'}}>
-                    {surveyData.wouldRecommendCount.positive}
-                  </div>
-                  <div className="text-sm text-gray-600 font-medium">Would Recommend</div>
+              {/* Age Distribution */}
+              <div className="mb-5">
+                <h3 className="text-sm font-semibold text-gray-700 mb-2">Age at Departure</h3>
+                <div className="space-y-1.5">
+                  {surveyData.demographics.age.map((a, i) => (
+                    <div key={i} className="flex items-center gap-2">
+                      <div className="w-20 text-xs text-gray-600">{a.range}</div>
+                      <div className="flex-1 bg-gray-200 rounded-full h-4">
+                        <div
+                          className="h-4 rounded-full flex items-center px-2 text-xs font-semibold text-white"
+                          style={{
+                            width: `${Math.max(a.percentage, 12)}%`,
+                            minWidth: '40px',
+                            backgroundColor: '#6366F1'
+                          }}
+                        >
+                          {a.percentage}%
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-                <div className="bg-red-50 p-4 rounded-lg border border-red-200">
-                  <div className="text-4xl font-bold text-red-600">
-                    {surveyData.wouldRecommendCount.total - surveyData.wouldRecommendCount.positive}
-                  </div>
-                  <div className="text-sm text-gray-600 font-medium">Would Not Recommend</div>
+              </div>
+
+              {/* Tenure at Departure */}
+              <div className="mb-5">
+                <h3 className="text-sm font-semibold text-gray-700 mb-2">Tenure at Departure</h3>
+                <div className="space-y-1.5">
+                  {surveyData.demographics.tenure.map((t, i) => (
+                    <div key={i} className="flex items-center gap-2">
+                      <div className="w-24 text-xs text-gray-600">{t.range}</div>
+                      <div className="flex-1 bg-gray-200 rounded-full h-4">
+                        <div
+                          className="h-4 rounded-full flex items-center px-2 text-xs font-semibold text-white"
+                          style={{
+                            width: `${Math.max(t.percentage, 12)}%`,
+                            minWidth: '40px',
+                            backgroundColor: t.percentage >= 50 ? '#EF4444' : '#10B981'
+                          }}
+                        >
+                          {t.percentage}%
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Employee Type */}
+              <div>
+                <h3 className="text-sm font-semibold text-gray-700 mb-2">Employee Type</h3>
+                <div className="flex gap-3">
+                  {surveyData.demographics.employeeType.map((et, i) => (
+                    <div key={i} className="flex-1 bg-gray-50 p-2 rounded border text-center">
+                      <div className="text-lg font-bold text-gray-900">{et.count}</div>
+                      <div className="text-xs text-gray-600">{et.type} ({et.percentage}%)</div>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
+          ) : (
+            <div className="bg-white rounded-lg shadow-sm border p-6">
+              <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                <ThumbsUp style={{color: '#71CC98'}} size={20} />
+                Would Recommend Creighton
+              </h2>
 
-            <div className="text-xs text-gray-600 text-center mt-4 bg-green-50 p-2 rounded border border-green-200">
-              <span className="font-semibold">Positive Indicator:</span> {surveyData.wouldRecommend}% recommendation rate shows strong employer brand
+              <div className="text-center py-6">
+                <div className="text-6xl font-bold mb-3" style={{color: '#71CC98'}}>
+                  {surveyData.wouldRecommend}%
+                </div>
+                <div className="text-lg text-gray-700 mb-6">would recommend Creighton as an employer</div>
+
+                {/* Visual Progress Bar */}
+                <div className="w-full bg-gray-200 rounded-full h-10 mb-6">
+                  <div
+                    className="h-10 rounded-full flex items-center justify-center text-white font-semibold text-sm"
+                    style={{
+                      width: `${surveyData.wouldRecommend}%`,
+                      backgroundColor: '#71CC98'
+                    }}
+                  >
+                    {surveyData.wouldRecommendCount.positive} of {surveyData.wouldRecommendCount.total} respondents
+                  </div>
+                </div>
+
+                {/* Breakdown */}
+                <div className="grid grid-cols-2 gap-4 text-center">
+                  <div className="bg-green-50 p-4 rounded-lg border border-green-200">
+                    <div className="text-4xl font-bold" style={{color: '#71CC98'}}>
+                      {surveyData.wouldRecommendCount.positive}
+                    </div>
+                    <div className="text-sm text-gray-600 font-medium">Would Recommend</div>
+                  </div>
+                  <div className="bg-red-50 p-4 rounded-lg border border-red-200">
+                    <div className="text-4xl font-bold text-red-600">
+                      {surveyData.wouldRecommendCount.total - surveyData.wouldRecommendCount.positive}
+                    </div>
+                    <div className="text-sm text-gray-600 font-medium">Would Not Recommend</div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="text-xs text-gray-600 text-center mt-4 bg-green-50 p-2 rounded border border-green-200">
+                <span className="font-semibold">Positive Indicator:</span> {surveyData.wouldRecommend}% recommendation rate shows strong employer brand
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Workplace Culture Indicators (conditional - Q2+ only) */}
+        {surveyData.additionalMetrics && (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div className="bg-white p-5 rounded-lg shadow-sm border text-center">
+              <div className="text-3xl font-bold" style={{color: '#71CC98'}}>{surveyData.additionalMetrics.hadToolsResources}%</div>
+              <div className="text-sm text-gray-600 font-medium mt-1">Had Tools & Resources</div>
+              <div className="text-xs text-gray-500 mt-1">to perform their job effectively</div>
+            </div>
+            <div className="bg-white p-5 rounded-lg shadow-sm border text-center">
+              <div className="text-3xl font-bold" style={{color: '#71CC98'}}>{surveyData.additionalMetrics.inclusiveCulture}%</div>
+              <div className="text-sm text-gray-600 font-medium mt-1">Inclusive Culture</div>
+              <div className="text-xs text-gray-500 mt-1">felt the culture was inclusive</div>
+            </div>
+            <div className="bg-white p-5 rounded-lg shadow-sm border text-center">
+              <div className="text-3xl font-bold" style={{color: surveyData.concernsReported.percentage > 25 ? '#F59E0B' : '#71CC98'}}>
+                {surveyData.concernsReported.percentage}%
+              </div>
+              <div className="text-sm text-gray-600 font-medium mt-1">Concerns Reported</div>
+              <div className="text-xs text-gray-500 mt-1">{surveyData.concernsReported.count} of {surveyData.concernsReported.total} respondents</div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Quarterly Termination Trends */}
         <div className="bg-white rounded-lg shadow-sm border p-6 mb-8">
