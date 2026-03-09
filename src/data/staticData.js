@@ -1847,6 +1847,72 @@ export const EXIT_SURVEY_DATA = {
         "Investigate workplace culture concerns",
         "Develop quarterly comparison analysis as more data becomes available"
       ]
+    },
+    insights: {
+      compAsFactor: 47,
+      compAsFactorDetail: "6.7% primary + 40% contributing",
+      avgTenureBucket: "N/A",
+      avgTenureDetail: "Demographics not collected in Q1",
+
+      topExitReasons: [
+        { reason: "Compensation/Salary", combinedPct: 47, primary: 7, contributing: 40 },
+        { reason: "Supervisor Issues", combinedPct: 47, primary: 13, contributing: 33 },
+        { reason: "Workload/Expectations", combinedPct: 40, primary: 7, contributing: 33 },
+        { reason: "Work-Life Balance", combinedPct: 27, primary: 0, contributing: 27 },
+        { reason: "Career Advancement", combinedPct: 27, primary: 7, contributing: 20 }
+      ],
+
+      themes: [
+        {
+          title: "Compensation",
+          subtitle: "Below Market",
+          color: "#EF4444",
+          items: [
+            "40% cited salary as contributing factor",
+            "Only 6.7% listed it as primary reason",
+            "Suggests pay is a tipping point, not sole driver"
+          ]
+        },
+        {
+          title: "Supervision",
+          subtitle: "Management Gaps",
+          color: "#F59E0B",
+          items: [
+            "13.3% dissatisfied with direct supervisor",
+            "33% cited supervisor as contributing factor",
+            "20% reported workplace concerns"
+          ]
+        },
+        {
+          title: "Flexibility",
+          subtitle: "Remote & Balance",
+          color: "#3B82F6",
+          items: [
+            "26.7% cited lack of flexibility",
+            "26.7% cited university culture issues",
+            "6.7% left over no remote/hybrid option"
+          ]
+        }
+      ],
+
+      recommendedActions: [
+        { action: "Conduct compensation market analysis for high-turnover roles", urgency: "NOW", urgencyColor: "#EF4444" },
+        { action: "Launch supervisor feedback program across departments", urgency: "NOW", urgencyColor: "#EF4444" },
+        { action: "Expand flexible work arrangements where possible", urgency: "Q2", urgencyColor: "#F59E0B" },
+        { action: "Increase exit survey response rate above 35%", urgency: "Q2", urgencyColor: "#F59E0B" },
+        { action: "Develop career pathing framework for staff roles", urgency: "Q3", urgencyColor: "#3B82F6" },
+        { action: "Create department-specific retention plans", urgency: "Q3", urgencyColor: "#3B82F6" }
+      ],
+
+      yoyTrend: {
+        currentLabel: "Q1 FY26",
+        previousLabel: "Q4 FY25",
+        metrics: [
+          { label: "Separations", current: 73, previous: 51, direction: "up", isGood: false },
+          { label: "Recommend %", current: 80, previous: 83, direction: "down", isGood: false },
+          { label: "Response Rate", current: 20.5, previous: 35.3, direction: "down", isGood: false }
+        ]
+      }
     }
   },
   // Q2 FY26 - October-December 2025
@@ -1953,6 +2019,72 @@ export const EXIT_SURVEY_DATA = {
         "Continue improving work-life balance programs",
         "Target 35%+ response rate for Q3 FY26"
       ]
+    },
+    insights: {
+      compAsFactor: 40,
+      compAsFactorDetail: "10% primary + 30% contributing",
+      avgTenureBucket: "~2 years",
+      avgTenureDetail: "60% left within 1-3 years",
+
+      topExitReasons: [
+        { reason: "Compensation/Salary", combinedPct: 40, primary: 10, contributing: 30 },
+        { reason: "Relocation", combinedPct: 40, primary: 20, contributing: 20 },
+        { reason: "Work-Life Balance", combinedPct: 30, primary: 0, contributing: 30 },
+        { reason: "Supervisor Issues", combinedPct: 20, primary: 10, contributing: 10 },
+        { reason: "Career/Education", combinedPct: 20, primary: 20, contributing: 0 }
+      ],
+
+      themes: [
+        {
+          title: "Compensation",
+          subtitle: "Below Market",
+          color: "#EF4444",
+          items: [
+            "30% cited salary as contributing factor",
+            "Compensation satisfaction lowest at 3.1/5.0",
+            "Combined 40% when including primary reason"
+          ]
+        },
+        {
+          title: "Supervision",
+          subtitle: "Access Gap",
+          color: "#F59E0B",
+          items: [
+            "Management support improved to 4.0/5.0",
+            "10% still cite supervisor as primary reason",
+            "30% reported workplace concerns"
+          ]
+        },
+        {
+          title: "Retention",
+          subtitle: "Early Exits",
+          color: "#3B82F6",
+          items: [
+            "60% of leavers had 1-3 year tenure",
+            "Only 10% had 5+ years of service",
+            "Onboarding-to-engagement gap evident"
+          ]
+        }
+      ],
+
+      recommendedActions: [
+        { action: "Targeted retention bonuses for 1-3 year employees in critical roles", urgency: "NOW", urgencyColor: "#EF4444" },
+        { action: "Compensation market study for staff positions below median", urgency: "NOW", urgencyColor: "#EF4444" },
+        { action: "Enhanced onboarding program with 90-day check-ins", urgency: "Q3", urgencyColor: "#F59E0B" },
+        { action: "Expand flexible work arrangements university-wide", urgency: "Q3", urgencyColor: "#F59E0B" },
+        { action: "Develop career pathing framework for staff roles", urgency: "Q4", urgencyColor: "#3B82F6" },
+        { action: "Launch stay interviews for high-performers at 18-month mark", urgency: "Q4", urgencyColor: "#3B82F6" }
+      ],
+
+      yoyTrend: {
+        currentLabel: "Q2 FY26",
+        previousLabel: "Q1 FY26",
+        metrics: [
+          { label: "Separations", current: 39, previous: 73, direction: "down", isGood: true },
+          { label: "Recommend %", current: 90, previous: 80, direction: "up", isGood: true },
+          { label: "Response Rate", current: 25.6, previous: 20.5, direction: "up", isGood: true }
+        ]
+      }
     }
   }
 };
