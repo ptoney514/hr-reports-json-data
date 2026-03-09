@@ -1848,6 +1848,112 @@ export const EXIT_SURVEY_DATA = {
         "Develop quarterly comparison analysis as more data becomes available"
       ]
     }
+  },
+  // Q2 FY26 - October-December 2025
+  // Source: Q2 FY26 Exit Survey PDF (23 pages), 10 responses from 39 exits
+  "2025-12-31": {
+    reportingDate: "12/31/25",
+    quarter: "Q2 FY26",
+    responseRate: 25.6,  // 10/39
+    totalResponses: 10,
+    totalExits: 39,      // Faculty 5, Staff 29, HSP 5
+    overallSatisfaction: 3.4,
+    wouldRecommend: 90,
+    wouldRecommendCount: { positive: 9, total: 10 },
+    concernsReported: { percentage: 30, count: 3, total: 10, description: "reported workplace concerns" },
+    departureReasons: [
+      { reason: "Relocation", count: 2, percentage: 20 },
+      { reason: "Pursue other career or education", count: 2, percentage: 20 },
+      { reason: "Family/Personal reasons", count: 1, percentage: 10 },
+      { reason: "Retirement", count: 1, percentage: 10 },
+      { reason: "Dissatisfied with direct supervisor", count: 1, percentage: 10 },
+      { reason: "Job was not as expected", count: 1, percentage: 10 },
+      { reason: "Unsatisfactory salary/pay", count: 1, percentage: 10 },
+      { reason: "Other", count: 1, percentage: 10 }
+    ],
+    contributingReasons: [
+      { reason: "Lack of work-life balance", count: 3, percentage: 30 },
+      { reason: "Unsatisfactory salary/pay", count: 3, percentage: 30 },
+      { reason: "Relocation", count: 2, percentage: 20 },
+      { reason: "Lack of flexibility", count: 2, percentage: 20 },
+      { reason: "Lack of career advancement opportunities", count: 1, percentage: 10 },
+      { reason: "University culture", count: 1, percentage: 10 },
+      { reason: "Dissatisfied with direct supervisor", count: 1, percentage: 10 },
+      { reason: "Remote/Hybrid option not available for position", count: 1, percentage: 10 }
+    ],
+    departmentExits: [
+      { department: "School of Medicine", exits: 8, responses: 3, responseRate: "37.5%" },
+      { department: "Student Life", exits: 5, responses: 2, responseRate: "40%" },
+      { department: "Athletics", exits: 4, responses: 2, responseRate: "50%" },
+      { department: "School of Dentistry", exits: 3, responses: 1, responseRate: "33.3%" },
+      { department: "Facilities", exits: 3, responses: 0, responseRate: "0%" },
+      { department: "Other Departments", exits: 16, responses: 2, responseRate: "12.5%" }
+    ],
+    satisfactionRatings: {
+      managementSupport: 4.0,
+      benefits: 3.8,
+      jobSatisfaction: 3.5,
+      careerDevelopment: 3.5,
+      compensation: 3.1,
+      workLifeBalance: 3.0
+    },
+    demographics: {
+      gender: [
+        { label: "Female", count: 6, percentage: 60 },
+        { label: "Male", count: 4, percentage: 40 }
+      ],
+      age: [
+        { range: "Under 30", count: 2, percentage: 20 },
+        { range: "30-39", count: 3, percentage: 30 },
+        { range: "40-49", count: 3, percentage: 30 },
+        { range: "50+", count: 2, percentage: 20 }
+      ],
+      race: [
+        { label: "White", count: 5, percentage: 50 },
+        { label: "Hispanic/Latino", count: 2, percentage: 20 },
+        { label: "Black/African American", count: 2, percentage: 20 },
+        { label: "Asian", count: 1, percentage: 10 }
+      ],
+      employeeType: [
+        { type: "Staff", count: 8, percentage: 80 },
+        { type: "Faculty", count: 2, percentage: 20 }
+      ],
+      location: [
+        { label: "Omaha", count: 8, percentage: 80 },
+        { label: "Phoenix", count: 2, percentage: 20 }
+      ],
+      tenure: [
+        { range: "Less than 1 year", count: 1, percentage: 10 },
+        { range: "1-3 years", count: 6, percentage: 60 },
+        { range: "3-5 years", count: 2, percentage: 20 },
+        { range: "5+ years", count: 1, percentage: 10 }
+      ]
+    },
+    additionalMetrics: {
+      hadToolsResources: 80,
+      inclusiveCulture: 80,
+      newPositionScope: "Similar or broader role"
+    },
+    keyInsights: {
+      areasOfConcern: [
+        "30% reported workplace concerns (3 of 10)",
+        "60% of departing employees had 1-3 year tenure",
+        "Work-life balance and salary are top contributing factors (30% each)",
+        "Compensation satisfaction lowest at 3.1/5.0"
+      ],
+      positiveFeedback: [
+        "90% would recommend Creighton as employer (up from 80% in Q1)",
+        "Management support improved to 4.0/5.0 (highest category)",
+        "Response rate improved to 25.6% (up from 20.5% in Q1)",
+        "80% reported having adequate tools and resources"
+      ],
+      actionItems: [
+        "Address early-tenure retention (60% leaving at 1-3 years)",
+        "Review compensation competitiveness - lowest satisfaction category",
+        "Continue improving work-life balance programs",
+        "Target 35%+ response rate for Q3 FY26"
+      ]
+    }
   }
 };
 
