@@ -107,7 +107,7 @@ const ExitSurveyInsightsSlide = () => {
                 <div className="w-full bg-gray-100 rounded-full h-3" role="progressbar" aria-valuenow={item.combinedPct} aria-valuemin={0} aria-valuemax={100} aria-label={`${item.reason}: ${item.combinedPct}%`}>
                   <div
                     className="h-3 rounded-full transition-all"
-                    style={{ width: `${item.combinedPct}%`, backgroundColor: REASON_COLORS[idx] }}
+                    style={{ width: `${item.combinedPct}%`, backgroundColor: REASON_COLORS[idx % REASON_COLORS.length] }}
                   />
                 </div>
                 <div className="flex gap-3 mt-1 text-xs text-gray-500">

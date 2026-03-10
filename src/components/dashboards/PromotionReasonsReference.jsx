@@ -196,12 +196,12 @@ const PromotionReasonsReference = () => {
   );
 };
 
-// Human-readable period from metadata dateRange
+// Human-readable period from metadata dateRange (parse strings directly to avoid timezone shift)
 const getPeriodText = (dateRange) => {
   const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-  const start = new Date(dateRange.start);
-  const end = new Date(dateRange.end);
-  return `${months[start.getMonth()]} - ${months[end.getMonth()]} ${end.getFullYear()}`;
+  const [, startMonth] = dateRange.start.split('-').map(Number);
+  const [endYear, endMonth] = dateRange.end.split('-').map(Number);
+  return `${months[startMonth - 1]} - ${months[endMonth - 1]} ${endYear}`;
 };
 
 export default PromotionReasonsReference;

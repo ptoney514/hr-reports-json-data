@@ -18,18 +18,18 @@ const promotionColors = {
   APPLIED: '#0054A6',   // Blue - Applied for Position (brand color)
 };
 
-// Format date as M/D/YY
+// Format date as M/D/YY (use UTC to avoid timezone shift on YYYY-MM-DD strings)
 const formatDate = (dateString) => {
   const date = new Date(dateString);
-  return `${date.getMonth() + 1}/${date.getDate()}/${String(date.getFullYear()).slice(-2)}`;
+  return `${date.getUTCMonth() + 1}/${date.getUTCDate()}/${String(date.getUTCFullYear()).slice(-2)}`;
 };
 
-// Human-readable period from metadata dateRange
+// Human-readable period from metadata dateRange (parse strings directly to avoid timezone shift)
 const getPeriodText = (dateRange) => {
   const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-  const start = new Date(dateRange.start);
-  const end = new Date(dateRange.end);
-  return `${months[start.getMonth()]} - ${months[end.getMonth()]} ${end.getFullYear()}`;
+  const [, startMonth] = dateRange.start.split('-').map(Number);
+  const [endYear, endMonth] = dateRange.end.split('-').map(Number);
+  return `${months[startMonth - 1]} - ${months[endMonth - 1]} ${endYear}`;
 };
 
 // Reason Code Badge Component (for detail table)
