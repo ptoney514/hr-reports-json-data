@@ -309,7 +309,7 @@ const OverTimePlaceholder = () => (
 );
 
 const PromotionsQ1FY26Dashboard = () => {
-  const { selectedQuarter, quarterConfig } = useQuarter();
+  const { selectedQuarter } = useQuarter();
 
   // Get data for the selected quarter
   const mobilityData = getInternalMobilityData(selectedQuarter);
