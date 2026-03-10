@@ -28,6 +28,7 @@ const ExitSurveyQ2Dashboard = lazy(() => import('./components/dashboards/ExitSur
 const ExitSurveyQ3Dashboard = lazy(() => import('./components/dashboards/ExitSurveyQ3Dashboard'));
 const ExitSurveyQ4Dashboard = lazy(() => import('./components/dashboards/ExitSurveyQ4Dashboard'));
 const ExitSurveyOverview = lazy(() => import('./components/dashboards/ExitSurveyOverview'));
+const ExitSurveyInsightsSlide = lazy(() => import('./components/dashboards/ExitSurveyInsightsSlide'));
 // Quarterly Turnover Reports
 const TurnoverQ1Dashboard = lazy(() => import('./components/dashboards/TurnoverQ1FY26Dashboard'));
 const TurnoverTrendsDashboard = lazy(() => import('./components/dashboards/TurnoverTrendsDashboard'));
@@ -205,6 +206,7 @@ function App() {
               <Route path="/dashboards/exit-survey-q2" element={<ExitSurveyQ2Dashboard />} />
               <Route path="/dashboards/exit-survey-q3" element={<ExitSurveyQ3Dashboard />} />
               <Route path="/dashboards/exit-survey-q4" element={<ExitSurveyQ4Dashboard />} />
+              <Route path="/dashboards/exit-survey-insights" element={<ExitSurveyInsightsSlide />} />
 
               {/* Quarterly Turnover Reports */}
               <Route path="/dashboards/turnover-q1" element={<TurnoverQ1Dashboard />} />

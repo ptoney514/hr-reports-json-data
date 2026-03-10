@@ -132,6 +132,13 @@ export const getExitSurveyData = (date = "2025-06-30") => {
   return staticData.getExitSurveyData(date);
 };
 
+/**
+ * Get internal mobility data for a specific date
+ */
+export const getInternalMobilityData = (date = "2025-12-31") => {
+  return staticData.getInternalMobilityData(date);
+};
+
 export const getExitSurveyDataAsync = async (date = "2025-06-30") => {
   return withFallback(
     () => apiService.getExitSurveyData(date),
@@ -427,6 +434,7 @@ const dataService = {
   getQuarterlyRecruitingDetails,
   getRecruitingData,
   getExitSurveyData,
+  getInternalMobilityData,
   getQuarterlyTurnoverData,
   getQuarterlyWorkforceData,
   getQuarterlyTurnoverRatesByCategory,
