@@ -2090,6 +2090,119 @@ export const EXIT_SURVEY_DATA = {
 };
 
 // ============================================================================
+// H1 FY26 EXIT SURVEY ANNUAL SUMMARY
+// Merged Q1 + Q2 FY26 exit survey data for half-year summary
+// Q1: Jul-Sep 2025 (73 exits, 15 responses) + Q2: Oct-Dec 2025 (39 exits, 10 responses)
+// ============================================================================
+export const H1_FY26_EXIT_SURVEY_SUMMARY = {
+  period: "H1 FY26",
+  dateRange: "Jul - Dec 2025",
+  totalExits: 112,
+  totalResponses: 25,
+  responseRate: 22.3,
+  overallSatisfaction: 3.34,
+  wouldRecommend: 84,
+  wouldRecommendCount: { positive: 21, total: 25 },
+  concernsReported: { percentage: 24, count: 6, total: 25 },
+
+  quarterComparison: [
+    { metric: "Exits", q1: 73, q2: 39, delta: -34, deltaLabel: "fewer exits", isGood: true },
+    { metric: "Responses", q1: 15, q2: 10, delta: -5, deltaLabel: "", isGood: null },
+    { metric: "Response Rate", q1: 20.5, q2: 25.6, delta: 5.1, deltaLabel: "improved", isGood: true, suffix: "%" },
+    { metric: "Satisfaction", q1: 3.3, q2: 3.4, delta: 0.1, deltaLabel: "", isGood: true, suffix: "/5" },
+    { metric: "Recommend", q1: 80, q2: 90, delta: 10, deltaLabel: "improved", isGood: true, suffix: "%" },
+    { metric: "Concerns", q1: 20, q2: 30, delta: 10, deltaLabel: "watch", isGood: false, suffix: "%" }
+  ],
+
+  departureReasons: [
+    { reason: "Other", count: 4, percentage: 16 },
+    { reason: "Dissatisfied with direct supervisor", count: 3, percentage: 12 },
+    { reason: "Pursue other career or education", count: 3, percentage: 12 },
+    { reason: "Relocation", count: 3, percentage: 12 },
+    { reason: "Family/Personal reasons", count: 2, percentage: 8 },
+    { reason: "Retirement", count: 2, percentage: 8 },
+    { reason: "Job was not as expected", count: 2, percentage: 8 },
+    { reason: "Unsatisfactory salary/pay", count: 2, percentage: 8 }
+  ],
+
+  contributingReasons: [
+    { reason: "Unsatisfactory salary/pay", count: 9, percentage: 36 },
+    { reason: "Lack of work-life balance", count: 7, percentage: 28 },
+    { reason: "Dissatisfied with direct supervisor", count: 6, percentage: 24 },
+    { reason: "Lack of flexibility", count: 6, percentage: 24 },
+    { reason: "Unrealistic job expectations/workload/hours", count: 5, percentage: 20 },
+    { reason: "University culture", count: 5, percentage: 20 },
+    { reason: "Lack of career advancement opportunities", count: 4, percentage: 16 },
+    { reason: "Remote/Hybrid option not available", count: 4, percentage: 16 },
+    { reason: "Job was not as expected", count: 3, percentage: 12 },
+    { reason: "Dissatisfied with University leadership", count: 3, percentage: 12 },
+    { reason: "Relocation", count: 2, percentage: 8 },
+    { reason: "Pursue other career or education", count: 2, percentage: 8 }
+  ],
+
+  satisfactionRatings: [
+    { category: "Management Support", q1: 3.4, q2: 4.0, combined: 3.64 },
+    { category: "Benefits", q1: 3.8, q2: 3.8, combined: 3.80 },
+    { category: "Job Satisfaction", q1: 3.2, q2: 3.5, combined: 3.32 },
+    { category: "Career Development", q1: 3.0, q2: 3.5, combined: 3.20 },
+    { category: "Compensation", q1: 3.2, q2: 3.1, combined: 3.16 },
+    { category: "Work-Life Balance", q1: 3.0, q2: 3.0, combined: 3.00 }
+  ],
+
+  themes: [
+    {
+      title: "Compensation",
+      subtitle: "Persistent Gap",
+      color: "#EF4444",
+      items: [
+        "36% cited salary as contributing factor",
+        "Compensation satisfaction lowest at 3.16/5.0",
+        "Top contributing factor in both quarters"
+      ]
+    },
+    {
+      title: "Supervision",
+      subtitle: "Improving but Watched",
+      color: "#F59E0B",
+      items: [
+        "Management support improved 3.4 → 4.0",
+        "24% cited supervisor as contributing factor",
+        "Concerns rose from 20% to 30%"
+      ]
+    },
+    {
+      title: "Retention",
+      subtitle: "Early Exits",
+      color: "#3B82F6",
+      items: [
+        "60% of Q2 leavers had 1-3 year tenure",
+        "Flexibility cited by 24% as contributing factor",
+        "Remote/hybrid options cited by 16%"
+      ]
+    }
+  ],
+
+  recommendedActions: [
+    { action: "Compensation market analysis for high-turnover roles", urgency: "NOW", urgencyColor: "#EF4444" },
+    { action: "Continue and expand supervisor development program", urgency: "NOW", urgencyColor: "#EF4444" },
+    { action: "Expand flexible work arrangements university-wide", urgency: "Q3", urgencyColor: "#F59E0B" },
+    { action: "Targeted retention bonuses for 1-3 year employees", urgency: "Q3", urgencyColor: "#F59E0B" },
+    { action: "Develop career pathing framework for staff roles", urgency: "Q4", urgencyColor: "#3B82F6" },
+    { action: "Launch stay interviews for high-performers at 18-month mark", urgency: "Q4", urgencyColor: "#3B82F6" }
+  ],
+
+  yoyTrend: {
+    currentLabel: "H1 FY26",
+    previousLabel: "H1 FY25",
+    metrics: [
+      { label: "Exits", current: 112, previous: 117, direction: "down", isGood: true },
+      { label: "Recommend %", current: 84, previous: 61, direction: "up", isGood: true },
+      { label: "Response Rate", current: 22.3, previous: 43.6, direction: "down", isGood: false }
+    ]
+  }
+};
+
+// ============================================================================
 // QUARTERLY TURNOVER TRENDS DATA
 // Historical turnover data for benefit-eligible employees (16 quarters)
 // ============================================================================

@@ -42,6 +42,7 @@ export const navigationRoutes = [
   { path: '/dashboards/section/exit-survey', label: 'Title - Exit Survey', group: 'Exit Survey', isDivider: true },
   { path: '/dashboards/exit-survey-q1', label: 'Exit Analysis Report', group: 'Exit Survey' },
   { path: '/dashboards/exit-survey-insights', label: 'Exit Survey Insights', group: 'Exit Survey' },
+  { path: '/dashboards/exit-survey-annual', label: 'H1 Exit Survey Summary', group: 'Exit Survey' },
 
   // Utility
   { path: '/sitemap', label: 'Sitemap', group: null },
