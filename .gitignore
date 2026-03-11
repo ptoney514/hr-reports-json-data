@@ -78,6 +78,9 @@ public/source-metrics/
 sample_data/
 test-*.csv
 EXIT_SURVEY_CONFIDENTIAL_SOURCES.md
+
+# Archived docs (kept locally, not in public repo)
+docs/_archived/
 pids
 *.pid
 *.seed
