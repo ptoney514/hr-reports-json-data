@@ -193,6 +193,57 @@ const MYJOBS_DATA = {
   ]
 };
 
+// Oracle Recruiting Cloud (myJobs) - Q2 FY26 Staff Pipeline Data
+// Source: Oracle Recruiting Cloud PDF exports (Oct-Dec 2025)
+// Note: Chart breakdown values are visual estimates from PDF charts
+const Q2_MYJOBS_DATA = {
+  source: "Oracle Recruiting Cloud (myJobs)",
+  asOf: "Q2 FY26",
+  requisitions: { open: 89, perRecruiter: 17.8, avgDaysOpen: 121, avgTimeToFill: 33.5, jobPostings: 0 },
+  applications: { active: 924, new: 2000, perRequisition: 26.1, internalPercentage: 2.4, referrals: 9 },
+  hires: { total: 79, internal: 16, internalRate: 20.3, avgDaysToHire: 24.8, hrProcessing: 74 },
+  offerAcceptance: 100.0, // Capped from 102.7% (carryover offers from Q1)
+  topJobFamilies: [
+    { name: "Admin Office - Provost", openings: 15 },
+    { name: "Facilities Mgmt - Custodial", openings: 12 },
+    { name: "Bio-Medical Sciences Dept", openings: 10 },
+    { name: "Student Financial Aid", openings: 9 },
+    { name: "Exec VP for Operations", openings: 8 },
+    { name: "Enrollment Mgmt - Admin", openings: 7 },
+    { name: "Dental Dean Administration", openings: 6 },
+    { name: "Facilities Mgmt - Mech Eng", openings: 5 },
+    { name: "IT Project Management Office", openings: 5 },
+    { name: "Creighton Therapy & Wellness", openings: 4 }
+  ],
+  applicationSources: [
+    { source: "External Career Site", applications: 900, percentage: 45.0, color: "#10B981" },
+    { source: "LinkedIn", applications: 350, percentage: 17.5, color: "#0A66C2" },
+    { source: "Other", applications: 280, percentage: 14.0, color: "#9CA3AF" },
+    { source: "jobright", applications: 200, percentage: 10.0, color: "#F59E0B" },
+    { source: "External Job Share", applications: 150, percentage: 7.5, color: "#8B5CF6" },
+    { source: "Job Alert", applications: 120, percentage: 6.0, color: "#0054A6" }
+  ],
+  topJobs: [
+    { title: "Senior Data Engineer (Develo...", applications: 550 },
+    { title: "Human Resources Assistant", applications: 280 },
+    { title: "Senior Marketing Strategist", applications: 220 },
+    { title: "Videographer", applications: 180 },
+    { title: "IT Support Specialist - Desktop", applications: 160 },
+    { title: "GME Program Manager I", applications: 140 },
+    { title: "Custodian", applications: 120 },
+    { title: "Temporary", applications: 100 },
+    { title: "Senior Director - Business S...", applications: 80 },
+    { title: "Director for Administration a...", applications: 70 }
+  ],
+  requisitionAging: [
+    { range: "0-30 Days", count: 10, percentage: 11.2, color: "#10B981" },
+    { range: "31-60 Days", count: 8, percentage: 9.0, color: "#3B82F6" },
+    { range: "61-90 Days", count: 12, percentage: 13.5, color: "#F59E0B" },
+    { range: "91-120 Days", count: 15, percentage: 16.9, color: "#EF4444" },
+    { range: ">120 Days", count: 44, percentage: 49.4, color: "#7F1D1D" }
+  ]
+};
+
 // Interfolio - Faculty Pipeline Data
 const INTERFOLIO_DATA = {
   source: "Interfolio",
@@ -333,8 +384,9 @@ const QUARTERLY_RECRUITING_PIPELINE = {
     oracleHires: ORACLE_HIRES_DATA
   },
   "2025-12-31": {
-    data: Q2_FY26_DATA
-    // myJobs, interfolio, oracleHires not yet available for Q2
+    data: Q2_FY26_DATA,
+    myJobs: Q2_MYJOBS_DATA
+    // interfolio, oracleHires not yet available for Q2
   }
 };
 
@@ -672,7 +724,7 @@ const RecruitingQ1FY26Dashboard = () => {
               </div>
 
               <div className="mt-4 text-xs text-gray-500 text-center">
-                LinkedIn leads with 40% of applications
+                {myJobs.applicationSources[0].source} leads with {myJobs.applicationSources[0].percentage}% of applications
               </div>
             </div>
 
@@ -1136,7 +1188,7 @@ const RecruitingQ1FY26Dashboard = () => {
         </div>)}
 
         {/* Executive Summary - only show when full pipeline data is available */}
-        {myJobs && (<div className="bg-white rounded-lg shadow-sm border p-8 mb-8">
+        {myJobs && interfolio && (<div className="bg-white rounded-lg shadow-sm border p-8 mb-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
             <FileText style={{color: '#0054A6'}} size={24} />
             Executive Summary
