@@ -63,21 +63,11 @@ const ReportGenerator = lazy(() => import('./components/reports/ReportGenerator'
 // Print Layout (Report Builder)
 const PrintLayout = lazy(() => import('./components/print/PrintLayout'));
 // Executive Dashboard
-const ExecutiveDashboard = lazy(() => import('./components/dashboards/ExecutiveDashboard'));
 const ExecutiveDashboardNew = lazy(() => import('./components/dashboards/ExecutiveDashboardNew'));
 // Section Dividers
 const SectionDivider = lazy(() => import('./components/ui/SectionDivider'));
 // Sitemap
 const SitemapDashboard = lazy(() => import('./components/dashboards/SitemapDashboard'));
-// Archive/Legacy Components
-const ExitSurveyDashboardOld = lazy(() => import('./components/dashboards/ExitSurveyDashboard_Old'));
-const ExitSurveyDashboardPrevious = lazy(() => import('./components/dashboards/ExitSurveyDashboard_Previous'));
-const ExitSurveyQ1DashboardOld = lazy(() => import('./components/dashboards/ExitSurveyQ1Dashboard_old'));
-const ExitSurveyQ4DashboardOld = lazy(() => import('./components/dashboards/ExitSurveyQ4Dashboard_old'));
-const DataImportDashboard = lazy(() => import('./components/dashboards/DataImportDashboard'));
-const DataHealthDashboard = lazy(() => import('./components/dashboards/DataHealthDashboard'));
-// WorkforceAudit temporarily disabled - papaparse dependency issue
-// const WorkforceAudit = lazy(() => import('./components/dashboards/WorkforceAudit'));
 // AdminDashboard removed - using static data now
 
 // Layout component that conditionally shows Navigation
@@ -198,9 +188,6 @@ function App() {
               <Route path="/dashboards/learning-development" element={<LearningDevelopmentDashboard />} />
               <Route path="/dashboards/total-rewards" element={<TotalRewardsDashboard />} />
               <Route path="/dashboards/benefits-wellbeing" element={<BenefitsWellbeingDashboard />} />
-              {/* Workforce Audit temporarily disabled - papaparse dependency issue */}
-              {/* <Route path="/dashboards/workforce-audit" element={<WorkforceAudit />} /> */}
-
               {/* Quarterly Exit Survey Reports */}
               <Route path="/dashboards/exit-survey-overview" element={<ExitSurveyOverview />} />
               <Route path="/dashboards/exit-survey-q1" element={<ExitSurveyQ1Dashboard />} />
@@ -261,15 +248,6 @@ function App() {
               {/* Sitemap Route */}
               <Route path="/sitemap" element={<SitemapDashboard />} />
 
-              {/* Archive/Legacy Routes */}
-              <Route path="/archive/exit-survey-old" element={<ExitSurveyDashboardOld />} />
-              <Route path="/archive/exit-survey-previous" element={<ExitSurveyDashboardPrevious />} />
-              <Route path="/archive/exit-survey-q1-old" element={<ExitSurveyQ1DashboardOld />} />
-              <Route path="/archive/exit-survey-q4-old" element={<ExitSurveyQ4DashboardOld />} />
-              <Route path="/archive/data-import" element={<DataImportDashboard />} />
-              <Route path="/archive/data-health" element={<DataHealthDashboard />} />
-              <Route path="/archive/executive-old" element={<ExecutiveDashboard />} />
-              
               {/* Default route - redirect to executive dashboard */}
               <Route path="/" element={<Navigate to="/dashboards/executive-new" replace />} />
               <Route path="/dashboards" element={<Navigate to="/dashboards/executive-new" replace />} />
