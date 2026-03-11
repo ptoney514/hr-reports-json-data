@@ -2200,16 +2200,26 @@ export const QUARTERLY_HEADCOUNT_TRENDS = [
 // - Rates are ANNUALIZED (quarterly rate * 4) for comparison with yearly benchmarks
 // ============================================================================
 // ANNUAL TURNOVER RATES BY CATEGORY
-// Annual and Q1 FY26 turnover rates with corresponding CUPA benchmarks
+// Annual and quarterly FY26 turnover rates with corresponding CUPA benchmarks
 // Used by QuarterlyTurnoverRatesDashboard for visual comparison
 // ============================================================================
 // Data Structure:
+// - FY 2023 rates compared against CUPA 2022-23 benchmarks
 // - FY 2024 rates compared against CUPA 2023-24 benchmarks
 // - FY 2025 rates compared against CUPA 2024-25 benchmarks
 // - Q1 FY26 rates compared against CUPA 2024-25 benchmarks
+// - Q2 FY26 (annualized) rates compared against CUPA 2024-25 benchmarks
 
 // Annual turnover rates by fiscal year
 export const ANNUAL_TURNOVER_RATES_BY_CATEGORY = {
+  fy2023: {
+    label: "FY 2023",
+    period: "Jul 2022 - Jun 2023",
+    faculty: 7.9,
+    staffExempt: 15.5,
+    staffNonExempt: 22.4,
+    total: 14.9
+  },
   fy2024: {
     label: "FY 2024",
     period: "Jul 2023 - Jun 2024",
@@ -2233,11 +2243,26 @@ export const ANNUAL_TURNOVER_RATES_BY_CATEGORY = {
     staffExempt: 16.5,
     staffNonExempt: 13.8,
     total: 10.8
+  },
+  q2fy26: {
+    label: "FY26 Annualized",
+    period: "Jul-Dec 2025 (Annualized)",
+    faculty: 2.6,
+    staffExempt: 8.0,
+    staffNonExempt: 17.9,
+    total: 8.7
   }
 };
 
 // CUPA Higher Education benchmarks by fiscal year
 export const TURNOVER_BENCHMARKS = {
+  fy2223: {
+    label: "Higher Ed. Avg.* 2022-23",
+    faculty: 6.7,
+    staffExempt: 15.1,
+    staffNonExempt: 17.3,
+    total: 13.0
+  },
   fy2324: {
     label: "Higher Ed. Avg.* 2023-24",
     faculty: 9.1,
@@ -2254,7 +2279,7 @@ export const TURNOVER_BENCHMARKS = {
   }
 };
 
-// Legacy quarterly data kept for reference (Q1 FY26 actual values)
+// Legacy quarterly data kept for reference
 export const QUARTERLY_TURNOVER_RATES_BY_CATEGORY = [
   {
     quarter: "Q1 FY26",
@@ -2264,6 +2289,14 @@ export const QUARTERLY_TURNOVER_RATES_BY_CATEGORY = [
     staffNonExempt: { terminations: 30, headcount: 869, rate: 13.8 },
     staff: { terminations: 54, headcount: 1451, rate: 14.9 },
     total: { terminations: 58, headcount: 2149, rate: 10.8 }
+  },
+  {
+    quarter: "Q2 FY26",
+    period: "Oct-Dec 2025",
+    faculty: { rate: 2.6 },
+    staffExempt: { rate: 8.0 },
+    staffNonExempt: { rate: 17.9 },
+    total: { rate: 8.7 }
   }
 ];
 
