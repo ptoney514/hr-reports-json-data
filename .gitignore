@@ -44,6 +44,8 @@ service-account*.json
 *.swp
 *.swo
 *~
+.superdesign/
+.windsurfrules
 
 # OS generated files
 .DS_Store?
