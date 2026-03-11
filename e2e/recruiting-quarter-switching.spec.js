@@ -79,13 +79,15 @@ test.describe('Recruiting Dashboard Quarter Switching', () => {
     await expect(dropdown).toHaveValue('2025-09-30');
   });
 
-  test('Q4 FY25 shows NoDataForQuarter (no recruiting data for that quarter)', async ({ page }) => {
-    await page.goto(RECRUITING_URL + '?quarter=2025-06-30');
+  test('only FY26 quarters appear in dropdown', async ({ page }) => {
+    await page.goto(RECRUITING_URL);
     await page.waitForLoadState('networkidle');
 
-    // Q4 FY25 also has no recruiting data, should show NoDataForQuarter
-    const noDataMessage = page.locator('text=Data Not Yet Available');
-    await expect(noDataMessage).toBeVisible({ timeout: 5000 });
+    const dropdown = page.locator('select[aria-label="Select reporting quarter"]');
+    const options = dropdown.locator('option');
+    await expect(options).toHaveCount(2);
+    await expect(options.nth(0)).toHaveValue('2025-12-31');
+    await expect(options.nth(1)).toHaveValue('2025-09-30');
   });
 
   test('Q2 FY26 shows pipeline KPI metrics', async ({ page }) => {
