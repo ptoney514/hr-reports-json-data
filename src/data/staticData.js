@@ -2353,6 +2353,31 @@ export const ANNUAL_TURNOVER_RATES_BY_CATEGORY = {
     staffNonExempt: 15.3,
     total: 11.2
   },
+  // Quarterly annualized rates for FY25 quarters (used in Q1 FY26 quarterly table)
+  q2fy25: {
+    label: "Q2 FY25",
+    period: "Oct-Dec 2024",
+    faculty: 2.3,
+    staffExempt: 10.3,
+    staffNonExempt: 8.8,
+    total: 7.1
+  },
+  q3fy25: {
+    label: "Q3 FY25",
+    period: "Jan-Mar 2025",
+    faculty: 4.7,
+    staffExempt: 13.2,
+    staffNonExempt: 11.1,
+    total: 9.6
+  },
+  q4fy25: {
+    label: "Q4 FY25",
+    period: "Apr-Jun 2025",
+    faculty: 5.8,
+    staffExempt: 12.4,
+    staffNonExempt: 10.6,
+    total: 9.5
+  },
   q1fy26: {
     label: "Q1 FY26",
     period: "Jul-Sep 2025",
@@ -2362,7 +2387,7 @@ export const ANNUAL_TURNOVER_RATES_BY_CATEGORY = {
     total: 10.8
   },
   q2fy26: {
-    label: "Q2 FY26",
+    label: "FY26 Annualized",
     period: "Jul-Dec 2025 (Annualized)",
     faculty: 2.6,
     staffExempt: 8.0,
@@ -2410,10 +2435,11 @@ export const QUARTERLY_TURNOVER_RATES_BY_CATEGORY = [
   {
     quarter: "Q2 FY26",
     period: "Oct-Dec 2025",
-    faculty: { rate: 2.6 },
-    staffExempt: { rate: 8.0 },
-    staffNonExempt: { rate: 17.9 },
-    total: { rate: 8.7 }
+    faculty: { terminations: 5, rate: 2.6 },
+    staffExempt: { terminations: 11, rate: 8.0 },
+    staffNonExempt: { terminations: 18, rate: 17.9 },
+    staff: { terminations: 29 },
+    total: { terminations: 34, rate: 8.7 }
   }
 ];
 
