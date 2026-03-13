@@ -18,13 +18,11 @@ const QuarterlyTurnoverRatesTable = ({ title = "Turnover Rates by Category", cla
   // Build dynamic column definitions based on selected quarter
   const columns = isQ2
     ? [
-        { type: 'benchmark', dataKey: 'fy2223', source: benchmarks, label: benchmarks.fy2223.label, ariaLabel: 'CUPA benchmark rate 2022-23' },
-        { type: 'rate', dataKey: 'fy2023', source: annualRates, benchmarkKey: 'fy2223', label: annualRates.fy2023.label, ariaLabel: 'FY 2023 turnover rate' },
         { type: 'benchmark', dataKey: 'fy2324', source: benchmarks, label: benchmarks.fy2324.label, ariaLabel: 'CUPA benchmark rate 2023-24' },
         { type: 'rate', dataKey: 'fy2024', source: annualRates, benchmarkKey: 'fy2324', label: annualRates.fy2024.label, ariaLabel: 'FY 2024 turnover rate' },
         { type: 'benchmark', dataKey: 'fy2425', source: benchmarks, label: benchmarks.fy2425.label, ariaLabel: 'CUPA benchmark rate 2024-25' },
         { type: 'rate', dataKey: 'fy2025', source: annualRates, benchmarkKey: 'fy2425', label: annualRates.fy2025.label, ariaLabel: 'FY 2025 turnover rate' },
-        { type: 'rate', dataKey: 'q2fy26', source: annualRates, benchmarkKey: 'fy2425', label: annualRates.q2fy26.label, ariaLabel: 'FY26 Annualized turnover rate' },
+        { type: 'rate', dataKey: 'q2fy26', source: annualRates, benchmarkKey: 'fy2425', label: annualRates.q2fy26.label, ariaLabel: 'Q2 FY26 turnover rate' },
       ]
     : [
         { type: 'benchmark', dataKey: 'fy2324', source: benchmarks, label: benchmarks.fy2324.label, ariaLabel: 'CUPA benchmark rate 2023-24' },
@@ -44,7 +42,7 @@ const QuarterlyTurnoverRatesTable = ({ title = "Turnover Rates by Category", cla
   };
 
   const footerNote = isQ2
-    ? '* Benchmark based on CUPA Higher Education data. FY rates are annual; FY26 Annualized as of 12/31/2025.'
+    ? '* Benchmark based on CUPA Higher Education data. FY rates are annual; Q2 FY26 is annualized (quarterly × 4) for comparison.'
     : '* Benchmark based on CUPA Higher Education data. FY rates are annual; Q1 FY26 is annualized (quarterly × 4) for comparison.';
 
   return (
@@ -57,7 +55,7 @@ const QuarterlyTurnoverRatesTable = ({ title = "Turnover Rates by Category", cla
         {/* Responsive table container */}
         <div className="overflow-x-auto pdf-table-container" data-content-type="table">
           <table
-            className={`w-full ${isQ2 ? 'min-w-[1100px]' : 'min-w-[800px]'} pdf-export-table`}
+            className="w-full min-w-[800px] pdf-export-table"
             role="table"
             aria-label="Annual turnover rates by category comparison table"
             data-table-ready="true"

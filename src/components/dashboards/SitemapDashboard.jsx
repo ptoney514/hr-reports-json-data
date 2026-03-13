@@ -53,7 +53,8 @@ const SitemapDashboard = () => {
     { path: '/dashboards/exit-survey-q1', label: 'Q1 FY26 Exit Survey', icon: FileText },
     { path: '/dashboards/exit-survey-q2', label: 'Q2 Exit Survey', icon: FileText, hidden: true },
     { path: '/dashboards/exit-survey-q3', label: 'Q3 Exit Survey', icon: FileText, hidden: true },
-    { path: '/dashboards/exit-survey-q4', label: 'Q4 Exit Survey', icon: FileText, hidden: true }
+    { path: '/dashboards/exit-survey-q4', label: 'Q4 Exit Survey', icon: FileText, hidden: true },
+    { path: '/dashboards/raw-exit-surveys', label: 'Raw Exit Survey Data', icon: Database }
   ];
 
   // Quarterly Reports - Turnover

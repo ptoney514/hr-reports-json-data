@@ -57,7 +57,7 @@ const QuarterlyTurnoverRatesDashboard = () => {
                       <h1 className="text-2xl font-bold text-gray-900">Turnover Analysis by Category</h1>
                       <p className="text-gray-600 text-sm mt-1">
                         {isQ2
-                          ? 'Annual Turnover Rates — FY 2023 through FY26 Annualized (12/31/2025) with CUPA Benchmarks'
+                          ? 'Annual Turnover Rates - FY 2024, FY 2025 & Q2 FY26 with CUPA Benchmarks'
                           : 'Annual Turnover Rates - FY 2024, FY 2025 & Q1 FY26 with CUPA Benchmarks'}
                       </p>
                     </div>
@@ -72,7 +72,7 @@ const QuarterlyTurnoverRatesDashboard = () => {
                       customHeader={{
                         title: "Turnover Rates by Category",
                         subtitle: isQ2
-                          ? "FY 2023 through FY26 Annualized (12/31/2025) with CUPA Benchmarks"
+                          ? "FY 2024, FY 2025 & Q2 FY26 with CUPA Benchmarks"
                           : "FY 2024, FY 2025 & Q1 FY26 with CUPA Benchmarks"
                       }}
                     />
@@ -93,7 +93,7 @@ const QuarterlyTurnoverRatesDashboard = () => {
                   </h3>
                   <p className="text-sm text-blue-700 print:text-black leading-relaxed">
                     {isQ2
-                      ? 'FY rates are annual turnover percentages. FY26 rates are annualized as of 12/31/2025 for comparison with CUPA benchmarks. Data includes benefit-eligible Full-Time and Part-Time employees only.'
+                      ? 'FY 2024 and FY 2025 rates are annual turnover percentages. Q2 FY26 rates are annualized (quarterly × 4) for comparison with CUPA benchmarks. Data includes benefit-eligible Full-Time and Part-Time employees only.'
                       : 'FY 2024 and FY 2025 rates are annual turnover percentages. Q1 FY26 rates are annualized (quarterly × 4) for comparison with CUPA benchmarks. Data includes benefit-eligible Full-Time and Part-Time employees only.'}
                   </p>
                 </div>
@@ -159,13 +159,13 @@ const QuarterlyTurnoverRatesDashboard = () => {
               <ul className="text-xs text-gray-600 space-y-1">
                 <li>• <strong>FY Rates:</strong> Annual turnover percentage for the full fiscal year</li>
                 {isQ2 ? (
-                  <li>• <strong>FY26 Annualized Rate:</strong> Annualized based on Jul-Dec 2025 data (as of 12/31/2025)</li>
+                  <li>• <strong>Q2 FY26 Rate:</strong> Annualized (Quarterly Terminations / Headcount) × 4 × 100</li>
                 ) : (
                   <li>• <strong>Q1 FY26 Rate:</strong> Annualized (Quarterly Terminations / Headcount) × 4 × 100</li>
                 )}
-                <li>• <strong>Benchmark Source:</strong> CUPA Higher Education data{isQ2 ? ' (2022-23, 2023-24, and 2024-25)' : ' (2023-24 and 2024-25)'}</li>
+                <li>• <strong>Benchmark Source:</strong> CUPA Higher Education data (2023-24 and 2024-25)</li>
                 {isQ2 ? (
-                  <li>• <strong>Comparison Logic:</strong> FY 2023 compares to 2022-23 benchmark; FY 2024 compares to 2023-24 benchmark; FY 2025 and FY26 Annualized compare to 2024-25 benchmark</li>
+                  <li>• <strong>Comparison Logic:</strong> FY 2024 compares to 2023-24 benchmark; FY 2025 and Q2 FY26 compare to 2024-25 benchmark</li>
                 ) : (
                   <li>• <strong>Comparison Logic:</strong> FY 2024 compares to 2023-24 benchmark; FY 2025 and Q1 FY26 compare to 2024-25 benchmark</li>
                 )}
