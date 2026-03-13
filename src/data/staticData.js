@@ -2060,7 +2060,7 @@ export const EXIT_SURVEY_DATA = {
           subtitle: "Early Exits",
           color: "#3B82F6",
           items: [
-            "60% of leavers had 1-3 year tenure",
+            "60% of those leaving had 1-3 year tenure",
             "Only 10% had 5+ years of service",
             "Onboarding-to-engagement gap evident"
           ]
@@ -2068,12 +2068,10 @@ export const EXIT_SURVEY_DATA = {
       ],
 
       recommendedActions: [
-        { action: "Targeted retention bonuses for 1-3 year employees in critical roles", urgency: "NOW", urgencyColor: "#EF4444" },
-        { action: "Compensation market study for staff positions below median", urgency: "NOW", urgencyColor: "#EF4444" },
-        { action: "Enhanced onboarding program with 90-day check-ins", urgency: "Q3", urgencyColor: "#F59E0B" },
-        { action: "Expand flexible work arrangements university-wide", urgency: "Q3", urgencyColor: "#F59E0B" },
+        { action: "Implement frequent 1:1 connection meetings as part of onboarding", urgency: "Q3", urgencyColor: "#F59E0B" },
+        { action: "Consider expanding flexible work arrangements, when possible", urgency: "Q3", urgencyColor: "#F59E0B" },
         { action: "Develop career pathing framework for staff roles", urgency: "Q4", urgencyColor: "#3B82F6" },
-        { action: "Launch stay interviews for high-performers at 18-month mark", urgency: "Q4", urgencyColor: "#3B82F6" }
+        { action: "Consider individualized development programs or other opportunities to fit the needs of the individual", urgency: "Q4", urgencyColor: "#3B82F6" }
       ],
 
       yoyTrend: {
@@ -2175,7 +2173,7 @@ export const H1_FY26_EXIT_SURVEY_SUMMARY = {
       subtitle: "Early Exits",
       color: "#3B82F6",
       items: [
-        "60% of Q2 leavers had 1-3 year tenure",
+        "60% of those leaving in Q2 had 1-3 year tenure",
         "Flexibility cited by 24% as contributing factor",
         "Remote/hybrid options cited by 16%"
       ]
@@ -2185,10 +2183,9 @@ export const H1_FY26_EXIT_SURVEY_SUMMARY = {
   recommendedActions: [
     { action: "Compensation market analysis for high-turnover roles", urgency: "NOW", urgencyColor: "#EF4444" },
     { action: "Continue and expand supervisor development program", urgency: "NOW", urgencyColor: "#EF4444" },
-    { action: "Expand flexible work arrangements university-wide", urgency: "Q3", urgencyColor: "#F59E0B" },
-    { action: "Targeted retention bonuses for 1-3 year employees", urgency: "Q3", urgencyColor: "#F59E0B" },
+    { action: "Consider expanding flexible work arrangements, when possible", urgency: "Q3", urgencyColor: "#F59E0B" },
     { action: "Develop career pathing framework for staff roles", urgency: "Q4", urgencyColor: "#3B82F6" },
-    { action: "Launch stay interviews for high-performers at 18-month mark", urgency: "Q4", urgencyColor: "#3B82F6" }
+    { action: "Consider individualized development programs or other opportunities to fit the needs of the individual", urgency: "Q4", urgencyColor: "#3B82F6" }
   ],
 
   yoyTrend: {
