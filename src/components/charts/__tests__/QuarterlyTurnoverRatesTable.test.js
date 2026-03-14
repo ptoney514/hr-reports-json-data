@@ -4,8 +4,8 @@
  * Tests for the turnover rates table component that displays
  * turnover rates by category (Faculty, Staff Exempt, Staff Non-Exempt, Total)
  * with corresponding CUPA benchmark comparisons.
- * Q1 view: 6 columns (category + 5 data columns)
- * Q2 view: 8 columns (category + 7 data columns including FY23 and 2022-23 benchmark)
+ * Q1 view: 6 columns (category + Benchmark* + Q2 FY25 + Q3 FY25 + Q4 FY25 + Q1 FY26)
+ * Q2 view: two-row header with 8 first-row columns (category + 7 data columns)
  */
 
 import React from 'react';
@@ -25,7 +25,7 @@ describe('QuarterlyTurnoverRatesTable Component', () => {
 
     it('should render with default title', () => {
       render(<QuarterlyTurnoverRatesTable />);
-      expect(screen.getByText('Turnover Rates by Category')).toBeInTheDocument();
+      expect(screen.getByText('Quarterly Turnover Rates by Category')).toBeInTheDocument();
     });
 
     it('should render with custom title', () => {
@@ -51,23 +51,17 @@ describe('QuarterlyTurnoverRatesTable Component', () => {
       expect(rows).toHaveLength(4);
     });
 
-    it('should render correct number of columns (6: category + 2 benchmarks + 3 rate periods)', () => {
+    it('should render correct number of columns (6: category + Benchmark + 4 quarterly)', () => {
       const headers = screen.getAllByRole('columnheader');
       expect(headers).toHaveLength(6);
     });
 
     it('should have correct header labels', () => {
-      expect(screen.getByRole('columnheader', { name: /employee category/i })).toBeInTheDocument();
-      expect(screen.getByRole('columnheader', { name: /CUPA benchmark rate 2023-24/i })).toBeInTheDocument();
-      expect(screen.getByRole('columnheader', { name: /FY 2024 turnover rate/i })).toBeInTheDocument();
-      expect(screen.getByRole('columnheader', { name: /CUPA benchmark rate 2024-25/i })).toBeInTheDocument();
-      expect(screen.getByRole('columnheader', { name: /FY 2025 turnover rate/i })).toBeInTheDocument();
-      expect(screen.getByRole('columnheader', { name: /Q1 FY26 turnover rate/i })).toBeInTheDocument();
-    });
-
-    it('should render period headers from data', () => {
-      expect(screen.getByText('FY 2024')).toBeInTheDocument();
-      expect(screen.getByText('FY 2025')).toBeInTheDocument();
+      expect(screen.getByText('Turnover Category')).toBeInTheDocument();
+      expect(screen.getByText('Benchmark*')).toBeInTheDocument();
+      expect(screen.getByText('Q2 FY25')).toBeInTheDocument();
+      expect(screen.getByText('Q3 FY25')).toBeInTheDocument();
+      expect(screen.getByText('Q4 FY25')).toBeInTheDocument();
       expect(screen.getByText('Q1 FY26')).toBeInTheDocument();
     });
 
@@ -79,17 +73,9 @@ describe('QuarterlyTurnoverRatesTable Component', () => {
     });
   });
 
-  describe('Data Display', () => {
+  describe('Data Display (Q1)', () => {
     beforeEach(() => {
       render(<QuarterlyTurnoverRatesTable />);
-    });
-
-    it('should display 2023-24 benchmark values', () => {
-      const table = screen.getByRole('table');
-      expect(table.textContent).toContain(`${benchmarks.fy2324.faculty}%`);
-      expect(table.textContent).toContain(`${benchmarks.fy2324.staffExempt}%`);
-      expect(table.textContent).toContain(`${benchmarks.fy2324.staffNonExempt}%`);
-      expect(table.textContent).toContain(`${benchmarks.fy2324.total}%`);
     });
 
     it('should display 2024-25 benchmark values', () => {
@@ -100,16 +86,10 @@ describe('QuarterlyTurnoverRatesTable Component', () => {
       expect(table.textContent).toContain(`${benchmarks.fy2425.total}%`);
     });
 
-    it('should display FY 2024 rates', () => {
+    it('should display Q2 FY25 rates', () => {
       const table = screen.getByRole('table');
-      expect(table.textContent).toContain(`${annualRates.fy2024.faculty}%`);
-      expect(table.textContent).toContain(`${annualRates.fy2024.total}%`);
-    });
-
-    it('should display FY 2025 rates', () => {
-      const table = screen.getByRole('table');
-      expect(table.textContent).toContain(`${annualRates.fy2025.faculty}%`);
-      expect(table.textContent).toContain(`${annualRates.fy2025.total}%`);
+      expect(table.textContent).toContain(`${annualRates.q2fy25.faculty}%`);
+      expect(table.textContent).toContain(`${annualRates.q2fy25.total}%`);
     });
 
     it('should display Q1 FY26 rates', () => {
@@ -122,24 +102,20 @@ describe('QuarterlyTurnoverRatesTable Component', () => {
   describe('Color Coding Logic', () => {
     it('should apply green styling to values below benchmark', () => {
       const { container } = render(<QuarterlyTurnoverRatesTable />);
-      // FY 2024 and FY 2025 rates are below benchmarks, so should have green styling
       const greenCells = container.querySelectorAll('.bg-green-100');
       expect(greenCells.length).toBeGreaterThan(0);
     });
 
     it('should apply red styling to values above benchmark', () => {
       const { container } = render(<QuarterlyTurnoverRatesTable />);
-      // Staff Exempt Q1 FY26 (16.5%) is above benchmark (15.0%), so should have red styling
       const redCells = container.querySelectorAll('.bg-red-100');
       expect(redCells.length).toBeGreaterThan(0);
     });
 
     it('should apply red styling to Staff Exempt Q1 FY26 cell (above benchmark)', () => {
       const { container } = render(<QuarterlyTurnoverRatesTable />);
-      // Staff Exempt Q1 FY26 (16.5%) is above benchmark (15.0%), verify this specific cell is red
       const redCells = container.querySelectorAll('td.bg-red-100');
       expect(redCells.length).toBeGreaterThan(0);
-      // Find the cell containing 16.5% (Staff Exempt Q1 FY26 rate)
       const staffExemptQ1Cell = Array.from(redCells).find(cell =>
         cell.textContent.includes(`${annualRates.q1fy26.staffExempt}%`)
       );
@@ -158,7 +134,7 @@ describe('QuarterlyTurnoverRatesTable Component', () => {
 
     it('should have aria-label on table', () => {
       const table = screen.getByRole('table');
-      expect(table).toHaveAttribute('aria-label', 'Annual turnover rates by category comparison table');
+      expect(table).toHaveAttribute('aria-label', 'Turnover rates by category comparison table');
     });
 
     it('should have scope="col" on header cells', () => {
@@ -196,21 +172,32 @@ describe('QuarterlyTurnoverRatesTable Component', () => {
   });
 
   describe('Q2 FY26 View', () => {
-    it('should render 8 column headers (category + 7 data columns)', () => {
+    it('should render two-row header with 15 total column headers', () => {
       render(<QuarterlyTurnoverRatesTable selectedQuarter="2025-12-31" />);
       const headers = screen.getAllByRole('columnheader');
-      expect(headers).toHaveLength(8);
+      // Row 1: Turnover Category (rowSpan=2) + 7 data cols = 8
+      // Row 2: 7 sublabel cols
+      expect(headers).toHaveLength(15);
     });
 
     it('should display Q2-specific column headers', () => {
       render(<QuarterlyTurnoverRatesTable selectedQuarter="2025-12-31" />);
-      expect(screen.getByRole('columnheader', { name: /CUPA benchmark rate 2022-23/i })).toBeInTheDocument();
-      expect(screen.getByRole('columnheader', { name: /FY 2023 turnover rate/i })).toBeInTheDocument();
-      expect(screen.getByRole('columnheader', { name: /CUPA benchmark rate 2023-24/i })).toBeInTheDocument();
-      expect(screen.getByRole('columnheader', { name: /FY 2024 turnover rate/i })).toBeInTheDocument();
-      expect(screen.getByRole('columnheader', { name: /CUPA benchmark rate 2024-25/i })).toBeInTheDocument();
-      expect(screen.getByRole('columnheader', { name: /FY 2025 turnover rate/i })).toBeInTheDocument();
-      expect(screen.getByRole('columnheader', { name: /FY26 Annualized turnover rate/i })).toBeInTheDocument();
+      expect(screen.getByText('Turnover Category')).toBeInTheDocument();
+      expect(screen.getByText('FY23')).toBeInTheDocument();
+      expect(screen.getByText('FY24')).toBeInTheDocument();
+      expect(screen.getByText('FY25')).toBeInTheDocument();
+      expect(screen.getByText('FY26 Annualized')).toBeInTheDocument();
+    });
+
+    it('should display HE Avg benchmark headers with sublabels', () => {
+      render(<QuarterlyTurnoverRatesTable selectedQuarter="2025-12-31" />);
+      // 3 HE Avg* headers in first row
+      const heAvgHeaders = screen.getAllByText('HE Avg*');
+      expect(heAvgHeaders).toHaveLength(3);
+      // Sublabels in second row
+      expect(screen.getByText('2022-23')).toBeInTheDocument();
+      expect(screen.getByText('2023-24')).toBeInTheDocument();
+      expect(screen.getByText('2024-25')).toBeInTheDocument();
     });
 
     it('should display Q2 FY26 rate values', () => {
@@ -277,6 +264,13 @@ describe('QuarterlyTurnoverRatesTable Component', () => {
       render(<QuarterlyTurnoverRatesTable selectedQuarter="2025-12-31" />);
       const table = screen.getByRole('table');
       expect(table).toHaveClass('min-w-[1100px]');
+    });
+
+    it('should have separator border on FY26 Annualized column', () => {
+      const { container } = render(<QuarterlyTurnoverRatesTable selectedQuarter="2025-12-31" />);
+      const separatorCells = container.querySelectorAll('.border-l-2.border-blue-200');
+      // 4 body rows should each have the separator on the last column
+      expect(separatorCells.length).toBe(4);
     });
   });
 });
