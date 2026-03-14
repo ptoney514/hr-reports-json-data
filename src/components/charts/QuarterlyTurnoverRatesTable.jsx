@@ -1,13 +1,11 @@
 import React from 'react';
 import { getAnnualTurnoverRatesByCategory } from '../../services/dataService';
 
-const QuarterlyTurnoverRatesTable = ({ title = "Turnover Rates by Category", className = "", selectedQuarter = "2025-09-30" }) => {
-  // Get data from static data
+const QuarterlyTurnoverRatesTable = ({ title = "Quarterly Turnover Rates by Category", className = "", selectedQuarter = "2025-09-30" }) => {
   const { annualRates, benchmarks } = getAnnualTurnoverRatesByCategory();
 
   const isQ2 = selectedQuarter === '2025-12-31';
 
-  // Categories to display
   const categories = [
     { key: 'faculty', label: 'Faculty' },
     { key: 'staffExempt', label: 'Staff Exempt' },
@@ -15,37 +13,38 @@ const QuarterlyTurnoverRatesTable = ({ title = "Turnover Rates by Category", cla
     { key: 'total', label: 'Total' }
   ];
 
-  // Build dynamic column definitions based on selected quarter
+  // Q1: Single benchmark column + 4 quarterly columns
+  // Q2: 3 benchmark/FY pairs + FY26 Annualized (7 data columns)
   const columns = isQ2
     ? [
-        { type: 'benchmark', dataKey: 'fy2223', source: benchmarks, label: benchmarks.fy2223.label, ariaLabel: 'CUPA benchmark rate 2022-23' },
-        { type: 'rate', dataKey: 'fy2023', source: annualRates, benchmarkKey: 'fy2223', label: annualRates.fy2023.label, ariaLabel: 'FY 2023 turnover rate' },
-        { type: 'benchmark', dataKey: 'fy2324', source: benchmarks, label: benchmarks.fy2324.label, ariaLabel: 'CUPA benchmark rate 2023-24' },
-        { type: 'rate', dataKey: 'fy2024', source: annualRates, benchmarkKey: 'fy2324', label: annualRates.fy2024.label, ariaLabel: 'FY 2024 turnover rate' },
-        { type: 'benchmark', dataKey: 'fy2425', source: benchmarks, label: benchmarks.fy2425.label, ariaLabel: 'CUPA benchmark rate 2024-25' },
-        { type: 'rate', dataKey: 'fy2025', source: annualRates, benchmarkKey: 'fy2425', label: annualRates.fy2025.label, ariaLabel: 'FY 2025 turnover rate' },
-        { type: 'rate', dataKey: 'q2fy26', source: annualRates, benchmarkKey: 'fy2425', label: annualRates.q2fy26.label, ariaLabel: 'FY26 Annualized turnover rate' },
+        { type: 'benchmark', dataKey: 'fy2223', source: benchmarks, label: 'HE Avg*', sublabel: '2022-23' },
+        { type: 'rate', dataKey: 'fy2023', source: annualRates, benchmarkKey: 'fy2223', label: 'FY23', sublabel: '' },
+        { type: 'benchmark', dataKey: 'fy2324', source: benchmarks, label: 'HE Avg*', sublabel: '2023-24' },
+        { type: 'rate', dataKey: 'fy2024', source: annualRates, benchmarkKey: 'fy2324', label: 'FY24', sublabel: '' },
+        { type: 'benchmark', dataKey: 'fy2425', source: benchmarks, label: 'HE Avg*', sublabel: '2024-25' },
+        { type: 'rate', dataKey: 'fy2025', source: annualRates, benchmarkKey: 'fy2425', label: 'FY25', sublabel: '' },
+        { type: 'rate', dataKey: 'q2fy26', source: annualRates, benchmarkKey: 'fy2425', label: 'FY26 Annualized', sublabel: '12/31/2025', separator: true },
       ]
     : [
-        { type: 'benchmark', dataKey: 'fy2324', source: benchmarks, label: benchmarks.fy2324.label, ariaLabel: 'CUPA benchmark rate 2023-24' },
-        { type: 'rate', dataKey: 'fy2024', source: annualRates, benchmarkKey: 'fy2324', label: annualRates.fy2024.label, ariaLabel: 'FY 2024 turnover rate' },
-        { type: 'benchmark', dataKey: 'fy2425', source: benchmarks, label: benchmarks.fy2425.label, ariaLabel: 'CUPA benchmark rate 2024-25' },
-        { type: 'rate', dataKey: 'fy2025', source: annualRates, benchmarkKey: 'fy2425', label: annualRates.fy2025.label, ariaLabel: 'FY 2025 turnover rate' },
-        { type: 'rate', dataKey: 'q1fy26', source: annualRates, benchmarkKey: 'fy2425', label: annualRates.q1fy26.label, ariaLabel: 'Q1 FY26 turnover rate' },
+        { type: 'benchmark', dataKey: 'fy2425', source: benchmarks, label: 'Benchmark*' },
+        { type: 'rate', dataKey: 'q2fy25', source: annualRates, benchmarkKey: 'fy2425', label: 'Q2 FY25' },
+        { type: 'rate', dataKey: 'q3fy25', source: annualRates, benchmarkKey: 'fy2425', label: 'Q3 FY25' },
+        { type: 'rate', dataKey: 'q4fy25', source: annualRates, benchmarkKey: 'fy2425', label: 'Q4 FY25' },
+        { type: 'rate', dataKey: 'q1fy26', source: annualRates, benchmarkKey: 'fy2425', label: 'Q1 FY26' },
       ];
 
-  // Determine cell styling based on performance vs benchmark
   const getCellStyling = (value, benchmark) => {
     if (value > benchmark) {
-      return "bg-red-100 text-red-800"; // Above benchmark (worse performance)
-    } else {
-      return "bg-green-100 text-green-800"; // Below benchmark (better performance)
+      return "bg-red-100 text-red-800";
     }
+    return "bg-green-100 text-green-800";
   };
 
   const footerNote = isQ2
-    ? '* Benchmark based on CUPA Higher Education data. FY rates are annual; FY26 Annualized as of 12/31/2025.'
-    : '* Benchmark based on CUPA Higher Education data. FY rates are annual; Q1 FY26 is annualized (quarterly × 4) for comparison.';
+    ? '*Higher Ed Average turnover numbers based on CUPA data. FY26 Annualized as of 12/31/2025.'
+    : '* Benchmark based on CUPA Higher Ed data (2024-25). Rates are annualized (quarterly \u00d7 4) for comparison.';
+
+  const minWidth = isQ2 ? 'min-w-[1100px]' : 'min-w-[800px]';
 
   return (
     <div className={`bg-white rounded-lg shadow-sm border print:border-gray ${className}`} data-pdf-ready="true">
@@ -54,61 +53,70 @@ const QuarterlyTurnoverRatesTable = ({ title = "Turnover Rates by Category", cla
           {title}
         </h3>
 
-        {/* Responsive table container */}
         <div className="overflow-x-auto pdf-table-container" data-content-type="table">
           <table
-            className={`w-full ${isQ2 ? 'min-w-[1100px]' : 'min-w-[800px]'} pdf-export-table`}
+            className={`w-full ${minWidth} pdf-export-table`}
             role="table"
-            aria-label="Annual turnover rates by category comparison table"
+            aria-label="Turnover rates by category comparison table"
             data-table-ready="true"
           >
-            {/* Table Header */}
             <thead>
-              <tr className="text-white" style={{backgroundColor: '#00245D'}}>
-                <th
-                  className="text-left py-3 px-4 font-semibold text-sm"
-                  scope="col"
-                  aria-label="Employee category"
-                >
-                  Turnover Category
-                </th>
-                {columns.map((col) => (
-                  <th
-                    key={col.dataKey}
-                    className="text-center py-3 px-3 font-semibold text-sm"
-                    scope="col"
-                    aria-label={col.ariaLabel}
-                  >
-                    {col.label}
+              {isQ2 ? (
+                <>
+                  <tr className="text-white" style={{backgroundColor: '#00245D'}}>
+                    <th className="text-left py-2 px-4 font-semibold text-sm" scope="col" rowSpan={2}>
+                      Turnover Category
+                    </th>
+                    {columns.map((col) => (
+                      <th key={col.dataKey} className={`text-center py-1 px-3 font-semibold text-sm${col.separator ? ' border-l-2' : ''}`} scope="col" style={col.separator ? {borderLeftColor: 'rgba(255,255,255,0.25)'} : undefined}>
+                        {col.label}
+                      </th>
+                    ))}
+                  </tr>
+                  <tr className="text-white text-xs" style={{backgroundColor: '#00245D'}}>
+                    {columns.map((col) => (
+                      <th key={`${col.dataKey}-sub`} className={`text-center py-1 px-3 font-normal${col.separator ? ' border-l-2' : ''}`} style={col.separator ? {borderLeftColor: 'rgba(255,255,255,0.25)'} : undefined}>
+                        {col.sublabel || '\u00A0'}
+                      </th>
+                    ))}
+                  </tr>
+                </>
+              ) : (
+                <tr className="text-white" style={{backgroundColor: '#00245D'}}>
+                  <th className="text-left py-3 px-4 font-semibold text-sm" scope="col">
+                    Turnover Category
                   </th>
-                ))}
-              </tr>
+                  {columns.map((col) => (
+                    <th key={col.dataKey} className="text-center py-3 px-3 font-semibold text-sm" scope="col">
+                      {col.label}
+                    </th>
+                  ))}
+                </tr>
+              )}
             </thead>
 
-            {/* Table Body */}
             <tbody>
               {categories.map((category, index) => (
                 <tr
                   key={category.key}
                   className={`border-b border-gray-200 ${index % 2 === 0 ? 'bg-gray-50' : 'bg-white'} print:bg-white`}
                 >
-                  {/* Category Name */}
                   <td className="py-3 px-4 font-medium text-gray-900">
                     {category.label}
                   </td>
-
                   {columns.map((col) => {
                     const value = col.source[col.dataKey][category.key];
+                    const separatorClass = col.separator ? ' border-l-2 border-blue-200' : '';
                     if (col.type === 'benchmark') {
                       return (
-                        <td key={col.dataKey} className="text-center py-3 px-3 text-gray-600">
+                        <td key={col.dataKey} className={`text-center py-3 px-3 text-gray-600${separatorClass}`}>
                           {value}%
                         </td>
                       );
                     }
                     const benchmarkValue = benchmarks[col.benchmarkKey][category.key];
                     return (
-                      <td key={col.dataKey} className={`text-center py-3 px-3 ${getCellStyling(value, benchmarkValue)}`}>
+                      <td key={col.dataKey} className={`text-center py-3 px-3 ${getCellStyling(value, benchmarkValue)}${separatorClass}`}>
                         {value}%
                       </td>
                     );
@@ -119,13 +127,12 @@ const QuarterlyTurnoverRatesTable = ({ title = "Turnover Rates by Category", cla
           </table>
         </div>
 
-        {/* Footer note */}
         <div className="mt-4 text-xs text-gray-500 print:text-black">
           {footerNote}
         </div>
         <div className="mt-2 text-xs text-gray-500 print:text-black">
           <span className="inline-block w-3 h-3 bg-green-100 border border-green-200 rounded mr-1"></span>
-          Below benchmark (better) &nbsp;
+          Below benchmark &nbsp;
           <span className="inline-block w-3 h-3 bg-red-100 border border-red-200 rounded mr-1"></span>
           Above benchmark (needs attention)
         </div>

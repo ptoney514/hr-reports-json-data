@@ -44,6 +44,8 @@ service-account*.json
 *.swp
 *.swo
 *~
+.superdesign/
+.windsurfrules
 
 # OS generated files
 .DS_Store?
@@ -65,14 +67,20 @@ source-metrics/**/raw/**/*
 source-metrics/*/fy*/
 source-metrics/*/FY*/
 
-# KEEP: Cleaned CSV data files (needed for cross-machine work)
-# These are essential transformed data that should be in Git
-!source-metrics/**/cleaned/**/*.csv
-!source-metrics/**/cleaned_data/**/*.csv
+# Sensitive HR data files - NEVER track
+*.xlsx
+*.xls
+*.xlsm
+~$*.xlsx
+source-metrics/**/cleaned/**/*.csv
+source-metrics/**/cleaned/**/*.json
+public/source-metrics/
+sample_data/
+test-*.csv
+EXIT_SURVEY_CONFIDENTIAL_SOURCES.md
 
-# IGNORE: Large JSON summaries (can be regenerated from CSV)
-source-metrics/**/cleaned/**/*_summary.json
-source-metrics/**/cleaned/**/*_cleaned.json
+# Archived docs (kept locally, not in public repo)
+docs/_archived/
 pids
 *.pid
 *.seed

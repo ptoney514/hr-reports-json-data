@@ -1780,7 +1780,8 @@ export const EXIT_SURVEY_DATA = {
     },
     departureReasons: [
       { reason: "Other", count: 3, percentage: 20 },
-      { reason: "Dissatisfied with direct supervisor", count: 2, percentage: 13.3 },
+      { reason: "Unrealistic job expectations/workload/hours", count: 2, percentage: 13.3 },
+      { reason: "Dissatisfied with direct supervisor", count: 1, percentage: 6.7 },
       { reason: "Pursue other career or education", count: 1, percentage: 6.7 },
       { reason: "Job was not as expected", count: 1, percentage: 6.7 },
       { reason: "Lack of career advancement opportunities", count: 1, percentage: 6.7 },
@@ -1788,22 +1789,21 @@ export const EXIT_SURVEY_DATA = {
       { reason: "Unsatisfactory salary/pay", count: 1, percentage: 6.7 },
       { reason: "Dissatisfied with University leadership", count: 1, percentage: 6.7 },
       { reason: "Relocation", count: 1, percentage: 6.7 },
-      { reason: "Unrealistic job expectations/workload/hours", count: 1, percentage: 6.7 },
       { reason: "Retirement", count: 1, percentage: 6.7 },
       { reason: "Remote/Hybrid option not available for position", count: 1, percentage: 6.7 }
     ],
     contributingReasons: [
       { reason: "Unsatisfactory salary/pay", count: 6, percentage: 40 },
       { reason: "Unrealistic job expectations/workload/hours", count: 5, percentage: 33.3 },
-      { reason: "Dissatisfied with direct supervisor", count: 5, percentage: 33.3 },
       { reason: "Lack of work-life balance", count: 4, percentage: 26.7 },
+      { reason: "Dissatisfied with direct supervisor", count: 4, percentage: 26.7 },
+      { reason: "Lack of career advancement opportunities", count: 4, percentage: 26.7 },
+      { reason: "Job was not as expected", count: 4, percentage: 26.7 },
       { reason: "University culture", count: 4, percentage: 26.7 },
-      { reason: "Lack of flexibility", count: 4, percentage: 26.7 },
-      { reason: "Lack of career advancement opportunities", count: 3, percentage: 20 },
-      { reason: "Job was not as expected", count: 3, percentage: 20 },
-      { reason: "Dissatisfied with University leadership", count: 3, percentage: 20 },
-      { reason: "Remote/Hybrid option not available for position", count: 3, percentage: 20 },
-      { reason: "Pursue other career or education", count: 2, percentage: 13.3 },
+      { reason: "Pursue other career or education", count: 3, percentage: 20 },
+      { reason: "Lack of flexibility", count: 3, percentage: 20 },
+      { reason: "Dissatisfied with University leadership", count: 2, percentage: 13.3 },
+      { reason: "Remote/Hybrid option not available for position", count: 2, percentage: 13.3 },
       { reason: "Commute/Lack of transportation", count: 1, percentage: 6.7 },
       { reason: "Leaving the workforce", count: 1, percentage: 6.7 },
       { reason: "Other", count: 1, percentage: 6.7 }
@@ -1827,6 +1827,9 @@ export const EXIT_SURVEY_DATA = {
       workLifeBalance: 3,
       compensation: 3.2,
       benefits: 3.8
+    },
+    additionalMetrics: {
+      hadToolsResources: 53
     },
     keyInsights: {
       areasOfConcern: [
@@ -1933,7 +1936,7 @@ export const EXIT_SURVEY_DATA = {
       { reason: "Family/Personal reasons", count: 1, percentage: 10 },
       { reason: "Retirement", count: 1, percentage: 10 },
       { reason: "Dissatisfied with direct supervisor", count: 1, percentage: 10 },
-      { reason: "Job was not as expected", count: 1, percentage: 10 },
+      { reason: "Unrealistic job expectations/workload/hours", count: 1, percentage: 10 },
       { reason: "Unsatisfactory salary/pay", count: 1, percentage: 10 },
       { reason: "Other", count: 1, percentage: 10 }
     ],
@@ -1942,8 +1945,8 @@ export const EXIT_SURVEY_DATA = {
       { reason: "Unsatisfactory salary/pay", count: 3, percentage: 30 },
       { reason: "Relocation", count: 2, percentage: 20 },
       { reason: "Lack of flexibility", count: 2, percentage: 20 },
+      { reason: "Unrealistic job expectations/workload/hours", count: 1, percentage: 10 },
       { reason: "Lack of career advancement opportunities", count: 1, percentage: 10 },
-      { reason: "University culture", count: 1, percentage: 10 },
       { reason: "Dissatisfied with direct supervisor", count: 1, percentage: 10 },
       { reason: "Remote/Hybrid option not available for position", count: 1, percentage: 10 }
     ],
@@ -2060,7 +2063,7 @@ export const EXIT_SURVEY_DATA = {
           subtitle: "Early Exits",
           color: "#3B82F6",
           items: [
-            "60% of leavers had 1-3 year tenure",
+            "60% of those leaving had 1-3 year tenure",
             "Only 10% had 5+ years of service",
             "Onboarding-to-engagement gap evident"
           ]
@@ -2068,12 +2071,10 @@ export const EXIT_SURVEY_DATA = {
       ],
 
       recommendedActions: [
-        { action: "Targeted retention bonuses for 1-3 year employees in critical roles", urgency: "NOW", urgencyColor: "#EF4444" },
-        { action: "Compensation market study for staff positions below median", urgency: "NOW", urgencyColor: "#EF4444" },
-        { action: "Enhanced onboarding program with 90-day check-ins", urgency: "Q3", urgencyColor: "#F59E0B" },
-        { action: "Expand flexible work arrangements university-wide", urgency: "Q3", urgencyColor: "#F59E0B" },
+        { action: "Implement frequent 1:1 connection meetings as part of onboarding", urgency: "Q3", urgencyColor: "#F59E0B" },
+        { action: "Consider expanding flexible work arrangements, when possible", urgency: "Q3", urgencyColor: "#F59E0B" },
         { action: "Develop career pathing framework for staff roles", urgency: "Q4", urgencyColor: "#3B82F6" },
-        { action: "Launch stay interviews for high-performers at 18-month mark", urgency: "Q4", urgencyColor: "#3B82F6" }
+        { action: "Consider individualized development programs or other opportunities to fit the needs of the individual", urgency: "Q4", urgencyColor: "#3B82F6" }
       ],
 
       yoyTrend: {
@@ -2116,28 +2117,32 @@ export const H1_FY26_EXIT_SURVEY_SUMMARY = {
 
   departureReasons: [
     { reason: "Other", count: 4, percentage: 16 },
-    { reason: "Dissatisfied with direct supervisor", count: 3, percentage: 12 },
+    { reason: "Unrealistic job expectations/workload/hours", count: 3, percentage: 12 },
     { reason: "Pursue other career or education", count: 3, percentage: 12 },
     { reason: "Relocation", count: 3, percentage: 12 },
+    { reason: "Dissatisfied with direct supervisor", count: 2, percentage: 8 },
     { reason: "Family/Personal reasons", count: 2, percentage: 8 },
     { reason: "Retirement", count: 2, percentage: 8 },
-    { reason: "Job was not as expected", count: 2, percentage: 8 },
-    { reason: "Unsatisfactory salary/pay", count: 2, percentage: 8 }
+    { reason: "Unsatisfactory salary/pay", count: 2, percentage: 8 },
+    { reason: "Job was not as expected", count: 1, percentage: 4 },
+    { reason: "Remote/Hybrid option not available for position", count: 1, percentage: 4 },
+    { reason: "Dissatisfied with University leadership", count: 1, percentage: 4 },
+    { reason: "Lack of career advancement opportunities", count: 1, percentage: 4 }
   ],
 
   contributingReasons: [
     { reason: "Unsatisfactory salary/pay", count: 9, percentage: 36 },
     { reason: "Lack of work-life balance", count: 7, percentage: 28 },
-    { reason: "Dissatisfied with direct supervisor", count: 6, percentage: 24 },
-    { reason: "Lack of flexibility", count: 6, percentage: 24 },
-    { reason: "Unrealistic job expectations/workload/hours", count: 5, percentage: 20 },
-    { reason: "University culture", count: 5, percentage: 20 },
-    { reason: "Lack of career advancement opportunities", count: 4, percentage: 16 },
-    { reason: "Remote/Hybrid option not available", count: 4, percentage: 16 },
-    { reason: "Job was not as expected", count: 3, percentage: 12 },
-    { reason: "Dissatisfied with University leadership", count: 3, percentage: 12 },
-    { reason: "Relocation", count: 2, percentage: 8 },
-    { reason: "Pursue other career or education", count: 2, percentage: 8 }
+    { reason: "Unrealistic job expectations/workload/hours", count: 6, percentage: 24 },
+    { reason: "Dissatisfied with direct supervisor", count: 5, percentage: 20 },
+    { reason: "Lack of flexibility", count: 5, percentage: 20 },
+    { reason: "Lack of career advancement opportunities", count: 5, percentage: 20 },
+    { reason: "Job was not as expected", count: 4, percentage: 16 },
+    { reason: "University culture", count: 4, percentage: 16 },
+    { reason: "Pursue other career or education", count: 3, percentage: 12 },
+    { reason: "Remote/Hybrid option not available", count: 3, percentage: 12 },
+    { reason: "Dissatisfied with University leadership", count: 2, percentage: 8 },
+    { reason: "Relocation", count: 2, percentage: 8 }
   ],
 
   satisfactionRatings: [
@@ -2175,7 +2180,7 @@ export const H1_FY26_EXIT_SURVEY_SUMMARY = {
       subtitle: "Early Exits",
       color: "#3B82F6",
       items: [
-        "60% of Q2 leavers had 1-3 year tenure",
+        "60% of those leaving in Q2 had 1-3 year tenure",
         "Flexibility cited by 24% as contributing factor",
         "Remote/hybrid options cited by 16%"
       ]
@@ -2185,10 +2190,9 @@ export const H1_FY26_EXIT_SURVEY_SUMMARY = {
   recommendedActions: [
     { action: "Compensation market analysis for high-turnover roles", urgency: "NOW", urgencyColor: "#EF4444" },
     { action: "Continue and expand supervisor development program", urgency: "NOW", urgencyColor: "#EF4444" },
-    { action: "Expand flexible work arrangements university-wide", urgency: "Q3", urgencyColor: "#F59E0B" },
-    { action: "Targeted retention bonuses for 1-3 year employees", urgency: "Q3", urgencyColor: "#F59E0B" },
+    { action: "Consider expanding flexible work arrangements, when possible", urgency: "Q3", urgencyColor: "#F59E0B" },
     { action: "Develop career pathing framework for staff roles", urgency: "Q4", urgencyColor: "#3B82F6" },
-    { action: "Launch stay interviews for high-performers at 18-month mark", urgency: "Q4", urgencyColor: "#3B82F6" }
+    { action: "Consider individualized development programs or other opportunities to fit the needs of the individual", urgency: "Q4", urgencyColor: "#3B82F6" }
   ],
 
   yoyTrend: {
@@ -2349,6 +2353,31 @@ export const ANNUAL_TURNOVER_RATES_BY_CATEGORY = {
     staffNonExempt: 15.3,
     total: 11.2
   },
+  // Quarterly annualized rates for FY25 quarters (used in Q1 FY26 quarterly table)
+  q2fy25: {
+    label: "Q2 FY25",
+    period: "Oct-Dec 2024",
+    faculty: 2.3,
+    staffExempt: 10.3,
+    staffNonExempt: 8.8,
+    total: 7.1
+  },
+  q3fy25: {
+    label: "Q3 FY25",
+    period: "Jan-Mar 2025",
+    faculty: 4.7,
+    staffExempt: 13.2,
+    staffNonExempt: 11.1,
+    total: 9.6
+  },
+  q4fy25: {
+    label: "Q4 FY25",
+    period: "Apr-Jun 2025",
+    faculty: 5.8,
+    staffExempt: 12.4,
+    staffNonExempt: 10.6,
+    total: 9.5
+  },
   q1fy26: {
     label: "Q1 FY26",
     period: "Jul-Sep 2025",
@@ -2406,10 +2435,11 @@ export const QUARTERLY_TURNOVER_RATES_BY_CATEGORY = [
   {
     quarter: "Q2 FY26",
     period: "Oct-Dec 2025",
-    faculty: { rate: 2.6 },
-    staffExempt: { rate: 8.0 },
-    staffNonExempt: { rate: 17.9 },
-    total: { rate: 8.7 }
+    faculty: { terminations: 5, rate: 2.6 },
+    staffExempt: { terminations: 11, rate: 8.0 },
+    staffNonExempt: { terminations: 18, rate: 17.9 },
+    staff: { terminations: 29 },
+    total: { terminations: 34, rate: 8.7 }
   }
 ];
 

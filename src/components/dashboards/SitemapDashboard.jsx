@@ -18,7 +18,6 @@ import {
   Shield,
   Database,
   Settings,
-  Archive,
   Map
 } from 'lucide-react';
 
@@ -54,7 +53,8 @@ const SitemapDashboard = () => {
     { path: '/dashboards/exit-survey-q1', label: 'Q1 FY26 Exit Survey', icon: FileText },
     { path: '/dashboards/exit-survey-q2', label: 'Q2 Exit Survey', icon: FileText, hidden: true },
     { path: '/dashboards/exit-survey-q3', label: 'Q3 Exit Survey', icon: FileText, hidden: true },
-    { path: '/dashboards/exit-survey-q4', label: 'Q4 Exit Survey', icon: FileText, hidden: true }
+    { path: '/dashboards/exit-survey-q4', label: 'Q4 Exit Survey', icon: FileText, hidden: true },
+    { path: '/dashboards/raw-exit-surveys', label: 'Raw Exit Survey Data', icon: Database }
   ];
 
   // Quarterly Reports - Turnover
@@ -98,17 +98,6 @@ const SitemapDashboard = () => {
     { path: '/dashboards/workforce-test', label: 'Workforce Test', icon: Settings, dev: true },
     { path: '/dashboards/turnover-test', label: 'Turnover Test', icon: Settings, dev: true },
     { path: '/dashboards/recruiting-test', label: 'Recruiting Test', icon: Settings, dev: true }
-  ];
-
-  // Archived / Legacy
-  const archivedPages = [
-    { path: '/archive/exit-survey-old', label: 'Exit Survey Dashboard (Old)', icon: Archive },
-    { path: '/archive/exit-survey-previous', label: 'Exit Survey Dashboard (Previous)', icon: Archive },
-    { path: '/archive/exit-survey-q1-old', label: 'Exit Survey Q1 (Old Version)', icon: Archive },
-    { path: '/archive/exit-survey-q4-old', label: 'Exit Survey Q4 (Old Version)', icon: Archive },
-    { path: '/archive/data-import', label: 'Data Import Dashboard', icon: Archive },
-    { path: '/archive/data-health', label: 'Data Health Dashboard', icon: Archive },
-    { path: '/archive/executive-old', label: 'Executive Dashboard (Old)', icon: Archive }
   ];
 
   // Render a single link item
@@ -157,7 +146,7 @@ const SitemapDashboard = () => {
           <h1 className="text-2xl md:text-3xl font-bold text-gray-900">HR Reports Sitemap</h1>
         </div>
         <p className="text-gray-600">
-          Complete page directory. All {mainDashboards.length + annualReports.length + quarterlyExitSurveys.length + quarterlyTurnover.length + quarterlyWorkforce.length + quarterlyRecruiting.length + quarterlyPromotions.length + adminTools.length + devTesting.length + archivedPages.length} pages are listed below.
+          Complete page directory. All {mainDashboards.length + annualReports.length + quarterlyExitSurveys.length + quarterlyTurnover.length + quarterlyWorkforce.length + quarterlyRecruiting.length + quarterlyPromotions.length + adminTools.length + devTesting.length} pages are listed below.
         </p>
       </div>
 
@@ -190,26 +179,6 @@ const SitemapDashboard = () => {
 
           {/* Development / Testing */}
           {renderCategory('Development / Testing', devTesting)}
-        </div>
-
-        {/* Archived Section - Full Width */}
-        <div className="mt-6">
-          <div className="bg-amber-50 rounded-xl shadow-sm border border-amber-200 overflow-hidden">
-            <div className="px-4 py-3 bg-amber-100 border-b border-amber-200">
-              <h2 className="text-sm font-semibold text-amber-800 uppercase tracking-wide">
-                Archived / Legacy (Reference Only)
-              </h2>
-            </div>
-            <div className="p-4">
-              <p className="text-sm text-amber-700 mb-4">
-                These pages are kept for historical reference but are not actively maintained.
-                They may contain outdated data or deprecated features.
-              </p>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
-                {archivedPages.map(renderLink)}
-              </div>
-            </div>
-          </div>
         </div>
 
         {/* Legend */}
